@@ -3,81 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V38</title>
+    <title>Roulette Tracker V50</title>
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #00ff88;
-            --red: #d32f2f; --black: #000; --green: #2e7d32;
+            --red: #ff4444; --black: #000; --green: #2e7d32;
             --wait: #ffcc00; --text: #e0e0e0;
-            --avoid-glow: #ff0000; --bet-glow: rgba(0, 255, 136, 0.6);
         }
         * { box-sizing: border-box; touch-action: manipulation; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         
-        #config-page { padding: 20px; max-width: 500px; margin: 0 auto; display: block; }
+        /* CONFIG */
+        #config-page { padding: 20px; max-width: 500px; margin: 0 auto; }
         .config-grid { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .full { grid-column: span 2; }
-        label { font-size: 0.8em; color: #888; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
+        label { font-size: 0.7em; color: #888; font-weight: bold; display: block; margin-bottom: 5px; text-transform: uppercase; }
         select, input { width: 100%; padding: 12px; background: #000; border: 1px solid #555; color: #fff; border-radius: 6px; font-size: 1em; }
         .btn-start { width: 100%; padding: 20px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .compact-toggles { display: flex; gap: 10px; grid-column: span 2; }
+        .toggle-box { flex: 1; display: flex; align-items: center; justify-content: space-between; background: #111; padding: 10px; border-radius: 6px; border: 1px solid #333; font-size: 0.75em; font-weight: bold; }
 
+        /* TRACKER UI */
         #tracker-page { display: none; }
         .frozen-top { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px; border-bottom: 3px solid #444; }
-        .status-box { padding: 10px; border-radius: 8px; text-align: center; min-height: 110px; display: flex; flex-direction: column; justify-content: center; font-weight: bold; }
-        .status-wait { background: #333; color: var(--wait); }
-        .status-ready { background: #1b5e20; color: #fff; border: 1px solid var(--accent); }
-        .signal-box { display: none; margin-top: 8px; padding: 10px; border-radius: 4px; border: 2px solid #fff; font-size: 1.3em; text-transform: uppercase; }
+        .status-box { padding: 12px; border-radius: 8px; text-align: center; min-height: 160px; display: flex; flex-direction: column; justify-content: center; font-weight: bold; }
+        .status-wait { background: #222; color: var(--wait); border: 2px solid #444; }
+        .status-ready { background: #000; color: #fff; border: 2px solid var(--accent); }
+        .signal-box { display: none; margin-top: 10px; }
         .status-ready .signal-box { display: block; }
+        .cmd-card { display: flex; flex-direction: column; border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .cmd-head { font-size: 0.7em; padding: 4px; text-transform: uppercase; }
+        .cmd-body { font-size: 1.2em; padding: 8px; font-weight: 900; }
+        .avoid { background: #400; color: #ff8888; }
+        .place { background: #052; color: #88ff88; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
-        .stat-card small { font-size: 0.55em; color: #888; display: block; }
-        .val { font-weight: bold; color: var(--accent); font-size: 1.1em; }
+        .val { font-weight: bold; color: var(--accent); font-size: 1em; }
 
         .history-feed { display: flex; gap: 8px; justify-content: center; margin-bottom: 5px; min-height: 35px; }
         .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.9em; border: 2px solid rgba(255,255,255,0.2); color: #fff; }
 
+        /* NUMPAD - COLOR FIX */
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; }
-        .num-btn { padding: 20px 0; border: 1px solid #444; border-radius: 6px; color: #fff; font-weight: bold; font-size: 1.4em; cursor: pointer; }
-        .btn-red { background: var(--red); }
-        .btn-black { background: var(--black); }
-        .btn-green { background: #2e7d32; }
-        .full-row { grid-column: span 3; }
-
-        @keyframes pulse-r { 0%, 100% { box-shadow: 0 0 5px #f00; } 50% { box-shadow: 0 0 30px #f00; border-color: #fff; } }
-        @keyframes pulse-g { 0%, 100% { box-shadow: 0 0 5px var(--accent); } 50% { box-shadow: 0 0 20px var(--accent); border-color: #fff; } }
-        .glow-red { animation: pulse-r 1s infinite; border: 3px solid #fff !important; }
-        .glow-green { animation: pulse-g 1.5s infinite; border: 3px solid #fff !important; }
+        .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+        .num-btn { padding: 18px 0; border: 1px solid #444; border-radius: 6px; color: #ffffff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .btn-green { background: var(--green) !important; }
+        .btn-red { background: var(--red) !important; }
+        .btn-black { background: var(--black) !important; }
         
-        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 20px; background: var(--card); border-radius: 8px; }
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 20px; background: var(--card); border-radius: 8px; }
         .audit-table td { padding: 12px 5px; border-bottom: 1px solid #333; text-align: center; }
+        .audit-table tr.pinned { background: rgba(0, 255, 136, 0.1); border-left: 4px solid var(--accent); }
         .heat-bg { background: #000; width: 85%; height: 8px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
         .heat-fill { height: 100%; transition: width 0.4s; }
-        .debug-val { display: block; font-size: 0.65em; color: #777; font-family: monospace; margin-top: 2px; }
+        @keyframes pulse-r { 0%, 100% { box-shadow: 0 0 5px #f00; } 50% { box-shadow: 0 0 30px #f00; border-color: #fff; } }
+        .glow-red { animation: pulse-r 1s infinite; border: 3px solid #fff !important; z-index: 10; }
     </style>
 </head>
 <body>
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">System Setup</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Engine V50</h2>
         <div class="full">
-            <label>Domain</label>
-            <select id="dom-sel"><option value="9ST">9 Streets</option><option value="DZC">Dozens & Columns</option></select>
+            <label>Wheel Type</label>
+            <select id="wheel-type" onchange="syncWarmup()">
+                <option value="EU">European</option>
+                <option value="US" selected>American</option>
+                <option value="TZ">Triple Zero</option>
+            </select>
         </div>
-        <div class="full"><label>Strategy</label><select id="strat-sel"></select></div>
-        <div class="full"><label>Unit Value (USD)</label><input type="number" id="unit-cash" value="1" step="0.5"></div>
+        <div class="compact-toggles">
+            <div class="toggle-box">HEDGE <input type="checkbox" id="basket-toggle" onchange="handleHedgeToggle(this.checked)"></div>
+            <div class="toggle-box">PUSH <input type="checkbox" id="push-toggle"></div>
+        </div>
+        <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
+        <div><label>Warmup</label><input type="number" id="warm-in" value="13"></div>
         <div class="full">
-            <label>Progression</label>
-            <select id="prog-sel"><option value="MART">Martingale</option><option value="NONE">Flat</option></select>
+            <label>Lookback Window</label>
+            <select id="mult-in" onchange="syncWarmup()">
+                <option value="1" selected>Short</option>
+                <option value="2">Standard</option>
+                <option value="3">Long</option>
+            </select>
         </div>
-        <div class="full">
-            <label>Lookback (Window)</label>
-            <select id="mult-in"><option value="1">Short</option><option value="2" selected>Standard</option><option value="3">Long</option></select>
-        </div>
-        <div><label>Warmup</label><input type="number" id="warm-in" value="25"></div>
-        <div><label>Stabilize</label><input type="number" id="stab-in" value="2"></div>
-        <div class="full"><label>Cooldown Rolls</label><input type="number" id="cool-in" value="3"></div>
+        <div><label>Cooldown Loss Streak</label><input type="number" id="cd-trigger" value="2"></div>
+        <div><label>Cooldown Wait</label><input type="number" id="cool-in" value="5"></div>
+        <div class="full"><label>Stabilize (Rolls)</label><input type="number" id="stab-in" value="1"></div>
     </div>
     <button class="btn-start" id="final-start">START SESSION</button>
 </div>
@@ -92,153 +105,183 @@
             <div class="stat-card"><small>PROFIT</small><span id="stat-p" class="val">$0</span></div>
             <div class="stat-card"><small>HIGH</small><span id="stat-h" class="val">$0</span></div>
             <div class="stat-card"><small>UNIT</small><span id="stat-u" class="val">1</span></div>
-            <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
+            <div class="stat-card"><small>L-LVL</small><span id="stat-loss-lvl" class="val">0</span></div>
         </div>
         <div id="feed" class="history-feed"></div>
     </div>
-
     <div style="padding:15px;">
         <div id="pad" class="num-pad"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-            <button id="final-undo" style="background:#444; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">UNDO LAST</button>
-            <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">RESET</button>
+            <button id="final-undo" style="background:#444; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">UNDO</button>
+            <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr style="color:#666; font-size:0.7em;"><th>POCKET</th><th>RANK</th><th>D</th><th>F</th><th>SCORE</th></tr></thead>
+            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>RANK</th><th>D</th><th>F</th><th>SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
 </div>
 
 <script>
+function syncWarmup() {
+    const mult = parseInt(document.getElementById('mult-in').value);
+    document.getElementById('warm-in').value = (12 * mult) + 1;
+}
+function handleHedgeToggle(checked) {
+    document.getElementById('push-toggle').checked = checked;
+}
+
 (function() {
     const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let state = { history: [], stack: [], pockets: [], zeros: null, profit: 0, high: 0, unit: 1, stab: 0, lastSig: "", cooldown: 0, consecutiveWins: 0 };
+    let state = { history: [], stack: [], pockets: [], zeros: [], profit: 0, high: 0, unit: 1, stabCount: 0, lastSigIds: "", cooldownLeft: 0, lossLevel: 0, consecutiveWins: 0 };
     let conf = {};
 
-    const dSel = document.getElementById('dom-sel');
-    const sSel = document.getElementById('strat-sel');
-    const pSel = document.getElementById('prog-sel');
-    const mSel = document.getElementById('mult-in');
-    const wIn = document.getElementById('warm-in');
-    const startBtn = document.getElementById('final-start');
-    const undoBtn = document.getElementById('final-undo');
-
-    function sync() {
-        const val = dSel.value;
-        const mult = parseInt(mSel.value);
-        const O_val = val === '9ST' ? 12 : 3;
-        const h_calc = (O_val * mult) + 1;
-        
-        sSel.innerHTML = "";
-        const opt = document.createElement('option');
-        
-        if (val === '9ST') { 
-            opt.value = "HOT"; opt.text = "Hot Avoid Mode"; 
-            pSel.value = "MART"; 
-        } else { 
-            opt.value = "COLD"; opt.text = "Cold Bet Mode"; 
-            pSel.value = "NONE"; 
+    document.getElementById('final-start').onclick = function() {
+        const wType = document.getElementById('wheel-type').value;
+        conf = {
+            wheel: wType, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
+            basketOn: document.getElementById('basket-toggle').checked, pushOn: document.getElementById('push-toggle').checked,
+            mult: parseInt(document.getElementById('mult-in').value), cdTrigger: parseInt(document.getElementById('cd-trigger').value),
+            cool: parseInt(document.getElementById('cool-in').value), stabLimit: parseInt(document.getElementById('stab-in').value),
+            warm: parseInt(document.getElementById('warm-in').value)
+        };
+        state.zeros = wType === 'EU' ? [0] : (wType === 'US' ? [0, 37] : [0, 37, 38]);
+        state.pockets = [];
+        for(let i=0; i<12; i++) {
+            let label = 'ST '+(i*3+1); let nums = [(i*3)+1, (i*3)+2, (i*3)+3];
+            if (i === 0 && conf.basketOn) { label = 'BASKET'; nums = [...nums, ...state.zeros]; }
+            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, rf:0, nd:0, isBasket: (i===0 && conf.basketOn), isZeroSet: false});
         }
-        sSel.appendChild(opt);
-        wIn.value = h_calc; // Sync Warmup Default to Calculated Window
-    }
-
-    dSel.onchange = sync;
-    mSel.onchange = sync;
-    sync();
-
-    startBtn.onclick = function() {
-        conf = { dom: dSel.value, strat: sSel.value, prog: pSel.value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1, warm: parseInt(wIn.value), mult: parseInt(mSel.value), stab: parseInt(document.getElementById('stab-in').value), cool: parseInt(document.getElementById('cool-in').value) };
-        conf.O = conf.dom === '9ST' ? 12 : 3; conf.h = (conf.O * conf.mult) + 1; conf.E = conf.h / conf.O;
-
-        if(conf.dom === '9ST') {
-            state.pockets = Array.from({length:12}, (_,i)=>({id: (i*3)+1, label: 'ST '+(i*3+1), nums:[i*3+1, i*3+2, i*3+3], hs:0, hits:0, d:0, rf:0, nd:0}));
-        } else {
-            state.pockets = [
-                {id:'D1', type:'D', label:'1st 12', nums:[1,2,3,4,5,6,7,8,9,10,11,12], hs:0, hits:0, d:0, rf:0, nd:0},
-                {id:'D2', type:'D', label:'2nd 12', nums:[13,14,15,16,17,18,19,20,21,22,23,24], hs:0, hits:0, d:0, rf:0, nd:0},
-                {id:'D3', type:'D', label:'3rd 12', nums:[25,26,27,28,29,30,31,32,33,34,35,36], hs:0, hits:0, d:0, rf:0, nd:0},
-                {id:'C1', type:'C', label:'Col 1', nums:[1,4,7,10,13,16,19,22,25,28,31,34], hs:0, hits:0, d:0, rf:0, nd:0},
-                {id:'C2', type:'C', label:'Col 2', nums:[2,5,8,11,14,17,20,23,26,29,32,35], hs:0, hits:0, d:0, rf:0, nd:0},
-                {id:'C3', type:'C', label:'Col 3', nums:[3,6,9,12,15,18,21,24,27,30,33,36], hs:0, hits:0, d:0, rf:0, nd:0}
-            ];
+        if (!conf.basketOn) {
+            state.pockets.push({id: 'z_set', label: 'ZEROS', nums: state.zeros, hs:0, hits:0, d:0, rf:0, nd:0, isBasket:false, isZeroSet: true});
         }
-        state.zeros = {id:'Z', label:'ZEROS', nums:[0], hs:0, hits:0, d:0, rf:0, nd:0};
         document.getElementById('config-page').style.display='none'; document.getElementById('tracker-page').style.display='block';
+        buildFeltPad(wType); refresh();
+    };
+
+    function buildFeltPad(w) {
         const pad = document.getElementById('pad'); pad.innerHTML = '';
-        const b0 = document.createElement('button'); b0.className='num-btn btn-green full-row'; b0.innerText='0'; b0.onclick = () => addRoll(0); pad.appendChild(b0);
+        const container = document.createElement('div'); container.className = 'zero-container';
+        const makeBtn = (val, txt) => {
+            const b = document.createElement('button'); b.id='nb-'+val; b.className='num-btn btn-green'; b.innerText=txt; b.onclick = () => addRoll(val); return b;
+        };
+        if (w === 'EU') {
+            const r = document.createElement('div'); r.style.display="grid"; r.appendChild(makeBtn(0, '0')); container.appendChild(r);
+        } else if (w === 'US') {
+            const r = document.createElement('div'); r.style.display="grid"; r.style.gridTemplateColumns="1fr 1fr"; r.style.gap="8px";
+            r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
+        } else {
+            const r1 = document.createElement('div'); r1.style.display="grid"; r1.appendChild(makeBtn(38, '000'));
+            const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px"; r2.style.marginTop="8px";
+            r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00'));
+            container.appendChild(r1); container.appendChild(r2);
+        }
+        pad.appendChild(container);
         for(let i=1;i<=36;i++) {
             const b = document.createElement('button'); b.id='nb-'+i; b.className='num-btn '+(reds.includes(i)?'btn-red':'btn-black');
             b.innerText=i; b.onclick = () => addRoll(i); pad.appendChild(b);
         }
-        refresh();
-    };
+    }
 
     function addRoll(n) {
-        state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, cooldown:state.cooldown, stab:state.stab, lastSig:state.lastSig, consecutiveWins:state.consecutiveWins}));
+        state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, cooldownLeft:state.cooldownLeft, stabCount:state.stabCount, lastSigIds:state.lastSigIds, lossLevel:state.lossLevel, consecutiveWins:state.consecutiveWins}));
         if(document.getElementById('status-txt').innerText === "READY") {
-            const ranked = [...state.pockets].sort((a,b)=>b.hs-a.hs); const b3 = ranked.slice(-3); let won = false;
-            if(conf.dom === '9ST') {
-                const avoid = b3.map(x=>x.id); const winST = n === 0 ? -1 : Math.ceil(n/3)*3-2;
-                if(!avoid.includes(winST) && winST !== -1) won = true;
-            } else {
-                const c = { D:0, C:0 }; b3.forEach(x=>c[x.type]++); const t = c.D >= 2 ? 'D' : 'C';
-                const targets = state.pockets.filter(x=>x.type===t).sort((a,b)=>a.hs-b.hs).slice(0,2);
-                if(targets.some(x=>x.nums.includes(n))) won = true;
-            }
+            const ranked = [...state.pockets].filter(p=>!p.isZeroSet).sort((a,b)=>b.hs-a.hs); 
+            const avoidIds = ranked.slice(-3).map(x=>x.id); const basketInBottom = ranked.slice(-3).some(x => x.isBasket);
+            let winIsZero = state.zeros.includes(n); const winIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
+            let won = !avoidIds.includes(winIdx);
+            if (!conf.basketOn && winIsZero) won = false;
+
             if(won) {
-                state.profit += (state.unit * conf.unitVal * (conf.dom==='9ST'?3:1));
-                state.consecutiveWins++;
-                if (state.profit > state.high) state.unit = 1;
-                else if (state.consecutiveWins >= 2) state.unit = Math.max(1, Math.floor(state.unit / 2));
+                if (winIsZero && conf.basketOn && !basketInBottom) {
+                    let pLoss = { 'EU': 0, 'US': -2, 'TZ': -4 };
+                    state.profit += (conf.pushOn ? (state.unit * conf.unitVal * pLoss[conf.wheel]) : (state.unit * conf.unitVal * 1));
+                    state.consecutiveWins = 0; 
+                } else { state.profit += (state.unit * conf.unitVal * 3); state.consecutiveWins++; }
+                if (state.profit >= state.high) { state.unit = 1; state.lossLevel = 0; }
+                else if (state.consecutiveWins >= 2) { state.unit = Math.max(1, Math.floor(state.unit / 2)); }
             } else {
-                state.profit -= (state.unit * conf.unitVal * (conf.dom==='9ST'?9:2));
-                state.consecutiveWins = 0;
-                if(conf.prog === 'MART') state.unit *= 2;
-                state.cooldown = conf.cool;
+                if (winIsZero && !basketInBottom && conf.basketOn) { state.consecutiveWins = 0; }
+                else {
+                    let lossAmt = (basketInBottom || conf.pushOn || !conf.basketOn) ? 9 : 19;
+                    state.profit -= (state.unit * conf.unitVal * lossAmt);
+                    state.lossLevel++; state.consecutiveWins = 0; state.unit *= 2;
+                    if (state.lossLevel >= conf.cdTrigger) state.cooldownLeft = conf.cool;
+                    state.stabCount = 0;
+                }
             }
             if(state.profit > state.high) state.high = state.profit;
-        } else if (state.cooldown > 0) { state.cooldown--; }
+        } else if (state.cooldownLeft > 0) { state.cooldownLeft--; }
         state.history.push(n); engine(); refresh();
     }
 
-    undoBtn.onclick = function() { if(!state.stack.length) return; const s = JSON.parse(state.stack.pop()); Object.assign(state, s); engine(); refresh(); };
+    document.getElementById('final-undo').onclick = function() { if(!state.stack.length) return; Object.assign(state, JSON.parse(state.stack.pop())); engine(); refresh(); };
 
     function engine() {
-        [...state.pockets, state.zeros].forEach(p => {
-            const curO = p.id==='Z'?37:conf.O; const curE = conf.h/curO;
+        state.pockets.forEach(p => {
+            const wheelSize = conf.wheel === 'EU' ? 37 : (conf.wheel === 'US' ? 38 : 39);
+            const prob = p.nums.length / wheelSize;
             let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d; p.nd = (curO-d)/(curO+d);
-            let aw=0, act=0; for(let i=state.history.length-1; i>=Math.max(0, state.history.length-conf.h); i--) { if(p.nums.includes(state.history[i])) { act++; aw += (1 - (0.9 * ((state.history.length-1-i)/conf.h))); } }
-            p.hits = act; const rf_raw = (aw-curE)/curE; p.rf = rf_raw/(1+Math.abs(rf_raw)); p.hs = (p.rf * 0.35) + (p.nd * 0.65);
+            p.d = d; p.nd = ((1/prob)-d)/((1/prob)+d);
+            let aw=0, act=0; let windowSize = (12 * conf.mult) + 1;
+            for(let i=state.history.length-1; i>=Math.max(0, state.history.length-windowSize); i--) {
+                if(p.nums.includes(state.history[i])) { act++; aw += (1 - (0.9 * ((state.history.length-1-i)/windowSize))); }
+            }
+            p.hits = act; const exp = windowSize * prob;
+            const rf_raw = (aw - exp) / exp;
+            p.rf = rf_raw/(1+Math.abs(rf_raw)); p.hs = (p.rf * 0.35) + (p.nd * 0.65);
         });
     }
 
     function refresh() {
-        const ranked = [...state.pockets].sort((a,b)=>b.hs-a.hs); const b3 = ranked.slice(-3); let sig = { txt: "", ids: [], type: '' };
-        if(conf.dom === '9ST') { sig = { txt: "AVOID ST: "+b3.map(p=>p.id).sort((a,b)=>a-b).join(', '), ids: b3.map(p=>p.id), type: 'A' }; } 
-        else { const c = { D:0, C:0 }; b3.forEach(x=>c[x.type]++); const t = c.D >= 2 ? 'D' : 'C'; const targets = state.pockets.filter(x=>x.type===t).sort((a,b)=>a.hs-b.hs).slice(0,2); sig = { txt: "BET "+(t==='D'?'DOZENS':'COLS')+": "+targets.map(x=>x.label).join(' & '), ids: targets.map(x=>x.id), type: 'B' }; }
-        if(sig.txt === state.lastSig) state.stab++; else { state.stab=1; state.lastSig=sig.txt; }
+        const streetsOnly = state.pockets.filter(p=>!p.isZeroSet);
+        const ranked = [...streetsOnly].sort((a,b)=>b.hs-a.hs); 
+        const b3 = ranked.slice(-3);
+        const currentSigKey = b3.map(x=>x.id).sort().join('|');
+        if (currentSigKey !== state.lastSigIds) { state.stabCount = 0; state.lastSigIds = currentSigKey; }
+        else { state.stabCount++; }
+
         let status = "READY", sCls = "status-ready";
         if(state.history.length < conf.warm) { status = "WARMUP ("+state.history.length+"/"+conf.warm+")"; sCls="status-wait"; }
-        else if(state.cooldown > 0) { status = "COOLDOWN ("+state.cooldown+")"; sCls="status-wait"; }
-        else if(state.stab < conf.stab) { status = "STABILIZING ("+state.stab+"/"+conf.stab+")"; sCls="status-wait"; }
+        else if(state.cooldownLeft > 0) { status = "COOLDOWN ("+state.cooldownLeft+")"; sCls="status-wait"; }
+        else if(state.stabCount < conf.stabLimit) { status = "STABILIZING ("+state.stabCount+"/"+conf.stabLimit+")"; sCls="status-wait"; }
+
         document.getElementById('status-txt').innerText = status; document.getElementById('status-box').className = "status-box "+sCls;
-        const sb = document.getElementById('sig-box'); sb.innerText = sig.txt; sb.style.background = conf.dom==='9ST'?'#a00':'#1b5e20';
-        const formatCur = (val) => (val < 0 ? `-$${Math.abs(val).toFixed(2)}` : `$${val.toFixed(2)}`);
+        const sigArea = document.getElementById('sig-box');
+        if(status === "READY") {
+            const basketAvoided = b3.some(x=>x.isBasket);
+            const stUnit = (!conf.basketOn || conf.pushOn) ? state.unit : state.unit * 2;
+            const bUnit = conf.pushOn ? state.unit : state.unit * 3;
+            let placeText = `STREETS (${stUnit})`;
+            if (conf.basketOn && !basketAvoided) placeText += ` + B (${bUnit})`;
+            sigArea.innerHTML = `<div class="cmd-card avoid"><div class="cmd-head">AVOID</div><div class="cmd-body">${b3.map(p=>p.label).join(', ')}</div></div><div class="cmd-card place"><div class="cmd-head">PLACE</div><div class="cmd-body">${placeText}</div></div>`;
+        }
+        
+        const formatCur = (v) => (v < 0 ? `-$${Math.abs(v).toFixed(2)}` : `$${v.toFixed(2)}`);
         document.getElementById('stat-p').innerText = formatCur(state.profit); document.getElementById('stat-h').innerText = formatCur(state.high);
-        document.getElementById('stat-u').innerText = state.unit;
-        const betAmt = status === "READY" ? (conf.dom === '9ST' ? state.unit * 9 : state.unit * 2) * conf.unitVal : 0;
-        document.getElementById('stat-b').innerText = formatCur(betAmt);
-        const feed = document.getElementById('feed'); feed.innerHTML = ''; state.history.slice(-6).reverse().forEach(n => { const chip = document.createElement('div'); chip.className='chip'; chip.style.background = n===0?'#2e7d32':(reds.includes(n)?'#d32f2f':'#000'); chip.innerText = n; feed.appendChild(chip); });
-        for(let i=1; i<=36; i++) { const btn = document.getElementById('nb-'+i); if(!btn) continue; btn.classList.remove('glow-red','glow-green'); if(status === "READY") { const active = sig.ids.includes(conf.dom==='9ST'?Math.ceil(i/3)*3-2:state.pockets.find(p=>p.nums.includes(i)).id); if(active) btn.classList.add(sig.type === 'A'?'glow-red':'glow-green'); } }
-        const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        [state.zeros, ...ranked].forEach((p,i) => {
-            const tr = document.createElement('tr'); const w = Math.min(Math.max(((p.hs+1)/2.2)*100, 5), 100); const color = p.hs>0.05?'var(--accent)':(p.hs<-0.15?'var(--red)':'var(--wait)');
-            tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div><span class="debug-val">RF: ${p.rf.toFixed(2)} | ND: ${p.nd.toFixed(2)}</span></td><td>${i===0?'Z':i}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(2)}</td>`;
-            bdy.appendChild(tr);
+        document.getElementById('stat-u').innerText = state.unit; document.getElementById('stat-loss-lvl').innerText = state.lossLevel;
+        
+        const feed = document.getElementById('feed'); feed.innerHTML = ''; state.history.slice(-6).reverse().forEach(n => {
+            const chip = document.createElement('div'); chip.className='chip';
+            let val = n === 37 ? '00' : (n === 38 ? '000' : n);
+            chip.style.background = (n===0||n>36)?'#2e7d32':(reds.includes(n)?'#d32f2f':'#000');
+            chip.innerText = val; feed.appendChild(chip);
         });
+
+        document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('glow-red'));
+        if(status === "READY") { b3.forEach(p => p.nums.forEach(n => { const b = document.getElementById('nb-'+n); if(b) b.classList.add('glow-red'); })); }
+
+        const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
+        if (!conf.basketOn) { const zSet = state.pockets.find(p=>p.isZeroSet); renderAuditRow(zSet, bdy, true); }
+        ranked.forEach((p) => renderAuditRow(p, bdy, false));
+    }
+
+    function renderAuditRow(p, bdy, isPinned) {
+        const tr = document.createElement('tr'); if(isPinned) tr.className = 'pinned';
+        const w = Math.min(Math.max(((p.hs+1)/2.2)*100, 5), 100);
+        const color = p.hs>0.05?'var(--accent)':(p.hs<-0.15?'var(--red)':'var(--wait)');
+        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${isPinned ? '★' : ''}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(2)}</td>`;
+        bdy.appendChild(tr);
     }
 })();
 </script>
