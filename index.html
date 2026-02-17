@@ -5,61 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zombie Lord's Playhouse | Gate</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Creepster&display=swap');
-
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            background-color: #020617; 
-            font-family: 'Cinzel', serif;
-            overflow: hidden;
-        }
-
-        /* Forced Background Pathing */
+        body, html { margin: 0; padding: 0; height: 100%; background-color: #020617; font-family: 'Cinzel', serif; overflow: hidden; }
+        
+        /* The Background Fix - Using .jpg as per your uploaded file */
         .bg-overlay {
             position: fixed;
-            top: 0; left: 0; 
-            width: 100vw; height: 100vh;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.9) 100%), 
-                        url('background.png'); 
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: -1;
+                        url('background.jpg'); 
+            background-size: cover; background-position: center; background-repeat: no-repeat; z-index: -1;
         }
 
         .bleeding-header {
-            font-family: 'Creepster', system-ui;
-            font-size: clamp(3rem, 10vw, 5rem);
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            line-height: 1;
-            text-shadow: 
-                0 0 10px rgba(16, 185, 129, 0.8),
-                2px 2px 0px #800, 
-                4px 7px 5px rgba(128, 0, 0, 0.5);
+            font-family: 'Creepster', system-ui; font-size: clamp(3rem, 10vw, 5rem);
+            color: #ffffff; text-transform: uppercase; letter-spacing: 4px;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 2px 2px 0px #800, 4px 7px 5px rgba(128, 0, 0, 0.5);
         }
 
-        .emerald-glow-text {
-            color: #10b981;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
-            letter-spacing: 0.5em;
-            font-weight: 900;
-        }
-
-        .gate-card {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            box-shadow: 0 0 80px rgba(0,0,0,1);
-            width: 90%;
-            max-width: 650px;
-        }
+        .emerald-glow-text { color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.6); letter-spacing: 0.5em; font-weight: 900; }
+        .gate-card { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(16, 185, 129, 0.4); box-shadow: 0 0 80px rgba(0,0,0,1); width: 90%; max-width: 650px; }
     </style>
 
     <script>
@@ -71,46 +40,30 @@
             messagingSenderId: "795162260246",
             appId: "1:795162260246:web:97f0361751ac1359b31637"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-
         async function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            try {
-                await auth.signInWithPopup(provider);
-                window.location.href = "lobby.html";
-            } catch (error) {
-                alert("The Lord rejects your soul: " + error.message);
-            }
+            try { await auth.signInWithPopup(provider); window.location.href = "lobby.html"; } 
+            catch (error) { alert("The Lord rejects your soul: " + error.message); }
         }
     </script>
 </head>
 <body class="flex items-center justify-center">
-
     <div class="bg-overlay"></div>
-
     <div class="p-8 md:p-12 gate-card text-center rounded-sm border-t-4 border-emerald-500">
-        
         <h1 class="bleeding-header mb-2">Zombie Lord's</h1>
         <p class="emerald-glow-text text-xs md:text-sm uppercase mb-10 tracking-[0.6em]">Playhouse</p>
-
         <p class="text-slate-300 text-sm italic mb-12 max-w-md mx-auto leading-relaxed px-4">
             "Kneel before the <span class="text-emerald-400 font-bold">Zombie Lord</span> upon the Emerald Shard Throne, 
             amidst the ruins of lost innocence and <span class="text-emerald-500/80">broken dreams</span>, 
             only the wicked may enter!"
         </p>
-
         <button onclick="loginWithGoogle()" class="group relative mx-auto w-full max-w-xs bg-white text-slate-950 py-4 px-6 rounded-sm font-black flex items-center justify-center gap-4 transition-all hover:bg-emerald-500 hover:text-white active:scale-95 shadow-2xl border-b-4 border-slate-300">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
             <span class="uppercase text-xs tracking-widest font-bold">Enter at your own Risk</span>
         </button>
-
-        <div class="mt-12 opacity-50 flex flex-col items-center">
-            <div class="w-12 h-[1px] bg-emerald-900/50 mb-4"></div>
-            <p class="text-[8px] tracking-[0.6em] text-emerald-500 font-bold uppercase">M11 Secure Entry</p>
-        </div>
+        <div class="mt-12 opacity-50 flex flex-col items-center"><p class="text-[8px] tracking-[0.6em] text-emerald-500 font-bold uppercase">M11 Secure Entry</p></div>
     </div>
-
 </body>
 </html>
