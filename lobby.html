@@ -3,17 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZombieLords Playhouse | Lobby</title>
+    <title>Playhouse Lobby | Zombie Lord's</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            background: #020617;
+            color: #f8fafc;
+            font-family: 'Cinzel', serif;
+            min-height: 100vh;
+        }
+
+        .bg-fixed-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.85) 0%, rgba(2, 6, 23, 0.95) 100%), 
+                        url('./background.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        .shard-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .shard-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .emerald-text {
+            color: #10b981;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+    </style>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
-            authDomain: "zomb lords-playhouse.firebaseapp.com",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
             projectId: "zombielords-playhouse",
             storageBucket: "zombielords-playhouse.firebasestorage.app",
             messagingSenderId: "795162260246",
@@ -23,51 +63,50 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
 
-        // Redirect to Gate if user is not logged in
         auth.onAuthStateChanged(user => {
             if (!user) {
                 window.location.href = "index.html";
             } else {
-                document.getElementById('user-display').innerText = user.displayName || user.email;
+                document.getElementById('user-tag').innerText = user.displayName || "Disciple";
             }
         });
 
         function logout() {
-            auth.signOut().then(() => {
-                window.location.href = "index.html";
-            });
+            auth.signOut().then(() => { window.location.href = "index.html"; });
         }
     </script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen">
+<body>
 
-    <nav class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
-        <h2 class="text-xl font-black text-emerald-400 tracking-tighter uppercase">ZombieLords</h2>
-        <div class="flex items-center gap-4">
-            <span id="user-display" class="text-xs font-bold text-slate-400 uppercase tracking-widest"></span>
-            <button onclick="logout()" class="text-[10px] bg-slate-800 border border-slate-700 px-3 py-1 rounded hover:bg-red-900/50 hover:border-red-500 transition-all uppercase font-bold">Logout</button>
+    <div class="bg-fixed-overlay"></div>
+
+    <nav class="p-6 flex justify-between items-center border-b border-emerald-900/30">
+        <h2 class="text-xl font-black emerald-text tracking-tighter uppercase">Zombie Lord's</h2>
+        <div class="flex items-center gap-6">
+            <span id="user-tag" class="text-[10px] tracking-[0.3em] uppercase text-slate-400"></span>
+            <button onclick="logout()" class="text-[9px] border border-slate-700 px-4 py-1 hover:bg-red-900/40 hover:border-red-500 transition-all uppercase font-bold tracking-widest">Abandon</button>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto p-10">
-        <header class="mb-12">
-            <h1 class="text-4xl font-bold mb-2 uppercase tracking-tight">The Playhouse</h1>
-            <p class="text-slate-400 font-medium">Choose your module.</p>
+    <main class="max-w-5xl mx-auto p-12">
+        <header class="mb-16 text-center">
+            <h1 class="text-5xl font-black mb-4 tracking-tight uppercase">Playhouse</h1>
+            <p class="text-emerald-500/60 text-xs tracking-[0.5em] uppercase font-bold">Select Your Trial</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-emerald-500/50 transition-all cursor-pointer group shadow-xl" onclick="window.location.href='roulette.html'">
-                <div class="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-3xl">🎡</div>
-                <h3 class="text-2xl font-bold mb-2">Roulette Tracker</h3>
-                <p class="text-sm text-slate-400 leading-relaxed">Advanced Engine V50 with 9-Street Hybrid logic.</p>
-                <div class="mt-8 flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-widest">Enter Module <span>&rarr;</span></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div class="shard-card p-10 rounded-sm cursor-pointer group" onclick="window.location.href='roulette.html'">
+                <div class="text-4xl mb-6 opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">🎡</div>
+                <h3 class="text-2xl font-black mb-3 uppercase tracking-wider">Roulette Engine</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">9-Street Hybrid Analysis. Monitor the wheel through the eyes of the Emerald King.</p>
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.3em] uppercase">Begin Session &rarr;</div>
             </div>
 
-            <div class="bg-slate-800/40 p-8 rounded-2xl border border-slate-800 opacity-60 grayscale relative overflow-hidden">
-                <div class="w-16 h-16 bg-slate-700/20 rounded-full flex items-center justify-center mb-6 text-3xl">🎲</div>
-                <h3 class="text-2xl font-bold mb-2 text-slate-500 uppercase tracking-tighter">Dice Master</h3>
-                <p class="text-sm text-slate-500 italic">Under Development</p>
-                <div class="absolute top-4 right-4 bg-slate-700 text-[8px] px-2 py-1 rounded uppercase font-bold text-slate-400">Locked</div>
+            <div class="shard-card p-10 rounded-sm opacity-40 grayscale relative">
+                <div class="text-4xl mb-6">🎲</div>
+                <h3 class="text-2xl font-black mb-3 uppercase tracking-wider text-slate-500">Dice Master</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-8">Fate is not yet ready to be written in the bones.</p>
+                <div class="absolute top-6 right-6 text-[8px] bg-slate-800 px-2 py-1 tracking-widest uppercase">Locked</div>
             </div>
         </div>
     </main>
