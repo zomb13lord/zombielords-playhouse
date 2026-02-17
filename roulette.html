@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Roulette Engine V50 | Zombie Lord's</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Inter:wght@400;700&display=swap');
+
+        body {
+            margin: 0; padding: 0;
+            background: #020617;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        .bg-fixed-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(2, 6, 23, 0.9) 0%, rgba(2, 6, 23, 0.98) 100%), 
+                        url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
+            background-size: cover;
+            background-position: center;
+            z-index: -1;
+        }
+
+        .engine-header { font-family: 'Cinzel', serif; }
+        
+        .number-btn {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .num-red { background: #991b1b; }
+        .num-black { background: #0f172a; }
+        .num-green { background: #065f46; }
+        
+        .number-btn:active { transform: scale(0.9); brightness: 1.5; }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
+            projectId: "zombielords-playhouse",
+            storageBucket: "zombielords-playhouse.firebasestorage.app",
+            messagingSenderId: "795162260246",
+            appId: "1:795162260246:web:97f0361751ac1359b31637"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Auth Guard
+        auth.onAuthStateChanged(user => {
+            if (!user) window.location.href = "index.html";
+        });
+
+        // --- ENGINE V50 LOGIC ---
+        let history = [];
+        const streets = [
+            [1,2,3], [4,5,6], [7,8,9], [10,11,12], 
+            [13,14,15], [16,17,18], [19,20,21], [22,23,24], 
+            [25,26,27], [28,29,30], [31,32,33], [34,35,36]
+        ];
+
+        function addRoll(num) {
+            history.unshift(num);
+            if (history.length > 50) history.pop();
+            updateUI();
+        }
+
+        function updateUI() {
+            const historyEl = document.getElementById('history-bar');
+            historyEl.innerHTML = history.map(n => `<div class="w-8 h-8 rounded flex items-center justify-center text-xs font-bold ${getCol(n)}">${n}</div>`).join('');
+            // Further analysis logic for 9-Street etc. goes here
+        }
+
+        function getCol(n) {
+            const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+            if (n === 0) return 'num-green';
+            return reds.includes(n) ? 'num-red' : 'num-black';
+        }
+    </script>
+</head>
+<body>
+
+    <div class="bg-fixed-overlay"></div>
+
+    <nav class="p-4 border-b border-emerald-900/30 flex justify-between items-center sticky top-0 bg-slate-950/80 backdrop-blur-md z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="window.location.href='lobby.html'" class="text-emerald-500 hover:text-white transition-colors">←</button>
+            <h1 class="engine-header font-black text-emerald-400 uppercase tracking-tighter text-sm">Engine V50</h1>
+        </div>
+        <div id="history-bar" class="flex gap-2 overflow-x-auto px-4 max-w-[50%]"></div>
+    </nav>
+
+    <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <section class="lg:col-span-2">
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="addRoll(0)" class="col-span-3 py-4 num-green rounded font-bold">0</button>
+                <script>
+                    for(let i=1; i<=36; i++) {
+                        const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+                        const col = reds.includes(i) ? 'num-red' : 'num-black';
+                        document.write(`<button onclick="addRoll(${i})" class="number-btn ${col}">${i}</button>`);
+                    }
+                </script>
+            </div>
+        </section>
+
+        <section class="flex flex-col gap-4">
+            <div class="stat-card p-6 rounded-sm">
+                <h3 class="engine-header text-emerald-500 text-xs font-bold uppercase tracking-widest mb-4">9-Street Hybrid</h3>
+                <div id="street-display" class="text-sm text-slate-400 italic">Awaiting data...</div>
+            </div>
+            
+            <div class="stat-card p-6 rounded-sm">
+                <h3 class="engine-header text-emerald-500 text-xs font-bold uppercase tracking-widest mb-4">Sector Heat</h3>
+                <div class="h-32 flex items-center justify-center text-slate-600 text-[10px] uppercase">No Session Active</div>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>
