@@ -12,7 +12,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Creepster&display=swap');
 
-        /* Brute Force Background */
+        /* Clean Background Implementation */
         body {
             margin: 0;
             padding: 0;
@@ -21,8 +21,8 @@
             align-items: center;
             justify-content: center;
             background-color: #020617;
-            /* Direct Link to ensure no pathing errors */
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.9)), 
+            /* Using the absolute URL that we verified works */
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.9)), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover;
             background-position: center;
@@ -31,36 +31,62 @@
             color: white;
         }
 
+        /* Gothic Decayed Header */
         .bleeding-header {
             font-family: 'Creepster', system-ui;
             font-size: clamp(3rem, 10vw, 5rem);
             color: #ffffff;
             text-transform: uppercase;
             letter-spacing: 4px;
-            line-height: 1;
+            line-height: 1.1;
             text-shadow: 
-                0 0 10px rgba(16, 185, 129, 0.8),
-                2px 2px 0px #800, 
-                4px 7px 5px rgba(128, 0, 0, 0.5);
+                0 0 15px rgba(16, 185, 129, 0.6),
+                2px 2px 0px #700, 
+                4px 6px 8px rgba(0, 0, 0, 0.8);
         }
 
         .emerald-glow-text {
             color: #10b981;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
-            letter-spacing: 0.5em;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            letter-spacing: 0.6em;
             font-weight: 900;
+            font-size: 0.75rem;
         }
 
+        /* Glassmorphism Card Container */
         .gate-card {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            box-shadow: 0 0 80px rgba(0,0,0,1);
-            width: 95%;
-            max-width: 650px;
-            padding: 3rem;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 100px rgba(0,0,0,0.9);
+            width: 92%;
+            max-width: 600px;
+            padding: 3.5rem 2rem;
             text-align: center;
-            border-top: 4px solid #10b981;
+            border-top: 3px solid #10b981;
+            border-radius: 4px;
+        }
+
+        /* The King's Button */
+        .wicked-button {
+            background: white;
+            color: #020617;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 4px solid #cbd5e1;
+        }
+
+        .wicked-button:hover {
+            background: #10b981;
+            color: white;
+            transform: translateY(-2px);
+            border-bottom-color: #059669;
+            letter-spacing: 0.1em;
+        }
+
+        .wicked-button:active {
+            transform: translateY(2px);
+            border-bottom-width: 0px;
         }
     </style>
 
@@ -80,9 +106,12 @@
         async function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
             try {
-                await auth.signInWithPopup(provider);
-                window.location.href = "lobby.html";
+                const result = await auth.signInWithPopup(provider);
+                if (result.user) {
+                    window.location.href = "lobby.html";
+                }
             } catch (error) {
+                console.error("The Lord rejects your soul:", error);
                 alert("The Lord rejects your soul: " + error.message);
             }
         }
@@ -92,21 +121,22 @@
 
     <div class="gate-card">
         <h1 class="bleeding-header mb-2">Zombie Lord's</h1>
-        <p class="emerald-glow-text text-xs md:text-sm uppercase mb-10 tracking-[0.6em]">Playhouse</p>
+        <p class="emerald-glow-text uppercase mb-12">Playhouse</p>
 
-        <p class="text-slate-300 text-sm italic mb-12 leading-relaxed px-4">
+        <p class="text-slate-300 text-sm italic mb-12 leading-relaxed px-6 font-serif">
             "Kneel before the <span class="text-emerald-400 font-bold uppercase">Zombie Lord</span> upon the Emerald Shard Throne, 
             amidst the ruins of lost innocence and <span class="text-emerald-500/80 uppercase">broken dreams</span>, 
             only the wicked may enter!"
         </p>
 
-        <button onclick="loginWithGoogle()" class="group relative mx-auto w-full max-w-xs bg-white text-slate-950 py-4 px-6 rounded-sm font-black flex items-center justify-center gap-4 transition-all hover:bg-emerald-500 hover:text-white active:scale-95 shadow-2xl border-b-4 border-slate-300">
+        <button onclick="loginWithGoogle()" class="wicked-button relative mx-auto w-full max-w-xs py-4 px-8 font-black flex items-center justify-center gap-4 shadow-2xl">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20" alt="Google">
             <span class="uppercase text-xs tracking-widest font-bold">Enter at your own Risk</span>
         </button>
 
-        <div class="mt-12 opacity-50 flex flex-col items-center">
-            <p class="text-[8px] tracking-[0.6em] text-emerald-500 font-bold uppercase">M11 Secure Entry</p>
+        <div class="mt-16 opacity-30 flex flex-col items-center">
+            <div class="w-16 h-[1px] bg-emerald-900/50 mb-4"></div>
+            <p class="text-[9px] tracking-[0.6em] text-emerald-500 font-bold uppercase">M11 Secure Entry</p>
         </div>
     </div>
 
