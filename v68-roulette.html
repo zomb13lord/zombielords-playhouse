@@ -4,15 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Roulette Tracker V68</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #00ff88;
             --red: #ff4444; --black: #000; --green: #2e7d32;
             --wait: #ffcc00; --text: #e0e0e0;
+            --emerald-glass: rgba(16, 185, 129, 0.1);
         }
         * { box-sizing: border-box; touch-action: manipulation; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         
+        /* Lobby Navigation Bar */
+        .lobby-nav {
+            background: rgba(2, 6, 23, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+        .lobby-nav .brand {
+            font-family: 'Cinzel', serif;
+            color: var(--accent);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 900;
+        }
+        .lobby-nav a {
+            font-family: 'Cinzel', serif;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.7em;
+            font-weight: 700;
+            border: 1px solid var(--accent);
+            padding: 5px 12px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        .lobby-nav a:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
         #config-page { padding: 20px; max-width: 500px; margin: 0 auto; }
         .config-grid { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .full { grid-column: span 2; }
@@ -60,6 +100,11 @@
     </style>
 </head>
 <body>
+
+<nav class="lobby-nav">
+    <div class="brand">Zombie Lord's</div>
+    <a href="lobby.html">Return to Playhouse</a>
+</nav>
 
 <div id="config-page">
     <div class="config-grid">
