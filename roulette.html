@@ -1,110 +1,68 @@
-<div id="config-page" class="shard p-10 max-w-5xl mx-auto shadow-2xl border border-emerald-900/20">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <div class="space-y-4">
-            <h3 class="text-[10px] cinzel text-emerald-500 tracking-[.3em] border-b border-emerald-900/30 pb-2">01_WHEEL_ARCHITECTURE</h3>
-            <div>
-                <label class="config-label">Wheel Type</label>
-                <select id="wheel-type" class="config-input" onchange="syncWheelSubtypes()">
-                    <option value="EU">European (37 Pockets)</option>
-                    <option value="US">American (38 Pockets)</option>
-                    <option value="TZ">Triple Zero (39 Pockets)</option>
-                </select>
-            </div>
-            <div>
-                <label class="config-label">Wheel Subtype</label>
-                <select id="wheel-subtype" class="config-input"></select>
-            </div>
-        </div>
+<nav class="flex justify-between items-center p-6 border-b border-emerald-900/30 bg-black/40 backdrop-blur-md">
+    <div class="cinzel text-xl tracking-widest text-emerald-500">STRATEGIC_ENGINE <span class="text-[10px] opacity-50">v2.0</span></div>
+    <div class="flex gap-8 text-[10px] font-mono uppercase tracking-[.2em]">
+        <button onclick="navigate('lobby')" class="hover:text-emerald-400 transition-colors">Lobby</button>
+        <button onclick="archiveCurrent()" class="hover:text-emerald-400 transition-colors">Archive</button>
+        <button onclick="logout()" class="text-red-900 hover:text-red-500 transition-colors">Logout</button>
+    </div>
+</nav>
 
-        <div class="space-y-4">
-            <h3 class="text-[10px] cinzel text-emerald-500 tracking-[.3em] border-b border-emerald-900/30 pb-2">02_DOMAIN_PROTOCOL</h3>
-            <div class="grid grid-cols-2 gap-4">
+<main class="p-8 max-w-7xl mx-auto">
+    <div id="session-init" class="flex gap-4 mb-12">
+        <button onclick="initNewSession()" class="shard-btn bg-emerald-900/20 border-emerald-500/50 text-emerald-400 px-8 py-3 rounded uppercase text-[10px] tracking-widest">New Session</button>
+        <button onclick="resumeLast()" class="shard-btn bg-slate-900/40 border-slate-700 text-slate-400 px-8 py-3 rounded uppercase text-[10px] tracking-widest">Resume Last</button>
+    </div>
+
+    <section id="configuration" class="shard p-8 bg-black/60 border border-emerald-900/20 rounded-xl shadow-2xl">
+        <h2 class="cinzel text-emerald-500 mb-8 text-sm tracking-widest">SYSTEM_CALIBRATION</h2>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            
+            <div class="space-y-6">
+                <div class="text-[9px] font-mono text-emerald-700 uppercase mb-2">01_WHEEL_PHYSICS</div>
                 <div>
-                    <label class="config-label">Domain</label>
-                    <select id="main-domain" class="config-input" onchange="syncSubCategories()">
-                        <option value="inside">Inside</option>
-                        <option value="outside">Outside</option>
-                        <option value="sectors">Sectors</option>
+                    <label class="config-label">Wheel Type</label>
+                    <select id="wheel-type" class="config-input w-full" onchange="syncWheelSubtypes()">
+                        <option value="EU">European (37)</option>
+                        <option value="US">American (38)</option>
+                        <option value="TZ">Triple Zero (39)</option>
                     </select>
                 </div>
                 <div>
-                    <label class="config-label">Sub-Category</label>
-                    <select id="sub-category" class="config-input" onchange="syncSubTypes()"></select>
+                    <label class="config-label">Subtype</label>
+                    <select id="wheel-subtype" class="config-input w-full"></select>
                 </div>
             </div>
-            <div>
-                <label class="config-label">Protocol (Subtype)</label>
-                <select id="sub-type" class="config-input" onchange="toggleSpecialInputs()"></select>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="text-[9px] font-mono text-emerald-700 uppercase mb-2">02_DOMAIN_PROTOCOL</div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="config-label">Domain</label>
+                        <select id="main-domain" class="config-input w-full" onchange="syncSubCategories()">
+                            <option value="inside">Inside</option>
+                            <option value="outside">Outside</option>
+                            <option value="sectors">Sectors</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="config-label">Sub-Category</label>
+                        <select id="sub-category" class="config-input w-full" onchange="syncSubTypes()"></select>
+                    </div>
+                    <div>
+                        <label class="config-label">Protocol</label>
+                        <select id="sub-type" class="config-input w-full" onchange="toggleSpecialInputs()"></select>
+                    </div>
+                </div>
+
+                <div id="neighbor-size-box" class="hidden p-4 bg-emerald-950/10 border border-emerald-900/30 rounded">
+                    <div class="flex items-center justify-between">
+                        <label class="config-label text-emerald-400">Neighbor Size (S)</label>
+                        <input type="number" id="neighbor-size" class="config-input w-20 text-center" value="1" min="1" max="18">
+                    </div>
+                    <div class="text-[8px] text-slate-500 mt-2 font-mono uppercase">Calculated Span: 1 + (S x 2) Pockets</div>
+                </div>
             </div>
         </div>
-
-        <div id="neighbor-size-box" class="hidden md:col-span-2 bg-emerald-950/20 p-4 border border-emerald-500/20 rounded">
-            <label class="config-label text-emerald-400">Neighbor Size (S)</label>
-            <input type="number" id="neighbor-size" class="config-input w-24" value="1" min="1" max="18">
-            <span class="text-[9px] ml-4 text-slate-400 italic font-mono uppercase tracking-widest">Calculated_Span: 1 + (S x 2) Pockets</span>
-        </div>
-    </div>
-</div>
-
-<script>
-// ITEM 1: WHEEL DATA (LOCKED)
-const wheelMap = {
-    "EU": ["Standard", "French"],
-    "US": ["Standard"],
-    "TZ": ["Standard (Sands/Venetian)", "EU Layout", "US Layout"]
-};
-
-// ITEM 2: DOMAIN DATA (LOCKED)
-const domainMap = {
-    "inside": {
-        "Straight Up": ["Single Number"],
-        "Splits": ["Standard (Horizontal)", "Vertical", "Both"],
-        "Streets": ["Standard", "Baskets", "Top Line"],
-        "Corners": ["Standard (Squares)"],
-        "Lines": ["Standard", "All", "Top Line"]
-    },
-    "outside": {
-        "Dozens/Columns": ["Dozens", "Columns", "Both"],
-        "Even Money": ["Red/Black", "Odd/Even", "High/Low"]
-    },
-    "sectors": {
-        "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"],
-        "Neighbors": ["Size (S)"],
-        "Heat Map": ["Dynamic Cluster"]
-    }
-};
-
-function syncWheelSubtypes() {
-    const type = document.getElementById('wheel-type').value;
-    const subSelect = document.getElementById('wheel-subtype');
-    subSelect.innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
-}
-
-function syncSubCategories() {
-    const domain = document.getElementById('main-domain').value;
-    const catSelect = document.getElementById('sub-category');
-    catSelect.innerHTML = Object.keys(domainMap[domain]).map(c => `<option value="${c}">${c}</option>`).join('');
-    syncSubTypes();
-}
-
-function syncSubTypes() {
-    const domain = document.getElementById('main-domain').value;
-    const cat = document.getElementById('sub-category').value;
-    const subSelect = document.getElementById('sub-type');
-    subSelect.innerHTML = domainMap[domain][cat].map(t => `<option value="${t}">${t}</option>`).join('');
-    toggleSpecialInputs();
-}
-
-function toggleSpecialInputs() {
-    const cat = document.getElementById('sub-category').value;
-    const box = document.getElementById('neighbor-size-box');
-    cat === "Neighbors" ? box.classList.remove('hidden') : box.classList.add('hidden');
-}
-
-// INITIALIZE
-document.addEventListener('DOMContentLoaded', () => {
-    syncWheelSubtypes();
-    syncSubCategories();
-});
-</script>
+    </section>
+</main>
