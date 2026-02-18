@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zombie Lord | Engine Calibration</title>
+    <title>Zombie Lord | Session Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -23,81 +23,74 @@
         .config-input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; }
         .btn-zombie { background: transparent; border: 1px solid var(--emerald); color: var(--emerald); padding: 12px 24px; text-transform: uppercase; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-zombie:hover { background: var(--emerald); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        .btn-danger { border-color: var(--blood); color: var(--blood); }
-        .btn-danger:hover { background: var(--blood); color: white; }
+        .shard { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(16, 185, 129, 0.2); backdrop-filter: blur(8px); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <nav class="flex justify-between items-center mb-8 bg-slate-900/40 p-4 border border-emerald-900/20 backdrop-blur-md sticky top-0 z-40">
-        <h2 class="cinzel emerald-text text-sm tracking-widest uppercase">Engine_Calibration</h2>
+        <h2 class="cinzel emerald-text text-sm tracking-widest uppercase">Vault_Access</h2>
         <div class="flex gap-4">
             <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400">Lobby</button>
-            <button onclick="triggerLogout()" class="text-[9px] uppercase font-bold text-blood">Abandon_Session</button>
+            <button onclick="triggerLogout()" class="text-[9px] uppercase font-bold text-blood">Abandon</button>
         </div>
     </nav>
 
-    <div id="fork-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/98 backdrop-blur-xl hidden">
-        <div class="max-w-md w-full p-8 border border-emerald-900/50 bg-slate-900/90 rounded-sm text-center">
-            <h2 class="cinzel text-2xl emerald-text mb-2 uppercase tracking-tighter">Vault_Access</h2>
-            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-8">Active Trial Detected in Firebase</p>
-            <div class="flex flex-col gap-3">
-                <button onclick="resumeFirebaseSession()" class="btn-zombie">Resume Trial</button>
-                <button onclick="showConfig()" class="btn-zombie border-white text-white">Load/Edit Settings</button>
-                <button onclick="clearAndNew()" class="text-[9px] text-slate-600 uppercase font-bold hover:text-blood pt-4 transition-colors">Terminate & Start New</button>
+    <div id="vault-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/98 backdrop-blur-xl hidden">
+        <div class="max-w-2xl w-full p-8 shard rounded-sm">
+            <h2 class="cinzel text-3xl emerald-text mb-6 text-center uppercase">The_Vault</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="p-6 border border-emerald-900/30 bg-black/40 text-center">
+                    <h3 class="text-xs font-bold mb-4 text-emerald-500 uppercase">Start New Trial</h3>
+                    <button onclick="showConfig()" class="btn-zombie w-full">Initialize</button>
+                </div>
+                <div class="p-6 border border-slate-700 bg-black/40">
+                    <h3 class="text-xs font-bold mb-4 text-slate-400 uppercase text-center">Stored Sessions</h3>
+                    <div id="session-list" class="space-y-2 max-h-40 overflow-y-auto pr-2 text-left">
+                        <p class="text-[9px] text-slate-600 italic">Scanning vault...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="exit-modal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 backdrop-blur-md hidden">
-        <div class="max-w-sm w-full p-8 border border-red-900/50 bg-slate-900 text-center">
-            <h2 class="cinzel text-xl text-red-500 mb-4 uppercase">Archive_Protocol</h2>
-            <p class="text-xs text-slate-400 mb-8 leading-relaxed">Shall we archive this session's history to the tomb, or purge it from the active vault?</p>
+    <div id="name-modal" class="fixed inset-0 z-[70] flex items-center justify-center bg-black/95 backdrop-blur-md hidden">
+        <div class="max-w-sm w-full p-8 shard text-center">
+            <h2 class="cinzel text-xl emerald-text mb-4 uppercase">Archive_Session</h2>
+            <input type="text" id="session-name" placeholder="ENTER_SESSION_NAME" class="config-input mb-6 text-center">
             <div class="flex flex-col gap-3">
-                <button onclick="archiveSession()" class="btn-zombie border-emerald-500 text-emerald-500">Archive & Logout</button>
-                <button onclick="purgeAndLogout()" class="btn-zombie btn-danger">Purge & Logout</button>
-                <button onclick="closeExitModal()" class="text-[9px] text-slate-500 uppercase mt-2">Cancel</button>
+                <button onclick="confirmArchive()" class="btn-zombie">Commit to History</button>
+                <button onclick="closeNameModal()" class="text-[9px] text-slate-500 uppercase">Cancel</button>
             </div>
         </div>
     </div>
 
     <div id="config-page" class="hidden max-w-4xl mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-900/60 p-10 border border-emerald-900/30 backdrop-blur-md">
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-4">
-                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-[0.3em] uppercase">01 // Domain Protocols</span>
-            </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel_Architecture</label>
-                <select id="wheel-type" class="config-input">
-                    <option value="EU">European (Single 0)</option>
-                    <option value="US">American (Double 0)</option>
-                    <option value="TZ">Triple Zero</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Main_Domain</label>
-                <select id="main-domain" class="config-input" onchange="updateSubDomains()">
-                    <option value="inside">Inside Bets</option>
-                    <option value="outside">Outside Bets</option>
-                </select>
-            </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Sub_Category</label>
-                <select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select>
-            </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Bet_Protocol</label>
-                <select id="sub-type" class="config-input"></select>
-            </div>
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mt-4">
-                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-[0.3em] uppercase">02 // Progression Parameters</span>
-            </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Unit_Value ($)</label>
-                <input type="number" id="base-unit" class="config-input" value="1" step="0.1">
-            </div>
-            <div class="md:col-span-2 mt-8">
-                <button onclick="saveAndLaunch()" class="btn-zombie w-full tracking-[0.2em]">Commit & Initialize</button>
+        <div class="shard p-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-4">
+                    <span class="text-[10px] cinzel text-slate-400 font-bold tracking-widest uppercase text-emerald-500">Tracker_Configuration</span>
+                </div>
+                <div>
+                    <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel_Architecture</label>
+                    <select id="wheel-type" class="config-input">
+                        <option value="EU">European (Single 0)</option>
+                        <option value="US">American (Double 0)</option>
+                        <option value="TZ">Triple Zero</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Main_Domain</label>
+                    <select id="main-domain" class="config-input" onchange="updateSubDomains()">
+                        <option value="inside">Inside Bets</option>
+                        <option value="outside">Outside Bets</option>
+                    </select>
+                </div>
+                <div><label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Sub_Category</label><select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select></div>
+                <div><label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Bet_Protocol</label><select id="sub-type" class="config-input"></select></div>
+                <div><label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Unit_Value ($)</label><input type="number" id="base-unit" class="config-input" value="1" step="0.1"></div>
+                <div class="md:col-span-2 mt-8"><button onclick="saveAndLaunch()" class="btn-zombie w-full">Initialize &rarr;</button></div>
             </div>
         </div>
     </div>
@@ -105,7 +98,7 @@
     <div id="tracker-temp" class="hidden flex flex-col items-center justify-center min-h-[60vh] text-center">
         <h1 class="cinzel text-5xl emerald-text animate-pulse mb-6">TRACKER_ACTIVE</h1>
         <div id="sync-info" class="text-[9px] text-slate-500 uppercase tracking-[0.5em] mb-12"></div>
-        <button onclick="showConfig()" class="btn-zombie">Return to Configuration</button>
+        <button onclick="showConfig()" class="btn-zombie">Settings</button>
     </div>
 
     <script>
@@ -113,6 +106,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         let currentUser = null;
+        let currentSessionId = "active_session"; 
 
         const lockedMap = {
             inside: { lines: ["6-Line Hybrid", "Double Line"], streets: ["3-Street", "Cold Hunt"], splits: ["Corner Split", "Vertical"], baskets: ["0-1-2-3 Basket"] },
@@ -121,15 +115,33 @@
 
         auth.onAuthStateChanged(user => {
             if (!user) window.location.href = "index.html";
-            else { currentUser = user; checkFirebaseVault(); }
+            else { currentUser = user; openVault(); }
         });
 
-        async function checkFirebaseVault() {
-            const doc = await db.collection("sessions").doc(currentUser.uid).get();
-            if (doc.exists) {
-                document.getElementById('fork-modal').classList.remove('hidden');
-                syncInputs(doc.data());
-            } else showConfig();
+        async function openVault() {
+            document.getElementById('vault-modal').classList.remove('hidden');
+            const listDiv = document.getElementById('session-list');
+            const snapshot = await db.collection("users").doc(currentUser.uid).collection("sessions").orderBy("timestamp", "desc").get();
+            
+            listDiv.innerHTML = '';
+            if (snapshot.empty) {
+                listDiv.innerHTML = '<p class="text-[9px] text-slate-600 uppercase">No stored sessions found.</p>';
+            } else {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left p-2 border border-slate-800 hover:border-emerald-500 text-[10px] uppercase transition-all mb-1 bg-black/20";
+                    btn.innerHTML = `<span class="text-emerald-500 font-bold">${data.name || 'Unnamed'}</span> <span class="text-slate-600 text-[8px] block">${new Date(data.timestamp?.seconds * 1000).toLocaleDateString()}</span>`;
+                    btn.onclick = () => loadStoredSession(doc.id, data);
+                    listDiv.appendChild(btn);
+                });
+            }
+        }
+
+        function loadStoredSession(id, data) {
+            currentSessionId = id;
+            syncInputs(data);
+            resumeFirebaseSession();
         }
 
         function syncInputs(d) {
@@ -140,7 +152,7 @@
             updateSubTypes();
             document.getElementById('sub-type').value = d.type;
             document.getElementById('base-unit').value = d.unit;
-            document.getElementById('sync-info').innerText = `NODE: ${d.type} | $${d.unit}`;
+            document.getElementById('sync-info').innerText = `LOADED: ${d.name || 'ACTIVE'} | PROTOCOL: ${d.type}`;
         }
 
         function updateSubDomains() {
@@ -158,7 +170,7 @@
         }
 
         function showConfig() {
-            document.getElementById('fork-modal').classList.add('hidden');
+            document.getElementById('vault-modal').classList.add('hidden');
             document.getElementById('tracker-temp').classList.add('hidden');
             document.getElementById('config-page').classList.remove('hidden');
             if(!document.getElementById('sub-domain').innerHTML) updateSubDomains();
@@ -166,38 +178,38 @@
 
         async function saveAndLaunch() {
             const config = {
+                name: "active_session",
                 wheel: document.getElementById('wheel-type').value, domain: document.getElementById('main-domain').value,
                 sub: document.getElementById('sub-domain').value, type: document.getElementById('sub-type').value,
                 unit: document.getElementById('base-unit').value, timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
-            await db.collection("sessions").doc(currentUser.uid).set(config);
+            await db.collection("users").doc(currentUser.uid).collection("sessions").doc("active_session").set(config);
             resumeFirebaseSession();
         }
 
         function resumeFirebaseSession() {
-            document.getElementById('fork-modal').classList.add('hidden');
+            document.getElementById('vault-modal').classList.add('hidden');
             document.getElementById('config-page').classList.add('hidden');
             document.getElementById('tracker-temp').classList.remove('hidden');
         }
 
-        function triggerLogout() { document.getElementById('exit-modal').classList.remove('hidden'); }
-        function closeExitModal() { document.getElementById('exit-modal').classList.add('hidden'); }
+        function triggerLogout() { document.getElementById('name-modal').classList.remove('hidden'); }
+        function closeNameModal() { document.getElementById('name-modal').classList.add('hidden'); }
 
-        async function clearAndNew() {
-            await db.collection("sessions").doc(currentUser.uid).delete();
-            window.location.reload();
-        }
-
-        async function purgeAndLogout() {
-            await db.collection("sessions").doc(currentUser.uid).delete();
-            auth.signOut().then(() => { window.location.href = "index.html"; });
-        }
-
-        async function archiveSession() {
-            const doc = await db.collection("sessions").doc(currentUser.uid).get();
-            if(doc.exists) {
-                await db.collection("archives").add({ ...doc.data(), archivedAt: new Date(), userId: currentUser.uid });
-                await db.collection("sessions").doc(currentUser.uid).delete();
+        async function confirmArchive() {
+            const name = document.getElementById('session-name').value || "Unnamed_Trial";
+            const doc = await db.collection("users").doc(currentUser.uid).collection("sessions").doc(currentSessionId).get();
+            if (doc.exists) {
+                // Move current active to a new named document
+                await db.collection("users").doc(currentUser.uid).collection("sessions").add({
+                    ...doc.data(),
+                    name: name,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                // Clean up active slot if it was the active one
+                if (currentSessionId === "active_session") {
+                    await db.collection("users").doc(currentUser.uid).collection("sessions").doc("active_session").delete();
+                }
             }
             auth.signOut().then(() => { window.location.href = "index.html"; });
         }
