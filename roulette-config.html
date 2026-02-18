@@ -13,8 +13,7 @@
         :root { --bg: #020617; --emerald: #10b981; }
         body {
             background-color: var(--bg);
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), 
-                              url('background.png');
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover; background-attachment: fixed;
             color: #f8fafc; font-family: 'JetBrains Mono', monospace;
         }
@@ -23,22 +22,24 @@
         .config-input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; }
         .btn-zombie { background: transparent; border: 1px solid var(--emerald); color: var(--emerald); padding: 12px 24px; text-transform: uppercase; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-zombie:hover { background: var(--emerald); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        .shard { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(16, 185, 129, 0.2); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .shard { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(16, 185, 129, 0.2); backdrop-filter: blur(16px); }
+        .pulse-emerald { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <nav class="flex justify-between items-center mb-8 bg-slate-950/60 p-4 border border-emerald-900/20 backdrop-blur-md sticky top-0 z-40">
         <h2 class="cinzel emerald-text text-sm tracking-widest uppercase">System_Calibration</h2>
-        <div class="flex gap-4">
-            <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400">Back to Lobby</button>
-        </div>
+        <div id="sync-status" class="text-[8px] text-slate-500 uppercase tracking-widest">Polling Vault...</div>
+        <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400">Back to Lobby</button>
     </nav>
 
     <div id="calibration-shard" class="max-w-4xl mx-auto shard p-10">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-4">
-                <span class="text-[10px] cinzel text-emerald-500 font-bold tracking-widest uppercase font-black">Calibration_Node</span>
+            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-4 flex justify-between">
+                <span class="text-[10px] cinzel text-emerald-500 font-bold tracking-widest uppercase">Calibration_Node</span>
+                <span id="last-sync" class="text-[8px] text-slate-600 uppercase"></span>
             </div>
             
             <div>
@@ -53,7 +54,6 @@
                 <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel Subtype</label>
                 <select id="wheel-subtype" class="config-input"></select>
             </div>
-
             <div>
                 <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Main Domain</label>
                 <select id="main-domain" class="config-input" onchange="updateSubDomains()">
@@ -78,11 +78,10 @@
             <div id="neighbor-input-box" class="md:col-span-2 hidden bg-emerald-950/20 p-4 border border-emerald-900/30">
                 <label class="text-[9px] uppercase font-bold text-emerald-400 block mb-2">Neighbor Size (S)</label>
                 <input type="number" id="neighbor-size" class="config-input" value="1" min="1" max="18">
-                <p class="text-[8px] text-slate-500 mt-1 italic">SPAN: 1 + (S x 2) POCKETS</p>
             </div>
 
-            <div class="md:col-span-2 mt-8">
-                <button onclick="commitAndLaunch()" class="btn-zombie w-full tracking-[0.4em]">Initialize_Execution_Node</button>
+            <div class="md:col-span-2 mt-8 flex gap-4">
+                <button onclick="commitAndLaunch()" class="btn-zombie flex-grow tracking-[0.4em]">Initialize_Node</button>
             </div>
         </div>
     </div>
@@ -92,29 +91,11 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
 
-        const wheelMap = {
-            "EU": ["Standard", "French"],
-            "US": ["Standard"],
-            "TZ": ["Standard (Sands/Venetian)", "EU Layout", "US Layout"]
-        };
-
+        const wheelMap = { EU: ["Standard", "French"], US: ["Standard"], TZ: ["Standard (Sands/Venetian)", "EU Layout", "US Layout"] };
         const domainMap = {
-            inside: {
-                "Straight Up": ["Single Number"],
-                "Splits": ["Standard (Horizontal)", "Vertical", "Both"],
-                "Streets": ["Standard", "Baskets", "Top Line"],
-                "Corners": ["Standard (Squares)"],
-                "Lines": ["Standard", "All", "Top Line"]
-            },
-            outside: {
-                "Dozens/Columns": ["Dozens", "Columns", "Both"],
-                "Even Money": ["Red/Black", "Odd/Even", "High/Low"]
-            },
-            sectors: {
-                "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"],
-                "Neighbors": ["Size (S)"],
-                "Heat Map": ["Dynamic Cluster"]
-            }
+            inside: { "Straight Up": ["Single Number"], "Splits": ["Standard (Horizontal)", "Vertical", "Both"], "Streets": ["Standard", "Baskets", "Top Line"], "Corners": ["Standard (Squares)"], "Lines": ["Standard", "All", "Top Line"] },
+            outside: { "Dozens/Columns": ["Dozens", "Columns", "Both"], "Even Money": ["Red/Black", "Odd/Even", "High/Low"] },
+            sectors: { "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], "Neighbors": ["Size (S)"], "Heat Map": ["Dynamic Cluster"] }
         };
 
         function updateWheelSubtypes() {
@@ -122,30 +103,48 @@
             const sub = document.getElementById('wheel-subtype');
             sub.innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
         }
-
         function updateSubDomains() {
             const d = document.getElementById('main-domain').value;
             document.getElementById('sub-domain').innerHTML = Object.keys(domainMap[d]).map(k => `<option value="${k}">${k}</option>`).join('');
             updateSubTypes();
         }
-
         function updateSubTypes() {
             const d = document.getElementById('main-domain').value;
             const s = document.getElementById('sub-domain').value;
             document.getElementById('sub-type').innerHTML = domainMap[d][s].map(t => `<option value="${t}">${t}</option>`).join('');
             toggleNeighborBox();
         }
-
         function toggleNeighborBox() {
             const s = document.getElementById('sub-domain').value;
             const box = document.getElementById('neighbor-input-box');
             s === "Neighbors" ? box.classList.remove('hidden') : box.classList.add('hidden');
         }
 
+        async function resumeActive() {
+            const user = auth.currentUser;
+            const doc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
+            if (doc.exists) {
+                const d = doc.data();
+                document.getElementById('wheel-type').value = d.wheel;
+                updateWheelSubtypes();
+                document.getElementById('wheel-subtype').value = d.wheelSub;
+                document.getElementById('main-domain').value = d.domain;
+                updateSubDomains();
+                document.getElementById('sub-domain').value = d.subCategory;
+                updateSubTypes();
+                document.getElementById('sub-type').value = d.protocol;
+                document.getElementById('neighbor-size').value = d.nSize || 1;
+                document.getElementById('base-unit').value = d.unit;
+                document.getElementById('sync-status').innerText = "Active Session Retained";
+                document.getElementById('last-sync').innerText = `Last Sync: ${new Date(d.timestamp?.seconds * 1000).toLocaleTimeString()}`;
+            } else {
+                updateWheelSubtypes(); updateSubDomains();
+                document.getElementById('sync-status').innerText = "No Active Session Found";
+            }
+        }
+
         async function commitAndLaunch() {
             const user = auth.currentUser;
-            if (!user) return alert("User not authenticated");
-
             const config = {
                 wheel: document.getElementById('wheel-type').value,
                 wheelSub: document.getElementById('wheel-subtype').value,
@@ -156,15 +155,13 @@
                 unit: document.getElementById('base-unit').value,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
-
             await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").set(config);
             window.location.href = "roulette.html";
         }
 
         auth.onAuthStateChanged(user => {
             if (!user) window.location.href = "index.html";
-            updateWheelSubtypes();
-            updateSubDomains();
+            else resumeActive();
         });
     </script>
 </body>
