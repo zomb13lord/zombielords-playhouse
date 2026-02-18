@@ -3,115 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Engine V50 | Zombie Lord's</title>
+    <title>Zombie Lord | Strategic Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #020617;
+            --card: rgba(15, 23, 42, 0.8);
+            --emerald: #10b981;
+            --blood: #ef4444;
+            --amber: #f59e0b;
+            --slate: #94a3b8;
+        }
 
         body {
-            margin: 0; padding: 0; min-height: 100vh;
-            background-color: #020617;
-            color: white;
-            font-family: 'Cinzel', serif;
-            /* Balanced background for mobile visibility */
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.9) 100%), 
+            background-color: var(--bg);
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover;
-            background-position: center 15%;
+            background-position: center;
             background-attachment: fixed;
+            color: #f8fafc;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
         }
 
-        .shard-panel {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        .cinzel { font-family: 'Cinzel', serif; }
+
+        /* --- HUD: Frozen Command Bar --- */
+        .hud-frozen {
+            position: sticky;
+            top: 0;
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+            z-index: 1000;
+            padding: 12px 20px;
         }
 
-        .emerald-glow {
-            color: #10b981;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        .hud-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        input[type="range"]::-webkit-slider-runnable-track {
-            background: rgba(16, 185, 129, 0.2);
-            height: 4px;
+        .hud-val { font-size: 1.1rem; font-weight: 700; display: block; }
+        .hud-label { font-size: 0.6rem; color: var(--slate); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- Unit Surveillance Grid --- */
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        .hidden { display: none !important; }
+        .unit-tile {
+            background: var(--card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        /* Status Glows from Item 5 Logic */
+        .status-stable { border-color: var(--emerald); box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.2); }
+        .status-recovery { border-color: var(--amber); animation: pulse-amber 2s infinite; }
+        .status-capped { border-color: var(--blood); animation: pulse-blood 1s infinite; }
+
+        @keyframes pulse-amber { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes pulse-blood { 0% { box-shadow: 0 0 0px var(--blood); } 50% { box-shadow: 0 0 10px var(--blood); } 100% { box-shadow: 0 0 0px var(--blood); } }
+
+        /* --- Audit Table --- */
+        .audit-wrapper {
+            margin: 20px;
+            background: var(--card);
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            overflow: hidden;
+        }
+
+        .audit-table { width: 100%; text-align: left; font-size: 0.75rem; border-collapse: collapse; }
+        .audit-table th { background: rgba(0,0,0,0.3); padding: 12px; color: var(--emerald); text-transform: uppercase; font-size: 0.6rem; }
+        .audit-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* Heat Bar */
+        .heat-container { width: 100%; background: #000; height: 4px; border-radius: 2px; margin-top: 4px; }
+        .heat-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+
+        /* Command Pulse */
+        .pulse-box {
+            background: #000;
+            border: 2px solid var(--emerald);
+            margin: 20px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .btn-action {
+            background: #111;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-action:hover { background: #222; border-color: var(--emerald); color: var(--emerald); }
+
     </style>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
-            authDomain: "zombielords-playhouse.firebaseapp.com",
-            projectId: "zombielords-playhouse",
-            storageBucket: "zombielords-playhouse.firebasestorage.app",
-            messagingSenderId: "795162260246",
-            appId: "1:795162260246:web:97f0361751ac1359b31637"
-        };
-        firebase.initializeApp(firebaseConfig);
-
-        firebase.auth().onAuthStateChanged(user => {
-            if (!user) window.location.href = "index.html";
-        });
-
-        function engageEngine() {
-            document.getElementById('config-layer').classList.add('hidden');
-            document.getElementById('tracker-layer').classList.remove('hidden');
-            // Logic to initialize the 9-Street math will go here
-        }
-    </script>
 </head>
-<body class="flex flex-col items-center p-4">
+<body>
 
-    <nav class="w-full max-w-5xl flex justify-between items-center py-4 mb-8">
-        <button onclick="window.location.href='lobby.html'" class="text-[10px] uppercase font-bold tracking-[0.3em] text-emerald-500/70 hover:text-emerald-400 transition-colors flex items-center gap-2">
-            <span>←</span> Return to Lobby
-        </button>
-        <div class="text-[9px] uppercase tracking-[0.4em] text-slate-500 font-bold">System: Engine V50</div>
-    </nav>
-
-    <div id="config-layer" class="shard-panel w-full max-w-md p-8 rounded-sm mt-10">
-        <header class="text-center mb-10">
-            <h2 class="text-2xl font-black uppercase tracking-tighter emerald-glow">Shard Configuration</h2>
-            <p class="text-[9px] uppercase tracking-[0.5em] text-slate-400 mt-2">Establish Resonance</p>
-        </header>
-
-        <div class="space-y-8 mb-10">
+    <header class="hud-frozen">
+        <div class="hud-grid">
             <div>
-                <div class="flex justify-between mb-2">
-                    <label class="text-[10px] uppercase font-bold text-emerald-500/80 tracking-widest">Hybrid Sensitivity</label>
-                    <span class="text-[10px] text-slate-500">75%</span>
-                </div>
-                <input type="range" class="w-full accent-emerald-500 bg-transparent cursor-pointer">
+                <span class="hud-label">Net_Profit</span>
+                <span id="stat-profit" class="hud-val text-emerald-400">$0.00</span>
             </div>
-
             <div>
-                <label class="text-[10px] uppercase font-bold text-emerald-500/80 tracking-widest block mb-2">Tracking Mode</label>
-                <select class="w-full bg-slate-900 border border-emerald-900/30 p-3 text-xs text-slate-300 outline-none focus:border-emerald-500 transition-colors">
-                    <option>9-Street Hybrid (Aggressive)</option>
-                    <option>9-Street Hybrid (Passive)</option>
-                    <option>Sector Convergence</option>
-                </select>
+                <span class="hud-label">Total_Bet</span>
+                <span id="stat-bet" class="hud-val text-white">$0.00</span>
+            </div>
+            <div class="text-right">
+                <span class="hud-label">System_Status</span>
+                <span id="sys-status" class="hud-val text-amber-500">WARMUP</span>
             </div>
         </div>
+    </header>
 
-        <button onclick="engageEngine()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 font-black uppercase text-xs tracking-[0.3em] transition-all border-b-4 border-emerald-900 active:border-b-0 active:translate-y-1">
-            Engage Shard Engine
-        </button>
-    </div>
-
-    <div id="tracker-layer" class="hidden w-full max-w-5xl">
-        <div class="shard-panel p-20 rounded-sm text-center border-dashed border-2 border-emerald-900/20">
-            <p class="text-emerald-500/40 uppercase tracking-[0.6em] text-xs animate-pulse">Awaiting Wheel Vibrations...</p>
+    <main class="max-w-6xl mx-auto">
+        
+        <div class="p-5 text-center">
+            <h1 class="cinzel text-3xl font-black tracking-widest text-white uppercase">Strategic Engine</h1>
+            <p class="text-[10px] text-emerald-500 tracking-[0.5em] font-bold">Independent Unit Surveillance</p>
         </div>
-    </div>
+
+        <div class="pulse-box">
+            <div class="hud-label mb-2">Current_Protocol</div>
+            <div id="instruction" class="cinzel text-2xl font-black text-emerald-400">WAITING FOR INPUT</div>
+        </div>
+
+        <div class="px-5"><span class="hud-label">Unit_Monitor</span></div>
+        <section class="unit-grid" id="unit-monitor">
+            <div class="unit-tile status-stable">
+                <div class="hud-label" style="font-size:0.5rem">ST 1</div>
+                <div class="text-xs font-bold">$1</div>
+            </div>
+            <div class="unit-tile status-recovery">
+                <div class="hud-label" style="font-size:0.5rem">ST 2</div>
+                <div class="text-xs font-bold">$4</div>
+            </div>
+            <div class="unit-tile status-capped">
+                <div class="hud-label" style="font-size:0.5rem">ST 3</div>
+                <div class="text-xs font-bold">$50</div>
+            </div>
+            </section>
+
+        <div class="px-5"><span class="hud-label">Audit_Log</span></div>
+        <div class="audit-wrapper">
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Unit</th>
+                        <th>Heat_Index</th>
+                        <th>Dist</th>
+                        <th>P/L</th>
+                    </tr>
+                </thead>
+                <tbody id="audit-body">
+                    <tr>
+                        <td>Street 1</td>
+                        <td>
+                            0.85
+                            <div class="heat-container"><div class="heat-fill bg-emerald-500" style="width: 85%"></div></div>
+                        </td>
+                        <td>12</td>
+                        <td class="text-emerald-400">+$12.00</td>
+                    </tr>
+                    <tr>
+                        <td>Street 2</td>
+                        <td>
+                            -0.42
+                            <div class="heat-container"><div class="heat-fill bg-blood" style="width: 42%"></div></div>
+                        </td>
+                        <td>3</td>
+                        <td class="text-blood">-$45.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4 p-5 mb-10">
+            <button class="btn-action" onclick="window.location.href='lobby.html'">Lobby</button>
+            <button class="btn-action">Undo</button>
+            <button class="btn-action" style="color:var(--blood)">Reset</button>
+        </div>
+
+    </main>
 
 </body>
 </html>
