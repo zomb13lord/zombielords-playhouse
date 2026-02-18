@@ -3,214 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zombie Lord | Strategic Engine</title>
+    <title>Zombie Lord | Config</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
         :root {
             --bg: #020617;
-            --card: rgba(15, 23, 42, 0.8);
             --emerald: #10b981;
-            --blood: #ef4444;
-            --amber: #f59e0b;
             --slate: #94a3b8;
         }
 
         body {
             background-color: var(--bg);
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.5), rgba(2, 6, 23, 0.9)), 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.9)), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover;
-            background-position: center;
             background-attachment: fixed;
             color: #f8fafc;
             font-family: 'JetBrains Mono', monospace;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
+            min-height: 100vh;
         }
 
         .cinzel { font-family: 'Cinzel', serif; }
+        .emerald-text { color: var(--emerald); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
 
-        /* --- HUD: Frozen Command Bar --- */
-        .hud-frozen {
-            position: sticky;
-            top: 0;
-            background: rgba(2, 6, 23, 0.95);
-            backdrop-filter: blur(15px);
-            border-bottom: 2px solid rgba(16, 185, 129, 0.2);
-            z-index: 1000;
-            padding: 12px 20px;
-        }
-
-        .hud-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .hud-val { font-size: 1.1rem; font-weight: 700; display: block; }
-        .hud-label { font-size: 0.6rem; color: var(--slate); text-transform: uppercase; letter-spacing: 1px; }
-
-        /* --- Unit Surveillance Grid --- */
-        .unit-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-            gap: 8px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .unit-tile {
-            background: var(--card);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .config-input {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: white;
+            padding: 12px;
             border-radius: 4px;
-            padding: 8px;
-            text-align: center;
-            transition: all 0.3s ease;
+            width: 100%;
+            outline: none;
         }
 
-        /* Status Glows from Item 5 Logic */
-        .status-stable { border-color: var(--emerald); box-shadow: inset 0 0 5px rgba(16, 185, 129, 0.2); }
-        .status-recovery { border-color: var(--amber); animation: pulse-amber 2s infinite; }
-        .status-capped { border-color: var(--blood); animation: pulse-blood 1s infinite; }
+        .config-input:focus { border-color: var(--emerald); }
 
-        @keyframes pulse-amber { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes pulse-blood { 0% { box-shadow: 0 0 0px var(--blood); } 50% { box-shadow: 0 0 10px var(--blood); } 100% { box-shadow: 0 0 0px var(--blood); } }
-
-        /* --- Audit Table --- */
-        .audit-wrapper {
-            margin: 20px;
-            background: var(--card);
-            border-radius: 8px;
-            border: 1px solid rgba(16, 185, 129, 0.1);
-            overflow: hidden;
-        }
-
-        .audit-table { width: 100%; text-align: left; font-size: 0.75rem; border-collapse: collapse; }
-        .audit-table th { background: rgba(0,0,0,0.3); padding: 12px; color: var(--emerald); text-transform: uppercase; font-size: 0.6rem; }
-        .audit-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* Heat Bar */
-        .heat-container { width: 100%; background: #000; height: 4px; border-radius: 2px; margin-top: 4px; }
-        .heat-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
-
-        /* Command Pulse */
-        .pulse-box {
-            background: #000;
-            border: 2px solid var(--emerald);
-            margin: 20px;
-            padding: 20px;
-            text-align: center;
-            border-radius: 8px;
-        }
-
-        .btn-action {
-            background: #111;
-            border: 1px solid #333;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
+        .btn-zombie {
+            background: transparent;
+            border: 1px solid var(--emerald);
+            color: var(--emerald);
+            padding: 15px;
             text-transform: uppercase;
             font-weight: bold;
-            transition: 0.3s;
+            transition: all 0.3s;
+            cursor: pointer;
         }
-        .btn-action:hover { background: #222; border-color: var(--emerald); color: var(--emerald); }
 
+        .btn-zombie:hover {
+            background: var(--emerald);
+            color: #000;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+        }
     </style>
 </head>
-<body>
+<body class="p-6">
 
-    <header class="hud-frozen">
-        <div class="hud-grid">
+    <div id="fork-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md hidden">
+        <div class="max-w-md w-full p-8 border border-emerald-900/50 bg-slate-900/80 rounded-sm text-center">
+            <h2 class="cinzel text-2xl emerald-text mb-4 uppercase tracking-tighter">Existing Trial Found</h2>
+            <p class="text-xs text-slate-400 mb-8 italic font-sans">Our records show an active session in the vault. Continue your descent?</p>
+            <div class="flex flex-col gap-4">
+                <button onclick="resumeFirebaseSession()" class="btn-zombie">Resume Session</button>
+                <button onclick="showConfig()" class="text-[10px] text-slate-500 uppercase font-bold hover:text-red-500 transition-colors">Overwrite with New Trial</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="config-page" class="hidden max-w-2xl mx-auto pt-10">
+        <header class="mb-12 text-center">
+            <h1 class="cinzel text-4xl md:text-5xl font-black mb-2 emerald-text uppercase">Engine Calibration</h1>
+            <p class="text-[10px] tracking-[0.5em] uppercase text-emerald-500/50 font-bold">Define the Mathematical Constraints</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/40 p-10 border border-emerald-900/20 backdrop-blur-sm">
+            
+            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-2">
+                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-widest">01 // Domain Protocols</span>
+            </div>
+
             <div>
-                <span class="hud-label">Net_Profit</span>
-                <span id="stat-profit" class="hud-val text-emerald-400">$0.00</span>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel Architecture</label>
+                <select id="wheel-type" class="config-input">
+                    <option value="EU">European (Single 0)</option>
+                    <option value="US">American (Double 0)</option>
+                    <option value="TZ">Triple Zero</option>
+                </select>
             </div>
+
             <div>
-                <span class="hud-label">Total_Bet</span>
-                <span id="stat-bet" class="hud-val text-white">$0.00</span>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Surveillance Domain</label>
+                <select id="domain-select" class="config-input">
+                    <option value="lines">Lines (11 Units)</option>
+                    <option value="streets">Streets (12 Units)</option>
+                    <option value="splits">Splits (60 Units)</option>
+                </select>
             </div>
-            <div class="text-right">
-                <span class="hud-label">System_Status</span>
-                <span id="sys-status" class="hud-val text-amber-500">WARMUP</span>
+
+            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-2 mt-4">
+                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-widest">02 // Progression Logic</span>
+            </div>
+
+            <div>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Algorithm</label>
+                <select id="prog-type" class="config-input" onchange="toggleInputs()">
+                    <option value="martingale">Martingale</option>
+                    <option value="martingale-plus">Martingale Plus</option>
+                    <option value="fibonacci">Fibonacci</option>
+                    <option value="ladder">The Ladder</option>
+                </select>
+            </div>
+
+            <div id="m-wrap">
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Multiplier (m)</label>
+                <input type="number" id="m-val" class="config-input" value="2" step="0.1">
+            </div>
+
+            <div id="z-wrap" class="hidden">
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Plus Factor (z)</label>
+                <input type="number" id="z-val" class="config-input" value="1">
+            </div>
+
+            <div>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Lookback Window (W)</label>
+                <input type="number" id="lookback-val" class="config-input" value="12">
+            </div>
+
+            <div class="md:col-span-2 pt-6">
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="cap-toggle" class="accent-emerald-500 h-4 w-4" checked disabled>
+                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Fixed Max Unit Cap (50 Units)</label>
+                </div>
+            </div>
+
+            <div class="md:col-span-2 mt-10">
+                <button onclick="saveAndLaunch()" class="btn-zombie w-full tracking-widest">Begin Trial &rarr;</button>
             </div>
         </div>
-    </header>
+    </div>
 
-    <main class="max-w-6xl mx-auto">
-        
-        <div class="p-5 text-center">
-            <h1 class="cinzel text-3xl font-black tracking-widest text-white uppercase">Strategic Engine</h1>
-            <p class="text-[10px] text-emerald-500 tracking-[0.5em] font-bold">Independent Unit Surveillance</p>
-        </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
+            projectId: "zombielords-playhouse",
+            storageBucket: "zombielords-playhouse.firebasestorage.app",
+            messagingSenderId: "795162260246",
+            appId: "1:795162260246:web:97f0361751ac1359b31637"
+        };
 
-        <div class="pulse-box">
-            <div class="hud-label mb-2">Current_Protocol</div>
-            <div id="instruction" class="cinzel text-2xl font-black text-emerald-400">WAITING FOR INPUT</div>
-        </div>
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUser = null;
 
-        <div class="px-5"><span class="hud-label">Unit_Monitor</span></div>
-        <section class="unit-grid" id="unit-monitor">
-            <div class="unit-tile status-stable">
-                <div class="hud-label" style="font-size:0.5rem">ST 1</div>
-                <div class="text-xs font-bold">$1</div>
-            </div>
-            <div class="unit-tile status-recovery">
-                <div class="hud-label" style="font-size:0.5rem">ST 2</div>
-                <div class="text-xs font-bold">$4</div>
-            </div>
-            <div class="unit-tile status-capped">
-                <div class="hud-label" style="font-size:0.5rem">ST 3</div>
-                <div class="text-xs font-bold">$50</div>
-            </div>
-            </section>
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                currentUser = user;
+                checkExistingSession();
+            }
+        });
 
-        <div class="px-5"><span class="hud-label">Audit_Log</span></div>
-        <div class="audit-wrapper">
-            <table class="audit-table">
-                <thead>
-                    <tr>
-                        <th>Unit</th>
-                        <th>Heat_Index</th>
-                        <th>Dist</th>
-                        <th>P/L</th>
-                    </tr>
-                </thead>
-                <tbody id="audit-body">
-                    <tr>
-                        <td>Street 1</td>
-                        <td>
-                            0.85
-                            <div class="heat-container"><div class="heat-fill bg-emerald-500" style="width: 85%"></div></div>
-                        </td>
-                        <td>12</td>
-                        <td class="text-emerald-400">+$12.00</td>
-                    </tr>
-                    <tr>
-                        <td>Street 2</td>
-                        <td>
-                            -0.42
-                            <div class="heat-container"><div class="heat-fill bg-blood" style="width: 42%"></div></div>
-                        </td>
-                        <td>3</td>
-                        <td class="text-blood">-$45.00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        async function checkExistingSession() {
+            const doc = await db.collection("sessions").doc(currentUser.uid).get();
+            if (doc.exists) {
+                document.getElementById('fork-modal').classList.remove('hidden');
+            } else {
+                showConfig();
+            }
+        }
 
-        <div class="grid grid-cols-3 gap-4 p-5 mb-10">
-            <button class="btn-action" onclick="window.location.href='lobby.html'">Lobby</button>
-            <button class="btn-action">Undo</button>
-            <button class="btn-action" style="color:var(--blood)">Reset</button>
-        </div>
+        function showConfig() {
+            document.getElementById('fork-modal').classList.add('hidden');
+            document.getElementById('config-page').classList.remove('hidden');
+        }
 
-    </main>
+        function toggleInputs() {
+            const type = document.getElementById('prog-type').value;
+            document.getElementById('z-wrap').classList.toggle('hidden', type !== 'martingale-plus');
+            document.getElementById('m-wrap').classList.toggle('hidden', type === 'fibonacci');
+        }
 
+        async function saveAndLaunch() {
+            const config = {
+                wheel: document.getElementById('wheel-type').value,
+                domain: document.getElementById('domain-select').value,
+                prog: document.getElementById('prog-type').value,
+                m: parseFloat(document.getElementById('m-val').value),
+                z: parseFloat(document.getElementById('z-val').value),
+                w: parseInt(document.getElementById('lookback-val').value),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                history: [],
+                profit: 0
+            };
+
+            await db.collection("sessions").doc(currentUser.uid).set(config);
+            console.log("Session Initialized. Transitioning to Tracker...");
+            // Redirect to the tracker UI phase would happen here
+        }
+
+        function resumeFirebaseSession() {
+            console.log("Fetching state from Firestore...");
+            // Redirect to tracker with loaded data
+        }
+    </script>
 </body>
 </html>
