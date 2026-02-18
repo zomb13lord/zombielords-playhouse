@@ -3,146 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Zombie Lord | Config</title>
+    <title>Zombie Lord | Tracker Settings</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@400;700&display=swap');
-
-        :root {
-            --bg: #020617;
-            --emerald: #10b981;
-            --slate: #94a3b8;
-        }
-
+        :root { --bg: #020617; --emerald: #10b981; --slate: #94a3b8; }
         body {
             background-color: var(--bg);
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.9)), 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.85), rgba(2, 6, 23, 0.98)), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
-            background-size: cover;
-            background-attachment: fixed;
-            color: #f8fafc;
-            font-family: 'JetBrains Mono', monospace;
-            min-height: 100vh;
+            background-size: cover; background-attachment: fixed;
+            color: #f8fafc; font-family: 'JetBrains Mono', monospace; min-height: 100vh;
         }
-
         .cinzel { font-family: 'Cinzel', serif; }
         .emerald-text { color: var(--emerald); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-
         .config-input {
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            color: white;
-            padding: 12px;
-            border-radius: 4px;
-            width: 100%;
-            outline: none;
+            background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3);
+            color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; font-size: 0.9rem;
         }
-
-        .config-input:focus { border-color: var(--emerald); }
-
         .btn-zombie {
-            background: transparent;
-            border: 1px solid var(--emerald);
-            color: var(--emerald);
-            padding: 15px;
-            text-transform: uppercase;
-            font-weight: bold;
-            transition: all 0.3s;
-            cursor: pointer;
+            background: transparent; border: 1px solid var(--emerald); color: var(--emerald);
+            padding: 15px; text-transform: uppercase; font-weight: bold; cursor: pointer; transition: all 0.3s;
         }
-
-        .btn-zombie:hover {
-            background: var(--emerald);
-            color: #000;
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-        }
+        .btn-zombie:hover { background: var(--emerald); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
     </style>
 </head>
-<body class="p-6">
+<body class="p-4 md:p-8">
 
-    <div id="fork-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md hidden">
-        <div class="max-w-md w-full p-8 border border-emerald-900/50 bg-slate-900/80 rounded-sm text-center">
+    <div id="fork-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/98 backdrop-blur-xl hidden">
+        <div class="max-w-md w-full p-8 border border-emerald-900/50 bg-slate-900/90 rounded-sm text-center">
             <h2 class="cinzel text-2xl emerald-text mb-4 uppercase tracking-tighter">Existing Trial Found</h2>
-            <p class="text-xs text-slate-400 mb-8 italic font-sans">Our records show an active session in the vault. Continue your descent?</p>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mb-8">Active session detected in Firebase</p>
             <div class="flex flex-col gap-4">
                 <button onclick="resumeFirebaseSession()" class="btn-zombie">Resume Session</button>
-                <button onclick="showConfig()" class="text-[10px] text-slate-500 uppercase font-bold hover:text-red-500 transition-colors">Overwrite with New Trial</button>
+                <button onclick="showConfig()" class="text-[10px] text-slate-500 uppercase font-bold hover:text-red-500 transition-colors">Overwrite / New Trial</button>
             </div>
         </div>
     </div>
 
-    <div id="config-page" class="hidden max-w-2xl mx-auto pt-10">
+    <div id="config-page" class="hidden max-w-4xl mx-auto">
         <header class="mb-12 text-center">
-            <h1 class="cinzel text-4xl md:text-5xl font-black mb-2 emerald-text uppercase">Engine Calibration</h1>
-            <p class="text-[10px] tracking-[0.5em] uppercase text-emerald-500/50 font-bold">Define the Mathematical Constraints</p>
+            <h1 class="cinzel text-4xl md:text-5xl font-black mb-2 emerald-text uppercase">Tracker Settings</h1>
+            <div class="flex justify-center gap-6 mt-4">
+                <button onclick="window.location.href='lobby.html'" class="text-[10px] text-slate-500 uppercase font-bold hover:text-emerald-400 tracking-widest transition-colors">&larr; Return to Lobby</button>
+            </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/40 p-10 border border-emerald-900/20 backdrop-blur-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-900/60 p-6 md:p-10 border border-emerald-900/30 backdrop-blur-md rounded-sm">
             
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-2">
-                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-widest">01 // Domain Protocols</span>
+            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2">
+                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-[0.3em] uppercase">Domain Protocols</span>
             </div>
 
             <div>
                 <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel Architecture</label>
                 <select id="wheel-type" class="config-input">
-                    <option value="EU">European (Single 0)</option>
-                    <option value="US">American (Double 0)</option>
+                    <option value="EU">European (Single Zero)</option>
+                    <option value="US">American (Double Zero)</option>
                     <option value="TZ">Triple Zero</option>
                 </select>
             </div>
 
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Surveillance Domain</label>
-                <select id="domain-select" class="config-input">
-                    <option value="lines">Lines (11 Units)</option>
-                    <option value="streets">Streets (12 Units)</option>
-                    <option value="splits">Splits (60 Units)</option>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Domain</label>
+                <select id="main-domain" class="config-input" onchange="updateSubDomains()">
+                    <option value="inside">Inside Bets</option>
+                    <option value="outside">Outside Bets</option>
                 </select>
             </div>
 
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-2 mt-4">
-                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-widest">02 // Progression Logic</span>
+            <div>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Sub-Category</label>
+                <select id="sub-domain" class="config-input" onchange="updateSubTypes()">
+                    </select>
+            </div>
+
+            <div>
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Sub-Type</label>
+                <select id="sub-type" class="config-input">
+                    </select>
+            </div>
+
+            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mt-4">
+                <span class="text-[10px] cinzel text-slate-400 font-bold tracking-[0.3em] uppercase">Progression Engine</span>
             </div>
 
             <div>
                 <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Algorithm</label>
-                <select id="prog-type" class="config-input" onchange="toggleInputs()">
+                <select id="prog-type" class="config-input">
                     <option value="martingale">Martingale</option>
                     <option value="martingale-plus">Martingale Plus</option>
                     <option value="fibonacci">Fibonacci</option>
-                    <option value="ladder">The Ladder</option>
                 </select>
             </div>
 
-            <div id="m-wrap">
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Multiplier (m)</label>
-                <input type="number" id="m-val" class="config-input" value="2" step="0.1">
-            </div>
-
-            <div id="z-wrap" class="hidden">
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Plus Factor (z)</label>
-                <input type="number" id="z-val" class="config-input" value="1">
-            </div>
-
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Lookback Window (W)</label>
-                <input type="number" id="lookback-val" class="config-input" value="12">
+                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Base Unit ($)</label>
+                <input type="number" id="base-unit" class="config-input" value="1" min="0.1" step="0.1">
             </div>
 
-            <div class="md:col-span-2 pt-6">
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" id="cap-toggle" class="accent-emerald-500 h-4 w-4" checked disabled>
-                    <label class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Fixed Max Unit Cap (50 Units)</label>
-                </div>
+            <div class="md:col-span-2 mt-8">
+                <button onclick="saveAndLaunch()" class="btn-zombie w-full tracking-[0.2em]">Initialize Engine &rarr;</button>
             </div>
+        </div>
+    </div>
 
-            <div class="md:col-span-2 mt-10">
-                <button onclick="saveAndLaunch()" class="btn-zombie w-full tracking-widest">Begin Trial &rarr;</button>
-            </div>
+    <div id="tracker-temp" class="hidden fixed inset-0 flex flex-col items-center justify-center bg-slate-950 p-8">
+        <div class="text-center">
+            <h1 class="cinzel text-4xl emerald-text animate-pulse mb-4">TRACKER_NODE_ACTIVE</h1>
+            <p class="text-slate-500 text-[10px] tracking-[0.5em] uppercase mb-12">Surveillance data flowing from Firebase</p>
+            <button onclick="showConfig()" class="btn-zombie px-12">Re-Calibrate Tracker</button>
         </div>
     </div>
 
@@ -155,62 +128,74 @@
             messagingSenderId: "795162260246",
             appId: "1:795162260246:web:97f0361751ac1359b31637"
         };
-
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         let currentUser = null;
 
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                window.location.href = "index.html";
-            } else {
-                currentUser = user;
-                checkExistingSession();
+        // Our Locked Domain Data (Strict Hierarchy)
+        const domainData = {
+            inside: {
+                lines: ["6-Line (Standard)", "Double Line"],
+                streets: ["Single Street", "Cold Hunt Variant"],
+                splits: ["Vertical Split", "Corner Split"]
+            },
+            outside: {
+                dozens: ["Single Dozen", "Double Dozen"],
+                columns: ["Standard Column", "Switch Column"],
+                even_money: ["Red/Black", "Odd/Even", "High/Low"]
             }
+        };
+
+        auth.onAuthStateChanged(user => {
+            if (!user) window.location.href = "index.html";
+            else { currentUser = user; checkExistingSession(); }
         });
 
         async function checkExistingSession() {
             const doc = await db.collection("sessions").doc(currentUser.uid).get();
-            if (doc.exists) {
-                document.getElementById('fork-modal').classList.remove('hidden');
-            } else {
-                showConfig();
-            }
+            if (doc.exists) document.getElementById('fork-modal').classList.remove('hidden');
+            else showConfig();
         }
 
         function showConfig() {
             document.getElementById('fork-modal').classList.add('hidden');
+            document.getElementById('tracker-temp').classList.add('hidden');
             document.getElementById('config-page').classList.remove('hidden');
+            updateSubDomains();
         }
 
-        function toggleInputs() {
-            const type = document.getElementById('prog-type').value;
-            document.getElementById('z-wrap').classList.toggle('hidden', type !== 'martingale-plus');
-            document.getElementById('m-wrap').classList.toggle('hidden', type === 'fibonacci');
+        function updateSubDomains() {
+            const domain = document.getElementById('main-domain').value;
+            const subSelect = document.getElementById('sub-domain');
+            subSelect.innerHTML = Object.keys(domainData[domain]).map(k => `<option value="${k}">${k.toUpperCase()}</option>`).join('');
+            updateSubTypes();
+        }
+
+        function updateSubTypes() {
+            const domain = document.getElementById('main-domain').value;
+            const sub = document.getElementById('sub-domain').value;
+            const typeSelect = document.getElementById('sub-type');
+            typeSelect.innerHTML = domainData[domain][sub].map(t => `<option value="${t}">${t}</option>`).join('');
         }
 
         async function saveAndLaunch() {
             const config = {
                 wheel: document.getElementById('wheel-type').value,
-                domain: document.getElementById('domain-select').value,
-                prog: document.getElementById('prog-type').value,
-                m: parseFloat(document.getElementById('m-val').value),
-                z: parseFloat(document.getElementById('z-val').value),
-                w: parseInt(document.getElementById('lookback-val').value),
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                history: [],
-                profit: 0
+                domain: document.getElementById('main-domain').value,
+                sub: document.getElementById('sub-domain').value,
+                type: document.getElementById('sub-type').value,
+                unit: document.getElementById('base-unit').value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
-
             await db.collection("sessions").doc(currentUser.uid).set(config);
-            console.log("Session Initialized. Transitioning to Tracker...");
-            // Redirect to the tracker UI phase would happen here
+            document.getElementById('config-page').classList.add('hidden');
+            document.getElementById('tracker-temp').classList.remove('hidden');
         }
 
         function resumeFirebaseSession() {
-            console.log("Fetching state from Firestore...");
-            // Redirect to tracker with loaded data
+            document.getElementById('fork-modal').classList.add('hidden');
+            document.getElementById('tracker-temp').classList.remove('hidden');
         }
     </script>
 </body>
