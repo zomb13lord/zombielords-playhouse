@@ -3,169 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaming Analysis Suite | Lobby</title>
+    <title>Zombie Lord | Command Lobby</title>
     <style>
         :root {
-            --bg-dark: #070a13;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --accent-blue: #00d4ff;
-            --accent-green: #00ff88;
-            --accent-purple: #bc6ff1;
-            --text-main: #ffffff;
-            --text-dim: #94a3b8;
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --bg: #0a0a0a;
+            --card: #141414;
+            --accent: #00ff88; /* Zombie Green */
+            --blood: #ff4444; /* Blood Red */
+            --text: #e0e0e0;
+            --dim: #666;
+            --gold: #ffcc00;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: radial-gradient(circle at top right, #1e293b, #070a13);
-            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            background: var(--bg);
+            /* Zombie Lord Texture Background */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(0, 255, 136, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255, 68, 68, 0.05) 0%, transparent 40%);
+            background-attachment: fixed;
+            color: var(--text);
             margin: 0;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 0;
             min-height: 100vh;
+        }
+
+        /* Top Utility Bar */
+        .top-bar {
+            width: 100%;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.8);
+            border-bottom: 2px solid #333;
+        }
+
+        .sys-info { color: var(--gold); font-size: 0.8em; font-weight: bold; }
+
+        .btn-logout {
+            background: var(--blood);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-size: 0.7em;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+        }
+
+        .btn-logout:hover {
+            background: #fff;
+            color: var(--blood);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 4rem;
-            max-width: 800px;
+            padding: 40px 20px;
         }
 
         .header h1 { 
-            font-size: 3rem; 
-            margin-bottom: 0.5rem; 
-            letter-spacing: -1px;
-            background: linear-gradient(to right, #fff, var(--accent-blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 3em; 
+            margin: 0;
+            color: var(--accent);
+            text-shadow: 0 0 15px var(--accent);
+            letter-spacing: 5px;
         }
 
-        .header p { color: var(--text-dim); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { 
+            color: var(--dim); 
+            font-size: 0.9em; 
+            text-transform: uppercase; 
+            margin-top: 5px;
+        }
 
+        /* Lobby Grid */
         .lobby-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2.5rem;
+            gap: 25px;
             width: 100%;
-            max-width: 1200px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
         .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 24px;
-            padding: 2.5rem;
+            background: var(--card);
+            border: 2px solid #333;
+            border-radius: 8px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid var(--glass-border);
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: border-color 0.3s;
         }
 
         .card:hover {
-            transform: translateY(-12px);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            border-color: var(--accent);
+            box-shadow: inset 0 0 15px rgba(0, 255, 136, 0.1);
         }
 
         .badge {
-            font-size: 0.7rem;
-            letter-spacing: 1.5px;
-            padding: 0.4rem 1rem;
-            border-radius: 6px;
-            font-weight: 800;
+            font-size: 0.6em;
+            padding: 4px 8px;
+            border-radius: 2px;
+            font-weight: 900;
             display: inline-block;
-            margin-bottom: 1.5rem;
+            margin-bottom: 15px;
             text-transform: uppercase;
+            border: 1px solid;
         }
 
-        /* Card Themes */
-        .stable-tracker { border-bottom: 4px solid var(--accent-green); }
-        .badge-stable { background: rgba(0, 255, 136, 0.15); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .badge-stable { color: var(--accent); border-color: var(--accent); }
+        .badge-dev { color: #fff; border-color: #fff; background: #333; }
+        .badge-soon { color: var(--gold); border-color: var(--gold); }
 
-        .main-tracker { border-bottom: 4px solid var(--accent-blue); }
-        .badge-dev { background: rgba(0, 212, 255, 0.15); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
-
-        .dice-tracker { border-bottom: 4px solid var(--accent-purple); opacity: 0.7; }
-        .badge-soon { background: rgba(188, 111, 241, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); }
-
-        h2 { margin: 0 0 1rem 0; font-size: 1.8rem; font-weight: 700; }
-        p { line-height: 1.7; color: var(--text-dim); margin-bottom: 3rem; font-size: 1rem; }
+        h2 { margin: 0 0 10px 0; font-size: 1.5em; color: #fff; }
+        p { line-height: 1.5; color: #888; margin-bottom: 30px; font-size: 0.85em; }
 
         .btn {
             display: block;
             text-align: center;
             text-decoration: none;
-            padding: 1.2rem;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 1rem;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-size: 0.9em;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
         }
 
-        .btn-stable { background: var(--accent-green); color: #051a10; }
-        .btn-main { background: var(--accent-blue); color: #021a24; }
-        .btn-disabled { background: #334155; color: #64748b; cursor: not-allowed; }
-        
-        .btn:not(.btn-disabled):hover { 
-            filter: brightness(1.1);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
-        }
+        .btn-stable { background: var(--green); border: 2px solid var(--accent); color: var(--accent); }
+        .btn-stable:hover { background: var(--accent); color: #000; }
 
-        .btn-main:hover { box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+        .btn-main { background: #333; border: 2px solid #fff; color: #fff; }
+        .btn-main:hover { background: #fff; color: #000; }
+
+        .btn-disabled { border: 2px solid #444; color: #444; cursor: not-allowed; }
 
         .dice-icon {
             position: absolute;
-            top: 20px;
-            right: 25px;
-            font-size: 3.5rem;
-            opacity: 0.05;
+            top: 15px;
+            right: 15px;
+            font-size: 2em;
+            opacity: 0.1;
+            color: var(--gold);
         }
+
     </style>
 </head>
 <body>
 
+    <div class="top-bar">
+        <div class="sys-info">ZOMBIE_LORD_OS // SESSION_ACTIVE</div>
+        <a href="index.html" class="btn-logout">TERMINATE_ACCESS</a>
+    </div>
+
     <header class="header">
-        <h1>COMMAND CENTER</h1>
-        <p>Strategic Gaming Analysis</p>
+        <h1>COMMAND_LOBBY</h1>
+        <p>Strategic Surveillance & Analysis</p>
     </header>
 
     <div class="lobby-grid">
         
-        <div class="card stable-tracker">
+        <div class="card">
             <div>
-                <span class="badge badge-stable">Deployment Ready</span>
-                <h2>Roulette v68</h2>
-                <p>Standalone stable build. Features Nine-Street logic, Cold Hunt strategies, and standard Martingale protocols.</p>
+                <span class="badge badge-stable">STABLE_V68</span>
+                <h2>Roulette Tracker</h2>
+                <p>Standardized Nine-Street Logic. Built on the V68 core engine. Theme: Legacy Utility.</p>
             </div>
-            <a href="v68-roulette.html" class="btn btn-stable">Initialize v68</a>
+            <a href="v68-roulette.html" class="btn btn-stable">INITIALIZE_V68</a>
         </div>
 
-        <div class="card main-tracker">
+        <div class="card">
             <div>
-                <span class="badge badge-dev">Engine Update</span>
+                <span class="badge badge-dev">ALPHA_BUILD</span>
                 <h2>Strategic Engine</h2>
-                <p>Advanced build with Independent Unit Tracking, Staircase Multipliers, and Dynamic Lookback Windows.</p>
+                <p>Advanced independent unit tracking. Modified Martingale "Staircase" multipliers and dynamic lookback.</p>
             </div>
-            <a href="roulette.html" class="btn btn-main">Initialize Engine</a>
+            <a href="roulette.html" class="btn btn-main">INITIALIZE_ENGINE</a>
         </div>
 
-        <div class="card dice-tracker">
+        <div class="card">
             <div class="dice-icon">🎲</div>
             <div>
-                <span class="badge badge-soon">Classified</span>
+                <span class="badge badge-soon">ENCRYPTED</span>
                 <h2>Dice Master</h2>
-                <p>Probability tracking for Craps and Sic Bo. Advanced dice-influence analytics engine in development.</p>
+                <p>Craps and Sic Bo probability engine. Dice-influence analytics currently locked in dev-tank.</p>
             </div>
-            <a href="#" class="btn btn-disabled">Locked</a>
+            <a href="#" class="btn btn-disabled">ACCESS_DENIED</a>
         </div>
 
     </div>
