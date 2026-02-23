@@ -14,10 +14,11 @@
         body { background-color: var(--bg); background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), url('https://zomb13lord.github.io/zombielords-playhouse/background.png'); background-size: cover; background-attachment: fixed; color: #f8fafc; font-family: 'JetBrains Mono', monospace; }
         .cinzel { font-family: 'Cinzel', serif; }
         .emerald-text { color: var(--emerald); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
-        .config-input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; }
+        .config-input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; font-size: 12px; }
         .btn-zombie { background: transparent; border: 1px solid var(--emerald); color: var(--emerald); padding: 12px 24px; text-transform: uppercase; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-zombie:hover { background: var(--emerald); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
         .shard { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(16, 185, 129, 0.2); backdrop-filter: blur(16px); }
+        label { font-size: 9px; text-transform: uppercase; font-weight: bold; color: #10b981; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -49,13 +50,14 @@
         <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400">Lobby</button>
     </nav>
 
-    <div id="calibration-shard" class="max-w-4xl mx-auto shard p-10">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="md:col-span-2 border-b border-emerald-900/30 pb-2 mb-4">
-                <span class="text-[10px] cinzel text-emerald-500 uppercase tracking-widest font-black">Input_Parameters</span>
+    <div id="calibration-shard" class="max-w-5xl mx-auto shard p-6 md:p-10">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="md:col-span-3 border-b border-emerald-900/30 pb-2">
+                <span class="cinzel text-emerald-500 text-[11px] uppercase tracking-widest font-black">Core_Geometry</span>
             </div>
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel Type</label>
+                <label>Wheel Type</label>
                 <select id="wheel-type" class="config-input" onchange="updateWheelSubtypes()">
                     <option value="EU">European (37)</option>
                     <option value="US">American (38)</option>
@@ -63,11 +65,19 @@
                 </select>
             </div>
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Wheel Subtype</label>
+                <label>Wheel Subtype</label>
                 <select id="wheel-subtype" class="config-input"></select>
             </div>
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Main Domain</label>
+                <label>Base Unit</label>
+                <input type="number" id="base-unit" class="config-input" value="1" step="0.1">
+            </div>
+
+            <div class="md:col-span-3 border-b border-emerald-900/30 pb-2 mt-4">
+                <span class="cinzel text-emerald-500 text-[11px] uppercase tracking-widest font-black">Logic_Protocols</span>
+            </div>
+            <div>
+                <label>Main Domain</label>
                 <select id="main-domain" class="config-input" onchange="updateSubDomains()">
                     <option value="inside">Inside</option>
                     <option value="outside">Outside</option>
@@ -75,22 +85,65 @@
                 </select>
             </div>
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Category</label>
+                <label>Category</label>
                 <select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select>
             </div>
             <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Protocol</label>
+                <label>Protocol</label>
                 <select id="sub-type" class="config-input" onchange="toggleNeighborBox()"></select>
             </div>
-            <div>
-                <label class="text-[9px] uppercase font-bold text-emerald-500 block mb-2">Base Unit</label>
-                <input type="number" id="base-unit" class="config-input" value="1" step="0.1">
+
+            <div class="md:col-span-3 border-b border-emerald-900/30 pb-2 mt-4">
+                <span class="cinzel text-emerald-500 text-[11px] uppercase tracking-widest font-black">Financial_Execution</span>
             </div>
-            <div id="neighbor-input-box" class="md:col-span-2 hidden bg-emerald-950/20 p-4 border border-emerald-900/30">
-                <label class="text-[9px] uppercase font-bold text-emerald-400 block mb-2">Neighbor Size (S)</label>
+            <div>
+                <label>Strategy</label>
+                <select id="strategy" class="config-input">
+                    <option value="cold">Cold Hunt</option>
+                    <option value="hot">Hot Streak</option>
+                    <option value="fixed">Fixed Target</option>
+                </select>
+            </div>
+            <div>
+                <label>Neg. Progression</label>
+                <select id="neg-progression" class="config-input">
+                    <option value="flat">Flat (None)</option>
+                    <option value="martingale">Martingale</option>
+                    <option value="martingale_plus">Martingale Plus</option>
+                    <option value="fibonacci">Fibonacci</option>
+                    <option value="dalambert">D’Alambert</option>
+                </select>
+            </div>
+            <div>
+                <label>Pos. Progression</label>
+                <select id="pos-progression" class="config-input">
+                    <option value="flat">Flat (None)</option>
+                    <option value="parole">Parole</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-3 border-b border-emerald-900/30 pb-2 mt-4">
+                <span class="cinzel text-emerald-500 text-[11px] uppercase tracking-widest font-black">System_Thresholds</span>
+            </div>
+            <div>
+                <label>Warmup (Spins)</label>
+                <input type="number" id="warmup-n" class="config-input" value="18">
+            </div>
+            <div>
+                <label>CD Loss Trigger</label>
+                <input type="number" id="cd-trigger-n" class="config-input" value="3">
+            </div>
+            <div>
+                <label>CD Length (Spins)</label>
+                <input type="number" id="cd-length-n" class="config-input" value="12">
+            </div>
+
+            <div id="neighbor-input-box" class="md:col-span-3 hidden bg-emerald-950/20 p-4 border border-emerald-900/30">
+                <label>Neighbor Size (S)</label>
                 <input type="number" id="neighbor-size" class="config-input" value="1">
             </div>
-            <div class="md:col-span-2 mt-8">
+
+            <div class="md:col-span-3 mt-8">
                 <button onclick="commitAndLaunch()" class="btn-zombie w-full tracking-[0.4em]">Initialize_Node</button>
             </div>
         </div>
@@ -111,6 +164,7 @@
         function updateWheelSubtypes() {
             const type = document.getElementById('wheel-type').value;
             const sub = document.getElementById('wheel-subtype');
+            if(!wheelMap[type]) return;
             sub.innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
         }
         function updateSubDomains() {
@@ -135,27 +189,33 @@
             const user = auth.currentUser;
             const doc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
 
-            // If coming from tracker, just load values and don't show modal
             if (referrer.includes('roulette.html')) {
                 if (doc.exists) loadValues(doc.data());
                 else startFresh();
             } else {
-                // If coming from lobby, show the entry modal
                 document.getElementById('vault-modal').classList.remove('hidden');
             }
         }
 
         function loadValues(d) {
-            document.getElementById('wheel-type').value = d.wheel;
+            document.getElementById('wheel-type').value = d.wheel || "EU";
             updateWheelSubtypes();
-            document.getElementById('wheel-subtype').value = d.wheelSub;
-            document.getElementById('main-domain').value = d.domain;
+            document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
+            document.getElementById('main-domain').value = d.domain || "inside";
             updateSubDomains();
-            document.getElementById('sub-domain').value = d.subCategory;
+            document.getElementById('sub-domain').value = d.subCategory || "Streets";
             updateSubTypes();
-            document.getElementById('sub-type').value = d.protocol;
+            document.getElementById('sub-type').value = d.protocol || "Standard";
             document.getElementById('neighbor-size').value = d.nSize || 1;
-            document.getElementById('base-unit').value = d.unit;
+            document.getElementById('base-unit').value = d.unit || 1;
+            
+            // New Values Load
+            if(d.strategy) document.getElementById('strategy').value = d.strategy;
+            if(d.negProg) document.getElementById('neg-progression').value = d.negProg;
+            if(d.posProg) document.getElementById('pos-progression').value = d.posProg;
+            if(d.warmup) document.getElementById('warmup-n').value = d.warmup;
+            if(d.cdTrigger) document.getElementById('cd-trigger-n').value = d.cdTrigger;
+            if(d.cdLength) document.getElementById('cd-length-n').value = d.cdLength;
         }
 
         async function resumeToTracker() {
@@ -181,8 +241,17 @@
                 protocol: document.getElementById('sub-type').value,
                 nSize: document.getElementById('neighbor-size').value,
                 unit: document.getElementById('base-unit').value,
+                
+                // New Data Commits
+                strategy: document.getElementById('strategy').value,
+                negProg: document.getElementById('neg-progression').value,
+                posProg: document.getElementById('pos-progression').value,
+                warmup: document.getElementById('warmup-n').value,
+                cdTrigger: document.getElementById('cd-trigger-n').value,
+                cdLength: document.getElementById('cd-length-n').value,
+
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                rolls: existingRolls // Preserve rolls during re-calibration
+                rolls: existingRolls
             };
             await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").set(config);
             window.location.href = "roulette.html";
