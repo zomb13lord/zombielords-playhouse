@@ -14,9 +14,36 @@
         body { background-color: var(--bg); background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.9), rgba(2, 6, 23, 0.98)), url('https://zomb13lord.github.io/zombielords-playhouse/background.png'); background-size: cover; background-attachment: fixed; color: #f8fafc; font-family: 'JetBrains Mono', monospace; }
         .cinzel { font-family: 'Cinzel', serif; }
         .emerald-text { color: var(--emerald); text-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+        
+        /* Standardized Config Input */
         .config-input { background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(16, 185, 129, 0.3); color: white; padding: 12px; border-radius: 4px; width: 100%; outline: none; font-size: 12px; }
-        .btn-zombie { background: transparent; border: 1px solid var(--emerald); color: var(--emerald); padding: 12px 24px; text-transform: uppercase; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-zombie:hover { background: var(--emerald); color: #000; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+        
+        /* Synchronized Button Aesthetic */
+        .btn-zombie { 
+            background: rgba(16, 185, 129, 0.05); 
+            border: 1px solid rgba(16, 185, 129, 0.4); 
+            color: var(--emerald); 
+            padding: 12px 24px; 
+            text-transform: uppercase; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.2s ease-in-out; 
+            letter-spacing: 0.2em;
+        }
+        .btn-zombie:hover { 
+            background: rgba(16, 185, 129, 0.2); 
+            color: #fff;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3); 
+        }
+        .btn-danger { 
+            border-color: rgba(239, 68, 68, 0.4) !important; 
+            color: #ef4444 !important; 
+        }
+        .btn-danger:hover { 
+            background: rgba(239, 68, 68, 0.1) !important; 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2) !important; 
+        }
+
         .shard { background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(16, 185, 129, 0.2); backdrop-filter: blur(16px); }
         label { font-size: 9px; text-transform: uppercase; font-weight: bold; color: #10b981; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
     </style>
@@ -24,36 +51,35 @@
 <body class="p-4 md:p-8">
 
     <div id="vault-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95 backdrop-blur-md hidden">
-        <div class="max-w-md w-full p-10 shard text-center">
+        <div class="max-w-md w-full p-10 shard text-center border-emerald-900/40">
             <h1 class="cinzel text-3xl emerald-text mb-2 uppercase tracking-tighter">Vault_Access</h1>
             <p class="text-[9px] text-slate-500 tracking-[0.4em] mb-10 uppercase">Session Management</p>
             <div class="flex flex-col gap-4">
                 <button onclick="resumeToTracker()" class="btn-zombie">Resume Session</button>
-                <button onclick="editCurrentConfig()" class="btn-zombie border-emerald-900/50">Edit Configuration</button>
+                <button onclick="editCurrentConfig()" class="btn-zombie">Edit Configuration</button>
                 <button onclick="toggleArchiveList(true)" class="btn-zombie border-slate-700 text-slate-400">Load Session</button>
-                <button onclick="startFresh()" class="btn-zombie border-red-900/30 text-slate-500">New Session</button>
+                <button onclick="startFresh()" class="btn-zombie btn-danger">New Session</button>
             </div>
         </div>
     </div>
 
     <div id="archive-portal" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 hidden">
-        <div class="max-w-2xl w-full p-8 shard">
+        <div class="max-w-2xl w-full p-8 shard border-emerald-900/50">
             <div class="flex justify-between items-center mb-6 border-b border-emerald-900/30 pb-4">
-                <h2 class="cinzel text-xl emerald-text uppercase">Stored_Nodes</h2>
-                <button onclick="toggleArchiveList(false)" class="text-slate-500 hover:text-white">✕</button>
+                <h2 class="cinzel text-xl emerald-text uppercase tracking-widest">Stored_Nodes</h2>
+                <button onclick="toggleArchiveList(false)" class="text-slate-500 hover:text-white transition">✕</button>
             </div>
-            <div id="session-list" class="space-y-3 max-h-[60vh] overflow-y-auto"></div>
+            <div id="session-list" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
         </div>
     </div>
 
     <nav class="flex justify-between items-center mb-8 bg-slate-950/60 p-4 border border-emerald-900/20 backdrop-blur-md sticky top-0 z-40">
         <h2 class="cinzel emerald-text text-sm tracking-widest uppercase">System_Calibration</h2>
-        <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400">Lobby</button>
+        <button onclick="window.location.href='lobby.html'" class="text-[9px] uppercase font-bold text-slate-400 hover:text-emerald-400 transition">Lobby</button>
     </nav>
 
     <div id="calibration-shard" class="max-w-5xl mx-auto shard p-6 md:p-10">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
             <div class="md:col-span-3 border-b border-emerald-900/30 pb-2">
                 <span class="cinzel text-emerald-500 text-[11px] uppercase tracking-widest font-black">Core_Geometry</span>
             </div>
@@ -155,6 +181,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
 
+        // Engine Maps
         const wheelMap = { EU: ["Standard", "French"], US: ["Standard"], TZ: ["Standard (Sands/Venetian)", "EU Layout", "US Layout"] };
         const domainMap = {
             inside: { "Straight Up": ["Single Number"], "Splits": ["Standard (Horizontal)", "Vertical", "Both"], "Streets": ["Standard", "Baskets", "Top Line"], "Corners": ["Standard (Squares)"], "Lines": ["Standard", "All", "Top Line"] },
@@ -162,6 +189,94 @@
             sectors: { "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], "Neighbors": ["Size (S)"], "Heat Map": ["Dynamic Cluster"] }
         };
 
+        // --- SESSION MANAGEMENT LOGIC ---
+        async function initCalibration() {
+            const referrer = document.referrer;
+            const user = auth.currentUser;
+            const doc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
+
+            if (referrer.includes('roulette.html') && doc.exists) {
+                loadValues(doc.data());
+            } else {
+                document.getElementById('vault-modal').classList.remove('hidden');
+            }
+        }
+
+        async function resumeToTracker() {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
+            if (doc.exists) window.location.href = "roulette.html";
+            else alert("ERROR: NO_ACTIVE_NODE_FOUND");
+        }
+
+        async function editCurrentConfig() {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
+            if (doc.exists) {
+                loadValues(doc.data());
+                document.getElementById('vault-modal').classList.add('hidden');
+            } else {
+                alert("NOTICE: INITIALIZING_NEW_BUFFER");
+                startFresh();
+            }
+        }
+
+        function startFresh() {
+            document.getElementById('vault-modal').classList.add('hidden');
+            document.getElementById('base-unit').value = 1;
+            document.getElementById('warmup-n').value = 18;
+            updateWheelSubtypes(); 
+            updateSubDomains();
+        }
+
+        // --- ARCHIVE GOVERNANCE (CRUD) ---
+        async function refreshArchiveList() {
+            const listDiv = document.getElementById('session-list');
+            listDiv.innerHTML = '';
+            const snapshot = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").orderBy("timestamp", "desc").get();
+            
+            snapshot.forEach(doc => {
+                if(doc.id === "active_session") return;
+                const d = doc.data();
+                const row = document.createElement('div');
+                row.className = "w-full p-4 shard border-emerald-900/30 flex flex-col gap-3";
+                row.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <input type="text" id="name-${doc.id}" value="${d.name || 'UNNAMED_TRIAL'}" 
+                            class="bg-transparent border-b border-emerald-900/40 text-emerald-400 focus:outline-none uppercase text-[10px] w-2/3">
+                        <span class="text-[8px] opacity-40 uppercase tracking-tighter">${d.protocol}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="loadArchive('${doc.id}')" class="text-[9px] bg-emerald-950/40 px-3 py-1 border border-emerald-800/50 hover:bg-emerald-500 hover:text-black uppercase font-bold transition">Load</button>
+                        <button onclick="renameArchive('${doc.id}')" class="text-[9px] px-3 py-1 border border-slate-700 text-slate-400 hover:text-white uppercase font-bold transition">Rename</button>
+                        <button onclick="deleteArchive('${doc.id}')" class="text-[9px] px-3 py-1 border border-red-900/20 text-red-900/40 hover:text-red-500 uppercase font-bold ml-auto transition">Delete</button>
+                    </div>`;
+                listDiv.appendChild(row);
+            });
+        }
+
+        async function renameArchive(id) {
+            const newName = document.getElementById(`name-${id}`).value;
+            await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).update({ name: newName });
+        }
+
+        async function deleteArchive(id) {
+            if(confirm("CONFIRM_PERMANENT_DELETION")) {
+                await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).delete();
+                refreshArchiveList();
+            }
+        }
+
+        async function loadArchive(id) {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).get();
+            await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").set(doc.data());
+            window.location.href = "roulette.html";
+        }
+
+        function toggleArchiveList(show) {
+            document.getElementById('archive-portal').classList.toggle('hidden', !show);
+            if(show) refreshArchiveList();
+        }
+
+        // --- UI HELPERS ---
         function updateWheelSubtypes() {
             const type = document.getElementById('wheel-type').value;
             const sub = document.getElementById('wheel-subtype');
@@ -185,19 +300,6 @@
             s === "Neighbors" ? box.classList.remove('hidden') : box.classList.add('hidden');
         }
 
-        async function initCalibration() {
-            const referrer = document.referrer;
-            const user = auth.currentUser;
-            const doc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
-
-            // Direct route check: Only bypass modal if returning from roulette.html with valid data
-            if (referrer.includes('roulette.html') && doc.exists) {
-                loadValues(doc.data());
-            } else {
-                document.getElementById('vault-modal').classList.remove('hidden');
-            }
-        }
-
         function loadValues(d) {
             document.getElementById('wheel-type').value = d.wheel || "EU";
             updateWheelSubtypes();
@@ -209,44 +311,17 @@
             document.getElementById('sub-type').value = d.protocol || "Standard";
             document.getElementById('neighbor-size').value = d.nSize || 1;
             document.getElementById('base-unit').value = d.unit || 1;
-            if(d.strategy) document.getElementById('strategy').value = d.strategy;
-            if(d.negProg) document.getElementById('neg-progression').value = d.negProg;
-            if(d.posProg) document.getElementById('pos-progression').value = d.posProg;
-            if(d.warmup) document.getElementById('warmup-n').value = d.warmup;
-            if(d.cdTrigger) document.getElementById('cd-trigger-n').value = d.cdTrigger;
-            if(d.cdLength) document.getElementById('cd-length-n').value = d.cdLength;
-        }
-
-        async function resumeToTracker() {
-            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
-            if (doc.exists) window.location.href = "roulette.html";
-            else alert("No Active Session Found.");
-        }
-
-        async function editCurrentConfig() {
-            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
-            if (doc.exists) {
-                loadValues(doc.data());
-                document.getElementById('vault-modal').classList.add('hidden');
-            } else {
-                alert("No Session Data Found. Initializing Defaults.");
-                startFresh();
-            }
-        }
-
-        function startFresh() {
-            document.getElementById('vault-modal').classList.add('hidden');
-            // Reset to Engine Standard Defaults
-            document.getElementById('wheel-type').value = "EU";
-            document.getElementById('base-unit').value = 1;
-            document.getElementById('warmup-n').value = 18;
-            updateWheelSubtypes(); updateSubDomains();
+            document.getElementById('strategy').value = d.strategy || "cold";
+            document.getElementById('neg-progression').value = d.negProg || "flat";
+            document.getElementById('pos-progression').value = d.posProg || "flat";
+            document.getElementById('warmup-n').value = d.warmup || 18;
+            document.getElementById('cd-trigger-n').value = d.cdTrigger || 3;
+            document.getElementById('cd-length-n').value = d.cdLength || 12;
         }
 
         async function commitAndLaunch() {
             const currentDoc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
             const existingRolls = currentDoc.exists ? currentDoc.data().rolls : [];
-
             const config = {
                 wheel: document.getElementById('wheel-type').value,
                 wheelSub: document.getElementById('wheel-subtype').value,
@@ -266,29 +341,6 @@
             };
             await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").set(config);
             window.location.href = "roulette.html";
-        }
-
-        async function refreshArchiveList() {
-            const listDiv = document.getElementById('session-list');
-            listDiv.innerHTML = '';
-            const snapshot = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").orderBy("timestamp", "desc").get();
-            snapshot.forEach(doc => {
-                if(doc.id === "active_session") return;
-                const d = doc.data();
-                const btn = document.createElement('button');
-                btn.className = "w-full text-left p-4 shard border-emerald-900/30 hover:border-emerald-500 mb-2 flex justify-between uppercase text-[10px]";
-                btn.innerHTML = `<span>${d.name || 'Trial'}</span><span class="opacity-50">${d.protocol}</span>`;
-                btn.onclick = async () => {
-                    await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").set(d);
-                    window.location.href = "roulette.html";
-                };
-                listDiv.appendChild(btn);
-            });
-        }
-
-        function toggleArchiveList(show) {
-            document.getElementById('archive-portal').classList.toggle('hidden', !show);
-            if(show) refreshArchiveList();
         }
 
         auth.onAuthStateChanged(user => { if (!user) window.location.href = "index.html"; else initCalibration(); });
