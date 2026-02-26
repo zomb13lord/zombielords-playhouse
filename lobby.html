@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playhouse Lobby | Zombie Lord's</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
@@ -18,30 +17,30 @@
             color: #f8fafc;
             font-family: 'Cinzel', serif;
             min-height: 100vh;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.3) 0%, rgba(2, 6, 23, 0.9) 100%), 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover;
-            background-position: center 15%;
+            background-position: center;
             background-attachment: fixed;
         }
 
         .shard-card {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .shard-card:hover {
             border-color: #10b981;
-            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
-            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            transform: translateY(-8px);
         }
 
         .emerald-text {
             color: #10b981;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+            text-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
         }
     </style>
 
@@ -73,40 +72,49 @@
 </head>
 <body class="flex flex-col">
 
-    <nav class="p-6 flex justify-between items-center bg-slate-950/40 backdrop-blur-md border-b border-emerald-900/30 sticky top-0 z-50">
-        <h2 class="text-lg font-black emerald-text tracking-tighter uppercase">Zombie Lord's</h2>
-        <div class="flex items-center gap-4">
-            <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-slate-400 font-bold"></span>
-            <button onclick="logout()" class="text-[9px] border border-red-900/50 px-3 py-1 bg-red-950/20 hover:bg-red-900/40 text-red-400 transition-all uppercase font-bold tracking-widest">Abandon</button>
+    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-50">
+        <div class="flex flex-col">
+            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
+            <span class="text-[10px] text-slate-500 tracking-[0.3em] uppercase font-bold">Playhouse</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">
+                Extinguish
+            </button>
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center justify-center p-6 md:p-12">
-        <header class="mb-12 text-center pt-20 md:pt-0">
-            <h1 class="text-4xl md:text-6xl font-black mb-2 tracking-tight uppercase">Playhouse</h1>
-            <p class="emerald-text text-[10px] tracking-[0.4em] uppercase font-bold">Select Your Trial</p>
+    <main class="flex-grow flex flex-col items-center justify-center p-6">
+        <header class="mb-16 text-center">
+            <h1 class="text-5xl md:text-7xl font-black mb-3 tracking-widest uppercase">Playhouse</h1>
+            <p class="emerald-text text-[11px] tracking-[0.6em] uppercase font-bold opacity-80">Choose Your Fate</p>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
             
             <div class="shard-card p-8 rounded-sm cursor-pointer group" onclick="window.location.href='v68-roulette.html'">
-                <div class="text-4xl mb-6 grayscale group-hover:grayscale-0 transition-all duration-500">🛡️</div>
-                <h3 class="text-xl font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Stable v68</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-8 font-serif italic">The proven foundation. Reliable tracking for standard 9-Street campaigns.</p>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.3em] uppercase border-t border-emerald-900/30 pt-4">Enter Node &rarr;</div>
+                <div class="text-4xl mb-6 opacity-60 group-hover:opacity-100 transition-opacity">🛡️</div>
+                <h3 class="text-lg font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Roulette Tracker v68 (Stable)</h3>
+                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">The proven foundation. Reliable tracking for standard 9-Street campaigns.</p>
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/30 pt-4 flex justify-between items-center">
+                    Awaken <span>&rarr;</span>
+                </div>
             </div>
 
-            <div class="shard-card p-8 rounded-sm cursor-pointer group border-emerald-500/50" onclick="window.location.href='roulette-config.html'">
-                <div class="text-4xl mb-6 grayscale group-hover:grayscale-0 transition-all duration-500">🎡</div>
-                <h3 class="text-xl font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Strategic Engine</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-8 font-serif italic">Advanced Alpha logic. Calibration of Wheel Physics and Sector Domains required.</p>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.3em] uppercase border-t border-emerald-900/30 pt-4">Calibrate Node &rarr;</div>
+            <div class="shard-card p-8 rounded-sm cursor-pointer group border-emerald-500/30" onclick="window.location.href='roulette-config.html'">
+                <div class="text-4xl mb-6 opacity-60 group-hover:opacity-100 transition-opacity">🎰</div>
+                <h3 class="text-lg font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Roulette Tracker</h3>
+                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">Advanced Alpha logic. Calibration of Wheel Physics and Sector Domains required.</p>
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/30 pt-4 flex justify-between items-center">
+                    Awaken <span>&rarr;</span>
+                </div>
             </div>
 
-            <div class="shard-card p-8 rounded-sm opacity-50 grayscale relative overflow-hidden">
+            <div class="shard-card p-8 rounded-sm opacity-40 grayscale relative overflow-hidden cursor-not-allowed">
                 <div class="text-4xl mb-6">🎲</div>
-                <h3 class="text-xl font-black mb-3 uppercase tracking-wider text-slate-500">Dice Master</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-8 font-serif italic">Fate is not yet ready to be written in the bones.</p>
+                <h3 class="text-lg font-black mb-3 uppercase tracking-wider text-slate-500">Dice Master</h3>
+                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">Fate is not yet ready to be written in the bones.</p>
                 <div class="absolute top-4 right-4 text-[8px] bg-slate-900/80 border border-slate-700 px-2 py-1 tracking-widest uppercase font-bold text-slate-500">Locked</div>
                 <div class="text-[10px] font-bold text-slate-600 tracking-[0.3em] uppercase border-t border-slate-800 pt-4">In Development</div>
             </div>
