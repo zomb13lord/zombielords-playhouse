@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zombie Lord's Playhouse | Gate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Zombie Lord's Playhouse</title>
+    
+    <meta property="og:title" content="Zombie Lord's Playhouse">
+    <meta property="og:type" content="website">
+    <meta name="twitter:title" content="Zombie Lord's Playhouse">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -12,40 +17,59 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Creepster&display=swap');
 
         body {
-            margin: 0; padding: 0; min-height: 100vh;
-            display: flex; align-items: flex-end; justify-content: center; /* Push content to bottom */
+            margin: 0; 
+            padding: 0; 
+            height: 100dvh; /* Dynamic viewport height to prevent mobile scroll */
+            width: 100vw;
+            display: grid;
+            place-items: center; /* Perfect center alignment */
             background-color: #020617;
-            /* Lighter mobile gradient: Only 10% dark at top, 80% at bottom */
-            background-image: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%), 
+            background-image: linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover;
-            background-position: center 15%; /* Frames the King's head better on vertical screens */
+            background-position: center 10%; /* Keeps the King's head in view */
             background-attachment: fixed;
             font-family: 'Cinzel', serif;
+            overflow: hidden; /* Hard-lock scroll */
         }
 
         .bleeding-header {
             font-family: 'Creepster', system-ui;
-            font-size: clamp(2.4rem, 11vw, 5rem);
-            color: #ffffff; text-transform: uppercase; letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 2px 2px 0px #800;
+            font-size: clamp(2rem, 10vw, 4.5rem);
+            color: #ffffff; 
+            text-transform: uppercase; 
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.6), 2px 2px 0px #800;
         }
 
-        .gate-card {
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
-            width: 100%; max-width: 500px; 
-            padding: 2.5rem 1.5rem 4rem 1.5rem; /* Extra bottom padding for mobile browsers */
-            text-align: center; border-top: 4px solid #10b981;
-            border-radius: 20px 20px 0 0; /* Rounded top corners for mobile feel */
+        .gate-portal {
+            background: rgba(0, 0, 0, 0.45); /* Increased transparency */
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+            width: 90%; 
+            max-width: 420px; 
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 24px; /* Fully rounded floating module */
+            transform: translateY(20px); /* Slight downward offset for visual balance */
         }
 
         .wicked-btn {
-            background: white; color: #020617; font-weight: 900; text-transform: uppercase;
-            letter-spacing: 0.1em; transition: all 0.2s; border-bottom: 4px solid #94a3b8;
-            border-radius: 4px;
+            background: white; 
+            color: #020617; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            letter-spacing: 0.1em; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 4px solid #94a3b8;
+            border-radius: 8px;
+        }
+
+        .wicked-btn:active {
+            transform: translateY(2px);
+            border-bottom-width: 2px;
         }
     </style>
 
@@ -67,25 +91,27 @@
                 await auth.signInWithPopup(provider);
                 window.location.href = "lobby.html";
             } catch (error) {
-                alert("The Lord rejects your soul: " + error.message);
+                console.error(error);
             }
         }
     </script>
 </head>
 <body>
-    <div class="gate-card">
-        <h1 class="bleeding-header mb-2">Zombie Lord's</h1>
-        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-[0.6em] mb-8">Playhouse</p>
-        <p class="text-slate-200 text-xs italic mb-10 leading-relaxed font-serif px-4">
-            "Kneel before the <span class="text-emerald-400 font-bold uppercase">Zombie Lord</span> upon the Emerald Shard Throne, 
-            amidst the ruins of lost innocence and <span class="text-emerald-500/80 uppercase font-bold">broken dreams</span>, 
-            only the wicked may enter!"
+    <div class="gate-portal">
+        <h1 class="bleeding-header mb-1">Zombie Lord's</h1>
+        <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-[0.5em] mb-6">Playhouse</p>
+        
+        <p class="text-slate-300 text-[11px] italic mb-8 leading-relaxed font-serif px-2">
+            "Kneel before the <span class="text-emerald-400 font-bold">Emerald Throne</span>,<br>
+            where <span class="text-emerald-500/80 uppercase font-bold">broken dreams</span> bleed into gold."
         </p>
+
         <button onclick="loginWithGoogle()" class="wicked-btn w-full py-4 flex items-center justify-center gap-3">
-            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="18" alt="G">
-            <span class="text-[11px]">Enter at your own Risk</span>
+            <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="16" alt="G">
+            <span class="text-[12px]">Claim Your Soul</span>
         </button>
-        <p class="mt-8 text-[8px] tracking-[0.4em] text-emerald-500/50 font-bold uppercase">M11 Secure Entry</p>
+
+        <p class="mt-8 text-[7px] tracking-[0.5em] text-emerald-500/40 font-bold uppercase">System M11 Active</p>
     </div>
 </body>
 </html>
