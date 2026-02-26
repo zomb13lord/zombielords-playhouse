@@ -28,9 +28,10 @@
             <h1 class="cinzel text-3xl emerald-text mb-2 uppercase tracking-tighter">Vault_Access</h1>
             <p class="text-[9px] text-slate-500 tracking-[0.4em] mb-10 uppercase">Session Management</p>
             <div class="flex flex-col gap-4">
-                <button onclick="resumeToTracker()" class="btn-zombie">Resume Active</button>
-                <button onclick="startFresh()" class="btn-zombie border-slate-700 text-slate-400">New Trial</button>
-                <button onclick="toggleArchiveList(true)" class="text-[10px] text-emerald-600 hover:text-emerald-400 uppercase font-bold mt-4">Load Archives</button>
+                <button onclick="resumeToTracker()" class="btn-zombie">Resume Session</button>
+                <button onclick="editCurrentConfig()" class="btn-zombie border-emerald-900/50">Edit Configuration</button>
+                <button onclick="toggleArchiveList(true)" class="btn-zombie border-slate-700 text-slate-400">Load Session</button>
+                <button onclick="startFresh()" class="btn-zombie border-red-900/30 text-slate-500">New Session</button>
             </div>
         </div>
     </div>
@@ -189,9 +190,9 @@
             const user = auth.currentUser;
             const doc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
 
-            if (referrer.includes('roulette.html')) {
-                if (doc.exists) loadValues(doc.data());
-                else startFresh();
+            // Direct route check: Only bypass modal if returning from roulette.html with valid data
+            if (referrer.includes('roulette.html') && doc.exists) {
+                loadValues(doc.data());
             } else {
                 document.getElementById('vault-modal').classList.remove('hidden');
             }
@@ -208,8 +209,6 @@
             document.getElementById('sub-type').value = d.protocol || "Standard";
             document.getElementById('neighbor-size').value = d.nSize || 1;
             document.getElementById('base-unit').value = d.unit || 1;
-            
-            // New Values Load
             if(d.strategy) document.getElementById('strategy').value = d.strategy;
             if(d.negProg) document.getElementById('neg-progression').value = d.negProg;
             if(d.posProg) document.getElementById('pos-progression').value = d.posProg;
@@ -224,8 +223,23 @@
             else alert("No Active Session Found.");
         }
 
+        async function editCurrentConfig() {
+            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
+            if (doc.exists) {
+                loadValues(doc.data());
+                document.getElementById('vault-modal').classList.add('hidden');
+            } else {
+                alert("No Session Data Found. Initializing Defaults.");
+                startFresh();
+            }
+        }
+
         function startFresh() {
             document.getElementById('vault-modal').classList.add('hidden');
+            // Reset to Engine Standard Defaults
+            document.getElementById('wheel-type').value = "EU";
+            document.getElementById('base-unit').value = 1;
+            document.getElementById('warmup-n').value = 18;
             updateWheelSubtypes(); updateSubDomains();
         }
 
@@ -241,15 +255,12 @@
                 protocol: document.getElementById('sub-type').value,
                 nSize: document.getElementById('neighbor-size').value,
                 unit: document.getElementById('base-unit').value,
-                
-                // New Data Commits
                 strategy: document.getElementById('strategy').value,
                 negProg: document.getElementById('neg-progression').value,
                 posProg: document.getElementById('pos-progression').value,
                 warmup: document.getElementById('warmup-n').value,
                 cdTrigger: document.getElementById('cd-trigger-n').value,
                 cdLength: document.getElementById('cd-length-n').value,
-
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 rolls: existingRolls
             };
