@@ -339,14 +339,23 @@
             const activeDoc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
             const archiveSnap = await db.collection("users").doc(user.uid).collection("sessions").get();
             
-            if (!activeDoc.exists) {
-                document.getElementById('btn-resume').classList.add('disabled');
-                document.getElementById('btn-edit').classList.add('disabled');
+            const hasActive = activeDoc.exists;
+            const hasArchives = archiveSnap.docs.some(doc => doc.id !== "active_session");
+
+            // Frictionless Onboarding Bypass
+            if (!hasActive && !hasArchives) {
+                document.getElementById('vault-modal').classList.add('hidden');
+                loadValues(null); // Boot default architecture immediately
+            } else {
+                if (!hasActive) {
+                    document.getElementById('btn-resume').classList.add('disabled');
+                    document.getElementById('btn-edit').classList.add('disabled');
+                }
+                if (!hasArchives) {
+                    document.getElementById('btn-load-main').classList.add('disabled');
+                }
+                document.getElementById('vault-modal').classList.remove('hidden');
             }
-            if (!archiveSnap.docs.some(doc => doc.id !== "active_session")) {
-                document.getElementById('btn-load-main').classList.add('disabled');
-            }
-            document.getElementById('vault-modal').classList.remove('hidden');
         });
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
@@ -483,7 +492,7 @@
         
         function startFresh() { 
             document.getElementById('vault-modal').classList.add('hidden'); 
-            loadValues(null); // Boot default architecture
+            loadValues(null); 
         }
         
         async function editCurrentConfig() { 
