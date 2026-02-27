@@ -59,47 +59,33 @@
 
         .shard { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); }
         
-        /* OVERHAULED INPUT STYLING FOR READABILITY */
         .config-input { 
-            background-color: #0f172a; 
-            border: 1px solid #059669; 
-            color: #f8fafc; 
-            padding: 10px 12px; 
-            border-radius: 6px; 
-            width: 100%; 
-            outline: none; 
-            font-size: 11px; 
-            font-family: 'Montserrat', sans-serif; 
-            transition: all 0.3s ease; 
+            background-color: #0f172a; border: 1px solid #059669; color: #f8fafc; 
+            padding: 10px 12px; border-radius: 6px; width: 100%; outline: none; 
+            font-size: 11px; font-family: 'Montserrat', sans-serif; transition: all 0.3s ease; 
             appearance: none; 
         }
         select.config-input {
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-            padding-right: 40px;
-            cursor: pointer;
+            background-repeat: no-repeat; background-position: right 12px center;
+            background-size: 16px; padding-right: 40px; cursor: pointer;
         }
         .config-input:focus { border-color: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.4); }
         .config-input option { background-color: #020617; color: #10b981; font-weight: 600; padding: 12px; }
 
         label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: #34d399; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
-        
         .modal-offset { top: 76px; }
 
-        /* Dynamic Felt Selection Styling */
+        /* UNIVERSAL ROULETTE FELT BOARD */
         .felt-btn {
             cursor: pointer; transition: all 0.2s ease-in-out;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.05); user-select: none;
         }
         .felt-btn:hover { border-color: rgba(16, 185, 129, 0.6); transform: translateY(-1px); }
         .felt-selected {
-            border-color: #10b981 !important;
-            color: #fff !important;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.6) !important;
-            opacity: 1 !important;
-            background-color: rgba(16, 185, 129, 0.2) !important;
+            border-color: #10b981 !important; color: #fff !important;
+            box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.4), 0 0 10px rgba(16, 185, 129, 0.6) !important;
+            opacity: 1 !important; background-color: rgba(16, 185, 129, 0.2) !important;
         }
     </style>
 </head>
@@ -139,11 +125,11 @@
         </div>
     </div>
 
-    <main class="flex-grow flex flex-col items-center justify-start p-6 pt-12">
-        <div class="w-full max-w-4xl mb-20">
+    <main class="flex-grow flex flex-col items-center justify-start p-4 md:p-6 pt-12">
+        <div class="w-full max-w-5xl mb-20">
             
-            <div class="shard p-8 mb-6 rounded shadow-lg">
-                <div class="border-b border-emerald-900/30 pb-4 mb-8 flex justify-between items-center">
+            <div class="shard p-6 md:p-8 mb-6 rounded shadow-lg">
+                <div class="border-b border-emerald-900/30 pb-4 mb-6 md:mb-8">
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Wheel Layout</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -162,8 +148,8 @@
                 </div>
             </div>
 
-            <div class="shard p-8 mb-6 rounded shadow-lg">
-                <div class="border-b border-emerald-900/30 pb-4 mb-8 flex justify-between items-center">
+            <div class="shard p-6 md:p-8 mb-6 rounded shadow-lg">
+                <div class="border-b border-emerald-900/30 pb-4 mb-6 md:mb-8">
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Strategy</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
@@ -199,18 +185,19 @@
                     </div>
                 </div>
 
-                <div id="target-selection-box" style="display: none;" class="mt-6 bg-emerald-950/20 p-6 border border-emerald-900/30 rounded">
-                    <label id="target-selection-label">Target Selection</label>
+                <div id="target-selection-box" style="display: none;" class="mt-8 bg-emerald-950/20 p-4 md:p-6 border border-emerald-900/30 rounded overflow-hidden">
+                    <label id="target-selection-label" class="mb-4">Target Selection</label>
                     <input type="number" id="target-dynamic-input" style="display: none;" class="config-input" placeholder="Enter quantity">
-                    <div id="felt-board" style="display: none;" class="w-full flex-col gap-1"></div>
+                    
+                    <div id="felt-board" style="display: none;" class="w-full"></div>
                 </div>
             </div>
 
-            <div class="shard p-8 mb-6 rounded shadow-lg">
-                <div class="border-b border-emerald-900/30 pb-4 mb-8 flex justify-between items-center">
+            <div class="shard p-6 md:p-8 mb-6 rounded shadow-lg">
+                <div class="border-b border-emerald-900/30 pb-4 mb-6 md:mb-8">
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Bet Commander</h2>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                     <div>
                         <label>Warmup</label>
                         <input type="number" id="warmup-n" class="config-input" value="16">
@@ -244,7 +231,7 @@
                         </select>
                     </div>
                     
-                    <div id="hedge-commander-box" style="display: none;" class="lg:col-span-6 bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                    <div id="hedge-commander-box" style="display: none;" class="col-span-2 md:col-span-3 lg:col-span-6 bg-slate-900/60 p-4 rounded border border-emerald-900/40">
                         <label>Top Line Hedge</label>
                         <select id="hedge-commander" class="config-input">
                             <option value="always">Always On</option>
@@ -254,8 +241,8 @@
                 </div>
             </div>
 
-            <div class="shard p-8 mb-8 rounded shadow-lg">
-                <div class="border-b border-emerald-900/30 pb-4 mb-8 flex justify-between items-center">
+            <div class="shard p-6 md:p-8 mb-8 rounded shadow-lg">
+                <div class="border-b border-emerald-900/30 pb-4 mb-6 md:mb-8">
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Progression</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -291,7 +278,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
                     <div id="prog-multi-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
                         <label>Multiplier</label>
                         <input type="number" id="prog-multi" class="config-input" value="2" step="0.1">
@@ -311,21 +298,11 @@
                 </div>
             </div>
 
-            <button onclick="commitAndLaunch()" class="shard-btn w-full cinzel emerald-text text-lg tracking-[0.5em] primary-shard py-6">
+            <button onclick="commitAndLaunch()" class="shard-btn w-full cinzel emerald-text text-xl tracking-[0.5em] primary-shard py-6 font-black">
                 START SESSION
             </button>
         </div>
     </main>
-
-    <div id="archive-portal" class="fixed inset-x-0 bottom-0 modal-offset z-[90] flex items-center justify-center bg-black/98 hidden">
-        <div class="max-w-3xl w-full p-10 shard border border-emerald-900/20 -mt-10">
-            <div class="flex justify-between items-center mb-10 border-b border-emerald-900/20 pb-6">
-                <h2 class="cinzel text-2xl emerald-text uppercase tracking-widest">Archived Sessions</h2>
-                <button onclick="toggleArchiveList(false)" class="text-slate-500 hover:text-white text-2xl transition">✕</button>
-            </div>
-            <div id="session-list" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2"></div>
-        </div>
-    </div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
@@ -341,11 +318,11 @@
 
         const domainMap = { 
             inside: { 
-                "Straight Up": ["Dynamic", "Fixed"], 
+                "Straight Up": ["Fixed", "Dynamic"], 
                 "Splits": ["Horizontal", "Vertical", "Both"], 
                 "Streets": ["Standard", "Baskets", "Top Line"], 
                 "Corners": ["Standard"], 
-                "Lines": ["Standard", "Full", "Baskets", "Top Line"] 
+                "Lines": ["Standard", "Full", "Top Line"] 
             }, 
             outside: { 
                 "Dozens/Columns": ["Dozens", "Columns", "Both"], 
@@ -385,9 +362,9 @@
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
 
-        function toggleVisibility(element, show, flexMode = false) {
+        function toggleVisibility(element, show, displayType = 'block') {
             if (!element) return;
-            element.style.display = show ? (flexMode ? 'flex' : 'block') : 'none';
+            element.style.display = show ? displayType : 'none';
         }
 
         function updateWheelSubtypes() {
@@ -410,91 +387,107 @@
             evaluateLogicFlows();
         }
 
+        function updateSelectionCount() {
+            const count = document.querySelectorAll('.felt-selected').length;
+            const label = document.getElementById('target-selection-label');
+            if (label) label.innerText = count > 0 ? `Target Selection (${count})` : `Target Selection`;
+
+            const typeSelect = document.getElementById('sub-type');
+            if (typeSelect) {
+                Array.from(typeSelect.options).forEach(opt => {
+                    if (opt.value === 'Fixed') {
+                        opt.text = count > 0 ? `Fixed (${count})` : 'Fixed';
+                    }
+                });
+            }
+        }
+
+        function handleFeltClick(btn, category, type, wheel) {
+            const val = btn.dataset.val;
+            let targets = [val]; 
+
+            if (val !== '0' && val !== '00' && val !== '000') {
+                const num = parseInt(val);
+                if (category === "Streets") {
+                    const s = Math.ceil(num / 3);
+                    targets = [s*3 - 2, s*3 - 1, s*3].map(String);
+                } else if (category === "Lines" && type === "Standard") {
+                    const l = Math.ceil(num / 6);
+                    targets = Array.from({length: 6}, (_, i) => String((l-1)*6 + i + 1));
+                }
+            } else {
+                if (type === "Top Line") {
+                    targets = wheel === 'EU' ? ['0','1','2','3'] : ['0','00','1','2','3'];
+                    if(wheel === 'TZ') targets.push('000');
+                } else if (type === "Baskets" && category === "Streets") {
+                    targets = ['0','1','2']; 
+                    if(wheel !== 'EU') targets.push('00');
+                }
+            }
+
+            const isSelected = btn.dataset.selected === 'true';
+            const willSelect = !isSelected;
+
+            targets.forEach(t => {
+                const targetBtn = document.querySelector(`.felt-btn[data-val="${t}"]`);
+                if (targetBtn) {
+                    targetBtn.dataset.selected = willSelect;
+                    if (willSelect) targetBtn.classList.add('felt-selected');
+                    else targetBtn.classList.remove('felt-selected');
+                }
+            });
+
+            updateSelectionCount();
+        }
+
         function renderFeltLayout(category, type, wheel) {
             const container = document.getElementById('felt-board');
             const newSignature = `${category}-${type}-${wheel}`;
-            if(container.dataset.signature === newSignature) return; 
             
+            if(container.dataset.signature === newSignature) return; 
             container.dataset.signature = newSignature;
             container.innerHTML = ''; 
 
-            const createBtn = (label, bgClass, val, colSpan = "col-span-1") => {
+            const createFeltBtn = (label, bgClass, val, gridClasses = "") => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = `felt-btn ${bgClass} ${colSpan} p-3 text-white text-[10px] md:text-xs font-bold rounded opacity-60 hover:opacity-100 uppercase text-center`;
+                btn.className = `felt-btn ${bgClass} ${gridClasses} p-2 md:p-3 text-white text-[11px] md:text-sm font-bold rounded opacity-60 hover:opacity-100 uppercase flex items-center justify-center min-h-[40px] md:min-h-[50px]`;
                 btn.innerText = label;
                 btn.dataset.val = val;
-                btn.onclick = () => {
-                    const isSelected = btn.dataset.selected === 'true';
-                    btn.dataset.selected = !isSelected;
-                    if(!isSelected) btn.classList.add('felt-selected');
-                    else btn.classList.remove('felt-selected');
-                };
+                btn.onclick = () => handleFeltClick(btn, category, type, wheel);
                 return btn;
             };
 
-            const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-            const getBg = (n) => redNums.includes(n) ? 'bg-red-800' : 'bg-gray-900';
+            const zerosDiv = document.createElement('div');
+            zerosDiv.className = `grid gap-1 md:flex md:flex-col md:col-start-1 md:row-start-1 md:row-span-3 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
 
-            if (category === "Streets") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
-                for(let i=1; i<=12; i++) {
-                    const start = (i-1)*3 + 1;
-                    grid.appendChild(createBtn(`Street ${i} (${start}-${start+2})`, 'bg-slate-800', `Street ${i}`));
-                }
-                container.appendChild(grid);
-            } else if (category === "Lines") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-2';
-                for(let i=1; i<=11; i++) grid.appendChild(createBtn(`Line ${i}`, 'bg-slate-800', `Line ${i}`));
-                container.appendChild(grid);
-            } else if (category === "Corners") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-3 gap-2';
-                for(let i=1; i<=22; i++) grid.appendChild(createBtn(`Corner ${i}`, 'bg-slate-800', `Corner ${i}`));
-                container.appendChild(grid);
-            } else if (category === "Splits") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-4 gap-2';
-                for(let i=1; i<=57; i++) grid.appendChild(createBtn(`Split ${i}`, 'bg-slate-800', `Split ${i}`));
-                container.appendChild(grid);
-            } else if (category === "Dozens/Columns") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-3 gap-2';
-                ["Dozen 1", "Dozen 2", "Dozen 3", "Column 1", "Column 2", "Column 3"].forEach(opt => {
-                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
-                });
-                container.appendChild(grid);
-            } else if (category === "Even Money") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
-                ["Red", "Black", "Odd", "Even", "High", "Low"].forEach(opt => {
-                    const bg = opt === "Red" ? "bg-red-800" : (opt === "Black" ? "bg-gray-900" : "bg-slate-800");
-                    grid.appendChild(createBtn(opt, bg, opt));
-                });
-                container.appendChild(grid);
-            } else if (category === "Racetrack") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-2';
-                ["Zero Game", "Voisins", "Orphelins", "Tier"].forEach(opt => {
-                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
-                });
-                container.appendChild(grid);
+            if (wheel === 'EU') {
+                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:h-full'));
+            } else if (wheel === 'US') {
+                zerosDiv.appendChild(createFeltBtn('00', 'bg-emerald-900', '00', 'md:flex-1'));
+                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:flex-1'));
             } else {
-                // DEFAULT 0-36 (Straight Up, Heat Map, etc)
-                const topGrid = document.createElement('div');
-                topGrid.className = `grid gap-1 mb-1 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
-                topGrid.appendChild(createBtn('0', 'bg-emerald-900', '0', 'col-span-1'));
-                if(wheel === 'US' || wheel === 'TZ') topGrid.appendChild(createBtn('00', 'bg-emerald-900', '00', 'col-span-1'));
-                if(wheel === 'TZ') topGrid.appendChild(createBtn('000', 'bg-emerald-900', '000', 'col-span-1'));
-                container.appendChild(topGrid);
-
-                const numGrid = document.createElement('div');
-                numGrid.className = 'grid grid-cols-3 gap-1';
-                for(let i=1; i<=36; i++) numGrid.appendChild(createBtn(i.toString(), getBg(i), i.toString()));
-                container.appendChild(numGrid);
+                zerosDiv.appendChild(createFeltBtn('000', 'bg-emerald-900', '000', 'md:flex-1'));
+                zerosDiv.appendChild(createFeltBtn('00', 'bg-emerald-900', '00', 'md:flex-1'));
+                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:flex-1'));
             }
+
+            const boardDiv = document.createElement('div');
+            boardDiv.className = 'grid grid-cols-3 md:grid-cols-[60px_repeat(12,1fr)] md:grid-rows-3 gap-1 md:gap-2 w-full';
+            boardDiv.appendChild(zerosDiv);
+
+            const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+
+            for(let i=1; i<=36; i++) {
+                const bg = redNums.includes(i) ? 'bg-red-900' : 'bg-slate-900';
+                const col = Math.ceil(i/3) + 1;
+                const row = 3 - ((i-1)%3);
+                const gridClasses = `md:[grid-column:${col}] md:[grid-row:${row}]`;
+                boardDiv.appendChild(createFeltBtn(i.toString(), bg, i.toString(), gridClasses));
+            }
+
+            container.appendChild(boardDiv);
+            updateSelectionCount();
         }
 
         function evaluateLogicFlows() {
@@ -527,11 +520,10 @@
             const pInc = document.getElementById('prog-inc-box');
             const pDec = document.getElementById('prog-dec-box');
 
-            // Hard Reset Display States
             toggleVisibility(typeSelect, true);
             toggleVisibility(dynBox, false);
             toggleVisibility(targetBox, false);
-            toggleVisibility(targetFeltBoard, false, true); // Use flex
+            toggleVisibility(targetFeltBoard, false); 
             toggleVisibility(targetDynamicInput, false);
             toggleVisibility(hedgeCmd, false);
             toggleVisibility(hedgeProg, false);
@@ -542,7 +534,6 @@
             
             typeLabel.innerText = "Type";
 
-            // Intercepts
             if (category === "Neighbors") {
                 toggleVisibility(typeSelect, false);
                 toggleVisibility(dynBox, true);
@@ -564,7 +555,9 @@
             if (showDynInput || showFelt) {
                 toggleVisibility(targetBox, true);
                 toggleVisibility(targetDynamicInput, showDynInput);
-                toggleVisibility(targetFeltBoard, showFelt, true); // Display flex
+                if(showFelt) {
+                    targetFeltBoard.style.display = 'block'; 
+                }
             }
 
             if (type === "Top Line") {
@@ -598,32 +591,6 @@
             document.getElementById('vault-modal').classList.add('hidden'); 
         }
 
-        function toggleArchiveList(show) { document.getElementById('archive-portal').classList.toggle('hidden', !show); if(show) refreshArchiveList(); }
-
-        async function refreshArchiveList() {
-            const listDiv = document.getElementById('session-list');
-            listDiv.innerHTML = '';
-            const snap = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").orderBy("timestamp", "desc").get();
-            snap.forEach(doc => {
-                if(doc.id === "active_session") return;
-                const d = doc.data();
-                const row = document.createElement('div');
-                row.className = "flex items-center justify-between p-4 bg-black/40 border border-white/5 rounded transition hover:border-emerald-900/50";
-                row.innerHTML = `<div class="text-left flex-grow"><input type="text" id="name-${doc.id}" value="${d.name || 'Unnamed'}" readOnly onkeydown="if(event.key==='Enter'){this.blur(); finalizeNameChange('${doc.id}');}" onblur="finalizeNameChange('${doc.id}')" class="bg-transparent text-emerald-400 cinzel text-sm uppercase focus:outline-none w-full cursor-default transition"></div><div class="flex items-center gap-4 ml-4"><i class="fa-solid fa-pen-to-square text-slate-600 hover:text-emerald-400 cursor-pointer text-xs transition" onclick="toggleEdit('${doc.id}')"></i><button onclick="loadArchive('${doc.id}')" class="cinzel text-[10px] emerald-text px-4 py-1 border border-emerald-900/30 hover:bg-emerald-500 hover:text-black transition">LOAD</button><i class="fa-solid fa-xmark text-red-900 hover:text-red-500 cursor-pointer text-lg transition" onclick="deleteArchive('${doc.id}')"></i></div>`;
-                listDiv.appendChild(row);
-            });
-        }
-
-        function toggleEdit(id) { const input = document.getElementById(`name-${id}`); input.readOnly = false; input.classList.add('border-b', 'border-emerald-500'); input.focus(); }
-        async function finalizeNameChange(id) { /* Handle renaming via separate function if needed */ }
-        async function deleteArchive(id) { if(confirm("PERMANENT_DELETION_PROTOCOL_INITIATED. PROCEED?")) { await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).delete(); refreshArchiveList(); } }
-        async function loadArchive(id) {
-            const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).get();
-            await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").set(doc.data());
-            window.location.href = "roulette.html";
-        }
-
-        // --- HARDENED INITIALIZATION ---
         function loadValues(d) {
             if(!d) {
                 document.getElementById('wheel-type').value = "US";
@@ -661,11 +628,12 @@
             updateWheelSubtypes();
             document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
             
-            document.getElementById('strategy').value = d.strategy || "fixed";
             document.getElementById('main-domain').value = d.domain || "inside";
             updateSubDomains();
             document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
             updateSubTypes();
+
+            document.getElementById('strategy').value = d.strategy || "fixed";
             
             if (d.subCategory === "Neighbors" || (d.subCategory === "Straight Up" && d.protocol === "Dynamic")) {
                 document.getElementById('dynamic-type-input').value = d.dynamicValue || d.nSize || 1;
@@ -685,6 +653,7 @@
                         btn.classList.add('felt-selected');
                     }
                 });
+                updateSelectionCount();
             }
             
             document.getElementById('warmup-n').value = d.warmup || 16;
@@ -726,7 +695,7 @@
                 strategy: document.getElementById('strategy').value,
                 domain: document.getElementById('main-domain').value,
                 subCategory: document.getElementById('sub-domain').value,
-                protocol: document.getElementById('sub-type').value, 
+                protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
                 dynamicValue: document.getElementById('sub-domain').value === "Neighbors" ? document.getElementById('dynamic-type-input').value : null,
                 numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
                 targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed") ? targetArray : null,
