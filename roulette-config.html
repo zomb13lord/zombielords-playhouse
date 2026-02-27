@@ -114,12 +114,12 @@
             
             <div class="shard p-8 mb-6 rounded border border-gold/20 bg-black/40 shadow-lg">
                 <div class="border-b border-gold/20 pb-4 mb-8 flex justify-between items-center">
-                    <h2 class="cinzel gold-text text-lg uppercase tracking-widest font-black">Wheel_Layout</h2>
+                    <h2 class="cinzel gold-text text-lg uppercase tracking-widest font-black">Wheel Layout</h2>
                     <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Core Geometry</span>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Architecture</label>
+                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Type</label>
                         <select id="wheel-type" class="config-input" onchange="updateWheelSubtypes()">
                             <option value="EU">European (37)</option>
                             <option value="US">American (38)</option>
@@ -127,7 +127,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Style (Sub-Layout)</label>
+                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Style</label>
                         <select id="wheel-subtype" class="config-input"></select>
                     </div>
                 </div>
@@ -135,30 +135,42 @@
 
             <div class="shard p-8 mb-6 rounded border border-emerald-900/30 bg-black/40 shadow-lg">
                 <div class="border-b border-emerald-900/30 pb-4 mb-8 flex justify-between items-center">
-                    <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Logic_Protocols</h2>
+                    <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Strategy</h2>
                     <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Domain Isolation</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Main Domain</label>
+                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Strategy</label>
+                        <select id="strategy" class="config-input">
+                            <option value="hot">Hot</option>
+                            <option value="cold">Cold</option>
+                            <option value="fixed">Fixed</option>
+                            <option value="radar">Radar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Domain</label>
                         <select id="main-domain" class="config-input" onchange="updateSubDomains()">
                             <option value="inside">Inside</option>
                             <option value="outside">Outside</option>
                             <option value="sectors">Sectors</option>
                         </select>
                     </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                         <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Category</label>
                         <select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Protocol</label>
+                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Type</label>
                         <select id="sub-type" class="config-input" onchange="toggleNeighborBox()"></select>
                     </div>
-                    <div id="neighbor-input-box" class="md:col-span-3 hidden bg-emerald-950/20 p-4 border border-emerald-900/30 rounded">
-                        <label class="text-[10px] uppercase font-semibold text-emerald-500 mb-2 block tracking-widest">Neighbor Size (S)</label>
-                        <input type="number" id="neighbor-size" class="config-input border-emerald-500/50" value="1">
-                    </div>
+                </div>
+                
+                <div id="neighbor-input-box" class="mt-6 hidden bg-emerald-950/20 p-4 border border-emerald-900/30 rounded">
+                    <label class="text-[10px] uppercase font-semibold text-emerald-500 mb-2 block tracking-widest">Neighbor Size (S)</label>
+                    <input type="number" id="neighbor-size" class="config-input border-emerald-500/50" value="1">
                 </div>
             </div>
 
@@ -167,18 +179,10 @@
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Financial_Execution</h2>
                     <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Bet Commander</span>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Base Unit ($)</label>
                         <input type="number" id="base-unit" class="config-input" value="1" step="0.1">
-                    </div>
-                    <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Strategy</label>
-                        <select id="strategy" class="config-input">
-                            <option value="cold">Cold Hunt</option>
-                            <option value="hot">Hot Streak</option>
-                            <option value="fixed">Fixed Target</option>
-                        </select>
                     </div>
                     <div>
                         <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Neg. Progression</label>
@@ -247,7 +251,7 @@
         const auth = firebase.auth(); 
         const db = firebase.firestore();
 
-        // Data Governance: Wheel Architecture Truth Map
+        // Data Governance: Architecture Maps
         const wheelMap = { 
             EU: ["Standard", "La Partage"], 
             US: ["Standard"], 
@@ -255,9 +259,22 @@
         };
 
         const domainMap = { 
-            inside: { "Straight Up": ["Single Number"], "Splits": ["Standard (Horizontal)", "Vertical"], "Streets": ["Standard", "Baskets"], "Corners": ["Standard (Squares)"], "Lines": ["Standard"] }, 
-            outside: { "Dozens/Columns": ["Dozens", "Columns"], "Even Money": ["Red/Black", "Odd/Even", "High/Low"] }, 
-            sectors: { "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], "Neighbors": ["Size (S)"], "Heat Map": ["Dynamic Cluster"] } 
+            inside: { 
+                "Straight Up": ["Single Numbers"], 
+                "Splits": ["Standard (Horizontal)", "Vertical", "Both"], 
+                "Streets": ["Standard", "Baskets", "Top Line"], 
+                "Corners": ["Standard (Squares)"], 
+                "Lines": ["Standard", "Full", "Baskets", "Top Line"] 
+            }, 
+            outside: { 
+                "Dozens/Columns": ["Dozens", "Columns"], 
+                "Even Money": ["Red/Black", "Odd/Even", "High/Low", "All"] 
+            }, 
+            sectors: { 
+                "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], 
+                "Neighbors": ["Size (S)"], 
+                "Heat Map": ["Dynamic"] 
+            } 
         };
 
         auth.onAuthStateChanged(async user => {
@@ -305,7 +322,8 @@
 
         function toggleNeighborBox() {
             const s = document.getElementById('sub-domain').value;
-            document.getElementById('neighbor-input-box').classList.toggle('hidden', s !== "Neighbors");
+            const box = document.getElementById('neighbor-input-box');
+            s === "Neighbors" ? box.classList.remove('hidden') : box.classList.add('hidden');
         }
 
         async function resumeToTracker() { window.location.href = "roulette.html"; }
@@ -394,20 +412,24 @@
             document.getElementById('wheel-type').value = d.wheel || "EU";
             updateWheelSubtypes();
             document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
+            
+            document.getElementById('strategy').value = d.strategy || "hot";
             document.getElementById('main-domain').value = d.domain || "inside";
             updateSubDomains();
             document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
             updateSubTypes();
-            document.getElementById('sub-type').value = d.protocol || "Single Number";
+            document.getElementById('sub-type').value = d.protocol || "Single Numbers";
+            
             document.getElementById('base-unit').value = d.unit || 1;
-            document.getElementById('strategy').value = d.strategy || "cold";
             document.getElementById('neg-progression').value = d.negProg || "flat";
             document.getElementById('pos-progression').value = d.posProg || "flat";
+            
             document.getElementById('warmup-n').value = d.warmup || 18;
             document.getElementById('cd-trigger-n').value = d.cdTrigger || 3;
             document.getElementById('cd-length-n').value = d.cdLength || 12;
             
             if (d.nSize) document.getElementById('neighbor-size').value = d.nSize;
+            toggleNeighborBox();
         }
 
         async function commitAndLaunch() {
@@ -416,12 +438,12 @@
             const config = {
                 wheel: document.getElementById('wheel-type').value,
                 wheelSub: document.getElementById('wheel-subtype').value,
+                strategy: document.getElementById('strategy').value,
                 domain: document.getElementById('main-domain').value,
                 subCategory: document.getElementById('sub-domain').value,
                 protocol: document.getElementById('sub-type').value,
                 nSize: document.getElementById('neighbor-size').value,
                 unit: document.getElementById('base-unit').value,
-                strategy: document.getElementById('strategy').value,
                 negProg: document.getElementById('neg-progression').value,
                 posProg: document.getElementById('pos-progression').value,
                 warmup: document.getElementById('warmup-n').value,
