@@ -58,9 +58,33 @@
         .primary-shard { border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.05); }
 
         .shard { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); }
-        .config-input { background: rgba(0,0,0,0.6); border: 1px solid #333; color: #fff; padding: 12px; border-radius: 2px; width: 100%; outline: none; font-size: 11px; font-family: 'Montserrat', sans-serif; transition: 0.3s; }
-        .config-input:focus { border-color: var(--emerald); }
-        label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: var(--emerald); margin-bottom: 8px; display: block; }
+        
+        /* OVERHAULED INPUT STYLING FOR READABILITY */
+        .config-input { 
+            background-color: #0f172a; 
+            border: 1px solid #059669; 
+            color: #f8fafc; 
+            padding: 10px 12px; 
+            border-radius: 6px; 
+            width: 100%; 
+            outline: none; 
+            font-size: 11px; 
+            font-family: 'Montserrat', sans-serif; 
+            transition: all 0.3s ease; 
+            appearance: none; 
+        }
+        select.config-input {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23059669' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        .config-input:focus { border-color: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.4); }
+        .config-input option { background-color: #020617; color: #10b981; font-weight: 600; padding: 12px; }
+
+        label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: #34d399; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
         
         .modal-offset { top: 76px; }
 
@@ -124,7 +148,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Type</label>
+                        <label>Type</label>
                         <select id="wheel-type" class="config-input" onchange="updateWheelSubtypes()">
                             <option value="EU">European (37)</option>
                             <option value="US">American (38)</option>
@@ -132,7 +156,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Style</label>
+                        <label>Style</label>
                         <select id="wheel-subtype" class="config-input" onchange="evaluateLogicFlows()"></select>
                     </div>
                 </div>
@@ -144,7 +168,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Domain</label>
+                        <label>Domain</label>
                         <select id="main-domain" class="config-input" onchange="updateSubDomains()">
                             <option value="inside">Inside</option>
                             <option value="outside">Outside</option>
@@ -152,17 +176,20 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Category</label>
+                        <label>Category</label>
                         <select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div id="type-container" class="relative">
-                        <label id="type-label" class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Type</label>
+                        <label id="type-label">Type</label>
                         <select id="sub-type" class="config-input" onchange="evaluateLogicFlows()"></select>
+                        <div id="dynamic-value-box" style="display: none;">
+                            <input type="number" id="dynamic-type-input" class="config-input" value="1">
+                        </div>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Strategy</label>
+                        <label>Strategy</label>
                         <select id="strategy" class="config-input" onchange="evaluateLogicFlows()">
                             <option value="fixed">Fixed</option>
                             <option value="cold">Cold</option>
@@ -172,12 +199,10 @@
                     </div>
                 </div>
 
-                <div id="target-selection-box" class="mt-6 hidden bg-emerald-950/20 p-6 border border-emerald-900/30 rounded">
-                    <label id="target-selection-label" class="text-[10px] uppercase font-semibold text-emerald-500 mb-4 block tracking-widest">Target Selection</label>
-                    
-                    <input type="number" id="target-dynamic-input" class="config-input border-emerald-500/50 hidden" placeholder="Enter quantity">
-                    
-                    <div id="felt-board" class="w-full flex flex-col gap-1 hidden"></div>
+                <div id="target-selection-box" style="display: none;" class="mt-6 bg-emerald-950/20 p-6 border border-emerald-900/30 rounded">
+                    <label id="target-selection-label">Target Selection</label>
+                    <input type="number" id="target-dynamic-input" style="display: none;" class="config-input" placeholder="Enter quantity">
+                    <div id="felt-board" style="display: none;" class="w-full flex-col gap-1"></div>
                 </div>
             </div>
 
@@ -187,30 +212,30 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-6">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Warmup</label>
+                        <label>Warmup</label>
                         <input type="number" id="warmup-n" class="config-input" value="16">
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Loss Trigger</label>
+                        <label>Loss Trigger</label>
                         <input type="number" id="cd-trigger-n" class="config-input" value="2">
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">CD Length</label>
+                        <label>CD Length</label>
                         <input type="number" id="cd-length-n" class="config-input" value="6">
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Stabilization</label>
+                        <label>Stabilization</label>
                         <input type="number" id="stabilization-n" class="config-input" value="3">
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Bet Prompt</label>
+                        <label>Bet Prompt</label>
                         <select id="bet-prompt" class="config-input">
                             <option value="place">Place</option>
                             <option value="avoid">Avoid</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Lookback</label>
+                        <label>Lookback</label>
                         <select id="lookback-w" class="config-input">
                             <option value="short">Short</option>
                             <option value="standard">Standard</option>
@@ -219,8 +244,8 @@
                         </select>
                     </div>
                     
-                    <div id="hedge-commander-box" class="hidden lg:col-span-6 bg-slate-900/40 p-3 rounded border border-emerald-900/20">
-                        <label class="text-[10px] uppercase font-semibold text-emerald-500 mb-2 block tracking-widest">Top Line Hedge</label>
+                    <div id="hedge-commander-box" style="display: none;" class="lg:col-span-6 bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                        <label>Top Line Hedge</label>
                         <select id="hedge-commander" class="config-input">
                             <option value="always">Always On</option>
                             <option value="dynamic">Dynamic</option>
@@ -235,11 +260,11 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Base Unit ($)</label>
+                        <label>Base Unit ($)</label>
                         <input type="number" id="base-unit" class="config-input" value="5" step="0.1">
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Neg. Progression</label>
+                        <label>Neg. Progression</label>
                         <select id="neg-progression" class="config-input" onchange="evaluateLogicFlows()">
                             <option value="flat">Flat</option>
                             <option value="martingale">Martingale</option>
@@ -250,15 +275,15 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-[10px] uppercase font-semibold text-slate-400 mb-2 block tracking-widest">Pos. Progression</label>
+                        <label>Pos. Progression</label>
                         <select id="pos-progression" class="config-input">
                             <option value="flat">Flat</option>
                             <option value="parole">Parole</option>
                         </select>
                     </div>
 
-                    <div id="hedge-progression-box" class="hidden">
-                        <label class="text-[10px] uppercase font-semibold text-emerald-500 mb-2 block tracking-widest">Hedge Directive</label>
+                    <div id="hedge-progression-box" style="display: none;">
+                        <label>Hedge Directive</label>
                         <select id="hedge-progression" class="config-input">
                             <option value="push">Push</option>
                             <option value="profit">Profit</option>
@@ -267,20 +292,20 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-                    <div id="prog-multi-box" class="hidden bg-slate-900/40 p-3 rounded border border-emerald-900/30">
-                        <label class="text-[9px] uppercase font-semibold text-emerald-400 mb-2 block">Multiplier</label>
+                    <div id="prog-multi-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                        <label>Multiplier</label>
                         <input type="number" id="prog-multi" class="config-input" value="2" step="0.1">
                     </div>
-                    <div id="prog-plus-box" class="hidden bg-slate-900/40 p-3 rounded border border-emerald-900/30">
-                        <label class="text-[9px] uppercase font-semibold text-emerald-400 mb-2 block">Plus Mod</label>
+                    <div id="prog-plus-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                        <label>Plus Mod</label>
                         <input type="number" id="prog-plus" class="config-input" value="1" step="0.1">
                     </div>
-                    <div id="prog-inc-box" class="hidden bg-slate-900/40 p-3 rounded border border-emerald-900/30">
-                        <label class="text-[9px] uppercase font-semibold text-emerald-400 mb-2 block">Increase (Loss)</label>
+                    <div id="prog-inc-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                        <label>Increase (Loss)</label>
                         <input type="number" id="prog-inc" class="config-input" value="1" step="1">
                     </div>
-                    <div id="prog-dec-box" class="hidden bg-slate-900/40 p-3 rounded border border-emerald-900/30">
-                        <label class="text-[9px] uppercase font-semibold text-emerald-400 mb-2 block">Decrease (Win)</label>
+                    <div id="prog-dec-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
+                        <label>Decrease (Win)</label>
                         <input type="number" id="prog-dec" class="config-input" value="1" step="1">
                     </div>
                 </div>
@@ -360,6 +385,11 @@
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
 
+        function toggleVisibility(element, show, flexMode = false) {
+            if (!element) return;
+            element.style.display = show ? (flexMode ? 'flex' : 'block') : 'none';
+        }
+
         function updateWheelSubtypes() {
             const type = document.getElementById('wheel-type').value;
             const sub = document.getElementById('wheel-subtype');
@@ -380,12 +410,9 @@
             evaluateLogicFlows();
         }
 
-        // Felt Grid Generator
         function renderFeltLayout(category, type, wheel) {
             const container = document.getElementById('felt-board');
             const newSignature = `${category}-${type}-${wheel}`;
-            
-            // Prevent erasing user selections if the domain/wheel hasn't actually changed
             if(container.dataset.signature === newSignature) return; 
             
             container.dataset.signature = newSignature;
@@ -407,9 +434,55 @@
             };
 
             const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-            const getBg = (n) => redNums.includes(n) ? 'bg-red-900' : 'bg-slate-900';
+            const getBg = (n) => redNums.includes(n) ? 'bg-red-800' : 'bg-gray-900';
 
-            if (category === "Straight Up") {
+            if (category === "Streets") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
+                for(let i=1; i<=12; i++) {
+                    const start = (i-1)*3 + 1;
+                    grid.appendChild(createBtn(`Street ${i} (${start}-${start+2})`, 'bg-slate-800', `Street ${i}`));
+                }
+                container.appendChild(grid);
+            } else if (category === "Lines") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-2';
+                for(let i=1; i<=11; i++) grid.appendChild(createBtn(`Line ${i}`, 'bg-slate-800', `Line ${i}`));
+                container.appendChild(grid);
+            } else if (category === "Corners") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-3 gap-2';
+                for(let i=1; i<=22; i++) grid.appendChild(createBtn(`Corner ${i}`, 'bg-slate-800', `Corner ${i}`));
+                container.appendChild(grid);
+            } else if (category === "Splits") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-4 gap-2';
+                for(let i=1; i<=57; i++) grid.appendChild(createBtn(`Split ${i}`, 'bg-slate-800', `Split ${i}`));
+                container.appendChild(grid);
+            } else if (category === "Dozens/Columns") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-3 gap-2';
+                ["Dozen 1", "Dozen 2", "Dozen 3", "Column 1", "Column 2", "Column 3"].forEach(opt => {
+                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
+                });
+                container.appendChild(grid);
+            } else if (category === "Even Money") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
+                ["Red", "Black", "Odd", "Even", "High", "Low"].forEach(opt => {
+                    const bg = opt === "Red" ? "bg-red-800" : (opt === "Black" ? "bg-gray-900" : "bg-slate-800");
+                    grid.appendChild(createBtn(opt, bg, opt));
+                });
+                container.appendChild(grid);
+            } else if (category === "Racetrack") {
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-2';
+                ["Zero Game", "Voisins", "Orphelins", "Tier"].forEach(opt => {
+                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
+                });
+                container.appendChild(grid);
+            } else {
+                // DEFAULT 0-36 (Straight Up, Heat Map, etc)
                 const topGrid = document.createElement('div');
                 topGrid.className = `grid gap-1 mb-1 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
                 topGrid.appendChild(createBtn('0', 'bg-emerald-900', '0', 'col-span-1'));
@@ -421,62 +494,9 @@
                 numGrid.className = 'grid grid-cols-3 gap-1';
                 for(let i=1; i<=36; i++) numGrid.appendChild(createBtn(i.toString(), getBg(i), i.toString()));
                 container.appendChild(numGrid);
-
-            } else if (category === "Streets") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
-                for(let i=1; i<=12; i++) {
-                    const start = (i-1)*3 + 1;
-                    grid.appendChild(createBtn(`Street ${i} (${start}-${start+2})`, 'bg-slate-800', `Street ${i}`));
-                }
-                container.appendChild(grid);
-
-            } else if (category === "Lines") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-2';
-                for(let i=1; i<=11; i++) grid.appendChild(createBtn(`Line ${i}`, 'bg-slate-800', `Line ${i}`));
-                container.appendChild(grid);
-
-            } else if (category === "Corners") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-3 gap-2';
-                for(let i=1; i<=22; i++) grid.appendChild(createBtn(`Corner ${i}`, 'bg-slate-800', `Corner ${i}`));
-                container.appendChild(grid);
-
-            } else if (category === "Splits") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-4 gap-2';
-                for(let i=1; i<=57; i++) grid.appendChild(createBtn(`Split ${i}`, 'bg-slate-800', `Split ${i}`));
-                container.appendChild(grid);
-
-            } else if (category === "Dozens/Columns") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-3 gap-2';
-                ["Dozen 1", "Dozen 2", "Dozen 3", "Column 1", "Column 2", "Column 3"].forEach(opt => {
-                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
-                });
-                container.appendChild(grid);
-
-            } else if (category === "Even Money") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 md:grid-cols-3 gap-2';
-                ["Red", "Black", "Odd", "Even", "High", "Low"].forEach(opt => {
-                    const bg = opt === "Red" ? "bg-red-900" : (opt === "Black" ? "bg-slate-900" : "bg-slate-800");
-                    grid.appendChild(createBtn(opt, bg, opt));
-                });
-                container.appendChild(grid);
-
-            } else if (category === "Racetrack") {
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-2';
-                ["Zero Game", "Voisins", "Orphelins", "Tier"].forEach(opt => {
-                    grid.appendChild(createBtn(opt, 'bg-slate-800', opt));
-                });
-                container.appendChild(grid);
             }
         }
 
-        // Global State Logic Controller
         function evaluateLogicFlows() {
             const wheelSelect = document.getElementById('wheel-type');
             const categorySelect = document.getElementById('sub-domain');
@@ -484,7 +504,6 @@
             const strategySelect = document.getElementById('strategy');
             const negProgSelect = document.getElementById('neg-progression');
 
-            // Guard against uninitialized DOM states
             if(!categorySelect || !typeSelect || !strategySelect) return;
 
             const wheel = wheelSelect.value;
@@ -508,70 +527,61 @@
             const pInc = document.getElementById('prog-inc-box');
             const pDec = document.getElementById('prog-dec-box');
 
-            // 1. Reset Display States
-            typeSelect.classList.remove('hidden');
-            dynBox.classList.add('hidden');
-            targetBox.classList.add('hidden');
-            targetFeltBoard.classList.add('hidden');
-            targetDynamicInput.classList.add('hidden');
-            hedgeCmd.classList.add('hidden');
-            hedgeProg.classList.add('hidden');
-            pMulti.classList.add('hidden'); pPlus.classList.add('hidden');
-            pInc.classList.add('hidden'); pDec.classList.add('hidden');
+            // Hard Reset Display States
+            toggleVisibility(typeSelect, true);
+            toggleVisibility(dynBox, false);
+            toggleVisibility(targetBox, false);
+            toggleVisibility(targetFeltBoard, false, true); // Use flex
+            toggleVisibility(targetDynamicInput, false);
+            toggleVisibility(hedgeCmd, false);
+            toggleVisibility(hedgeProg, false);
+            toggleVisibility(pMulti, false);
+            toggleVisibility(pPlus, false);
+            toggleVisibility(pInc, false);
+            toggleVisibility(pDec, false);
+            
             typeLabel.innerText = "Type";
 
-            // 2. Neighbors Edge Case
+            // Intercepts
             if (category === "Neighbors") {
-                typeSelect.classList.add('hidden');
-                dynBox.classList.remove('hidden');
+                toggleVisibility(typeSelect, false);
+                toggleVisibility(dynBox, true);
                 typeLabel.innerText = "Neighbor Size (S)";
             } 
 
-            // 3. Strategy & Target Logic
             let showFelt = false;
             let showDynInput = false;
 
-            if (category === "Straight Up") {
-                if (type === "Dynamic") {
-                    showDynInput = true;
-                    targetLabel.innerText = "Number of Pockets";
-                } else if (type === "Fixed") {
-                    showFelt = true;
-                    targetLabel.innerText = "Target Selection";
-                }
-            } else {
-                if (strategy === "fixed") {
-                    showFelt = true;
-                    targetLabel.innerText = "Target Selection";
-                }
+            if (category === "Straight Up" && type === "Dynamic") {
+                showDynInput = true;
+                targetLabel.innerText = "Number of Pockets";
+            } else if (strategy === "fixed" || (category === "Straight Up" && type === "Fixed")) {
+                showFelt = true;
+                targetLabel.innerText = "Target Selection";
+                renderFeltLayout(category, type, wheel);
             }
 
             if (showDynInput || showFelt) {
-                targetBox.classList.remove('hidden');
-                if (showDynInput) targetDynamicInput.classList.remove('hidden');
-                if (showFelt) {
-                    targetFeltBoard.classList.remove('hidden');
-                    renderFeltLayout(category, type, wheel);
-                }
+                toggleVisibility(targetBox, true);
+                toggleVisibility(targetDynamicInput, showDynInput);
+                toggleVisibility(targetFeltBoard, showFelt, true); // Display flex
             }
 
-            // 4. Top Line Hedge Matrix
             if (type === "Top Line") {
-                hedgeCmd.classList.remove('hidden');
-                hedgeProg.classList.remove('hidden');
+                toggleVisibility(hedgeCmd, true);
+                toggleVisibility(hedgeProg, true);
             }
 
-            // 5. Progression Matrix
             switch(negProg) {
                 case 'martingale':
-                    pMulti.classList.remove('hidden'); break;
+                    toggleVisibility(pMulti, true); break;
                 case 'martingale_plus':
-                    pMulti.classList.remove('hidden'); pPlus.classList.remove('hidden'); break;
+                    toggleVisibility(pMulti, true); toggleVisibility(pPlus, true); break;
                 case 'fibonacci':
                 case 'dalambert':
-                    pInc.classList.remove('hidden'); pDec.classList.remove('hidden'); break;
+                    toggleVisibility(pInc, true); toggleVisibility(pDec, true); break;
                 case 'ladder':
-                    pInc.classList.remove('hidden'); break;
+                    toggleVisibility(pInc, true); break;
             }
         }
 
@@ -605,7 +615,7 @@
         }
 
         function toggleEdit(id) { const input = document.getElementById(`name-${id}`); input.readOnly = false; input.classList.add('border-b', 'border-emerald-500'); input.focus(); }
-        async function finalizeNameChange(id) { /* Basic finalize logic omitted for brevity */ }
+        async function finalizeNameChange(id) { /* Handle renaming via separate function if needed */ }
         async function deleteArchive(id) { if(confirm("PERMANENT_DELETION_PROTOCOL_INITIATED. PROCEED?")) { await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).delete(); refreshArchiveList(); } }
         async function loadArchive(id) {
             const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc(id).get();
@@ -613,7 +623,7 @@
             window.location.href = "roulette.html";
         }
 
-        // --- HARDENED INITIALIZATION PROTOCOL ---
+        // --- HARDENED INITIALIZATION ---
         function loadValues(d) {
             if(!d) {
                 document.getElementById('wheel-type').value = "US";
@@ -647,7 +657,6 @@
                 return;
             }
             
-            // Standard User Save Load Protocol
             document.getElementById('wheel-type').value = d.wheel || "US";
             updateWheelSubtypes();
             document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
@@ -666,7 +675,7 @@
                 document.getElementById('sub-type').value = d.protocol || "Fixed";
             }
 
-            evaluateLogicFlows(); // Generate Felt UI Before Marking Selected
+            evaluateLogicFlows(); 
 
             if((d.strategy === "fixed" || d.protocol === "Fixed") && d.targets) {
                 const btns = document.querySelectorAll('.felt-btn');
@@ -717,7 +726,7 @@
                 strategy: document.getElementById('strategy').value,
                 domain: document.getElementById('main-domain').value,
                 subCategory: document.getElementById('sub-domain').value,
-                protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
+                protocol: document.getElementById('sub-type').value, 
                 dynamicValue: document.getElementById('sub-domain').value === "Neighbors" ? document.getElementById('dynamic-type-input').value : null,
                 numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
                 targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed") ? targetArray : null,
