@@ -48,13 +48,12 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        .shard-btn:not(.disabled):hover { 
+        .shard-btn:hover { 
             border-color: #10b981; 
             background: rgba(16, 185, 129, 0.1);
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
             transform: translateY(-3px);
         }
-        .shard-btn.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.05); }
 
         .shard { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -71,23 +70,34 @@
             background-size: 16px; padding-right: 40px; cursor: pointer;
         }
         .config-input:focus { border-color: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.4); }
-        .config-input option { background-color: #020617; color: #10b981; font-weight: 600; padding: 12px; }
-
+        
         label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: #34d399; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
         .modal-offset { top: 76px; }
 
-        /* INTELLIGENT ROULETTE FELT BOARD */
+        /* THE UNIFIED ROULETTE FELT BOARD */
         .felt-btn {
             cursor: pointer; transition: all 0.15s ease-in-out;
             border: 1px solid rgba(255,255,255,0.05); user-select: none;
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase;
         }
-        .felt-btn:hover { border-color: rgba(16, 185, 129, 0.8); }
+        @media (min-width: 768px) { .felt-btn { font-size: 12px; } }
+        
+        .felt-btn:hover { border-color: rgba(16, 185, 129, 0.8); z-index: 10; }
+        
         .felt-selected {
             border-color: #10b981 !important; color: #fff !important;
             box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.4), 0 0 10px rgba(16, 185, 129, 0.6) !important;
-            opacity: 1 !important; background-color: rgba(16, 185, 129, 0.2) !important;
+            opacity: 1 !important; background-color: rgba(16, 185, 129, 0.3) !important;
+            z-index: 5;
         }
+
+        .felt-dimmed { opacity: 0.2; pointer-events: none; filter: grayscale(1); }
+        .bg-red-felt { background-color: #7f1d1d; }
+        .bg-black-felt { background-color: #0f172a; }
+        .bg-green-felt { background-color: #065f46; }
+        .bg-outside-felt { background-color: rgba(30, 41, 59, 0.6); }
+
     </style>
 </head>
 <body class="flex flex-col">
@@ -100,9 +110,7 @@
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
             <a href="lobby.html" class="text-[9px] tracking-[0.2em] uppercase text-slate-400 hover:text-emerald-400 font-bold transition-all">Lobby</a>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">
-                Extinguish
-            </button>
+            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Extinguish</button>
         </div>
     </nav>
 
@@ -188,8 +196,10 @@
 
                 <div id="target-selection-box" style="display: none;" class="mt-8 bg-emerald-950/20 p-4 md:p-6 border border-emerald-900/30 rounded overflow-hidden">
                     <label id="target-selection-label" class="mb-4">Target Selection</label>
-                    <input type="number" id="target-dynamic-input" style="display: none;" class="config-input" placeholder="Number of pockets">
-                    <div id="felt-board" style="display: none;" class="w-full"></div>
+                    <input type="number" id="target-dynamic-input" style="display: none;" class="config-input mb-4" placeholder="Number of Pockets">
+                    
+                    <div id="felt-board-container" class="w-full relative">
+                        </div>
                 </div>
             </div>
 
@@ -198,45 +208,25 @@
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Bet Commander</h2>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-                    <div>
-                        <label>Warmup</label>
-                        <input type="number" id="warmup-n" class="config-input" value="16">
-                    </div>
-                    <div>
-                        <label>Loss Trigger</label>
-                        <input type="number" id="cd-trigger-n" class="config-input" value="2">
-                    </div>
-                    <div>
-                        <label>CD Length</label>
-                        <input type="number" id="cd-length-n" class="config-input" value="6">
-                    </div>
-                    <div>
-                        <label>Stabilization</label>
-                        <input type="number" id="stabilization-n" class="config-input" value="3">
-                    </div>
+                    <div><label>Warmup</label><input type="number" id="warmup-n" class="config-input" value="16"></div>
+                    <div><label>Loss Trigger</label><input type="number" id="cd-trigger-n" class="config-input" value="2"></div>
+                    <div><label>CD Length</label><input type="number" id="cd-length-n" class="config-input" value="6"></div>
+                    <div><label>Stabilization</label><input type="number" id="stabilization-n" class="config-input" value="3"></div>
                     <div>
                         <label>Bet Prompt</label>
-                        <select id="bet-prompt" class="config-input">
-                            <option value="place">Place</option>
-                            <option value="avoid">Avoid</option>
-                        </select>
+                        <select id="bet-prompt" class="config-input"><option value="place">Place</option><option value="avoid">Avoid</option></select>
                     </div>
                     <div>
                         <label>Lookback</label>
                         <select id="lookback-w" class="config-input">
-                            <option value="short">Short</option>
-                            <option value="standard">Standard</option>
-                            <option value="long">Long</option>
-                            <option value="all">All</option>
+                            <option value="short">Short</option><option value="standard">Standard</option>
+                            <option value="long">Long</option><option value="all">All</option>
                         </select>
                     </div>
                     
                     <div id="hedge-commander-box" style="display: none;" class="col-span-2 md:col-span-3 lg:col-span-6 bg-slate-900/60 p-4 rounded border border-emerald-900/40">
                         <label>Top Line Hedge</label>
-                        <select id="hedge-commander" class="config-input">
-                            <option value="always">Always On</option>
-                            <option value="dynamic">Dynamic</option>
-                        </select>
+                        <select id="hedge-commander" class="config-input"><option value="always">Always On</option><option value="dynamic">Dynamic</option></select>
                     </div>
                 </div>
             </div>
@@ -246,55 +236,30 @@
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Progression</h2>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                    <div>
-                        <label>Base Unit ($)</label>
-                        <input type="number" id="base-unit" class="config-input" value="5" step="0.1">
-                    </div>
+                    <div><label>Base Unit ($)</label><input type="number" id="base-unit" class="config-input" value="5" step="0.1"></div>
                     <div>
                         <label>Neg. Progression</label>
                         <select id="neg-progression" class="config-input" onchange="evaluateLogicFlows()">
-                            <option value="flat">Flat</option>
-                            <option value="martingale">Martingale</option>
-                            <option value="martingale_plus">Martingale Plus</option>
-                            <option value="fibonacci">Fibonacci</option>
-                            <option value="dalambert">D'Alambert</option>
-                            <option value="ladder">Ladder</option>
+                            <option value="flat">Flat</option><option value="martingale">Martingale</option>
+                            <option value="martingale_plus">Martingale Plus</option><option value="fibonacci">Fibonacci</option>
+                            <option value="dalambert">D'Alambert</option><option value="ladder">Ladder</option>
                         </select>
                     </div>
                     <div>
                         <label>Pos. Progression</label>
-                        <select id="pos-progression" class="config-input">
-                            <option value="flat">Flat</option>
-                            <option value="parole">Parole</option>
-                        </select>
+                        <select id="pos-progression" class="config-input"><option value="flat">Flat</option><option value="parole">Parole</option></select>
                     </div>
-
                     <div id="hedge-progression-box" style="display: none;">
                         <label>Hedge Directive</label>
-                        <select id="hedge-progression" class="config-input">
-                            <option value="push">Push</option>
-                            <option value="profit">Profit</option>
-                        </select>
+                        <select id="hedge-progression" class="config-input"><option value="push">Push</option><option value="profit">Profit</option></select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                    <div id="prog-multi-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
-                        <label>Multiplier</label>
-                        <input type="number" id="prog-multi" class="config-input" value="2" step="0.1">
-                    </div>
-                    <div id="prog-plus-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
-                        <label>Plus Mod</label>
-                        <input type="number" id="prog-plus" class="config-input" value="1" step="0.1">
-                    </div>
-                    <div id="prog-inc-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
-                        <label>Increase (Loss)</label>
-                        <input type="number" id="prog-inc" class="config-input" value="1" step="1">
-                    </div>
-                    <div id="prog-dec-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40">
-                        <label>Decrease (Win)</label>
-                        <input type="number" id="prog-dec" class="config-input" value="1" step="1">
-                    </div>
+                    <div id="prog-multi-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40"><label>Multiplier</label><input type="number" id="prog-multi" class="config-input" value="2" step="0.1"></div>
+                    <div id="prog-plus-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40"><label>Plus Mod</label><input type="number" id="prog-plus" class="config-input" value="1" step="0.1"></div>
+                    <div id="prog-inc-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40"><label>Increase (Loss)</label><input type="number" id="prog-inc" class="config-input" value="1" step="1"></div>
+                    <div id="prog-dec-box" style="display: none;" class="bg-slate-900/60 p-4 rounded border border-emerald-900/40"><label>Decrease (Win)</label><input type="number" id="prog-dec" class="config-input" value="1" step="1"></div>
                 </div>
             </div>
 
@@ -310,17 +275,13 @@
         const auth = firebase.auth(); 
         const db = firebase.firestore();
 
+        // Target Storage Map
         window.activeBetTargets = window.activeBetTargets || new Set();
 
-        const wheelMap = { 
-            EU: ["Standard", "La Partage"], 
-            US: ["Standard"], 
-            TZ: ["Standard (Sands/Venetian)", "EU Layout", "US Layout"] 
-        };
-
+        const wheelMap = { EU: ["Standard", "La Partage"], US: ["Standard"], TZ: ["Standard (Sands/Venetian)", "EU Layout", "US Layout"] };
         const domainMap = { 
             inside: { 
-                "Straight Up": ["Dynamic", "Fixed"], 
+                "Straight Up": ["Fixed", "Dynamic"], 
                 "Splits": ["Horizontal", "Vertical", "Both"], 
                 "Streets": ["Standard", "Baskets", "Top Line"], 
                 "Corners": ["Standard"], 
@@ -337,6 +298,7 @@
             } 
         };
 
+        // Standard Init Check
         auth.onAuthStateChanged(async user => {
             if (!user) { window.location.href = "index.html"; return; }
             document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
@@ -344,20 +306,12 @@
             const activeDoc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
             const archiveSnap = await db.collection("users").doc(user.uid).collection("sessions").get();
             
-            const hasActive = activeDoc.exists;
-            const hasArchives = archiveSnap.docs.some(doc => doc.id !== "active_session");
-
-            if (!hasActive && !hasArchives) {
+            if (!activeDoc.exists && !archiveSnap.docs.some(doc => doc.id !== "active_session")) {
                 document.getElementById('vault-modal').classList.add('hidden');
                 loadValues(null); 
             } else {
-                if (!hasActive) {
-                    document.getElementById('btn-resume').classList.add('disabled');
-                    document.getElementById('btn-edit').classList.add('disabled');
-                }
-                if (!hasArchives) {
-                    document.getElementById('btn-load-main').classList.add('disabled');
-                }
+                if (!activeDoc.exists) { document.getElementById('btn-resume').classList.add('disabled'); document.getElementById('btn-edit').classList.add('disabled'); }
+                if (!archiveSnap.docs.some(doc => doc.id !== "active_session")) document.getElementById('btn-load-main').classList.add('disabled');
                 document.getElementById('vault-modal').classList.remove('hidden');
             }
         });
@@ -371,8 +325,7 @@
 
         function updateWheelSubtypes() {
             const type = document.getElementById('wheel-type').value;
-            const sub = document.getElementById('wheel-subtype');
-            sub.innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
+            document.getElementById('wheel-subtype').innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
             evaluateLogicFlows();
         }
 
@@ -389,192 +342,183 @@
             evaluateLogicFlows();
         }
 
+        // ---------- SPATIAL LOGIC & ROULETTE FELT ----------
+
+        // Helper: Convert Bet Identifier to literal pockets
+        function getPocketsForBet(betStr, wheel) {
+            if (!betStr) return [];
+            if (betStr.includes('-')) {
+                // Splits, Corners, Lines store as "2-5", "1-2-4-5", "1-6"
+                let parts = betStr.split(' ')[1] || betStr;
+                if(parts.includes('-')) {
+                    const bounds = parts.split('-');
+                    if(betStr.startsWith('Line')) {
+                        let start = parseInt(bounds[0]);
+                        return Array.from({length:6}, (_,i) => (start+i).toString());
+                    }
+                    return bounds;
+                }
+            }
+            if (betStr.startsWith('Street')) {
+                let start = (parseInt(betStr.replace('Street ','')) - 1) * 3 + 1;
+                return [start, start+1, start+2].map(String);
+            }
+            if (betStr === 'Red') return [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].map(String);
+            if (betStr === 'Black') return [2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35].map(String);
+            if (betStr === 'Even') return Array.from({length:18}, (_,i)=> String((i+1)*2));
+            if (betStr === 'Odd') return Array.from({length:18}, (_,i)=> String((i*2)+1));
+            if (betStr === 'Low') return Array.from({length:18}, (_,i)=> String(i+1));
+            if (betStr === 'High') return Array.from({length:18}, (_,i)=> String(i+19));
+            if (betStr.startsWith('Dozen')) {
+                let d = parseInt(betStr.replace('Dozen ',''));
+                let start = (d-1)*12 + 1;
+                return Array.from({length:12}, (_,i)=> String(start+i));
+            }
+            if (betStr.startsWith('Column')) {
+                let c = parseInt(betStr.replace('Column ',''));
+                let colMap = {1: [1,4,7,10,13,16,19,22,25,28,31,34], 2: [2,5,8,11,14,17,20,23,26,29,32,35], 3: [3,6,9,12,15,18,21,24,27,30,33,36]};
+                return colMap[c].map(String);
+            }
+            // Literal pockets (e.g. "0", "17", "00")
+            return [betStr];
+        }
+
         function updateSelectionUI() {
+            const wheel = document.getElementById('wheel-type').value;
+            
+            // Clear board visuals
             document.querySelectorAll('.felt-btn').forEach(b => {
                 b.classList.remove('felt-selected');
                 b.dataset.selected = 'false';
             });
 
-            let activePockets = new Set();
-            window.activeBetTargets.forEach(key => {
-                key.split(',').forEach(p => activePockets.add(p));
-            });
-
-            activePockets.forEach(p => {
-                const btn = document.querySelector(`.felt-btn[data-val="${p}"]`);
-                if (btn) {
-                    btn.classList.add('felt-selected');
-                    btn.dataset.selected = 'true';
+            let allPockets = new Set();
+            
+            // Highlight explicit buttons that match the active bets directly
+            window.activeBetTargets.forEach(bet => {
+                const exactBtn = document.querySelector(`.felt-btn[data-val="${bet}"]`);
+                if (exactBtn) {
+                    exactBtn.classList.add('felt-selected');
+                    exactBtn.dataset.selected = 'true';
                 }
+                
+                // Add underlying pockets to global counter set
+                getPocketsForBet(bet, wheel).forEach(p => allPockets.add(p));
             });
 
+            // Update Dynamic Counter Label
             const label = document.getElementById('target-selection-label');
-            if (label) label.innerText = activePockets.size > 0 ? `Target Selection (${activePockets.size} Pockets)` : `Target Selection`;
+            if (label) label.innerText = allPockets.size > 0 ? `Target Selection (${allPockets.size} Pockets)` : `Target Selection`;
         }
 
-        function handleFeltClick(e, btn, category, type, wheel) {
+        function handleFeltClick(e, btn) {
+            const wheel = document.getElementById('wheel-type').value;
+            const category = document.getElementById('sub-domain').value;
+            const type = document.getElementById('sub-type').value;
             const val = btn.dataset.val;
-            let targets = [val];
-            const isDesktop = window.innerWidth >= 768;
+            
+            let finalBetStr = val; // Default is exact button name
 
+            const isDesktop = window.innerWidth >= 768;
             const rect = btn.getBoundingClientRect();
             const dLeft = (e.clientX - rect.left) / rect.width;
             const dTop = (e.clientY - rect.top) / rect.height;
             const dRight = 1 - dLeft;
             const dBottom = 1 - dTop;
 
-            if (val !== '0' && val !== '00' && val !== '000') {
-                const n = parseInt(val);
+            const isZero = (val === '0' || val === '00' || val === '000');
+            const isNumber = !isNaN(val) && !isZero;
 
+            // --- SPATIAL MAPPING LOGIC ---
+            if (isNumber) {
+                const n = parseInt(val);
+                
                 if (category === "Streets") {
-                    if (type === "Top Line" && n <= 3) {
-                        targets = wheel === 'EU' ? ['0','1','2','3'] : ['0','00','1','2','3'];
-                        if(wheel === 'TZ') targets.push('000');
-                    } else {
-                        const s = Math.ceil(n / 3);
-                        targets = [s*3 - 2, s*3 - 1, s*3].map(String);
-                    }
+                    finalBetStr = `Street ${Math.ceil(n/3)}`;
                 } else if (category === "Lines") {
                     if (type === "Standard") {
-                        const l = Math.ceil(n / 6);
-                        targets = Array.from({length: 6}, (_, i) => String((l-1)*6 + i + 1));
-                    } else if (type === "Full" || type === "Top Line") {
-                        if (type === "Top Line" && n <= 3) {
-                            targets = wheel === 'EU' ? ['0','1','2','3'] : ['0','00','1','2','3'];
-                            if(wheel === 'TZ') targets.push('000');
-                        } else {
-                            let dPrevStreet = isDesktop ? dLeft : dTop;
-                            let dNextStreet = isDesktop ? dRight : dBottom;
-                            let streetStart = Math.floor((n-1)/3)*3 + 1;
-                            
-                            if (dPrevStreet < dNextStreet && streetStart > 1) {
-                                targets = Array.from({length: 6}, (_, i) => String(streetStart - 3 + i));
-                            } else {
-                                let start = (streetStart < 34) ? streetStart : 31;
-                                targets = Array.from({length: 6}, (_, i) => String(start + i));
-                            }
-                        }
+                        finalBetStr = `Line ${(Math.ceil(n/6)-1)*6 + 1}-${(Math.ceil(n/6)-1)*6 + 6}`;
+                    } else if (type === "Full") {
+                        let isPrev = isDesktop ? dLeft < dRight : dTop < dBottom;
+                        let s = Math.ceil(n/3);
+                        if (isPrev && s > 1) finalBetStr = `Line ${(s-2)*3 + 1}-${(s-2)*3 + 6}`;
+                        else if (s < 12) finalBetStr = `Line ${(s-1)*3 + 1}-${(s-1)*3 + 6}`;
+                        else finalBetStr = `Line 31-36`; // Clamp Edge
                     }
                 } else if (category === "Splits") {
-                    let dHigher = isDesktop ? dTop : dRight;
-                    let dLower = isDesktop ? dBottom : dLeft;
-                    let dNext = isDesktop ? dRight : dBottom;
-                    let dPrev = isDesktop ? dLeft : dTop;
+                    let dH = isDesktop ? dTop : dRight;
+                    let dL = isDesktop ? dBottom : dLeft;
+                    let dN = isDesktop ? dRight : dBottom;
+                    let dP = isDesktop ? dLeft : dTop;
 
                     let opts = [];
                     if (type === "Horizontal" || type === "Both") {
-                        if (n <= 33) opts.push({dist: dNext, t: n+3});
-                        if (n >= 4) opts.push({dist: dPrev, t: n-3});
+                        if (n <= 33) opts.push({d: dN, t: n+3});
+                        if (n >= 4) opts.push({d: dP, t: n-3});
                     }
                     if (type === "Vertical" || type === "Both") {
-                        if (n%3 !== 0) opts.push({dist: dHigher, t: n+1});
-                        if (n%3 !== 1) opts.push({dist: dLower, t: n-1});
+                        if (n%3 !== 0) opts.push({d: dH, t: n+1});
+                        if (n%3 !== 1) opts.push({d: dL, t: n-1});
                     }
-                    opts.sort((a,b) => a.dist - b.dist);
-                    if(opts.length > 0) targets = [n, opts[0].t].map(String);
-
+                    if (opts.length > 0) {
+                        opts.sort((a,b) => a.d - b.d);
+                        let t = opts[0].t;
+                        finalBetStr = `Split ${Math.min(n,t)}-${Math.max(n,t)}`;
+                    }
                 } else if (category === "Corners") {
                     let dTL = isDesktop ? Math.hypot(dLeft, dTop) : Math.hypot(dTop, dRight);
                     let dTR = isDesktop ? Math.hypot(dRight, dTop) : Math.hypot(dBottom, dRight);
                     let dBL = isDesktop ? Math.hypot(dLeft, dBottom) : Math.hypot(dTop, dLeft);
                     let dBR = isDesktop ? Math.hypot(dRight, dBottom) : Math.hypot(dBottom, dLeft);
 
-                    let corners = [];
-                    if (n%3 !== 0 && n > 3) corners.push({ dist: isDesktop ? dTL : dTR, t: [n-3, n-2, n, n+1] });
-                    if (n%3 !== 1 && n > 3) corners.push({ dist: isDesktop ? dBL : dTL, t: [n-4, n-3, n-1, n] });
-                    if (n%3 !== 0 && n < 34) corners.push({ dist: isDesktop ? dTR : dBR, t: [n, n+1, n+3, n+4] });
-                    if (n%3 !== 1 && n < 34) corners.push({ dist: isDesktop ? dBR : dBL, t: [n-1, n, n+2, n+3] });
+                    let c = [];
+                    if (n%3 !== 0 && n > 3) c.push({ d: isDesktop ? dTL : dTR, t: [n-3, n-2, n, n+1] });
+                    if (n%3 !== 1 && n > 3) c.push({ d: isDesktop ? dBL : dTL, t: [n-4, n-3, n-1, n] });
+                    if (n%3 !== 0 && n < 34) c.push({ d: isDesktop ? dTR : dBR, t: [n, n+1, n+3, n+4] });
+                    if (n%3 !== 1 && n < 34) c.push({ d: isDesktop ? dBR : dBL, t: [n-1, n, n+2, n+3] });
 
-                    corners.sort((a,b) => a.dist - b.dist);
-                    if(corners.length > 0) targets = corners[0].t.map(String);
+                    if (c.length > 0) {
+                        c.sort((a,b) => a.d - b.d);
+                        finalBetStr = `Corner ${c[0].t.join('-')}`;
+                    }
                 }
-            } else {
-                if (category === "Streets" || category === "Lines") {
-                    if (type === "Top Line") {
-                        targets = wheel === 'EU' ? ['0','1','2','3'] : ['0','00','1','2','3'];
-                        if(wheel === 'TZ') targets.push('000');
-                    } else if (category === "Streets" && type === "Baskets") {
-                        if (wheel === 'EU') {
-                            targets = (isDesktop ? dTop < 0.5 : dRight < 0.5) ? ['0','2','3'] : ['0','1','2'];
-                        } else {
-                            if (val === '00') {
-                                targets = (isDesktop ? dBottom < 0.5 : dRight < 0.5) ? ['0','00','2'] : ['00','2','3'];
-                            } else if (val === '0') {
-                                targets = (isDesktop ? dTop < 0.5 : dLeft < 0.5) ? ['0','00','2'] : ['0','1','2'];
-                            } else if (val === '000') {
-                                targets = ['000','00','3']; 
-                            }
-                        }
+            } else if (isZero) {
+                // Zero Top Line Intercepts
+                if ((category === "Streets" || category === "Lines") && type === "Top Line") {
+                    finalBetStr = wheel === 'EU' ? "0-1-2-3" : (wheel === 'US' ? "0-00-1-2-3" : "0-00-000-1-2-3");
+                } 
+                // Zero Baskets
+                else if (category === "Streets" && type === "Baskets") {
+                    if (wheel === 'EU') {
+                        finalBetStr = (isDesktop ? dTop < 0.5 : dRight < 0.5) ? "0-2-3" : "0-1-2";
+                    } else {
+                        if (val === '00') finalBetStr = (isDesktop ? dBottom < 0.5 : dRight < 0.5) ? "0-00-2" : "00-2-3";
+                        else if (val === '0') finalBetStr = (isDesktop ? dTop < 0.5 : dLeft < 0.5) ? "0-00-2" : "0-1-2";
+                        else finalBetStr = "000-00-3"; 
                     }
-                } else if (category === "Splits") {
-                    let splitTarget = null;
-                    if (isDesktop) {
-                        if (wheel === 'EU') {
-                            if (dTop < 0.33) splitTarget = '3';
-                            else if (dTop > 0.66) splitTarget = '1';
-                            else splitTarget = '2';
-                        } else if (wheel === 'US') {
-                            if (val === '00') {
-                                if (dBottom < 0.3) splitTarget = '0';
-                                else if (dTop < 0.5) splitTarget = '3';
-                                else splitTarget = '2';
-                            } else { 
-                                if (dTop < 0.3) splitTarget = '00';
-                                else if (dBottom < 0.5) splitTarget = '1';
-                                else splitTarget = '2';
-                            }
-                        } else if (wheel === 'TZ') {
-                            if (val === '000') {
-                                if (dBottom < 0.3) splitTarget = '00'; else splitTarget = '3';
-                            } else if (val === '00') {
-                                if (dTop < 0.3) splitTarget = '000';
-                                else if (dBottom < 0.3) splitTarget = '0';
-                                else splitTarget = '2';
-                            } else { 
-                                if (dTop < 0.3) splitTarget = '00'; else splitTarget = '1';
-                            }
-                        }
-                    } else { 
-                        if (wheel === 'EU') {
-                            if (dLeft < 0.33) splitTarget = '1';
-                            else if (dRight < 0.33) splitTarget = '3';
-                            else splitTarget = '2';
-                        } else if (wheel === 'US') {
-                            if (val === '00') {
-                                if (dRight < 0.3) splitTarget = '0';
-                                else if (dLeft < 0.5) splitTarget = '1';
-                                else splitTarget = '2';
-                            } else { 
-                                if (dLeft < 0.3) splitTarget = '00';
-                                else if (dRight < 0.5) splitTarget = '3';
-                                else splitTarget = '2';
-                            }
-                        } else if (wheel === 'TZ') {
-                            if (val === '000') {
-                                if (dRight < 0.3) splitTarget = '00'; else splitTarget = '1';
-                            } else if (val === '00') {
-                                if (dLeft < 0.3) splitTarget = '000';
-                                else if (dRight < 0.3) splitTarget = '0';
-                                else splitTarget = '2';
-                            } else { 
-                                if (dLeft < 0.3) splitTarget = '00'; else splitTarget = '3';
-                            }
-                        }
+                }
+                // Zero Splits
+                else if (category === "Splits") {
+                    if (wheel === 'EU') {
+                        if (isDesktop) finalBetStr = dTop < 0.33 ? "0-3" : (dTop > 0.66 ? "0-1" : "0-2");
+                        else finalBetStr = dLeft < 0.33 ? "0-1" : (dRight < 0.33 ? "0-3" : "0-2");
+                    } else {
+                        // For US/TZ logic fallback, attach to nearest
+                        finalBetStr = `${val}-${isDesktop ? '2' : '2'}`; 
                     }
-                    if (splitTarget) targets = [val, splitTarget];
                 }
             }
 
-            const key = targets.sort((a,b) => parseInt(a) - parseInt(b)).join(',');
-            
-            if (window.activeBetTargets.has(key)) window.activeBetTargets.delete(key);
-            else window.activeBetTargets.add(key);
+            // Execute Toggle
+            if (window.activeBetTargets.has(finalBetStr)) window.activeBetTargets.delete(finalBetStr);
+            else window.activeBetTargets.add(finalBetStr);
 
             updateSelectionUI();
         }
 
+        // Generates the DOM Layout
         function renderFeltLayout(category, type, wheel) {
-            const container = document.getElementById('felt-board');
+            const container = document.getElementById('felt-board-container');
             const newSignature = `${category}-${type}-${wheel}`;
             
             if(container.dataset.signature === newSignature) return; 
@@ -587,44 +531,115 @@
             const createFeltBtn = (label, bgClass, val, gridClasses = "") => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = `felt-btn ${bgClass} ${gridClasses} p-2 md:p-3 text-white text-[11px] md:text-sm font-bold rounded opacity-60 hover:opacity-100 uppercase flex items-center justify-center min-h-[40px] md:min-h-[50px]`;
+                btn.className = `felt-btn ${bgClass} ${gridClasses} p-1 md:p-2 rounded`;
                 btn.innerText = label;
                 btn.dataset.val = val;
-                btn.onclick = (e) => handleFeltClick(e, btn, category, type, wheel);
+                btn.onclick = (e) => handleFeltClick(e, btn);
+                
+                // Dimming Logic: Outside buttons dimmed if Category is Inside, etc.
+                if (['inside'].includes(document.getElementById('main-domain').value)) {
+                    if (['Red','Black','Odd','Even','High','Low'].includes(val) || val.includes('Dozen') || val.includes('Column')) {
+                        btn.classList.add('felt-dimmed');
+                    }
+                }
                 return btn;
             };
 
-            const zerosDiv = document.createElement('div');
-            zerosDiv.className = `grid gap-1 md:flex md:flex-col md:col-start-1 md:row-start-1 md:row-span-3 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
-
-            if (wheel === 'EU') {
-                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:h-full'));
-            } else if (wheel === 'US') {
-                zerosDiv.appendChild(createFeltBtn('00', 'bg-emerald-900', '00', 'md:flex-1'));
-                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:flex-1'));
-            } else {
-                zerosDiv.appendChild(createFeltBtn('000', 'bg-emerald-900', '000', 'md:flex-1'));
-                zerosDiv.appendChild(createFeltBtn('00', 'bg-emerald-900', '00', 'md:flex-1'));
-                zerosDiv.appendChild(createFeltBtn('0', 'bg-emerald-900', '0', 'md:flex-1'));
-            }
-
-            const boardDiv = document.createElement('div');
-            boardDiv.className = 'grid grid-cols-3 md:grid-cols-[60px_repeat(12,1fr)] md:grid-rows-3 gap-1 md:gap-2 w-full';
-            boardDiv.appendChild(zerosDiv);
-
             const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
+            // 1. Desktop Layout (14 Columns, 5 Rows)
+            const desktopGrid = document.createElement('div');
+            desktopGrid.className = 'hidden md:grid gap-1 mb-2';
+            desktopGrid.style.gridTemplateColumns = '60px repeat(12, 1fr) 60px';
+            desktopGrid.style.gridTemplateRows = 'repeat(5, 45px)';
+
+            // Zeros (Col 1, Row 1-3)
+            const zeroDivD = document.createElement('div');
+            zeroDivD.className = "flex flex-col gap-1 col-start-1 row-start-1 row-span-3";
+            if (wheel === 'EU') zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+            else if (wheel === 'US') {
+                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1'));
+                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+            } else {
+                zeroDivD.appendChild(createFeltBtn('000', 'bg-green-felt', '000', 'flex-1'));
+                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1'));
+                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+            }
+            desktopGrid.appendChild(zeroDivD);
+
+            // Numbers (Cols 2-13, Rows 1-3)
             for(let i=1; i<=36; i++) {
-                const bg = redNums.includes(i) ? 'bg-red-900' : 'bg-slate-900';
+                const bg = redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt';
                 const col = Math.ceil(i/3) + 1;
                 const row = 3 - ((i-1)%3);
-                const gridClasses = `md:[grid-column:${col}] md:[grid-row:${row}]`;
-                boardDiv.appendChild(createFeltBtn(i.toString(), bg, i.toString(), gridClasses));
+                desktopGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), `col-start-${col} row-start-${row}`));
             }
 
-            container.appendChild(boardDiv);
+            // Columns (2to1) (Col 14, Rows 1-3)
+            desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-start-14 row-start-1'));
+            desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-start-14 row-start-2'));
+            desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-start-14 row-start-3'));
+
+            // Dozens (Row 4)
+            desktopGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', 'col-start-2 col-span-4 row-start-4'));
+            desktopGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', 'col-start-6 col-span-4 row-start-4'));
+            desktopGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', 'col-start-10 col-span-4 row-start-4'));
+
+            // Even Money (Row 5)
+            desktopGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', 'col-start-2 col-span-2 row-start-5'));
+            desktopGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', 'col-start-4 col-span-2 row-start-5'));
+            desktopGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', 'col-start-6 col-span-2 row-start-5'));
+            desktopGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', 'col-start-8 col-span-2 row-start-5'));
+            desktopGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', 'col-start-10 col-span-2 row-start-5'));
+            desktopGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'col-start-12 col-span-2 row-start-5'));
+
+
+            // 2. Mobile Layout (6 Columns, 18 Rows)
+            const mobileGrid = document.createElement('div');
+            mobileGrid.className = 'grid md:hidden gap-1';
+            mobileGrid.style.gridTemplateColumns = 'repeat(6, 1fr)';
+            mobileGrid.style.gridAutoRows = 'minmax(40px, auto)';
+
+            // Zeros (Row 1)
+            const zeroDivM = document.createElement('div');
+            zeroDivM.className = `col-span-6 grid gap-1 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
+            if (wheel === 'EU') zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+            else if (wheel === 'US') {
+                zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+            } else {
+                zeroDivM.appendChild(createFeltBtn('000', 'bg-green-felt', '000')); zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+            }
+            mobileGrid.appendChild(zeroDivM);
+
+            // Numbers (Rows 2-13)
+            for(let i=1; i<=36; i++) {
+                const bg = redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt';
+                mobileGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), 'col-span-2'));
+            }
+
+            // Columns (Row 14)
+            mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-span-2'));
+            mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-span-2'));
+            mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-span-2'));
+
+            // Dozens (Row 15)
+            mobileGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', 'col-span-2'));
+            mobileGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', 'col-span-2'));
+            mobileGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', 'col-span-2'));
+
+            // Even Money (Rows 16-18)
+            mobileGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', 'col-span-3'));
+            mobileGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', 'col-span-3'));
+            mobileGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', 'col-span-3'));
+            mobileGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', 'col-span-3'));
+            mobileGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', 'col-span-3'));
+            mobileGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'col-span-3'));
+
+            container.appendChild(desktopGrid);
+            container.appendChild(mobileGrid);
         }
 
+        // Logic Cascade Evaluator
         function evaluateLogicFlows() {
             const wheelSelect = document.getElementById('wheel-type');
             const categorySelect = document.getElementById('sub-domain');
@@ -690,9 +705,7 @@
             if (showDynInput || showFelt) {
                 toggleVisibility(targetBox, true);
                 toggleVisibility(targetDynamicInput, showDynInput);
-                if(showFelt) {
-                    targetFeltBoard.style.display = 'block'; 
-                }
+                if(showFelt) { targetFeltBoard.style.display = 'block'; }
             }
 
             if (type === "Top Line") {
