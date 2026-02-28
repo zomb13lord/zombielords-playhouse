@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V68</title>
+    <title>Roulette Tracker V68 - Frequency Decay</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #00ff88;
-            --red: #ff4444; --black: #000; --green: #2e7d32;
+            --red: #ef4444; --black: #000; --green: #2e7d32;
+            --blue: #3b82f6; --yellow: #fbbf24;
             --wait: #ffcc00; --text: #e0e0e0;
-            --emerald-glass: rgba(16, 185, 129, 0.1);
         }
         * { box-sizing: border-box; touch-action: manipulation; }
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         
-        /* Lobby Navigation Bar */
         .lobby-nav {
             background: rgba(2, 6, 23, 0.9);
             backdrop-filter: blur(10px);
@@ -47,11 +46,6 @@
             text-transform: uppercase;
             transition: all 0.3s ease;
         }
-        .lobby-nav a:hover {
-            background: var(--accent);
-            color: #000;
-            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
-        }
 
         #config-page { padding: 20px; max-width: 500px; margin: 0 auto; }
         .config-grid { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -59,7 +53,6 @@
         label { font-size: 0.6em; color: #888; font-weight: bold; display: block; margin-bottom: 2px; text-transform: uppercase; }
         select, input { width: 100%; padding: 8px; background: #000; border: 1px solid #555; color: #fff; border-radius: 6px; font-size: 0.9em; }
         .btn-start { width: 100%; padding: 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .compact-toggles { display: flex; flex-direction: column; gap: 8px; grid-column: span 2; }
         .toggle-box { flex: 1; display: flex; align-items: center; justify-content: space-between; background: #111; padding: 8px; border-radius: 6px; border: 1px solid #333; font-size: 0.7em; font-weight: bold; }
 
         #tracker-page { display: none; }
@@ -149,7 +142,7 @@
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>RANK</th><th>D</th><th>F</th><th>SCORE</th></tr></thead>
+            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>RANK</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
@@ -177,7 +170,7 @@
             let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
             let nums = [startNum, startNum+1, startNum+2];
             if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
-            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, rf:0, isBasket: (i===0 && conf.basketOn), dozen: Math.floor(i/4)+1});
+            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, isBasket: (i===0 && conf.basketOn), dozen: Math.floor(i/4)+1});
             state.lastHitCounts[i] = 0;
         }
         document.getElementById('config-page').style.display='none'; document.getElementById('tracker-page').style.display='block';
@@ -216,20 +209,17 @@
                 if (conf.basketOn && inBasket && !avoidIds.includes(0)) {
                     let payout = { 'EU': 8, 'US': 6, 'TZ': 5 }[conf.wheel];
                     state.profit += conf.pushOn ? (state.unit * conf.unitVal * ((payout + 1) - 9)) : (state.unit * conf.unitVal * ((3 * payout + 3) - 19));
-                    state.consecutiveWins = 0;
                 } else {
                     state.profit += (state.unit * conf.unitVal * ((conf.basketOn && !conf.pushOn) ? 5 : 3));
-                    state.consecutiveWins++;
                 }
                 if (state.profit >= state.high) { state.unit = 1; state.lossLevel = 0; }
-                else if (state.consecutiveWins >= 2) state.unit = Math.max(1, Math.floor(state.unit / 2));
             } else {
                 if (!(conf.basketOn && inBasket && !avoidIds.includes(0))) {
                     state.profit -= (state.unit * conf.unitVal * ((avoidIds.includes(0) || conf.pushOn || !conf.basketOn) ? 9 : 19));
-                    state.lossLevel++; state.consecutiveWins = 0; state.unit *= 2;
+                    state.lossLevel++; state.unit *= 2;
                     if (state.lossLevel >= conf.cdTrigger) state.cooldownLeft = conf.cool;
                     state.stabCount = 0;
-                } else { state.consecutiveWins = 0; }
+                }
             }
             if(state.profit > state.high) state.high = state.profit;
         } else if (state.cooldownLeft > 0) state.cooldownLeft--;
@@ -238,44 +228,43 @@
 
     function engine() {
         const wheelSize = conf.wheel === 'EU' ? 37 : (conf.wheel === 'US' ? 38 : 39);
-        const windowSize = Math.min(state.history.length, (12 * conf.mult) + 1);
+        const lookupLimit = 12 * conf.mult;
+        const H = Math.min(state.history.length, lookupLimit);
 
         state.pockets.forEach(p => {
-            const prob = p.nums.length / wheelSize;
+            const P = p.nums.length / wheelSize;
+            const E = P * H;
+            
             let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d; p.nd = ((1/prob)-d)/((1/prob)+d);
-            
-            let aw=0, hWindow = 0;
-            for(let i=state.history.length-1; i>=Math.max(0, state.history.length-windowSize); i--) {
-                if(p.nums.includes(state.history[i])) { hWindow++; aw += (1 - (0.85 * ((state.history.length-1-i)/windowSize))); }
+            p.d = d;
+
+            let hitCount = 0;
+            const startIdx = Math.max(0, state.history.length - H);
+            for(let i = state.history.length - 1; i >= startIdx; i--) {
+                if(p.nums.includes(state.history[i])) hitCount++;
             }
-            p.hits = hWindow; 
-            const exp = windowSize * prob;
-            const rf_raw = exp === 0 ? 0 : (aw - exp) / exp; 
-            p.rf = rf_raw / (1 + Math.abs(rf_raw)); 
+            p.hits = hitCount;
+
+            const F = E === 0 ? 0 : hitCount / E;
+            const M = Math.max(0.0001, (H - d) / H);
             
-            // Updated weight: hs = (rf * 0.55) + (nd * 0.45)
-            p.hs = (p.rf * 0.55) + (p.nd * 0.45);
+            p.hs = F * M;
         });
     }
 
     function getBettingAvoids() {
         let pool = [...state.pockets].filter(p => !(conf.permHedge && p.isBasket));
         pool.sort((a, b) => {
-            if (Math.abs(a.hs - b.hs) > 0.001) return a.hs - b.hs;
-            if (a.dozen !== b.dozen) return b.dozen - a.dozen;
-            return b.id - a.id;
+            if (Math.abs(a.hs - b.hs) > 0.0001) return a.hs - b.hs;
+            return b.d - a.d;
         });
         return pool.slice(0, 3);
     }
 
     function refresh() {
         const auditSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
-        
-        // Stabilization Set Logic
-        const currentBottomThree = auditSorted.slice(-3);
-        const currentBottomIds = currentBottomThree.map(p => p.id).sort().join('|');
-        const bottomRfCold = currentBottomThree.every(p => p.rf < 0);
+        const avoids = getBettingAvoids();
+        const currentBottomIds = avoids.map(p => p.id).sort().join('|');
 
         if (currentBottomIds !== state.lastBottomIds) {
             state.stabCount = 0;
@@ -284,9 +273,11 @@
             state.stabCount++;
         }
 
+        const bottomAllCold = avoids.every(p => p.hs < 0.4);
+
         let status = (state.history.length < conf.warm) ? "WARMUP ("+state.history.length+"/"+conf.warm+")" : 
                      (state.cooldownLeft > 0) ? "COOLDOWN ("+state.cooldownLeft+")" : 
-                     (!bottomRfCold || state.stabCount < conf.stabLimit) ? "STABILIZING ("+state.stabCount+"/"+conf.stabLimit+")" : "READY";
+                     (!bottomAllCold || state.stabCount < conf.stabLimit) ? "STABILIZING ("+state.stabCount+"/"+conf.stabLimit+")" : "READY";
         
         let sCls = (status === "READY") ? "status-ready" : "status-wait";
         document.getElementById('status-txt').innerText = status; document.getElementById('status-box').className = "status-box "+sCls;
@@ -294,7 +285,6 @@
         document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('glow-red', 'glow-green'));
 
         if(status === "READY") {
-            const avoids = getBettingAvoids();
             const dispSorted = [...avoids].sort((a,b) => a.id - b.id);
             const aIds = avoids.map(x=>x.id);
             const p9 = state.pockets.filter(p => !aIds.includes(p.id) && !(conf.permHedge && p.isBasket)).sort((a,b)=>a.id - b.id);
@@ -315,7 +305,6 @@
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(2)}`; document.getElementById('stat-h').innerText = `$${state.high.toFixed(2)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
         let betT = 0; if(status === "READY") {
-            const avoids = getBettingAvoids();
             const aIds = avoids.map(x=>x.id);
             if (!conf.basketOn) betT = state.unit * 9;
             else if(conf.pushOn) betT = 9 * state.unit;
@@ -326,17 +315,24 @@
             const chip = document.createElement('div'); chip.className='chip'; chip.style.background = (n === 0 || n > 36) ? '#2e7d32' : (reds.includes(n) ? '#d32f2f' : '#000');
             chip.innerText = n === 37 ? '00' : (n === 38 ? '000' : n); feed.appendChild(chip);
         });
-        state.pockets.forEach(p => state.lastHitCounts[p.id] = p.hits);
+
         const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
         if (conf.permHedge) { renderRow(state.pockets[0], bdy, true, '★'); }
         auditSorted.forEach((p, idx) => { if(conf.permHedge && p.isBasket) return; renderRow(p, bdy, false, idx + 1); });
     }
+
     function renderRow(p, bdy, pin, rank) {
         const tr = document.createElement('tr'); if(pin) tr.className = 'pinned';
-        const w = Math.min(Math.max(((p.hs+1)/2.2)*100, 5), 100);
-        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${p.hs>0.05?'var(--accent)':(p.hs<-0.15?'var(--red)':'var(--wait)')}"></div></div></td><td>${rank}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(2)}</td>`;
+        
+        let color = 'var(--yellow)';
+        if (p.hs > 0.6) color = 'var(--red)';
+        else if (p.hs < 0.4) color = 'var(--blue)';
+
+        const w = Math.min(100, (p.hs / 1.5) * 100);
+        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${rank}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
         bdy.appendChild(tr);
     }
+
     document.getElementById('final-undo').onclick = function() { if(!state.stack.length) return; Object.assign(state, JSON.parse(state.stack.pop())); engine(); refresh(); };
 })();
 </script>
