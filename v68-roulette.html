@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V68.4</title>
+    <title>Roulette Tracker V68.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -58,10 +58,14 @@
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 1px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: all 0.2s; }
         .btn-green { background: var(--green) !important; }
         .btn-red { background: var(--red) !important; }
         .btn-black { background: var(--black) !important; }
+
+        /* HIGHLIGHT CLASSES */
+        .glow-red { border-color: #fff !important; box-shadow: inset 0 0 20px #ff0000, 0 0 10px #ff0000; transform: scale(0.98); }
+        .glow-green { border-color: #fff !important; box-shadow: inset 0 0 20px #00ff00, 0 0 10px #00ff00; transform: scale(1.02); }
         
         .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 20px; background: var(--card); border-radius: 8px; }
         .audit-table td { padding: 10px 5px; border-bottom: 1px solid #333; text-align: center; }
@@ -78,7 +82,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V68.4</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V68.5</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option></select></div>
         <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option></select></div>
@@ -225,8 +229,8 @@
 
     function engine() {
         state.pockets.forEach(p => {
-            const cycle = 36 / p.nums.length;
-            const odds = p.nums.length / 36;
+            const cycle = 36 / 3; // Fixed street logic
+            const odds = 3 / 36;
             let H = conf.mult === 'ALL' ? state.history.length : Math.floor((cycle * conf.mult) + 1);
             if (H < 1) H = 1;
             const actualH = Math.min(state.history.length, H);
@@ -277,7 +281,12 @@
         document.getElementById('status-box').className = "status-box " + sCls;
         
         const sigArea = document.getElementById('sig-box'); sigArea.innerHTML = "";
-        document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('glow-red', 'glow-green'));
+        
+        // RESET HIGHLIGHTS
+        document.querySelectorAll('.num-btn').forEach(btn => {
+            btn.classList.remove('glow-red');
+            btn.classList.remove('glow-green');
+        });
 
         if(status === "READY") {
             const dispSorted = [...avoids].sort((a,b) => a.id - b.id);
