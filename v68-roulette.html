@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V68.3</title>
+    <title>Roulette Tracker V68.4 - Cycle Auditor</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -78,22 +78,20 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V68.3</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V68.4</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
-        <div class="full"><label>Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option></select></div>
-        <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option></select></div>
+        <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short (Cycle + 1)</option><option value="2">Standard (2x Cycle + 1)</option><option value="3" selected>Long (3x Cycle + 1)</option><option value="ALL">ALL (Session)</option></select></div>
         <div><label>Progression</label><select id="prog-sel"><option value="MART" selected>Martingale</option></select></div>
         <div><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
-        <div class="compact-toggles">
+        <div class="compact-toggles full">
             <div style="display:flex; gap:8px;">
                 <div class="toggle-box">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
                 <div class="toggle-box">PERM HEDGE <input type="checkbox" id="perm-hedge" checked></div>
+                <div class="toggle-box">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
             </div>
-            <div class="toggle-box" style="margin-top:8px;">PUSH (1:1 Ratio) <input type="checkbox" id="push-toggle"></div>
         </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
-        <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option></select></div>
         <div><label>CD Loss Streak</label><input type="number" id="cd-trigger" value="2"></div>
         <div><label>CD Wait</label><input type="number" id="cool-in" value="4"></div>
         <div class="full"><label>Stabilization</label><input type="number" id="stab-in" value="3"></div>
@@ -119,7 +117,7 @@
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>RANK</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
+            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>WIN H</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
@@ -132,6 +130,7 @@
     let conf = {};
 
     document.getElementById('final-start').onclick = function() {
+        const multInput = document.getElementById('mult-in').value;
         conf = {
             wheel: document.getElementById('wheel-type').value, 
             unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
@@ -139,7 +138,7 @@
             pushOn: document.getElementById('push-toggle').checked,
             permHedge: document.getElementById('perm-hedge').checked, 
             view: document.getElementById('view-mode').value,
-            mult: parseInt(document.getElementById('mult-in').value), 
+            mult: multInput === 'ALL' ? 'ALL' : parseInt(multInput), 
             cdTrigger: parseInt(document.getElementById('cd-trigger').value), 
             cool: parseInt(document.getElementById('cool-in').value), 
             stabLimit: parseInt(document.getElementById('stab-in').value), 
@@ -152,7 +151,7 @@
             let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
             let nums = [startNum, startNum+1, startNum+2];
             if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
-            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, isBasket: (i===0 && conf.basketOn)});
+            state.pockets.push({id: i, label: label, nums: nums, hs:0, fr:0, hits:0, d:0, winH:0, isBasket: (i===0 && conf.basketOn)});
         }
         document.getElementById('config-page').style.display='none'; 
         document.getElementById('tracker-page').style.display='block';
@@ -189,24 +188,17 @@
         const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
         const isHitInSet = currentAvoidIds.includes(streetIdx);
 
-        // STABILIZATION LOGIC V7.0
-        // If already stable and hit occurs -> enter latency roll
         if (state.stabCount >= conf.stabLimit && isHitInSet) {
-            state.latencyRoll = true;
-            state.stabCount = 0;
+            state.latencyRoll = true; state.stabCount = 0;
         } else if (isHitInSet) {
-            // If unstable and hit occurs -> normal reset
-            state.stabCount = 0;
-            state.latencyRoll = false;
+            state.stabCount = 0; state.latencyRoll = false;
         } else {
-            // Clear latency roll if a non-set number hits
             state.latencyRoll = false;
         }
 
         if(document.getElementById('status-txt').innerText === "READY") {
             const win = !currentAvoidIds.includes(streetIdx);
             const isBasketHit = state.pockets[0].nums.includes(n);
-            
             if(win) {
                 if (conf.basketOn && isBasketHit && !currentAvoidIds.includes(0)) {
                     let payout = { 'EU': 8, 'US': 6, 'TZ': 5 }[conf.wheel];
@@ -230,20 +222,36 @@
     }
 
     function engine() {
-        const wheelSize = conf.wheel === 'EU' ? 37 : (conf.wheel === 'US' ? 38 : 39);
-        const H = Math.min(state.history.length, (12 * conf.mult));
         state.pockets.forEach(p => {
-            const P = p.nums.length / wheelSize;
-            const E = P * H;
-            let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d;
+            const cycle = 36 / p.nums.length;
+            const odds = p.nums.length / 36;
+            
+            // 1. Determine Window H
+            let H = (conf.mult === 'ALL') ? state.history.length : Math.floor((cycle * conf.mult) + 1);
+            if (H < 1) H = 1;
+            const actualH = Math.min(state.history.length, H);
+            p.winH = actualH;
+
+            // 2. Count Hits
             let hitCount = 0;
-            const startIdx = Math.max(0, state.history.length - H);
+            const startIdx = Math.max(0, state.history.length - actualH);
             for(let i = state.history.length - 1; i >= startIdx; i--) { if(p.nums.includes(state.history[i])) hitCount++; }
             p.hits = hitCount;
-            const F = E === 0 ? 0 : hitCount / E;
-            const M = Math.max(0.0001, (H - d) / H);
-            p.hs = F * M;
+
+            // 3. Frequency Rate (FR)
+            const frequency = hitCount / actualH;
+            const FR = frequency / odds;
+            p.fr = FR;
+
+            // 4. Depth (D)
+            let d = 0; 
+            for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
+            if (state.history.length === 0) d = 0;
+            p.d = d;
+
+            // 5. Heat Score (HS) with Cycle-Relative Decay
+            const decay = 1 / (1 + (d / cycle));
+            p.hs = FR * decay;
         });
     }
 
@@ -261,10 +269,8 @@
         const avoids = getBettingAvoids();
         const currentIds = avoids.map(p => p.id).sort().join('|');
 
-        // Set Persistence Logic
         if (currentIds !== state.lastBottomIds) {
-            state.stabCount = 0;
-            state.lastBottomIds = currentIds;
+            state.stabCount = 0; state.lastBottomIds = currentIds;
         } else if (state.history.length >= conf.warm && !state.latencyRoll) {
             state.stabCount++;
         }
@@ -304,7 +310,8 @@
         document.getElementById('stat-h').innerText = `$${state.high.toFixed(2)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
         
-        let betT = 0; if(status === "READY") {
+        let betT = 0; 
+        if(status === "READY") {
             const aIds = avoids.map(x=>x.id);
             if (!conf.basketOn) betT = state.unit * 9;
             else if(conf.pushOn) betT = 9 * state.unit;
@@ -326,10 +333,12 @@
 
     function renderRow(p, bdy, pin, rank) {
         const tr = document.createElement('tr'); if(pin) tr.className = 'pinned';
-        let color = 'var(--yellow)';
-        if (p.hs > 0.6) color = 'var(--red)'; else if (p.hs < 0.4) color = 'var(--blue)';
-        const w = Math.min(100, (p.hs / 1.5) * 100);
-        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${rank}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
+        let color = 'var(--blue)'; // Default Cold
+        if (p.hs >= 0.5) color = 'var(--red)'; // Hot
+        else if (p.hs >= 0.4) color = 'var(--yellow)'; // Warm
+        
+        const w = Math.min(100, (p.hs / 2) * 100);
+        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
         bdy.appendChild(tr);
     }
 
