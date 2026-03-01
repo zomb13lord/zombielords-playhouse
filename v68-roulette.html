@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.1</title>
+    <title>Roulette Tracker V69.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -40,9 +40,9 @@
         
         .cmd-card { display: flex; flex-direction: column; border-radius: 6px; border: 2px solid #fff; overflow: hidden; margin-top: 10px; }
         .cmd-head { font-size: 0.7em; padding: 4px; text-transform: uppercase; font-weight: 900; }
-        .cmd-body { font-size: 1.1em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
-        .mode-avoid { background: #004488; } /* Blue for Cold/Avoid */
-        .mode-place { background: #880000; } /* Red for Hot/Place */
+        .cmd-body { font-size: 0.95em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
+        .mode-avoid { background: #004488; }
+        .mode-place { background: #880000; }
         .mode-wait { background: #444; color: #aaa; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
@@ -54,23 +54,23 @@
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: 0.2s; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
         
-        /* DYNAMIC HIGHLIGHTS */
         .highlight-blue { background: #004488 !important; border-color: #00aaff !important; box-shadow: 0 0 15px #00aaff; }
         .highlight-red { background: #880000 !important; border-color: #ff4444 !important; box-shadow: 0 0 15px #ff4444; }
 
         .btn-green { background: var(--green); }
-        .btn-red { background: #440000; } /* Dark base for Red pockets */
+        .btn-red { background: #440000; }
         .btn-black { background: #000; }
         
-        .bet-toggle-btn { width: 100%; padding: 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 1.2em; cursor: pointer; transition: 0.3s; margin-bottom: 15px;}
+        .bet-toggle-btn { width: 100%; padding: 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 1.2em; cursor: pointer; margin-bottom: 15px;}
         .bet-on { background: var(--accent); color: #000; border: 2px solid #fff; }
         .bet-off { background: #444; color: #888; border: 2px solid #222; }
 
-        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 20px; background: var(--card); border-radius: 8px; }
-        .audit-table td { padding: 10px 5px; border-bottom: 1px solid #333; text-align: center; }
-        .heat-bg { background: #000; width: 85%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.75em; margin-top: 20px; background: var(--card); border-radius: 8px; table-layout: fixed; }
+        .audit-table th { color: #888; padding: 10px 2px; border-bottom: 1px solid #444; }
+        .audit-table td { padding: 8px 2px; border-bottom: 1px solid #333; text-align: center; overflow: hidden; white-space: nowrap; }
+        .heat-bg { background: #000; width: 90%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
         .heat-fill { height: 100%; transition: width 0.4s; }
     </style>
 </head>
@@ -83,14 +83,15 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.1</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V69.2</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
+        <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets (N=3)</option><option value="36SN">36 Singles (N=1)</option></select></div>
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div class="full"><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
         <div class="full">
             <div style="display:flex; gap:8px;">
-                <div class="toggle-box" style="flex:1; display:flex; justify-content:space-between;">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
-                <div class="toggle-box" style="flex:1; display:flex; justify-content:space-between;">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
+                <div class="toggle-box" style="flex:1;">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
+                <div class="toggle-box" style="flex:1;">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
             </div>
         </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
@@ -118,7 +119,7 @@
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>H-WIN</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
+            <thead><tr><th style="width:30%">UNIT</th><th style="width:15%">W</th><th style="width:15%">D</th><th style="width:15%">H</th><th style="width:25%">SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
@@ -132,31 +133,41 @@
 
     document.getElementById('final-start').onclick = function() {
         const multVal = document.getElementById('mult-in').value;
+        const dom = document.getElementById('dom-sel').value;
         conf = {
             wheel: document.getElementById('wheel-type').value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
             basketOn: document.getElementById('basket-toggle').checked, pushOn: document.getElementById('push-toggle').checked,
-            view: document.getElementById('view-mode').value,
+            view: document.getElementById('view-mode').value, domain: dom,
             mult: multVal === 'ALL' ? 'ALL' : parseInt(multVal), warm: parseInt(document.getElementById('warm-in').value)
         };
         state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
         state.pockets = [];
-        for(let i=0; i<12; i++) {
-            let startNum = (i*3)+1;
-            let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
-            let nums = [startNum, startNum+1, startNum+2];
-            if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
-            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, winH: 0});
+        
+        if(conf.domain === '9ST') {
+            for(let i=0; i<12; i++) {
+                let startNum = (i*3)+1;
+                let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
+                let nums = [startNum, startNum+1, startNum+2];
+                if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
+                state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, winH: 0});
+            }
+        } else {
+            const allNums = [...state.zeros, ...Array.from({length:36}, (_,i)=>i+1)];
+            allNums.forEach((n, idx) => {
+                let label = n === 37 ? '00' : (n === 38 ? '000' : n.toString());
+                state.pockets.push({id: idx, label: label, nums: [n], hs:0, hits:0, d:0, winH: 0});
+            });
         }
+
         document.getElementById('config-page').style.display='none'; 
         document.getElementById('tracker-page').style.display='block';
         buildFeltPad(conf.wheel); refresh();
     };
 
     document.getElementById('bet-toggle').onclick = function() {
-        if (state.history.length < conf.warm) return; // Optional: disable toggle during warmup
         state.isBetting = !state.isBetting;
         this.innerText = state.isBetting ? "BET: ON" : "BET: OFF";
-        this.className = state.isBetting ? "bet-toggle-btn bet-on" : "bet-toggle-btn bet-off";
+        this.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
         refresh();
     };
 
@@ -168,8 +179,8 @@
         };
         if (w === 'EU') container.appendChild(makeBtn(0, '0'));
         else if (w === 'US') {
-            const row = document.createElement('div'); row.style.display="grid"; row.style.gridTemplateColumns="1fr 1fr"; row.style.gap="8px";
-            row.appendChild(makeBtn(0, '0')); row.appendChild(makeBtn(37, '00')); container.appendChild(row);
+            const r = document.createElement('div'); r.style.display="grid"; r.style.gridTemplateColumns="1fr 1fr"; r.style.gap="8px";
+            r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
         } else {
             const r1 = document.createElement('div'); r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
             const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px";
@@ -190,24 +201,22 @@
         const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
 
         if(state.isBetting) {
-            const win = !avoidIds.includes(streetIdx);
-            const isBasketHit = state.pockets[0].nums.includes(n);
+            let win = false;
+            if(conf.domain === '9ST') win = !avoidIds.includes(streetIdx);
+            else {
+                const targetIdx = state.pockets.findIndex(p => p.nums.includes(n));
+                win = !avoidIds.includes(targetIdx);
+            }
+
             if(win) {
-                if (conf.basketOn && isBasketHit && !avoidIds.includes(0)) {
-                    let payout = { 'EU': 8, 'US': 6, 'TZ': 5 }[conf.wheel];
-                    state.profit += conf.pushOn ? (state.unit * conf.unitVal * ((payout + 1) - 9)) : (state.unit * conf.unitVal * ((3 * payout + 3) - 19));
-                } else {
-                    state.profit += (state.unit * conf.unitVal * ((conf.basketOn && !conf.pushOn) ? 5 : 3));
-                }
+                state.profit += (state.unit * conf.unitVal * 3); // Basic Street Logic
                 if (state.profit >= state.high) state.unit = 1;
             } else {
-                if (!(conf.basketOn && isBasketHit && !avoidIds.includes(0))) {
-                    state.profit -= (state.unit * conf.unitVal * ((avoidIds.includes(0) || conf.pushOn || !conf.basketOn) ? 9 : 19));
-                    state.unit *= 2;
-                    state.isBetting = false; // AUTO-OFF ON LOSS
-                    const btn = document.getElementById('bet-toggle');
-                    btn.innerText = "BET: OFF"; btn.className = "bet-toggle-btn bet-off";
-                }
+                state.profit -= (state.unit * conf.unitVal * 9); // Basic Loss Logic
+                state.unit *= 2;
+                state.isBetting = false; 
+                document.getElementById('bet-toggle').innerText = "BET: OFF";
+                document.getElementById('bet-toggle').className = "bet-toggle-btn bet-off";
             }
             if(state.profit > state.high) state.high = state.profit;
         }
@@ -217,21 +226,23 @@
 
     function engine() {
         state.pockets.forEach(p => {
-            const cycle = 12; const odds = 3 / 36;
+            const cycle = conf.domain === '9ST' ? 12 : 36;
+            const odds = p.nums.length / 36;
             let H = conf.mult === 'ALL' ? state.history.length : Math.floor((cycle * conf.mult) + 1);
             if (H < 1) H = 1; const actualH = Math.min(state.history.length, H); p.winH = actualH;
             let hitCount = 0; const startIdx = Math.max(0, state.history.length - actualH);
             for(let i = state.history.length - 1; i >= startIdx; i--) { if(p.nums.includes(state.history[i])) hitCount++; }
-            p.hits = hitCount; p.fr = (hitCount / actualH) / odds;
+            p.hits = hitCount;
+            const FR = (hitCount / actualH) / odds;
             let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d; p.hs = p.fr * (1 / (1 + (d / cycle)));
+            p.d = d; p.hs = FR * (1 / (1 + (d / cycle)));
         });
     }
 
     function getBettingAvoids() {
         let pool = [...state.pockets];
         pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
-        return pool.slice(0, 3);
+        return pool.slice(0, conf.domain === '9ST' ? 3 : 12); // Proportional Avoids
     }
 
     function refresh() {
@@ -243,34 +254,31 @@
         document.getElementById('status-box').className = "status-box " + (state.isBetting ? "status-ready" : "status-wait");
         
         const sigArea = document.getElementById('sig-box'); sigArea.innerHTML = "";
-        
-        // Reset Pad Highlights
         document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('highlight-blue', 'highlight-red'));
 
         if(!warmup) {
             const aIds = avoids.map(x=>x.id);
-            const p9 = state.pockets.filter(p => !aIds.includes(p.id));
+            const pNon = state.pockets.filter(p => !aIds.includes(p.id));
             
-            // ASCENDING SORT FOR LABELS
-            const sortedAvoids = [...avoids].sort((a,b) => a.id - b.id);
-            const sortedP9 = [...p9].sort((a,b) => a.id - b.id);
-
-            // Number Pad Coloring
+            // Highlights
             avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-blue')));
-            p9.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-red')));
+            pNon.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-red')));
 
             if(state.isBetting) {
-                if(conf.view === 'AVOID') sigArea.innerHTML = `<div class="cmd-card mode-avoid"><div class="cmd-head">AVOID STREETS</div><div class="cmd-body">${sortedAvoids.map(p=>p.label).join(', ')}</div></div>`;
-                else sigArea.innerHTML = `<div class="cmd-card mode-place"><div class="cmd-head">PLACE ON</div><div class="cmd-body">${sortedP9.map(p=>p.label).join(', ')}</div></div>`;
+                const sortedLabels = (conf.view === 'AVOID' ? [...avoids] : [...pNon]).sort((a,b)=>a.id - b.id).map(p=>p.label);
+                sigArea.innerHTML = `<div class="cmd-card ${conf.view === 'AVOID' ? 'mode-avoid' : 'mode-place'}">
+                    <div class="cmd-head">${conf.view} COMMANDER</div>
+                    <div class="cmd-body" style="font-size:0.8em;">${sortedLabels.join(', ')}</div>
+                </div>`;
             } else {
                 sigArea.innerHTML = `<div class="cmd-card mode-wait"><div class="cmd-head">COMMANDER</div><div class="cmd-body">WAIT...</div></div>`;
             }
         }
         
-        document.getElementById('stat-p').innerText = `$${state.profit.toFixed(2)}`;
-        document.getElementById('stat-h').innerText = `$${state.high.toFixed(2)}`;
+        document.getElementById('stat-p').innerText = `$${state.profit.toFixed(0)}`;
+        document.getElementById('stat-h').innerText = `$${state.high.toFixed(0)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
-        document.getElementById('stat-b').innerText = state.isBetting ? `$${(state.unit * 9 * conf.unitVal).toFixed(2)}` : "$0";
+        document.getElementById('stat-b').innerText = state.isBetting ? `$${(state.unit * 9 * conf.unitVal).toFixed(0)}` : "$0";
         
         const feed = document.getElementById('feed'); feed.innerHTML = '';
         state.history.slice(-8).reverse().forEach(n => {
@@ -280,22 +288,22 @@
         });
 
         const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        auditSorted.forEach((p, idx) => renderRow(p, bdy));
+        auditSorted.forEach(p => renderRow(p, bdy));
     }
 
     function renderRow(p, bdy) {
         const tr = document.createElement('tr');
         let color = p.hs >= 0.5 ? 'var(--red)' : (p.hs >= 0.4 ? 'var(--yellow)' : 'var(--blue)');
-        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100,(p.hs/2)*100)}%; background:${color}"></div></div></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
+        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100,(p.hs/2)*100)}%; background:${color}"></div></div></td>
+            <td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
         bdy.appendChild(tr);
     }
 
     document.getElementById('final-undo').onclick = function() { 
         if(!state.stack.length) return; 
         Object.assign(state, JSON.parse(state.stack.pop())); 
-        const btn = document.getElementById('bet-toggle');
-        btn.innerText = state.isBetting ? "BET: ON" : "BET: OFF";
-        btn.className = state.isBetting ? "bet-toggle-btn bet-on" : "bet-toggle-btn bet-off";
+        document.getElementById('bet-toggle').innerText = state.isBetting ? "BET: ON" : "BET: OFF";
+        document.getElementById('bet-toggle').className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
         engine(); refresh(); 
     };
 })();
