@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.2</title>
+    <title>Roulette Tracker V69.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -28,7 +28,6 @@
         label { font-size: 0.6em; color: #888; font-weight: bold; display: block; margin-bottom: 2px; text-transform: uppercase; }
         select, input { width: 100%; padding: 8px; background: #000; border: 1px solid #555; color: #fff; border-radius: 6px; font-size: 0.9em; }
         .btn-start { width: 100%; padding: 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
-        .toggle-box { flex: 1; display: flex; align-items: center; justify-content: space-between; background: #111; padding: 8px; border-radius: 6px; border: 1px solid #333; font-size: 0.7em; font-weight: bold; }
 
         #tracker-page { display: none; }
         .frozen-top { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px; border-bottom: 3px solid #444; }
@@ -49,8 +48,13 @@
         .history-feed { display: flex; gap: 8px; justify-content: center; margin-top: 8px; min-height: 38px; overflow: hidden; }
         .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; flex-shrink: 0; }
 
-        .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
-        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: all 0.2s; }
+        /* FIXED NUMBER PAD CSS */
+        .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px; }
+        .zero-container { grid-column: span 3; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+        .zero-row { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
+        .zero-row.double { grid-template-columns: 1fr 1fr; }
+        
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: all 0.2s; width: 100%; }
         .btn-green { background: var(--green) !important; } .btn-red { background: var(--red) !important; } .btn-black { background: var(--black) !important; }
         .glow-red { border-color: #fff !important; box-shadow: inset 0 0 20px #ff0000, 0 0 10px #ff0000; transform: scale(0.98); }
         .glow-green { border-color: #fff !important; box-shadow: inset 0 0 20px #00ff00, 0 0 10px #00ff00; transform: scale(1.02); }
@@ -71,7 +75,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.2</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.3</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div><label>Domain</label><select id="dom-sel" onchange="toggleSuInput()"><option value="9ST" selected>9 Streets</option><option value="SU">Straight Up</option></select></div>
         <div id="su-config" style="display:none;"><label>Total Bet Count</label><input type="number" id="su-total" value="28"></div>
@@ -79,9 +83,9 @@
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div class="compact-toggles full">
             <div style="display:flex; gap:8px;">
-                <div class="toggle-box">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
-                <div class="toggle-box">PERM HEDGE <input type="checkbox" id="perm-hedge" checked></div>
-                <div class="toggle-box">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
+                <div class="toggle-box" style="flex:1">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
+                <div class="toggle-box" style="flex:1">PERM HEDGE <input type="checkbox" id="perm-hedge" checked></div>
+                <div class="toggle-box" style="flex:1">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
             </div>
         </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
@@ -153,16 +157,13 @@
             cool: parseInt(document.getElementById('cool-in').value)
         };
         state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
-        state.primaryPockets = [];
-        state.suPockets = [];
+        state.primaryPockets = []; state.suPockets = [];
 
-        // Build Single Number Pool (Always calculated)
         const allNums = [...state.zeros, ...Array.from({length: 36}, (_, i) => i + 1)];
         allNums.forEach((n, idx) => {
             state.suPockets.push({id: idx, label: (n===37?'00':(n===38?'000':n)), nums:[n], hs:0, hits:0, d:0, evHits: 0});
         });
 
-        // Build Primary Domain Pool
         if (conf.domain === '9ST') {
             for(let i=0; i<12; i++) {
                 let startNum = (i*3)+1;
@@ -173,32 +174,37 @@
             document.getElementById('su-audit-container').style.display = 'block';
             document.getElementById('primary-audit-label').innerText = "9 Streets Audit";
         } else {
-            state.primaryPockets = state.suPockets; // Merge for SU domain
+            state.primaryPockets = state.suPockets;
             document.getElementById('su-audit-container').style.display = 'none';
             document.getElementById('primary-audit-label').innerText = "Straight Up Audit";
         }
 
-        document.getElementById('config-page').style.display='none'; 
-        document.getElementById('tracker-page').style.display='block';
+        document.getElementById('config-page').style.display='none'; document.getElementById('tracker-page').style.display='block';
         buildFeltPad(conf.wheel); refresh();
     };
 
     function buildFeltPad(w) {
         const pad = document.getElementById('pad'); pad.innerHTML = '';
         const container = document.createElement('div'); container.className = 'zero-container';
+        
         const makeBtn = (val, txt) => {
             const b = document.createElement('button'); b.id='nb-'+val; b.className='num-btn btn-green'; b.innerText=txt; b.onclick = () => addRoll(val); return b;
         };
-        if (w === 'EU') container.appendChild(makeBtn(0, '0'));
-        else if (w === 'US') {
-            const row = document.createElement('div'); row.style.display="grid"; row.style.gridTemplateColumns="1fr 1fr"; row.style.gap="8px";
-            row.appendChild(makeBtn(0, '0')); row.appendChild(makeBtn(37, '00')); container.appendChild(row);
+
+        if (w === 'EU') {
+            const r = document.createElement('div'); r.className = 'zero-row';
+            r.appendChild(makeBtn(0, '0')); container.appendChild(r);
+        } else if (w === 'US') {
+            const r = document.createElement('div'); r.className = 'zero-row double';
+            r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
         } else {
-            const r1 = document.createElement('div'); r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
-            const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px";
+            const r1 = document.createElement('div'); r1.className = 'zero-row';
+            r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
+            const r2 = document.createElement('div'); r2.className = 'zero-row double'; r2.style.marginTop = "8px";
             r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00')); container.appendChild(r2);
         }
         pad.appendChild(container);
+
         for(let i=1; i<=36; i++) {
             const b = document.createElement('button'); b.id='nb-'+i; b.className='num-btn '+(reds.includes(i)?'btn-red':'btn-black');
             b.innerText=i; b.onclick = () => addRoll(i); pad.appendChild(b);
@@ -213,10 +219,9 @@
         
         if (statusTxt === "READY") {
             state.primaryPockets.forEach(p => {
-                const isTargetedAvoid = avoidIds.includes(p.id);
                 if (p.nums.includes(n)) {
-                    if (conf.view === 'AVOID' && isTargetedAvoid) p.evHits++;
-                    else if (conf.view === 'PLACE' && !isTargetedAvoid) p.evHits++;
+                    if (conf.view === 'AVOID' && avoidIds.includes(p.id)) p.evHits++;
+                    else if (conf.view === 'PLACE' && !avoidIds.includes(p.id)) p.evHits++;
                 }
             });
             const hitInAvoid = avoidIds.some(aid => state.primaryPockets[aid].nums.includes(n));
@@ -246,10 +251,8 @@
                     if(p.nums.includes(state.history[i])) hitCount++;
                 }
                 p.hits = hitCount;
-                const FR = (hitCount / actualH) / odds;
-                let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-                p.d = d;
-                p.hs = FR * (1 / (1 + (d / cycle)));
+                p.d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; p.d++; }
+                p.hs = ((hitCount / actualH) / odds) * (1 / (1 + (p.d / cycle)));
             });
         });
     }
@@ -282,6 +285,7 @@
         }
 
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(2)}`;
+        document.getElementById('stat-h').innerText = `$${state.high.toFixed(2)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
         
         renderPool(state.primaryPockets, 'audit-body-primary');
