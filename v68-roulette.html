@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V70.1</title>
+    <title>Roulette Tracker V70.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -83,7 +83,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V70.1</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V70.2</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option><option value="36SN">36 Singles</option></select></div>
         <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option><option value="HOT">Hot Hunt</option></select></div>
@@ -173,8 +173,10 @@
         const makeBtn = (n) => {
             const b = document.createElement('button'); b.id='nb-'+n; 
             b.innerText = n === 37 ? '00' : (n === 38 ? '000' : n);
-            b.className = (n === 0 || n > 36) ? 'num-btn p-green' : (reds.includes(n) ? 'num-btn p-red' : 'num-btn p-black');
-            b.onclick = () => addRoll(n); return b;
+            let cls = 'num-btn ';
+            if(n === 0 || n > 36) cls += 'p-green';
+            else cls += reds.includes(n) ? 'p-red' : 'p-black';
+            b.className = cls; b.onclick = () => addRoll(n); return b;
         };
         if(conf.wheel === 'EU') zCont.appendChild(makeBtn(0));
         else if(conf.wheel === 'US'){
@@ -191,14 +193,20 @@
 
     function addRoll(n) {
         stack.push(JSON.stringify({p: state.profit, h: state.high, u: state.unit, b: state.isBetting, rolls: [...rolls]}));
-        const targets = getTargets();
-        const tIds = targets.map(p => p.id);
+        
+        // Logical Selection based on Strategy AND Terminal Mode
+        const activeTargets = getDisplaySet();
+        const tIds = activeTargets.map(p => p.id);
 
         if(state.isBetting) {
             const streetIdx = Math.floor((n-1)/3);
-            const isHit = (conf.domain === '9ST') ? (n > 0 && n <= 36 && tIds.includes(streetIdx)) : targets.some(p => p.nums.includes(n));
-            const win = (conf.view === 'AVOID') ? !isHit : isHit;
-            const stake = conf.target * state.unit * conf.unitVal;
+            const isHit = (conf.domain === '9ST') ? (n > 0 && n <= 36 && tIds.includes(streetIdx)) : activeTargets.some(p => p.nums.includes(n));
+            
+            // In PLACE mode, hitting a target is a Win. In AVOID mode, hitting a target is a Loss.
+            const win = (conf.view === 'PLACE') ? isHit : !isHit;
+            
+            let coveredCount = 0; activeTargets.forEach(p => coveredCount += p.nums.length);
+            const stake = coveredCount * state.unit * conf.unitVal;
 
             if(win) {
                 state.profit += (state.unit * conf.unitVal * 36) - stake;
@@ -216,28 +224,46 @@
     function engine() {
         state.pockets.forEach(p => {
             const cycle = (conf.domain === '9ST' ? 12 : 36);
-            let winSize = conf.mult === 'ALL' ? rolls.length : (cycle * conf.mult) + 1;
-            const actualWin = Math.max(1, Math.min(rolls.length, winSize)); p.winH = actualWin;
-            let hits = 0; const winArr = rolls.slice(-actualWin);
-            winArr.forEach(r => { if(p.nums.includes(r)) hits++; });
-            p.hits = hits;
+            let windowSize = conf.mult === 'ALL' ? rolls.length : (cycle * conf.mult) + 1;
+            const actualWin = Math.max(1, Math.min(rolls.length, windowSize)); p.winH = actualWin;
+            let h = 0; const winArr = rolls.slice(-actualWin);
+            winArr.forEach(r => { if(p.nums.includes(r)) h++; });
+            p.hits = h;
             let d = 0; for(let i=rolls.length-1; i>=0; i--) { if(p.nums.includes(rolls[i])) break; d++; }
             p.d = d;
-            const fr = (hits / actualWin) / (p.nums.length / 36);
+            const fr = (h / actualWin) / (p.nums.length / 36);
             p.hs = fr * (1 / (1 + (d / cycle)));
         });
     }
 
-    function getTargets() {
+    // This handles the Logic/Strategy Layer
+    function getStrategySet() {
         let pool = [...state.pockets];
         if(conf.strategy === 'COLD') pool.sort((a,b) => a.hs - b.hs || b.d - a.d);
         else pool.sort((a,b) => b.hs - a.hs || a.d - b.d);
         return pool.slice(0, conf.target);
     }
 
+    // This handles the Presentation/Terminal Layer
+    function getDisplaySet() {
+        const strategySet = getStrategySet();
+        const stratIds = strategySet.map(p => p.id);
+        
+        if (conf.view === 'PLACE') {
+            return strategySet;
+        } else {
+            // AVOID Mode: We show the Strategy Set's OPPOSITE to avoid.
+            // If strategy is COLD, we show the HOTTEST to avoid.
+            let oppositePool = [...state.pockets].filter(p => !stratIds.includes(p.id));
+            if(conf.strategy === 'COLD') oppositePool.sort((a,b) => b.hs - a.hs || a.d - b.d);
+            else oppositePool.sort((a,b) => a.hs - b.hs || b.d - a.d);
+            return oppositePool.slice(0, conf.target);
+        }
+    }
+
     function refresh() {
         const audit = [...state.pockets].sort((a,b) => b.hs - a.hs);
-        const targets = getTargets();
+        const displaySet = getDisplaySet();
         const warmup = rolls.length < conf.warm;
         
         document.getElementById('status-txt').innerText = warmup ? `WARMUP (${rolls.length}/${conf.warm})` : (state.isBetting ? "ACTIVE" : "READY (WAIT)");
@@ -246,15 +272,17 @@
         document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('glow-blue', 'glow-red'));
         if(!warmup) {
             const hCls = (conf.view === 'AVOID') ? 'glow-blue' : 'glow-red';
-            targets.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
-            const labels = [...targets].sort((a,b)=>a.id-b.id).map(p=>p.label);
+            displaySet.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
+            const labels = [...displaySet].sort((a,b)=>a.id-b.id).map(p=>p.label);
             document.getElementById('sig-box').innerHTML = `<div class="cmd-card ${state.isBetting?(conf.view==='AVOID'?'mode-avoid':'mode-place'):'mode-wait'}"><div class="cmd-head">${state.isBetting?conf.view:'READY'}</div><div class="cmd-body">${labels.join(', ')}</div></div>`;
         }
         
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(0)}`;
         document.getElementById('stat-h').innerText = `$${state.high.toFixed(0)}`;
         document.getElementById('stat-rolls').innerText = rolls.length;
-        document.getElementById('stat-b').innerText = state.isBetting ? `$${(conf.target * state.unit * conf.unitVal).toFixed(0)}` : "$0";
+        
+        let covered = 0; displaySet.forEach(p => covered += p.nums.length);
+        document.getElementById('stat-b').innerText = state.isBetting ? `$${(covered * state.unit * conf.unitVal).toFixed(0)}` : "$0";
         
         const feed = document.getElementById('history-feed'); feed.innerHTML = '';
         rolls.slice(-8).reverse().forEach(n => {
@@ -276,10 +304,7 @@
         if(!stack.length) return; 
         const prev = JSON.parse(stack.pop());
         state.profit = prev.p; state.high = prev.h; state.unit = prev.u; state.isBetting = prev.b; rolls = prev.rolls;
-        const btn = document.getElementById('bet-toggle');
-        btn.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
-        btn.innerText = "BET: " + (state.isBetting ? "ON" : "OFF");
-        engine(); refresh(); 
+        refresh(); 
     };
 })();
 </script>
