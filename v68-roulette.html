@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V70.2</title>
+    <title>Roulette Tracker V70.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +32,6 @@
         .btn-start { width: 100%; padding: 18px; background: var(--green-pocket); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 
         #tracker-page { display: none; }
-        .frozen-top { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px; border-bottom: 3px solid #444; }
         .status-box { padding: 10px; border-radius: 8px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; font-weight: bold; border: 2px solid #444; margin: 10px; }
         .status-wait { background: #222; color: var(--wait); }
         .status-ready { background: #000; color: #fff; border-color: var(--accent); }
@@ -48,12 +47,12 @@
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
         .val { font-weight: bold; color: var(--accent); font-size: 0.95em; }
 
-        .history-feed { display: flex; gap: 8px; justify-content: center; margin: 8px 0; min-height: 38px; overflow: hidden; }
+        .history-feed { display: flex; gap: 8px; justify-content: center; margin: 8px 0; min-height: 38px; }
         .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; flex-shrink: 0; }
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 15px auto; }
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 1px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
         .p-red { background: var(--red-pocket) !important; }
         .p-black { background: var(--black-pocket) !important; }
         .p-green { background: var(--green-pocket) !important; }
@@ -61,14 +60,12 @@
         .glow-blue { background: var(--blue-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--blue-high); }
         .glow-red { background: var(--red-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--red-high); }
         
-        .bet-toggle-btn { width: 100%; padding: 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 1.2em; cursor: pointer; margin-top: 15px;}
+        .bet-toggle-btn { width: 100%; padding: 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 1.2em; cursor: pointer; margin-bottom: 10px; }
         .bet-on { background: var(--accent); color: #000; border: 2px solid #fff; }
         .bet-off { background: #444; color: #888; border: 2px solid #222; }
 
         .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 20px; background: var(--card); border-radius: 8px; }
         .audit-table td { padding: 10px 5px; border-bottom: 1px solid #333; text-align: center; }
-        .heat-bg { background: #000; width: 85%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
-        .heat-fill { height: 100%; transition: width 0.4s; }
     </style>
 </head>
 <body>
@@ -83,39 +80,37 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V70.2</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V70.4</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option><option value="36SN">36 Singles</option></select></div>
-        <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option><option value="HOT">Hot Hunt</option></select></div>
-        <div><label>Target Count</label><input type="number" id="target-count" value="10"></div>
+        <div class="full"><label>Strategy (Mathematical Target)</label><select id="strat-sel"><option value="COLD">Cold Hunt</option><option value="HOT" selected>Hot Hunt</option></select></div>
+        <div><label>Strategy Count</label><input type="number" id="target-count" value="28"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
-        <div class="full"><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
-        <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
+        <div class="full"><label>Terminal Mode (Display Setting)</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
+        <div><label>Unit Value ($)</label><input type="number" id="unit-cash" value="5"></div>
     </div>
     <button class="btn-start" id="final-start">START SESSION</button>
 </div>
 
 <div id="tracker-page">
-    <div class="frozen-top">
-        <div id="status-box" class="status-box status-wait"><div id="status-txt">WARMING UP</div><div id="sig-box"></div></div>
-        <div class="stat-grid">
-            <div class="stat-card"><small>PROFIT</small><span id="stat-p" class="val">$0</span></div>
-            <div class="stat-card"><small>HIGH</small><span id="stat-h" class="val">$0</span></div>
-            <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
-            <div class="stat-card"><small>ROLLS</small><span id="stat-rolls" class="val">0</span></div>
-        </div>
-        <div id="history-feed" class="history-feed"></div>
+    <div id="status-box" class="status-box status-wait"><div id="status-txt">WARMING UP</div><div id="sig-box"></div></div>
+    <div class="stat-grid">
+        <div class="stat-card"><small>PROFIT</small><span id="stat-p" class="val">$0</span></div>
+        <div class="stat-card"><small>HIGH</small><span id="stat-h" class="val">$0</span></div>
+        <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
+        <div class="stat-card"><small>ROLLS</small><span id="stat-rolls" class="val">0</span></div>
     </div>
+    <div id="history-feed" class="history-feed"></div>
     <div style="padding:15px;">
-        <div id="pad" class="num-pad"></div>
         <button id="bet-toggle" class="bet-toggle-btn bet-off">BET: OFF</button>
+        <div id="pad" class="num-pad"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
             <button id="final-undo" style="background:#444; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">UNDO</button>
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr><th>UNIT</th><th>W</th><th>D</th><th>H</th><th>SCORE</th></tr></thead>
+            <thead><tr style="color:#888; font-size:0.8em;"><th>UNIT</th><th>W</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
@@ -124,16 +119,16 @@
 <script>
 (function() {
     const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let rolls = [];
+    let sessionRolls = [];
     let stack = [];
     let state = { pockets: [], profit: 0, high: 0, unit: 1, isBetting: false };
     let conf = {};
 
     document.getElementById('final-start').onclick = function() {
         conf = {
-            wheel: document.getElementById('wheel-type').value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
+            wheel: document.getElementById('wheel-type').value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 5,
             view: document.getElementById('view-mode').value, domain: document.getElementById('dom-sel').value,
-            strategy: document.getElementById('strat-sel').value, target: parseInt(document.getElementById('target-count').value) || 10,
+            strategy: document.getElementById('strat-sel').value, target: parseInt(document.getElementById('target-count').value) || 28,
             mult: document.getElementById('mult-in').value === 'ALL' ? 'ALL' : parseInt(document.getElementById('mult-in').value),
             warm: parseInt(document.getElementById('warm-in').value)
         };
@@ -160,7 +155,7 @@
     }
 
     document.getElementById('bet-toggle').onclick = function() {
-        if(rolls.length < conf.warm) return;
+        if(sessionRolls.length < conf.warm) return;
         state.isBetting = !state.isBetting;
         this.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
         this.innerText = "BET: " + (state.isBetting ? "ON" : "OFF");
@@ -173,10 +168,8 @@
         const makeBtn = (n) => {
             const b = document.createElement('button'); b.id='nb-'+n; 
             b.innerText = n === 37 ? '00' : (n === 38 ? '000' : n);
-            let cls = 'num-btn ';
-            if(n === 0 || n > 36) cls += 'p-green';
-            else cls += reds.includes(n) ? 'p-red' : 'p-black';
-            b.className = cls; b.onclick = () => addRoll(n); return b;
+            b.className = (n === 0 || n > 36) ? 'num-btn p-green' : (reds.includes(n) ? 'num-btn p-red' : 'num-btn p-black');
+            b.onclick = () => addRoll(n); return b;
         };
         if(conf.wheel === 'EU') zCont.appendChild(makeBtn(0));
         else if(conf.wheel === 'US'){
@@ -192,81 +185,71 @@
     }
 
     function addRoll(n) {
-        stack.push(JSON.stringify({p: state.profit, h: state.high, u: state.unit, b: state.isBetting, rolls: [...rolls]}));
+        stack.push(JSON.stringify({p: state.profit, h: state.high, u: state.unit, b: state.isBetting, rolls: [...sessionRolls]}));
         
-        // Logical Selection based on Strategy AND Terminal Mode
-        const activeTargets = getDisplaySet();
-        const tIds = activeTargets.map(p => p.id);
+        // 1. IDENTIFY STRATEGY GROUP (The group we are mathematically betting on)
+        let auditPool = [...state.pockets];
+        if(conf.strategy === 'COLD') auditPool.sort((a,b) => a.hs - b.hs || b.d - a.d);
+        else auditPool.sort((a,b) => b.hs - a.hs || a.d - b.d);
+        const strategyGroup = auditPool.slice(0, conf.target);
+        const strategyIds = strategyGroup.map(p => p.id);
 
         if(state.isBetting) {
             const streetIdx = Math.floor((n-1)/3);
-            const isHit = (conf.domain === '9ST') ? (n > 0 && n <= 36 && tIds.includes(streetIdx)) : activeTargets.some(p => p.nums.includes(n));
+            const isHitInStrategy = (conf.domain === '9ST') ? (n > 0 && n <= 36 && strategyIds.includes(streetIdx)) : strategyGroup.some(p => p.nums.includes(n));
             
-            // In PLACE mode, hitting a target is a Win. In AVOID mode, hitting a target is a Loss.
-            const win = (conf.view === 'PLACE') ? isHit : !isHit;
-            
-            let coveredCount = 0; activeTargets.forEach(p => coveredCount += p.nums.length);
-            const stake = coveredCount * state.unit * conf.unitVal;
+            // Stake is ALWAYS based on Strategy Count (e.g. 28 numbers * 5 units = 140)
+            let totalPocketsBet = 0;
+            strategyGroup.forEach(p => totalPocketsBet += p.nums.length);
+            const totalStake = totalPocketsBet * state.unit * conf.unitVal;
 
-            if(win) {
-                state.profit += (state.unit * conf.unitVal * 36) - stake;
+            if(isHitInStrategy) {
+                // WIN: (Unit * 36) - Stake. For Hot 28 @ 5 units: (5 * 36) - 140 = 40.
+                state.profit += (state.unit * conf.unitVal * 36) - totalStake;
                 if(state.profit >= state.high) state.unit = 1;
             } else {
-                state.profit -= stake; state.unit *= 2; state.isBetting = false;
+                // LOSS: -140
+                state.profit -= totalStake; 
+                state.unit *= 2; state.isBetting = false;
                 const btn = document.getElementById('bet-toggle');
                 btn.className = "bet-toggle-btn bet-off"; btn.innerText = "BET: OFF";
             }
             if(state.profit > state.high) state.high = state.profit;
         }
-        rolls.push(n); engine(); refresh();
+        sessionRolls.push(n); engine(); refresh();
     }
 
     function engine() {
         state.pockets.forEach(p => {
             const cycle = (conf.domain === '9ST' ? 12 : 36);
-            let windowSize = conf.mult === 'ALL' ? rolls.length : (cycle * conf.mult) + 1;
-            const actualWin = Math.max(1, Math.min(rolls.length, windowSize)); p.winH = actualWin;
-            let h = 0; const winArr = rolls.slice(-actualWin);
+            let winSize = conf.mult === 'ALL' ? sessionRolls.length : (cycle * conf.mult) + 1;
+            const actualWin = Math.max(1, Math.min(sessionRolls.length, windowSize)); p.winH = actualWin;
+            let h = 0; const winArr = sessionRolls.slice(-actualWin);
             winArr.forEach(r => { if(p.nums.includes(r)) h++; });
             p.hits = h;
-            let d = 0; for(let i=rolls.length-1; i>=0; i--) { if(p.nums.includes(rolls[i])) break; d++; }
+            let d = 0; for(let i=sessionRolls.length-1; i>=0; i--) { if(p.nums.includes(sessionRolls[i])) break; d++; }
             p.d = d;
             const fr = (h / actualWin) / (p.nums.length / 36);
             p.hs = fr * (1 / (1 + (d / cycle)));
         });
     }
 
-    // This handles the Logic/Strategy Layer
-    function getStrategySet() {
-        let pool = [...state.pockets];
-        if(conf.strategy === 'COLD') pool.sort((a,b) => a.hs - b.hs || b.d - a.d);
-        else pool.sort((a,b) => b.hs - a.hs || a.d - b.d);
-        return pool.slice(0, conf.target);
-    }
-
-    // This handles the Presentation/Terminal Layer
-    function getDisplaySet() {
-        const strategySet = getStrategySet();
-        const stratIds = strategySet.map(p => p.id);
-        
-        if (conf.view === 'PLACE') {
-            return strategySet;
-        } else {
-            // AVOID Mode: We show the Strategy Set's OPPOSITE to avoid.
-            // If strategy is COLD, we show the HOTTEST to avoid.
-            let oppositePool = [...state.pockets].filter(p => !stratIds.includes(p.id));
-            if(conf.strategy === 'COLD') oppositePool.sort((a,b) => b.hs - a.hs || a.d - b.d);
-            else oppositePool.sort((a,b) => a.hs - b.hs || b.d - a.d);
-            return oppositePool.slice(0, conf.target);
-        }
-    }
-
     function refresh() {
-        const audit = [...state.pockets].sort((a,b) => b.hs - a.hs);
-        const displaySet = getDisplaySet();
-        const warmup = rolls.length < conf.warm;
+        const auditTable = [...state.pockets].sort((a,b) => b.hs - a.hs);
         
-        document.getElementById('status-txt').innerText = warmup ? `WARMUP (${rolls.length}/${conf.warm})` : (state.isBetting ? "ACTIVE" : "READY (WAIT)");
+        // Logical Sorting for Audit (Matches Config Strategy)
+        let auditSorted = [...state.pockets];
+        if(conf.strategy === 'COLD') auditSorted.sort((a,b) => a.hs - b.hs || b.d - a.d);
+        else auditSorted.sort((a,b) => b.hs - a.hs || a.d - b.d);
+        
+        const strategySet = auditSorted.slice(0, conf.target);
+        const stratIds = strategySet.map(p => p.id);
+
+        // Terminal Mode Filter (UI Display Only)
+        let displaySet = (conf.view === 'PLACE') ? strategySet : state.pockets.filter(p => !stratIds.includes(p.id));
+
+        const warmup = sessionRolls.length < conf.warm;
+        document.getElementById('status-txt').innerText = warmup ? `WARMUP (${sessionRolls.length}/${conf.warm})` : (state.isBetting ? "BETTING ACTIVE" : "READY (WAIT)");
         document.getElementById('status-box').className = "status-box " + (state.isBetting ? "status-ready" : "status-wait");
         
         document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('glow-blue', 'glow-red'));
@@ -274,28 +257,32 @@
             const hCls = (conf.view === 'AVOID') ? 'glow-blue' : 'glow-red';
             displaySet.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
             const labels = [...displaySet].sort((a,b)=>a.id-b.id).map(p=>p.label);
-            document.getElementById('sig-box').innerHTML = `<div class="cmd-card ${state.isBetting?(conf.view==='AVOID'?'mode-avoid':'mode-place'):'mode-wait'}"><div class="cmd-head">${state.isBetting?conf.view:'READY'}</div><div class="cmd-body">${labels.join(', ')}</div></div>`;
+            document.getElementById('sig-box').innerHTML = `<div class="cmd-card ${state.isBetting?(conf.view==='AVOID'?'mode-avoid':'mode-place'):'mode-wait'}">
+                <div class="cmd-head">${state.isBetting ? conf.view : 'READY'} COMMANDER</div>
+                <div class="cmd-body">${labels.join(', ')}</div>
+            </div>`;
         }
         
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(0)}`;
         document.getElementById('stat-h').innerText = `$${state.high.toFixed(0)}`;
-        document.getElementById('stat-rolls').innerText = rolls.length;
-        
-        let covered = 0; displaySet.forEach(p => covered += p.nums.length);
-        document.getElementById('stat-b').innerText = state.isBetting ? `$${(covered * state.unit * conf.unitVal).toFixed(0)}` : "$0";
+        document.getElementById('stat-rolls').innerText = sessionRolls.length;
+
+        // Stat Stake is always based on the Strategy count
+        let totalPocketsStrategy = 0; strategySet.forEach(p => totalPocketsStrategy += p.nums.length);
+        document.getElementById('stat-b').innerText = state.isBetting ? `$${(totalPocketsStrategy * state.unit * conf.unitVal).toFixed(0)}` : "$0";
         
         const feed = document.getElementById('history-feed'); feed.innerHTML = '';
-        rolls.slice(-8).reverse().forEach(n => {
-            const chip = document.createElement('div'); chip.className='chip';
+        sessionRolls.slice(-8).reverse().forEach(n => {
+            const chip = document.createElement('div'); chip.className = 'chip';
             chip.style.background = (n === 0 || n > 36) ? 'var(--green-pocket)' : (reds.includes(n) ? 'var(--red-pocket)' : '#000');
             chip.innerText = n === 37 ? '00' : (n === 38 ? '000' : n); feed.appendChild(chip);
         });
 
         const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        audit.forEach(p => {
+        auditTable.forEach(p => {
             const tr = document.createElement('tr');
             let color = p.hs >= 0.5 ? 'var(--red-pocket)' : (p.hs >= 0.4 ? 'var(--yellow)' : 'var(--blue-high)');
-            tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100,(p.hs/2)*100)}%; background:${color}"></div></div></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
+            tr.innerHTML = `<td><b>${p.label}</b></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
             bdy.appendChild(tr);
         });
     }
@@ -303,8 +290,8 @@
     document.getElementById('final-undo').onclick = function() { 
         if(!stack.length) return; 
         const prev = JSON.parse(stack.pop());
-        state.profit = prev.p; state.high = prev.h; state.unit = prev.u; state.isBetting = prev.b; rolls = prev.rolls;
-        refresh(); 
+        state.profit = prev.p; state.high = prev.h; state.unit = prev.u; state.isBetting = prev.b; sessionRolls = prev.rolls;
+        engine(); refresh(); 
     };
 })();
 </script>
