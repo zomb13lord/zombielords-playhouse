@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.4</title>
+    <title>Roulette Tracker V69.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -74,7 +74,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.4</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.5</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div><label>Domain</label><select id="dom-sel" onchange="toggleSuInput()"><option value="9ST" selected>9 Streets</option><option value="SU">Straight Up</option></select></div>
         <div id="su-config" style="display:none;"><label>Total Bet Count</label><input type="number" id="su-total" value="28"></div>
@@ -204,7 +204,21 @@
     }
 
     function addRoll(n) {
-        state.stack.push(JSON.stringify(state));
+        // FIXED: Safe Undo Snapshoting to prevent Memory Crash
+        const snapshot = {
+            history: [...state.history],
+            profit: state.profit,
+            high: state.high,
+            unit: state.unit,
+            cooldownLeft: state.cooldownLeft,
+            lossLevel: state.lossLevel,
+            evHitsPrimary: state.primaryPockets.map(p => p.evHits),
+            evHitsSU: state.suPockets.map(p => p.evHits)
+        };
+        state.stack.push(JSON.stringify(snapshot));
+        if (state.stack.length > 50) state.stack.shift(); // Limit undo buffer
+
+        const statusTxt = document.getElementById('status-txt').innerText;
         const avoids = getBettingAvoids();
         const avoidIds = avoids.map(p => p.id);
         const isWarm = state.history.length >= conf.warm;
@@ -259,7 +273,6 @@
     }
 
     function refresh() {
-        const auditSorted = [...state.primaryPockets].sort((a,b) => b.hs - a.hs);
         const avoids = getBettingAvoids();
         const avoidIds = avoids.map(p => p.id);
         const status = (state.history.length < conf.warm) ? "WARMUP" : (state.cooldownLeft > 0 ? "COOLDOWN" : "READY");
@@ -305,7 +318,19 @@
         });
     }
 
-    document.getElementById('final-undo').onclick = () => { if(state.stack.length) { state = JSON.parse(state.stack.pop()); refresh(); } };
+    document.getElementById('final-undo').onclick = () => {
+        if(!state.stack.length) return;
+        const snap = JSON.parse(state.stack.pop());
+        state.history = snap.history;
+        state.profit = snap.profit;
+        state.high = snap.high;
+        state.unit = snap.unit;
+        state.cooldownLeft = snap.cooldownLeft;
+        state.lossLevel = snap.lossLevel;
+        state.primaryPockets.forEach((p, i) => p.evHits = snap.evHitsPrimary[i]);
+        state.suPockets.forEach((p, i) => p.evHits = snap.evHitsSU[i]);
+        engine(); refresh();
+    };
 })();
 </script>
 </body>
