@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.2</title>
+    <title>Roulette Tracker V69.3</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -21,9 +21,11 @@
             border-bottom: 1px solid rgba(16, 185, 129, 0.3);
             padding: 10px 15px;
             display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+            position: sticky; top: 0;
         }
         .lobby-nav .brand { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; }
-        .lobby-nav a { font-family: 'Cinzel', serif; color: #fff; text-decoration: none; font-size: 0.7em; font-weight: 700; border: 1px solid var(--accent); padding: 5px 12px; border-radius: 2px; text-transform: uppercase; }
+        .nav-links { display: flex; gap: 10px; }
+        .lobby-nav a, .nav-btn { font-family: 'Cinzel', serif; color: #fff; text-decoration: none; font-size: 0.65em; font-weight: 700; border: 1px solid var(--accent); padding: 5px 10px; border-radius: 2px; text-transform: uppercase; cursor: pointer; background: transparent; }
 
         #config-page { padding: 20px; max-width: 500px; margin: 0 auto; }
         .config-grid { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -33,28 +35,27 @@
         .btn-start { width: 100%; padding: 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 
         #tracker-page { display: none; }
-        .frozen-top { position: sticky; top: 0; background: var(--bg); z-index: 100; padding: 10px; border-bottom: 3px solid #444; }
-        .status-box { padding: 10px; border-radius: 8px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; font-weight: bold; border: 2px solid #444; }
+        .status-box { padding: 10px; border-radius: 8px; text-align: center; min-height: 120px; display: flex; flex-direction: column; justify-content: center; font-weight: bold; border: 2px solid #444; margin: 10px; }
         .status-wait { background: #222; color: var(--wait); }
         .status-ready { background: #000; color: #fff; border-color: var(--accent); }
         
         .cmd-card { display: flex; flex-direction: column; border-radius: 6px; border: 2px solid #fff; overflow: hidden; margin-top: 10px; }
         .cmd-head { font-size: 0.7em; padding: 4px; text-transform: uppercase; font-weight: 900; }
-        .cmd-body { font-size: 0.95em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
+        .cmd-body { font-size: 0.9em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
         .mode-avoid { background: #004488; }
         .mode-place { background: #880000; }
         .mode-wait { background: #444; color: #aaa; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px; }
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
         .val { font-weight: bold; color: var(--accent); font-size: 0.95em; }
 
-        .history-feed { display: flex; gap: 8px; justify-content: center; margin-top: 8px; min-height: 38px; overflow: hidden; }
-        .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; flex-shrink: 0; }
+        .history-feed { display: flex; gap: 8px; justify-content: center; margin: 8px 0; min-height: 38px; }
+        .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; }
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: 0.2s; }
         
         .highlight-blue { background: #004488 !important; border-color: #00aaff !important; box-shadow: 0 0 15px #00aaff; }
         .highlight-red { background: #880000 !important; border-color: #ff4444 !important; box-shadow: 0 0 15px #ff4444; }
@@ -69,7 +70,7 @@
 
         .audit-table { width: 100%; border-collapse: collapse; font-size: 0.75em; margin-top: 20px; background: var(--card); border-radius: 8px; table-layout: fixed; }
         .audit-table th { color: #888; padding: 10px 2px; border-bottom: 1px solid #444; }
-        .audit-table td { padding: 8px 2px; border-bottom: 1px solid #333; text-align: center; overflow: hidden; white-space: nowrap; }
+        .audit-table td { padding: 8px 2px; border-bottom: 1px solid #333; text-align: center; }
         .heat-bg { background: #000; width: 90%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
         .heat-fill { height: 100%; transition: width 0.4s; }
     </style>
@@ -78,14 +79,19 @@
 
 <nav class="lobby-nav">
     <div class="brand">Zombie Lord's</div>
-    <a href="lobby.html">Return to Playhouse</a>
+    <div class="nav-links">
+        <button id="nav-config" class="nav-btn" style="display:none;" onclick="showConfig()">Config</button>
+        <a href="lobby.html">Lobby</a>
+    </div>
 </nav>
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V69.2</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V69.3</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets (N=3)</option><option value="36SN">36 Singles (N=1)</option></select></div>
+        <div><label>Bet Target Count</label><input type="number" id="target-count" value="3"></div>
+        <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div class="full"><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
         <div class="full">
@@ -95,22 +101,20 @@
             </div>
         </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
-        <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
     </div>
     <button class="btn-start" id="final-start">START SESSION</button>
 </div>
 
 <div id="tracker-page">
-    <div class="frozen-top">
-        <div id="status-box" class="status-box status-wait"><div id="status-txt">WARMING UP</div><div id="sig-box"></div></div>
-        <div class="stat-grid">
-            <div class="stat-card"><small>PROFIT</small><span id="stat-p" class="val">$0</span></div>
-            <div class="stat-card"><small>HIGH</small><span id="stat-h" class="val">$0</span></div>
-            <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
-            <div class="stat-card"><small>ROLLS</small><span id="stat-rolls" class="val">0</span></div>
-        </div>
-        <div id="feed" class="history-feed"></div>
+    <div id="status-box" class="status-box status-wait"><div id="status-txt">WARMING UP</div><div id="sig-box"></div></div>
+    <div class="stat-grid">
+        <div class="stat-card"><small>PROFIT</small><span id="stat-p" class="val">$0</span></div>
+        <div class="stat-card"><small>HIGH</small><span id="stat-h" class="val">$0</span></div>
+        <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
+        <div class="stat-card"><small>ROLLS</small><span id="stat-rolls" class="val">0</span></div>
     </div>
+    <div id="feed" class="history-feed"></div>
+
     <div style="padding:15px;">
         <button id="bet-toggle" class="bet-toggle-btn bet-off">BET: OFF</button>
         <div id="pad" class="num-pad"></div>
@@ -131,6 +135,12 @@
     let state = { history: [], stack: [], pockets: [], zeros: [], profit: 0, high: 0, unit: 1, isBetting: false };
     let conf = {};
 
+    window.showConfig = function() {
+        document.getElementById('tracker-page').style.display = 'none';
+        document.getElementById('config-page').style.display = 'block';
+        document.getElementById('nav-config').style.display = 'none';
+    };
+
     document.getElementById('final-start').onclick = function() {
         const multVal = document.getElementById('mult-in').value;
         const dom = document.getElementById('dom-sel').value;
@@ -138,11 +148,13 @@
             wheel: document.getElementById('wheel-type').value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
             basketOn: document.getElementById('basket-toggle').checked, pushOn: document.getElementById('push-toggle').checked,
             view: document.getElementById('view-mode').value, domain: dom,
+            targetCount: parseInt(document.getElementById('target-count').value) || 3,
             mult: multVal === 'ALL' ? 'ALL' : parseInt(multVal), warm: parseInt(document.getElementById('warm-in').value)
         };
         state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
-        state.pockets = [];
         
+        // Rebuild pockets based on new config
+        state.pockets = [];
         if(conf.domain === '9ST') {
             for(let i=0; i<12; i++) {
                 let startNum = (i*3)+1;
@@ -161,10 +173,12 @@
 
         document.getElementById('config-page').style.display='none'; 
         document.getElementById('tracker-page').style.display='block';
-        buildFeltPad(conf.wheel); refresh();
+        document.getElementById('nav-config').style.display='inline-block';
+        buildFeltPad(conf.wheel); engine(); refresh();
     };
 
     document.getElementById('bet-toggle').onclick = function() {
+        if (state.history.length < conf.warm) return;
         state.isBetting = !state.isBetting;
         this.innerText = state.isBetting ? "BET: ON" : "BET: OFF";
         this.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
@@ -195,7 +209,6 @@
 
     function addRoll(n) {
         state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, isBetting:state.isBetting}));
-        
         const avoids = getBettingAvoids();
         const avoidIds = avoids.map(p => p.id);
         const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
@@ -207,12 +220,11 @@
                 const targetIdx = state.pockets.findIndex(p => p.nums.includes(n));
                 win = !avoidIds.includes(targetIdx);
             }
-
             if(win) {
-                state.profit += (state.unit * conf.unitVal * 3); // Basic Street Logic
+                state.profit += (state.unit * conf.unitVal * 3);
                 if (state.profit >= state.high) state.unit = 1;
             } else {
-                state.profit -= (state.unit * conf.unitVal * 9); // Basic Loss Logic
+                state.profit -= (state.unit * conf.unitVal * 9);
                 state.unit *= 2;
                 state.isBetting = false; 
                 document.getElementById('bet-toggle').innerText = "BET: OFF";
@@ -220,7 +232,6 @@
             }
             if(state.profit > state.high) state.high = state.profit;
         }
-        
         state.history.push(n); engine(); refresh();
     }
 
@@ -242,7 +253,7 @@
     function getBettingAvoids() {
         let pool = [...state.pockets];
         pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
-        return pool.slice(0, conf.domain === '9ST' ? 3 : 12); // Proportional Avoids
+        return pool.slice(0, conf.targetCount);
     }
 
     function refresh() {
@@ -259,8 +270,6 @@
         if(!warmup) {
             const aIds = avoids.map(x=>x.id);
             const pNon = state.pockets.filter(p => !aIds.includes(p.id));
-            
-            // Highlights
             avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-blue')));
             pNon.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-red')));
 
@@ -268,7 +277,7 @@
                 const sortedLabels = (conf.view === 'AVOID' ? [...avoids] : [...pNon]).sort((a,b)=>a.id - b.id).map(p=>p.label);
                 sigArea.innerHTML = `<div class="cmd-card ${conf.view === 'AVOID' ? 'mode-avoid' : 'mode-place'}">
                     <div class="cmd-head">${conf.view} COMMANDER</div>
-                    <div class="cmd-body" style="font-size:0.8em;">${sortedLabels.join(', ')}</div>
+                    <div class="cmd-body">${sortedLabels.join(', ')}</div>
                 </div>`;
             } else {
                 sigArea.innerHTML = `<div class="cmd-card mode-wait"><div class="cmd-head">COMMANDER</div><div class="cmd-body">WAIT...</div></div>`;
