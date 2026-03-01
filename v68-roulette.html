@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.7</title>
+    <title>Roulette Tracker V69.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -41,19 +41,19 @@
         .cmd-body { font-size: 1.1em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
         .mode-avoid { background: #004488; }
         .mode-place { background: #880000; }
-        .mode-wait { background: #333; color: #888; }
+        .mode-wait { background: #333; color: #888; border-color: #555; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
         .val { font-weight: bold; color: var(--accent); font-size: 0.95em; }
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
-        .num-btn { padding: 18px 0; border: 1px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: background 0.2s; }
         .btn-green { background: var(--green) !important; }
-        .btn-red { background: #500 !important; }
+        .btn-red { background: #400 !important; }
         .btn-black { background: #000 !important; }
 
-        /* HIGHLIGHT OVERRIDES */
+        /* HIGHLIGHTS */
         .glow-blue { background: #0055ff !important; border-color: #fff !important; box-shadow: 0 0 15px #0055ff; }
         .glow-red { background: #ff0000 !important; border-color: #fff !important; box-shadow: 0 0 15px #ff0000; }
         
@@ -79,7 +79,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.7</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.8</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option><option value="36SN">36 Singles</option></select></div>
         <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option><option value="HOT">Hot Hunt</option></select></div>
@@ -159,11 +159,14 @@
 
     function buildPad() {
         const pad = document.getElementById('pad'); pad.innerHTML = '';
-        for(let i=1; i<=36; i++){
-            const b = document.createElement('button'); b.id='nb-'+i; b.innerText=i;
-            b.className='num-btn '+(reds.includes(i)?'btn-red':'btn-black');
-            b.onclick = () => addRoll(i); pad.appendChild(b);
-        }
+        const container = document.createElement('div'); container.className = 'zero-container';
+        // Logic for Zeros handled specifically...
+        const allNums = Array.from({length:36},(_,i)=>i+1);
+        allNums.forEach(n => {
+            const b = document.createElement('button'); b.id='nb-'+n; b.innerText=n;
+            b.className='num-btn '+(reds.includes(n)?'btn-red':'btn-black');
+            b.onclick = () => addRoll(n); pad.appendChild(b);
+        });
     }
 
     function addRoll(n) {
@@ -177,13 +180,12 @@
             const win = (conf.view === 'AVOID') ? !isHit : isHit;
             const stake = conf.target * state.unit * conf.unitVal;
             if(win) {
-                const payout = (conf.domain === '9ST' ? 12 : 36);
-                state.profit += (state.unit * conf.unitVal * payout) - stake;
+                state.profit += (state.unit * conf.unitVal * 36) - stake;
                 if(state.profit >= state.high) state.unit = 1;
             } else {
                 state.profit -= stake; state.unit *= 2; state.isBetting = false;
-                document.getElementById('bet-toggle').className = "bet-toggle-btn bet-off";
-                document.getElementById('bet-toggle').innerText = "BET: OFF";
+                const btn = document.getElementById('bet-toggle');
+                btn.className = "bet-toggle-btn bet-off"; btn.innerText = "BET: OFF";
             }
             if(state.profit > state.high) state.high = state.profit;
         }
@@ -193,12 +195,23 @@
     function engine() {
         state.pockets.forEach(p => {
             const cycle = (conf.domain === '9ST' ? 12 : 36);
-            let H = conf.mult === 'ALL' ? state.history.length : (cycle * conf.mult) + 1;
-            const actualH = Math.max(1, Math.min(state.history.length, H)); p.winH = actualH;
-            let hits = 0; for(let i=state.history.length-1; i>=state.history.length-actualH; i--) if(p.nums.includes(state.history[i])) hits++;
-            p.hits = hits; p.fr = (hits/actualH)/(p.nums.length/36);
-            let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d; p.hs = p.fr * (1/(1+(d/cycle)));
+            const H = conf.mult === 'ALL' ? state.history.length : (cycle * conf.mult) + 1;
+            const winSize = Math.max(1, Math.min(state.history.length, H)); p.winH = winSize;
+            
+            // HITS only within the Window
+            let hits = 0; 
+            const histWindow = state.history.slice(-winSize);
+            histWindow.forEach(r => { if(p.nums.includes(r)) hits++; });
+            p.hits = hits;
+            
+            // DEPTH scans the WHOLE history
+            let d = 0; 
+            for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
+            p.d = d;
+
+            // Math Engine (FR * Cycle Decay)
+            const fr = (hits / winSize) / (p.nums.length / 36);
+            p.hs = fr * (1 / (1 + (d / cycle)));
         });
     }
 
@@ -238,7 +251,10 @@
         });
     }
 
-    document.getElementById('final-undo').onclick = function() { if(!state.stack.length) return; state = JSON.parse(state.stack.pop()); engine(); refresh(); };
+    document.getElementById('final-undo').onclick = function() { 
+        if(!state.stack.length) return; 
+        state = JSON.parse(state.stack.pop()); engine(); refresh(); 
+    };
 })();
 </script>
 </body>
