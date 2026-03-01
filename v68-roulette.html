@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V68.5</title>
+    <title>Roulette Tracker V69.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,15 +16,8 @@
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         
         .lobby-nav {
-            background: rgba(2, 6, 23, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 10px 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
+            background: rgba(2, 6, 23, 0.9); border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
         }
         .lobby-nav .brand { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; }
         .lobby-nav a { font-family: 'Cinzel', serif; color: #fff; text-decoration: none; font-size: 0.7em; font-weight: 700; border: 1px solid var(--accent); padding: 5px 12px; border-radius: 2px; text-transform: uppercase; }
@@ -57,18 +50,14 @@
         .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; flex-shrink: 0; }
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
-        .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
         .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: all 0.2s; }
-        .btn-green { background: var(--green) !important; }
-        .btn-red { background: var(--red) !important; }
-        .btn-black { background: var(--black) !important; }
-
-        /* HIGHLIGHT CLASSES */
+        .btn-green { background: var(--green) !important; } .btn-red { background: var(--red) !important; } .btn-black { background: var(--black) !important; }
         .glow-red { border-color: #fff !important; box-shadow: inset 0 0 20px #ff0000, 0 0 10px #ff0000; transform: scale(0.98); }
         .glow-green { border-color: #fff !important; box-shadow: inset 0 0 20px #00ff00, 0 0 10px #00ff00; transform: scale(1.02); }
         
-        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 20px; background: var(--card); border-radius: 8px; }
+        .audit-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 10px; background: var(--card); border-radius: 8px; }
         .audit-table td { padding: 10px 5px; border-bottom: 1px solid #333; text-align: center; }
+        .table-header { font-size: 0.65em; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; font-weight: bold; padding-left: 5px; }
         .heat-bg { background: #000; width: 85%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
         .heat-fill { height: 100%; transition: width 0.4s; }
     </style>
@@ -82,22 +71,21 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V68.5</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.2</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
-        <div class="full"><label>Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option></select></div>
-        <div class="full"><label>Strategy</label><select id="strat-sel"><option value="COLD" selected>Cold Hunt</option></select></div>
-        <div><label>Progression</label><select id="prog-sel"><option value="MART" selected>Martingale</option></select></div>
-        <div><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
-        <div class="compact-toggles">
+        <div><label>Domain</label><select id="dom-sel" onchange="toggleSuInput()"><option value="9ST" selected>9 Streets</option><option value="SU">Straight Up</option></select></div>
+        <div id="su-config" style="display:none;"><label>Total Bet Count</label><input type="number" id="su-total" value="28"></div>
+        <div class="full"><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
+        <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
+        <div class="compact-toggles full">
             <div style="display:flex; gap:8px;">
                 <div class="toggle-box">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
                 <div class="toggle-box">PERM HEDGE <input type="checkbox" id="perm-hedge" checked></div>
+                <div class="toggle-box">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
             </div>
-            <div class="toggle-box" style="margin-top:8px;">PUSH (1:1 Ratio) <input type="checkbox" id="push-toggle"></div>
         </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
-        <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div><label>CD Loss Streak</label><input type="number" id="cd-trigger" value="2"></div>
         <div><label>CD Wait</label><input type="number" id="cool-in" value="4"></div>
         <div class="full"><label>Stabilization</label><input type="number" id="stab-in" value="3"></div>
@@ -122,43 +110,74 @@
             <button id="final-undo" style="background:#444; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">UNDO</button>
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
+
+        <div id="primary-audit-label" class="table-header">Domain Audit</div>
         <table class="audit-table">
-            <thead><tr style="color:#666; font-size:0.7em;"><th>STREET / BASKET</th><th>H-WIN</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
-            <tbody id="audit-body"></tbody>
+            <thead><tr style="color:#666; font-size:0.7em;"><th>UNIT</th><th>EV HITS</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
+            <tbody id="audit-body-primary"></tbody>
         </table>
+
+        <div id="su-audit-container" style="display:none;">
+            <div class="table-header">Straight Up Audit</div>
+            <table class="audit-table">
+                <thead><tr style="color:#666; font-size:0.7em;"><th>NUM</th><th>EV HITS</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
+                <tbody id="audit-body-su"></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
 (function() {
     const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let state = { history: [], stack: [], pockets: [], zeros: [], profit: 0, high: 0, unit: 1, stabCount: 0, lastBottomIds: "", cooldownLeft: 0, lossLevel: 0, latencyRoll: false };
+    let state = { history: [], stack: [], primaryPockets: [], suPockets: [], zeros: [], profit: 0, high: 0, unit: 1, cooldownLeft: 0, lossLevel: 0 };
     let conf = {};
+
+    window.toggleSuInput = function() {
+        document.getElementById('su-config').style.display = document.getElementById('dom-sel').value === 'SU' ? 'block' : 'none';
+    };
 
     document.getElementById('final-start').onclick = function() {
         const multVal = document.getElementById('mult-in').value;
+        const domVal = document.getElementById('dom-sel').value;
         conf = {
             wheel: document.getElementById('wheel-type').value, 
             unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
             basketOn: document.getElementById('basket-toggle').checked, 
-            pushOn: document.getElementById('push-toggle').checked,
-            permHedge: document.getElementById('perm-hedge').checked, 
             view: document.getElementById('view-mode').value,
-            mult: multVal === 'ALL' ? 'ALL' : parseInt(multVal), 
-            cdTrigger: parseInt(document.getElementById('cd-trigger').value), 
-            cool: parseInt(document.getElementById('cool-in').value), 
-            stabLimit: parseInt(document.getElementById('stab-in').value), 
-            warm: parseInt(document.getElementById('warm-in').value)
+            mult: multVal === 'ALL' ? 'ALL' : parseInt(multVal),
+            warm: parseInt(document.getElementById('warm-in').value),
+            domain: domVal,
+            suTotal: parseInt(document.getElementById('su-total').value),
+            cdTrigger: parseInt(document.getElementById('cd-trigger').value),
+            cool: parseInt(document.getElementById('cool-in').value)
         };
         state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
-        state.pockets = [];
-        for(let i=0; i<12; i++) {
-            let startNum = (i*3)+1;
-            let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
-            let nums = [startNum, startNum+1, startNum+2];
-            if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
-            state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, winH: 0, isBasket: (i===0 && conf.basketOn)});
+        state.primaryPockets = [];
+        state.suPockets = [];
+
+        // Build Single Number Pool (Always calculated)
+        const allNums = [...state.zeros, ...Array.from({length: 36}, (_, i) => i + 1)];
+        allNums.forEach((n, idx) => {
+            state.suPockets.push({id: idx, label: (n===37?'00':(n===38?'000':n)), nums:[n], hs:0, hits:0, d:0, evHits: 0});
+        });
+
+        // Build Primary Domain Pool
+        if (conf.domain === '9ST') {
+            for(let i=0; i<12; i++) {
+                let startNum = (i*3)+1;
+                let nums = [startNum, startNum+1, startNum+2];
+                if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
+                state.primaryPockets.push({id: i, label: (i===0 && conf.basketOn ? 'BASKET' : 'ST '+startNum), nums: nums, hs:0, hits:0, d:0, evHits: 0});
+            }
+            document.getElementById('su-audit-container').style.display = 'block';
+            document.getElementById('primary-audit-label').innerText = "9 Streets Audit";
+        } else {
+            state.primaryPockets = state.suPockets; // Merge for SU domain
+            document.getElementById('su-audit-container').style.display = 'none';
+            document.getElementById('primary-audit-label').innerText = "Straight Up Audit";
         }
+
         document.getElementById('config-page').style.display='none'; 
         document.getElementById('tracker-page').style.display='block';
         buildFeltPad(conf.wheel); refresh();
@@ -176,7 +195,7 @@
             row.appendChild(makeBtn(0, '0')); row.appendChild(makeBtn(37, '00')); container.appendChild(row);
         } else {
             const r1 = document.createElement('div'); r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
-            const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px"; r2.style.marginTop="8px";
+            const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px";
             r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00')); container.appendChild(r2);
         }
         pad.appendChild(container);
@@ -187,159 +206,107 @@
     }
 
     function addRoll(n) {
-        state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, cooldownLeft:state.cooldownLeft, stabCount:state.stabCount, lastBottomIds:state.lastBottomIds, lossLevel:state.lossLevel, latencyRoll:state.latencyRoll}));
+        state.stack.push(JSON.stringify(state));
+        const statusTxt = document.getElementById('status-txt').innerText;
+        const avoids = getBettingAvoids();
+        const avoidIds = avoids.map(p => p.id);
         
-        const currentAvoids = getBettingAvoids();
-        const currentAvoidIds = currentAvoids.map(p => p.id);
-        const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
-        const isHitInSet = currentAvoidIds.includes(streetIdx);
-
-        if (state.stabCount >= conf.stabLimit && isHitInSet) {
-            state.latencyRoll = true; state.stabCount = 0;
-        } else if (isHitInSet) {
-            state.stabCount = 0; state.latencyRoll = false;
-        } else {
-            state.latencyRoll = false;
-        }
-
-        if(document.getElementById('status-txt').innerText === "READY") {
-            const win = !currentAvoidIds.includes(streetIdx);
-            const isBasketHit = state.pockets[0].nums.includes(n);
-            if(win) {
-                if (conf.basketOn && isBasketHit && !currentAvoidIds.includes(0)) {
-                    let payout = { 'EU': 8, 'US': 6, 'TZ': 5 }[conf.wheel];
-                    state.profit += conf.pushOn ? (state.unit * conf.unitVal * ((payout + 1) - 9)) : (state.unit * conf.unitVal * ((3 * payout + 3) - 19));
-                } else {
-                    state.profit += (state.unit * conf.unitVal * ((conf.basketOn && !conf.pushOn) ? 5 : 3));
+        if (statusTxt === "READY") {
+            state.primaryPockets.forEach(p => {
+                const isTargetedAvoid = avoidIds.includes(p.id);
+                if (p.nums.includes(n)) {
+                    if (conf.view === 'AVOID' && isTargetedAvoid) p.evHits++;
+                    else if (conf.view === 'PLACE' && !isTargetedAvoid) p.evHits++;
                 }
+            });
+            const hitInAvoid = avoidIds.some(aid => state.primaryPockets[aid].nums.includes(n));
+            if(!hitInAvoid) {
+                state.profit += (state.unit * conf.unitVal);
                 if (state.profit >= state.high) { state.unit = 1; state.lossLevel = 0; }
             } else {
-                if (!(conf.basketOn && isBasketHit && !currentAvoidIds.includes(0))) {
-                    state.profit -= (state.unit * conf.unitVal * ((currentAvoidIds.includes(0) || conf.pushOn || !conf.basketOn) ? 9 : 19));
-                    state.lossLevel++; state.unit *= 2;
-                    if (state.lossLevel >= conf.cdTrigger) state.cooldownLeft = conf.cool;
-                    state.stabCount = 0;
-                }
+                state.profit -= (state.unit * conf.unitVal);
+                state.lossLevel++; state.unit *= 2;
+                if (state.lossLevel >= conf.cdTrigger) state.cooldownLeft = conf.cool;
             }
             if(state.profit > state.high) state.high = state.profit;
         } else if (state.cooldownLeft > 0) state.cooldownLeft--;
-        
+
         state.history.push(n); engine(); refresh();
     }
 
     function engine() {
-        state.pockets.forEach(p => {
-            const cycle = 36 / 3; // Fixed street logic
-            const odds = 3 / 36;
-            let H = conf.mult === 'ALL' ? state.history.length : Math.floor((cycle * conf.mult) + 1);
-            if (H < 1) H = 1;
-            const actualH = Math.min(state.history.length, H);
-            p.winH = actualH;
-
-            let hitCount = 0;
-            const startIdx = Math.max(0, state.history.length - actualH);
-            for(let i = state.history.length - 1; i >= startIdx; i--) { if(p.nums.includes(state.history[i])) hitCount++; }
-            p.hits = hitCount;
-
-            const FR = (hitCount / actualH) / odds;
-            let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d;
-            
-            const decay = 1 / (1 + (d / cycle));
-            p.hs = FR * decay;
+        [state.primaryPockets, state.suPockets].forEach(pool => {
+            pool.forEach(p => {
+                const cycle = 36 / p.nums.length;
+                const odds = p.nums.length / 36;
+                let H = conf.mult === 'ALL' ? state.history.length : Math.floor((cycle * conf.mult) + 1);
+                const actualH = Math.min(state.history.length, Math.max(1, H));
+                let hitCount = 0;
+                for(let i = state.history.length - 1; i >= Math.max(0, state.history.length - actualH); i--) {
+                    if(p.nums.includes(state.history[i])) hitCount++;
+                }
+                p.hits = hitCount;
+                const FR = (hitCount / actualH) / odds;
+                let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
+                p.d = d;
+                p.hs = FR * (1 / (1 + (d / cycle)));
+            });
         });
     }
 
     function getBettingAvoids() {
-        let pool = [...state.pockets].filter(p => !(conf.permHedge && p.isBasket));
-        pool.sort((a, b) => {
-            if (Math.abs(a.hs - b.hs) > 0.0001) return a.hs - b.hs;
-            return b.d - a.d;
-        });
-        return pool.slice(0, 3);
+        let pool = [...state.primaryPockets];
+        pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
+        const avoidCount = conf.domain === '9ST' ? 3 : (state.primaryPockets.length - conf.suTotal);
+        return pool.slice(0, avoidCount);
     }
 
     function refresh() {
-        const auditSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
         const avoids = getBettingAvoids();
-        const currentIds = avoids.map(p => p.id).sort().join('|');
-
-        if (currentIds !== state.lastBottomIds) {
-            state.stabCount = 0; state.lastBottomIds = currentIds;
-        } else if (state.history.length >= conf.warm && !state.latencyRoll) {
-            state.stabCount++;
-        }
-
-        const isCold = avoids.every(p => p.hs < 0.4);
-        let status = (state.history.length < conf.warm) ? "WARMUP ("+state.history.length+"/"+conf.warm+")" : 
-                     (state.cooldownLeft > 0) ? "COOLDOWN ("+state.cooldownLeft+")" : 
-                     (state.latencyRoll) ? "STABILIZING (LATENCY ROLL)" :
-                     (!isCold || state.stabCount < conf.stabLimit) ? "STABILIZING ("+state.stabCount+"/"+conf.stabLimit+")" : "READY";
+        const avoidIds = avoids.map(p => p.id);
+        const status = (state.history.length < conf.warm) ? "WARMUP" : (state.cooldownLeft > 0 ? "COOLDOWN" : "READY");
         
-        let sCls = (status === "READY") ? "status-ready" : "status-wait";
         document.getElementById('status-txt').innerText = status;
-        document.getElementById('status-box').className = "status-box " + sCls;
+        document.getElementById('status-box').className = "status-box " + (status === "READY" ? "status-ready" : "status-wait");
         
+        document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('glow-red', 'glow-green'));
         const sigArea = document.getElementById('sig-box'); sigArea.innerHTML = "";
-        
-        // RESET HIGHLIGHTS
-        document.querySelectorAll('.num-btn').forEach(btn => {
-            btn.classList.remove('glow-red');
-            btn.classList.remove('glow-green');
-        });
 
         if(status === "READY") {
-            const dispSorted = [...avoids].sort((a,b) => a.id - b.id);
-            const aIds = avoids.map(x=>x.id);
-            const p9 = state.pockets.filter(p => !aIds.includes(p.id) && !(conf.permHedge && p.isBasket)).sort((a,b)=>a.id - b.id);
-            
-            if(conf.view === 'AVOID') {
-                sigArea.innerHTML = `<div class="cmd-card mode-avoid"><div class="cmd-head">AVOID STREETS</div><div class="cmd-body">${dispSorted.map(p=>p.label).join(', ')}</div></div>`;
-                avoids.forEach(p => p.nums.forEach(n => { const b = document.getElementById('nb-'+n); if(b) b.classList.add('glow-red'); }));
-            } else {
-                const stU = (!conf.basketOn || conf.pushOn) ? state.unit : state.unit * 2;
-                const bU = conf.pushOn ? state.unit : state.unit * 3;
-                let bT = (conf.basketOn && (!aIds.includes(0) || conf.permHedge)) ? ` + B (${bU})` : "";
-                sigArea.innerHTML = `<div class="cmd-card mode-place"><div class="cmd-head">PLACE ON</div><div class="cmd-body">${p9.map(p=>p.label).join(', ')}<br><span style="font-size:0.6em; color:var(--accent)">STREETS: ${stU} UNIT(S)${bT}</span></div></div>`;
-                p9.forEach(p => p.nums.forEach(n => { const b = document.getElementById('nb-'+n); if(b) b.classList.add('glow-green'); }));
-                if(conf.basketOn && (!aIds.includes(0) || conf.permHedge)) { [...state.zeros, 1, 2, 3].forEach(n => { const b = document.getElementById('nb-'+n); if(b) b.classList.add('glow-green'); }); }
-            }
+            const places = state.primaryPockets.filter(p => !avoidIds.includes(p.id));
+            const head = conf.view === 'AVOID' ? `AVOID ${avoids.length}` : `PLACE ON ${places.length}`;
+            const body = conf.view === 'AVOID' ? avoids.map(p=>p.label).join(', ') : places.map(p=>p.label).join(', ');
+            sigArea.innerHTML = `<div class="cmd-card mode-${conf.view.toLowerCase()}"><div class="cmd-head">${head} UNITS</div><div class="cmd-body" style="font-size:0.7em">${body}</div></div>`;
+            avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-red')));
+            places.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-green')));
         }
-        
+
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(2)}`;
-        document.getElementById('stat-h').innerText = `$${state.high.toFixed(2)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
         
-        let betT = 0; if(status === "READY") {
-            const aIds = avoids.map(x=>x.id);
-            if (!conf.basketOn) betT = state.unit * 9;
-            else if(conf.pushOn) betT = 9 * state.unit;
-            else betT = (aIds.includes(0) && !conf.permHedge) ? state.unit * 18 : state.unit * 19;
-        }
-        document.getElementById('stat-b').innerText = `$${(betT * conf.unitVal).toFixed(2)}`;
-        
+        renderPool(state.primaryPockets, 'audit-body-primary');
+        if (conf.domain === '9ST') renderPool(state.suPockets, 'audit-body-su');
+
         const feed = document.getElementById('feed'); feed.innerHTML = '';
         state.history.slice(-8).reverse().forEach(n => {
             const chip = document.createElement('div'); chip.className='chip';
             chip.style.background = (n === 0 || n > 36) ? '#2e7d32' : (reds.includes(n) ? '#d32f2f' : '#000');
             chip.innerText = n === 37 ? '00' : (n === 38 ? '000' : n); feed.appendChild(chip);
         });
-
-        const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        if (conf.permHedge) renderRow(state.pockets[0], bdy, true, '★');
-        auditSorted.forEach((p, idx) => { if(conf.permHedge && p.isBasket) return; renderRow(p, bdy, false, idx + 1); });
     }
 
-    function renderRow(p, bdy, pin, rank) {
-        const tr = document.createElement('tr'); if(pin) tr.className = 'pinned';
-        let color = 'var(--blue)';
-        if (p.hs >= 0.5) color = 'var(--red)'; else if (p.hs >= 0.4) color = 'var(--yellow)';
-        const w = Math.min(100, (p.hs / 2) * 100);
-        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
-        bdy.appendChild(tr);
+    function renderPool(pool, targetId) {
+        const bdy = document.getElementById(targetId); bdy.innerHTML = '';
+        const sorted = [...pool].sort((a,b) => b.hs - a.hs);
+        sorted.forEach(p => {
+            const tr = document.createElement('tr');
+            let color = p.hs >= 0.5 ? 'var(--red)' : (p.hs >= 0.4 ? 'var(--yellow)' : 'var(--blue)');
+            tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100, p.hs*50)}%; background:${color}"></div></div></td><td>${p.evHits}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
+            bdy.appendChild(tr);
+        });
     }
 
-    document.getElementById('final-undo').onclick = function() { if(!state.stack.length) return; Object.assign(state, JSON.parse(state.stack.pop())); engine(); refresh(); };
+    document.getElementById('final-undo').onclick = () => { if(state.stack.length) { state = JSON.parse(state.stack.pop()); refresh(); } };
 })();
 </script>
 </body>
