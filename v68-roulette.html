@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.4</title>
+    <title>Roulette Tracker V69.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,12 +16,10 @@
         body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; }
         
         .lobby-nav {
-            background: rgba(2, 6, 23, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 10px 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
-            position: sticky; top: 0;
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; position: sticky; top: 0;
         }
         .lobby-nav .brand { font-family: 'Cinzel', serif; color: var(--accent); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px; font-weight: 900; }
         .nav-links { display: flex; gap: 10px; }
@@ -44,33 +42,23 @@
         .cmd-body { font-size: 0.9em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
         .mode-avoid { background: #004488; }
         .mode-place { background: #880000; }
-        .mode-wait { background: #444; color: #aaa; }
+        .mode-wait { background: #333; color: #999; border-color: #555; }
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px; }
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
         .val { font-weight: bold; color: var(--accent); font-size: 0.95em; }
 
-        .history-feed { display: flex; gap: 8px; justify-content: center; margin: 8px 0; min-height: 38px; }
-        .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; }
-
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px;}
-        .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: 0.2s; }
+        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
         
-        /* EXCLUSIVE HIGHLIGHT CLASSES */
         .highlight-avoid { background: #004488 !important; border-color: #00aaff !important; box-shadow: 0 0 15px #00aaff; }
         .highlight-place { background: #880000 !important; border-color: #ff4444 !important; box-shadow: 0 0 15px #ff4444; }
 
-        .btn-green { background: var(--green); }
-        .btn-red { background: #440000; }
-        .btn-black { background: #000; }
-        
         .bet-toggle-btn { width: 100%; padding: 15px; border-radius: 6px; border: none; font-weight: 900; font-size: 1.2em; cursor: pointer; margin-bottom: 15px;}
         .bet-on { background: var(--accent); color: #000; border: 2px solid #fff; }
         .bet-off { background: #444; color: #888; border: 2px solid #222; }
 
         .audit-table { width: 100%; border-collapse: collapse; font-size: 0.75em; margin-top: 20px; background: var(--card); border-radius: 8px; table-layout: fixed; }
-        .audit-table th { color: #888; padding: 10px 2px; border-bottom: 1px solid #444; }
         .audit-table td { padding: 8px 2px; border-bottom: 1px solid #333; text-align: center; }
         .heat-bg { background: #000; width: 90%; height: 6px; border-radius: 4px; margin: 4px auto; border: 1px solid #444; overflow: hidden; }
         .heat-fill { height: 100%; transition: width 0.4s; }
@@ -88,19 +76,13 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.4</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.5</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets (N=3)</option><option value="36SN">36 Singles (N=1)</option></select></div>
         <div><label>Bet Target Count</label><input type="number" id="target-count" value="3"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div class="full"><label>Terminal Mode</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
-        <div class="full">
-            <div style="display:flex; gap:8px;">
-                <div class="toggle-box" style="flex:1;">HEDGE <input type="checkbox" id="basket-toggle" checked></div>
-                <div class="toggle-box" style="flex:1;">PUSH (1:1) <input type="checkbox" id="push-toggle"></div>
-            </div>
-        </div>
         <div><label>Unit ($)</label><input type="number" id="unit-cash" value="1"></div>
     </div>
     <button class="btn-start" id="final-start">START SESSION</button>
@@ -114,8 +96,6 @@
         <div class="stat-card"><small>BET</small><span id="stat-b" class="val">$0</span></div>
         <div class="stat-card"><small>ROLLS</small><span id="stat-rolls" class="val">0</span></div>
     </div>
-    <div id="feed" class="history-feed"></div>
-
     <div style="padding:15px;">
         <button id="bet-toggle" class="bet-toggle-btn bet-off">BET: OFF</button>
         <div id="pad" class="num-pad"></div>
@@ -133,7 +113,7 @@
 <script>
 (function() {
     const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
-    let state = { history: [], stack: [], pockets: [], zeros: [], profit: 0, high: 0, unit: 1, isBetting: false };
+    let state = { history: [], stack: [], pockets: [], profit: 0, high: 0, unit: 1, isBetting: false };
     let conf = {};
 
     window.showConfig = function() {
@@ -143,38 +123,29 @@
     };
 
     document.getElementById('final-start').onclick = function() {
-        const multVal = document.getElementById('mult-in').value;
-        const dom = document.getElementById('dom-sel').value;
         conf = {
             wheel: document.getElementById('wheel-type').value, unitVal: parseFloat(document.getElementById('unit-cash').value) || 1,
-            basketOn: document.getElementById('basket-toggle').checked, pushOn: document.getElementById('push-toggle').checked,
-            view: document.getElementById('view-mode').value, domain: dom,
+            view: document.getElementById('view-mode').value, domain: document.getElementById('dom-sel').value,
             targetCount: parseInt(document.getElementById('target-count').value) || 3,
-            mult: multVal === 'ALL' ? 'ALL' : parseInt(multVal), warm: parseInt(document.getElementById('warm-in').value)
+            mult: document.getElementById('mult-in').value === 'ALL' ? 'ALL' : parseInt(document.getElementById('mult-in').value),
+            warm: parseInt(document.getElementById('warm-in').value)
         };
-        state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
-        
+        const zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
         state.pockets = [];
         if(conf.domain === '9ST') {
-            for(let i=0; i<12; i++) {
-                let startNum = (i*3)+1;
-                let label = (i === 0 && conf.basketOn) ? 'BASKET' : 'ST '+startNum;
-                let nums = [startNum, startNum+1, startNum+2];
-                if (i === 0 && conf.basketOn) nums = [...nums, ...state.zeros];
-                state.pockets.push({id: i, label: label, nums: nums, hs:0, hits:0, d:0, winH: 0});
+            for(let i=0; i<12; i++){
+                let s = (i*3)+1;
+                state.pockets.push({id: i, label: 'ST '+s, nums: [s, s+1, s+2], hs:0, hits:0, d:0, winH:0});
             }
         } else {
-            const allNums = [...state.zeros, ...Array.from({length:36}, (_,i)=>i+1)];
-            allNums.forEach((n, idx) => {
-                let label = n === 37 ? '00' : (n === 38 ? '000' : n.toString());
-                state.pockets.push({id: idx, label: label, nums: [n], hs:0, hits:0, d:0, winH: 0});
+            [...zeros, ...Array.from({length:36},(_,i)=>i+1)].forEach((n, idx) => {
+                state.pockets.push({id: idx, label: (n==37?'00':(n==38?'000':n.toString())), nums: [n], hs:0, hits:0, d:0, winH:0});
             });
         }
-
         document.getElementById('config-page').style.display='none'; 
         document.getElementById('tracker-page').style.display='block';
         document.getElementById('nav-config').style.display='inline-block';
-        buildFeltPad(conf.wheel); engine(); refresh();
+        buildFeltPad(); engine(); refresh();
     };
 
     document.getElementById('bet-toggle').onclick = function() {
@@ -185,22 +156,8 @@
         refresh();
     };
 
-    function buildFeltPad(w) {
+    function buildFeltPad() {
         const pad = document.getElementById('pad'); pad.innerHTML = '';
-        const container = document.createElement('div'); container.className = 'zero-container';
-        const makeBtn = (val, txt) => {
-            const b = document.createElement('button'); b.id='nb-'+val; b.className='num-btn btn-green'; b.innerText=txt; b.onclick = () => addRoll(val); return b;
-        };
-        if (w === 'EU') container.appendChild(makeBtn(0, '0'));
-        else if (w === 'US') {
-            const r = document.createElement('div'); r.style.display="grid"; r.style.gridTemplateColumns="1fr 1fr"; r.style.gap="8px";
-            r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
-        } else {
-            const r1 = document.createElement('div'); r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
-            const r2 = document.createElement('div'); r2.style.display="grid"; r2.style.gridTemplateColumns="1fr 1fr"; r2.style.gap="8px";
-            r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00')); container.appendChild(r2);
-        }
-        pad.appendChild(container);
         for(let i=1; i<=36; i++) {
             const b = document.createElement('button'); b.id='nb-'+i; b.className='num-btn '+(reds.includes(i)?'btn-red':'btn-black');
             b.innerText=i; b.onclick = () => addRoll(i); pad.appendChild(b);
@@ -208,28 +165,27 @@
     }
 
     function addRoll(n) {
-        state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, isBetting:state.isBetting}));
-        const targetGroup = getTargetGroup();
-        const targetIds = targetGroup.map(p => p.id);
-        const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
+        state.stack.push(JSON.stringify({...state, history:[...state.history]}));
+        const targets = getTargetGroup();
+        const targetIds = targets.map(p => p.id);
+        const streetIdx = Math.floor((n-1)/3);
 
         if(state.isBetting) {
-            let win = false;
-            if(conf.domain === '9ST') win = (conf.view === 'AVOID') ? !targetIds.includes(streetIdx) : targetIds.includes(streetIdx);
-            else {
-                const currentIdx = state.pockets.findIndex(p => p.nums.includes(n));
-                win = (conf.view === 'AVOID') ? !targetIds.includes(currentIdx) : targetIds.includes(currentIdx);
-            }
+            const isTargetHit = (conf.domain === '9ST') ? targetIds.includes(streetIdx) : targets.some(p => p.nums.includes(n));
+            const win = (conf.view === 'AVOID') ? !isTargetHit : isTargetHit;
+            const totalStake = conf.targetCount * state.unit * conf.unitVal;
 
             if(win) {
-                state.profit += (state.unit * conf.unitVal * 3);
+                // Correct Math: (Unit * 36) - Stake for Singles; (Unit * 12) - Stake for Streets
+                const payoutMult = (conf.domain === '9ST') ? 12 : 36;
+                state.profit += (state.unit * conf.unitVal * payoutMult) - totalStake;
                 if (state.profit >= state.high) state.unit = 1;
             } else {
-                state.profit -= (state.unit * conf.unitVal * 9);
+                state.profit -= totalStake;
                 state.unit *= 2;
-                state.isBetting = false; 
-                document.getElementById('bet-toggle').innerText = "BET: OFF";
+                state.isBetting = false;
                 document.getElementById('bet-toggle').className = "bet-toggle-btn bet-off";
+                document.getElementById('bet-toggle').innerText = "BET: OFF";
             }
             if(state.profit > state.high) state.high = state.profit;
         }
@@ -238,88 +194,61 @@
 
     function engine() {
         state.pockets.forEach(p => {
-            const cycle = conf.domain === '9ST' ? 12 : 36;
+            const cycle = (conf.domain === '9ST') ? 12 : 36;
             const odds = p.nums.length / 36;
             let H = conf.mult === 'ALL' ? state.history.length : Math.floor((cycle * conf.mult) + 1);
-            if (H < 1) H = 1; const actualH = Math.min(state.history.length, H); p.winH = actualH;
-            let hitCount = 0; const startIdx = Math.max(0, state.history.length - actualH);
-            for(let i = state.history.length - 1; i >= startIdx; i--) { if(p.nums.includes(state.history[i])) hitCount++; }
-            p.hits = hitCount;
-            const FR = (hitCount / actualH) / odds;
+            const actualH = Math.max(1, Math.min(state.history.length, H)); p.winH = actualH;
+            let hits = 0; for(let i=state.history.length-1; i>=state.history.length-actualH; i--) if(p.nums.includes(state.history[i])) hits++;
+            p.hits = hits; p.fr = (hits/actualH)/odds;
             let d = 0; for(let i=state.history.length-1; i>=0; i--) { if(p.nums.includes(state.history[i])) break; d++; }
-            p.d = d; p.hs = FR * (1 / (1 + (d / cycle)));
+            p.d = d; p.hs = p.fr * (1/(1+(d/cycle)));
         });
     }
 
     function getTargetGroup() {
         let pool = [...state.pockets];
-        if (conf.view === 'AVOID') {
-            pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
-        } else {
-            pool.sort((a, b) => (Math.abs(b.hs - a.hs) > 0.0001) ? b.hs - a.hs : a.d - b.d);
-        }
+        pool.sort((a,b) => (conf.view === 'AVOID') ? (a.hs-b.hs || b.d-a.d) : (b.hs-a.hs || a.d-b.d));
         return pool.slice(0, conf.targetCount);
     }
 
     function refresh() {
-        const auditSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
-        const targetGroup = getTargetGroup();
+        const audit = [...state.pockets].sort((a,b) => b.hs - a.hs);
+        const targets = getTargetGroup();
         const warmup = state.history.length < conf.warm;
         
-        document.getElementById('status-txt').innerText = warmup ? `WARMUP (${state.history.length}/${conf.warm})` : (state.isBetting ? "BETTING ACTIVE" : "WAITING FOR ENTRY");
+        document.getElementById('status-txt').innerText = warmup ? `WARMUP (${state.history.length}/${conf.warm})` : (state.isBetting ? "BETTING ACTIVE" : "READY (WAITING)");
         document.getElementById('status-box').className = "status-box " + (state.isBetting ? "status-ready" : "status-wait");
         
         const sigArea = document.getElementById('sig-box'); sigArea.innerHTML = "";
-        
-        // Reset Pad Highlights
         document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('highlight-avoid', 'highlight-place'));
 
         if(!warmup) {
             const hCls = (conf.view === 'AVOID') ? 'highlight-avoid' : 'highlight-place';
-            targetGroup.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
-
-            if(state.isBetting) {
-                const sortedLabels = [...targetGroup].sort((a,b)=>a.id - b.id).map(p=>p.label);
-                sigArea.innerHTML = `<div class="cmd-card ${conf.view === 'AVOID' ? 'mode-avoid' : 'mode-place'}">
-                    <div class="cmd-head">${conf.view} COMMANDER</div>
-                    <div class="cmd-body">${sortedLabels.join(', ')}</div>
-                </div>`;
-            } else {
-                sigArea.innerHTML = `<div class="cmd-card mode-wait"><div class="cmd-head">COMMANDER</div><div class="cmd-body">WAIT...</div></div>`;
-            }
+            targets.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
+            const sortedLabels = [...targets].sort((a,b)=>a.id - b.id).map(p=>p.label);
+            sigArea.innerHTML = `<div class="cmd-card ${state.isBetting ? (conf.view==='AVOID'?'mode-avoid':'mode-place') : 'mode-wait'}">
+                <div class="cmd-head">${state.isBetting ? conf.view : 'READY'} COMMANDER</div>
+                <div class="cmd-body">${sortedLabels.join(', ')}</div>
+            </div>`;
         }
         
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(0)}`;
         document.getElementById('stat-h').innerText = `$${state.high.toFixed(0)}`;
         document.getElementById('stat-rolls').innerText = state.history.length;
-        document.getElementById('stat-b').innerText = state.isBetting ? `$${(state.unit * 9 * conf.unitVal).toFixed(0)}` : "$0";
+        document.getElementById('stat-b').innerText = state.isBetting ? `$${(conf.targetCount * state.unit * conf.unitVal).toFixed(0)}` : "$0";
         
-        const feed = document.getElementById('feed'); feed.innerHTML = '';
-        state.history.slice(-8).reverse().forEach(n => {
-            const chip = document.createElement('div'); chip.className='chip';
-            chip.style.background = (n === 0 || n > 36) ? '#2e7d32' : (reds.includes(n) ? '#d32f2f' : '#000');
-            chip.innerText = n === 37 ? '00' : (n === 38 ? '000' : n); feed.appendChild(chip);
-        });
-
         const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        auditSorted.forEach(p => renderRow(p, bdy));
-    }
-
-    function renderRow(p, bdy) {
-        const tr = document.createElement('tr');
-        let color = p.hs >= 0.5 ? 'var(--red)' : (p.hs >= 0.4 ? 'var(--yellow)' : 'var(--blue)');
-        tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100,(p.hs/2)*100)}%; background:${color}"></div></div></td>
-            <td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
-        bdy.appendChild(tr);
+        audit.forEach(p => {
+            const tr = document.createElement('tr');
+            let color = p.hs >= 0.5 ? 'var(--red)' : (p.hs >= 0.4 ? 'var(--yellow)' : 'var(--blue)');
+            tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${Math.min(100,(p.hs/2)*100)}%; background:${color}"></div></div></td><td>${p.winH}</td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
+            bdy.appendChild(tr);
+        });
     }
 
     document.getElementById('final-undo').onclick = function() { 
         if(!state.stack.length) return; 
-        Object.assign(state, JSON.parse(state.stack.pop())); 
-        const btn = document.getElementById('bet-toggle');
-        btn.innerText = state.isBetting ? "BET: ON" : "BET: OFF";
-        btn.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
-        engine(); refresh(); 
+        state = JSON.parse(state.stack.pop()); engine(); refresh(); 
     };
 })();
 </script>
