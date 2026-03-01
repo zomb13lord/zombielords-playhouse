@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.3</title>
+    <title>Roulette Tracker V69.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -31,7 +31,7 @@
         .config-grid { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .full { grid-column: span 2; }
         label { font-size: 0.6em; color: #888; font-weight: bold; display: block; margin-bottom: 2px; text-transform: uppercase; }
-        select, input { width: 100%; padding: 8px; background: #000; border: 1px solid #555; color: #fff; border-radius: 6px; font-size: 0.9em; }
+        select, input { width: 100%; padding: 8px; background: #000; border: 1px solid #555; border-radius: 6px; color: #fff; font-size: 0.9em; }
         .btn-start { width: 100%; padding: 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 
         #tracker-page { display: none; }
@@ -57,8 +57,9 @@
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
         .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; transition: 0.2s; }
         
-        .highlight-blue { background: #004488 !important; border-color: #00aaff !important; box-shadow: 0 0 15px #00aaff; }
-        .highlight-red { background: #880000 !important; border-color: #ff4444 !important; box-shadow: 0 0 15px #ff4444; }
+        /* EXCLUSIVE HIGHLIGHT CLASSES */
+        .highlight-avoid { background: #004488 !important; border-color: #00aaff !important; box-shadow: 0 0 15px #00aaff; }
+        .highlight-place { background: #880000 !important; border-color: #ff4444 !important; box-shadow: 0 0 15px #ff4444; }
 
         .btn-green { background: var(--green); }
         .btn-red { background: #440000; }
@@ -87,7 +88,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V69.3</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V69.4</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets (N=3)</option><option value="36SN">36 Singles (N=1)</option></select></div>
         <div><label>Bet Target Count</label><input type="number" id="target-count" value="3"></div>
@@ -153,7 +154,6 @@
         };
         state.zeros = conf.wheel === 'EU' ? [0] : (conf.wheel === 'US' ? [0, 37] : [0, 37, 38]);
         
-        // Rebuild pockets based on new config
         state.pockets = [];
         if(conf.domain === '9ST') {
             for(let i=0; i<12; i++) {
@@ -209,17 +209,18 @@
 
     function addRoll(n) {
         state.stack.push(JSON.stringify({history:[...state.history], profit:state.profit, high:state.high, unit:state.unit, isBetting:state.isBetting}));
-        const avoids = getBettingAvoids();
-        const avoidIds = avoids.map(p => p.id);
+        const targetGroup = getTargetGroup();
+        const targetIds = targetGroup.map(p => p.id);
         const streetIdx = (n === 0 || n > 36) ? 0 : Math.floor((n-1)/3);
 
         if(state.isBetting) {
             let win = false;
-            if(conf.domain === '9ST') win = !avoidIds.includes(streetIdx);
+            if(conf.domain === '9ST') win = (conf.view === 'AVOID') ? !targetIds.includes(streetIdx) : targetIds.includes(streetIdx);
             else {
-                const targetIdx = state.pockets.findIndex(p => p.nums.includes(n));
-                win = !avoidIds.includes(targetIdx);
+                const currentIdx = state.pockets.findIndex(p => p.nums.includes(n));
+                win = (conf.view === 'AVOID') ? !targetIds.includes(currentIdx) : targetIds.includes(currentIdx);
             }
+
             if(win) {
                 state.profit += (state.unit * conf.unitVal * 3);
                 if (state.profit >= state.high) state.unit = 1;
@@ -250,31 +251,35 @@
         });
     }
 
-    function getBettingAvoids() {
+    function getTargetGroup() {
         let pool = [...state.pockets];
-        pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
+        if (conf.view === 'AVOID') {
+            pool.sort((a, b) => (Math.abs(a.hs - b.hs) > 0.0001) ? a.hs - b.hs : b.d - a.d);
+        } else {
+            pool.sort((a, b) => (Math.abs(b.hs - a.hs) > 0.0001) ? b.hs - a.hs : a.d - b.d);
+        }
         return pool.slice(0, conf.targetCount);
     }
 
     function refresh() {
         const auditSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
-        const avoids = getBettingAvoids();
+        const targetGroup = getTargetGroup();
         const warmup = state.history.length < conf.warm;
         
         document.getElementById('status-txt').innerText = warmup ? `WARMUP (${state.history.length}/${conf.warm})` : (state.isBetting ? "BETTING ACTIVE" : "WAITING FOR ENTRY");
         document.getElementById('status-box').className = "status-box " + (state.isBetting ? "status-ready" : "status-wait");
         
         const sigArea = document.getElementById('sig-box'); sigArea.innerHTML = "";
-        document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('highlight-blue', 'highlight-red'));
+        
+        // Reset Pad Highlights
+        document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('highlight-avoid', 'highlight-place'));
 
         if(!warmup) {
-            const aIds = avoids.map(x=>x.id);
-            const pNon = state.pockets.filter(p => !aIds.includes(p.id));
-            avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-blue')));
-            pNon.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('highlight-red')));
+            const hCls = (conf.view === 'AVOID') ? 'highlight-avoid' : 'highlight-place';
+            targetGroup.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls)));
 
             if(state.isBetting) {
-                const sortedLabels = (conf.view === 'AVOID' ? [...avoids] : [...pNon]).sort((a,b)=>a.id - b.id).map(p=>p.label);
+                const sortedLabels = [...targetGroup].sort((a,b)=>a.id - b.id).map(p=>p.label);
                 sigArea.innerHTML = `<div class="cmd-card ${conf.view === 'AVOID' ? 'mode-avoid' : 'mode-place'}">
                     <div class="cmd-head">${conf.view} COMMANDER</div>
                     <div class="cmd-body">${sortedLabels.join(', ')}</div>
@@ -311,8 +316,9 @@
     document.getElementById('final-undo').onclick = function() { 
         if(!state.stack.length) return; 
         Object.assign(state, JSON.parse(state.stack.pop())); 
-        document.getElementById('bet-toggle').innerText = state.isBetting ? "BET: ON" : "BET: OFF";
-        document.getElementById('bet-toggle').className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
+        const btn = document.getElementById('bet-toggle');
+        btn.innerText = state.isBetting ? "BET: ON" : "BET: OFF";
+        btn.className = "bet-toggle-btn " + (state.isBetting ? "bet-on" : "bet-off");
         engine(); refresh(); 
     };
 })();
