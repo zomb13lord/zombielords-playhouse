@@ -204,7 +204,6 @@
     }
 
     function addRoll(n) {
-        // FIXED: Safe Undo Snapshoting to prevent Memory Crash
         const snapshot = {
             history: [...state.history],
             profit: state.profit,
@@ -216,7 +215,7 @@
             evHitsSU: state.suPockets.map(p => p.evHits)
         };
         state.stack.push(JSON.stringify(snapshot));
-        if (state.stack.length > 50) state.stack.shift(); // Limit undo buffer
+        if (state.stack.length > 50) state.stack.shift();
 
         const statusTxt = document.getElementById('status-txt').innerText;
         const avoids = getBettingAvoids();
@@ -225,9 +224,10 @@
 
         if (isWarm && state.cooldownLeft === 0) {
             state.primaryPockets.forEach(p => {
+                const isTargetedAvoid = avoidIds.includes(p.id);
                 if (p.nums.includes(n)) {
-                    if (conf.view === 'AVOID' && avoidIds.includes(p.id)) p.evHits++;
-                    else if (conf.view === 'PLACE' && !avoidIds.includes(p.id)) p.evHits++;
+                    if (conf.view === 'AVOID' && isTargetedAvoid) p.evHits++;
+                    else if (conf.view === 'PLACE' && !isTargetedAvoid) p.evHits++;
                 }
             });
             const hitInAvoid = avoidIds.some(aid => state.primaryPockets[aid].nums.includes(n));
@@ -285,11 +285,16 @@
 
         if(status === "READY") {
             const places = state.primaryPockets.filter(p => !avoidIds.includes(p.id));
-            const head = conf.view === 'AVOID' ? `AVOID ${avoids.length}` : `PLACE ON ${places.length}`;
+            const head = conf.view === 'AVOID' ? `AVOID ${avoids.length} UNITS` : `PLACE ON ${places.length} UNITS`;
             const body = conf.view === 'AVOID' ? avoids.map(p=>p.label).join(', ') : places.map(p=>p.label).join(', ');
-            sigArea.innerHTML = `<div class="cmd-card mode-${conf.view.toLowerCase()}"><div class="cmd-head">${head} UNITS</div><div class="cmd-body" style="font-size:0.7em">${body}</div></div>`;
-            avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-red')));
-            places.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-green')));
+            sigArea.innerHTML = `<div class="cmd-card mode-${conf.view.toLowerCase()}"><div class="cmd-head">${head}</div><div class="cmd-body" style="font-size:0.7em">${body}</div></div>`;
+            
+            // FIXED HIGHLIGHTING: Dynamically follow view setting
+            if (conf.view === 'AVOID') {
+                avoids.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-red')));
+            } else {
+                places.forEach(p => p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add('glow-green')));
+            }
         }
 
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(2)}`;
@@ -321,12 +326,8 @@
     document.getElementById('final-undo').onclick = () => {
         if(!state.stack.length) return;
         const snap = JSON.parse(state.stack.pop());
-        state.history = snap.history;
-        state.profit = snap.profit;
-        state.high = snap.high;
-        state.unit = snap.unit;
-        state.cooldownLeft = snap.cooldownLeft;
-        state.lossLevel = snap.lossLevel;
+        state.history = snap.history; state.profit = snap.profit; state.high = snap.high;
+        state.unit = snap.unit; state.cooldownLeft = snap.cooldownLeft; state.lossLevel = snap.lossLevel;
         state.primaryPockets.forEach((p, i) => p.evHits = snap.evHitsPrimary[i]);
         state.suPockets.forEach((p, i) => p.evHits = snap.evHitsSU[i]);
         engine(); refresh();
