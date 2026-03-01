@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V69.3</title>
+    <title>Roulette Tracker V69.4</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -48,7 +48,6 @@
         .history-feed { display: flex; gap: 8px; justify-content: center; margin-top: 8px; min-height: 38px; overflow: hidden; }
         .chip { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85em; border: 2px solid rgba(255,255,255,0.2); color: #fff; flex-shrink: 0; }
 
-        /* FIXED NUMBER PAD CSS */
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 0 auto; margin-top: 15px; }
         .zero-container { grid-column: span 3; width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
         .zero-row { display: grid; grid-template-columns: 1fr; gap: 8px; width: 100%; }
@@ -75,7 +74,7 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.3</h2>
+        <h2 class="full" style="margin:0; color:var(--accent);">Logic Engine V69.4</h2>
         <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
         <div><label>Domain</label><select id="dom-sel" onchange="toggleSuInput()"><option value="9ST" selected>9 Streets</option><option value="SU">Straight Up</option></select></div>
         <div id="su-config" style="display:none;"><label>Total Bet Count</label><input type="number" id="su-total" value="28"></div>
@@ -186,25 +185,18 @@
     function buildFeltPad(w) {
         const pad = document.getElementById('pad'); pad.innerHTML = '';
         const container = document.createElement('div'); container.className = 'zero-container';
-        
         const makeBtn = (val, txt) => {
             const b = document.createElement('button'); b.id='nb-'+val; b.className='num-btn btn-green'; b.innerText=txt; b.onclick = () => addRoll(val); return b;
         };
-
         if (w === 'EU') {
-            const r = document.createElement('div'); r.className = 'zero-row';
-            r.appendChild(makeBtn(0, '0')); container.appendChild(r);
+            const r = document.createElement('div'); r.className = 'zero-row'; r.appendChild(makeBtn(0, '0')); container.appendChild(r);
         } else if (w === 'US') {
-            const r = document.createElement('div'); r.className = 'zero-row double';
-            r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
+            const r = document.createElement('div'); r.className = 'zero-row double'; r.appendChild(makeBtn(0, '0')); r.appendChild(makeBtn(37, '00')); container.appendChild(r);
         } else {
-            const r1 = document.createElement('div'); r1.className = 'zero-row';
-            r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
-            const r2 = document.createElement('div'); r2.className = 'zero-row double'; r2.style.marginTop = "8px";
-            r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00')); container.appendChild(r2);
+            const r1 = document.createElement('div'); r1.className = 'zero-row'; r1.appendChild(makeBtn(38, '000')); container.appendChild(r1);
+            const r2 = document.createElement('div'); r2.className = 'zero-row double'; r2.style.marginTop = "8px"; r2.appendChild(makeBtn(0, '0')); r2.appendChild(makeBtn(37, '00')); container.appendChild(r2);
         }
         pad.appendChild(container);
-
         for(let i=1; i<=36; i++) {
             const b = document.createElement('button'); b.id='nb-'+i; b.className='num-btn '+(reds.includes(i)?'btn-red':'btn-black');
             b.innerText=i; b.onclick = () => addRoll(i); pad.appendChild(b);
@@ -213,11 +205,11 @@
 
     function addRoll(n) {
         state.stack.push(JSON.stringify(state));
-        const statusTxt = document.getElementById('status-txt').innerText;
         const avoids = getBettingAvoids();
         const avoidIds = avoids.map(p => p.id);
-        
-        if (statusTxt === "READY") {
+        const isWarm = state.history.length >= conf.warm;
+
+        if (isWarm && state.cooldownLeft === 0) {
             state.primaryPockets.forEach(p => {
                 if (p.nums.includes(n)) {
                     if (conf.view === 'AVOID' && avoidIds.includes(p.id)) p.evHits++;
@@ -234,7 +226,9 @@
                 if (state.lossLevel >= conf.cdTrigger) state.cooldownLeft = conf.cool;
             }
             if(state.profit > state.high) state.high = state.profit;
-        } else if (state.cooldownLeft > 0) state.cooldownLeft--;
+        } else if (state.cooldownLeft > 0) {
+            state.cooldownLeft--;
+        }
 
         state.history.push(n); engine(); refresh();
     }
@@ -265,11 +259,12 @@
     }
 
     function refresh() {
+        const auditSorted = [...state.primaryPockets].sort((a,b) => b.hs - a.hs);
         const avoids = getBettingAvoids();
         const avoidIds = avoids.map(p => p.id);
         const status = (state.history.length < conf.warm) ? "WARMUP" : (state.cooldownLeft > 0 ? "COOLDOWN" : "READY");
         
-        document.getElementById('status-txt').innerText = status;
+        document.getElementById('status-txt').innerText = status + (status !== "READY" ? " (" + (status === "WARMUP" ? state.history.length : state.cooldownLeft) + ")" : "");
         document.getElementById('status-box').className = "status-box " + (status === "READY" ? "status-ready" : "status-wait");
         
         document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('glow-red', 'glow-green'));
