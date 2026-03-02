@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V70.9</title>
+    <title>Roulette Tracker V71.1</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #121212; --card: #1e1e1e; --accent: #00ff88;
             --red-pocket: #d32f2f; --black-pocket: #000; --green-pocket: #2e7d32;
-            --blue-high: #3b82f6; --red-high: #ef4444;
+            --blue-high: #0055ff; --red-high: #ff0000; --yellow-mid: #fbbf24;
             --wait: #ffcc00; --text: #e0e0e0;
         }
         * { box-sizing: border-box; touch-action: manipulation; }
@@ -41,9 +41,8 @@
         .cmd-head { font-size: 0.7em; padding: 4px; text-transform: uppercase; font-weight: 900; }
         .cmd-body { font-size: 1.1em; padding: 8px; font-weight: 900; background: rgba(0,0,0,0.6); }
         
-        /* THE USER'S COLOR REQ */
-        .color-cold { background: var(--blue-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--blue-high); }
-        .color-hot { background: var(--red-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--red-high); }
+        .glow-blue { background: var(--blue-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--blue-high); }
+        .glow-red { background: var(--red-high) !important; border-color: #fff !important; box-shadow: 0 0 15px var(--red-high); }
 
         .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px; }
         .stat-card { background: #000; padding: 8px 2px; border-radius: 6px; text-align: center; border: 1px solid #333; }
@@ -54,7 +53,7 @@
 
         .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 400px; margin: 15px auto; }
         .zero-container { grid-column: span 3; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-        .num-btn { padding: 18px 0; border: 2px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
+        .num-btn { padding: 18px 0; border: 1px solid #444; border-radius: 6px; color: #fff !important; font-weight: bold; font-size: 1.4em; cursor: pointer; text-align: center; }
         
         .p-red { background: var(--red-pocket) !important; }
         .p-black { background: var(--black-pocket) !important; }
@@ -82,15 +81,15 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Manual Auditor V70.9</h2>
-        <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
+        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V71.1</h2>
         <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option><option value="36SN">36 Singles</option></select></div>
         <div class="full"><label>Strategy (Winners)</label><select id="strat-sel"><option value="COLD">Cold Hunt</option><option value="HOT" selected>Hot Hunt</option></select></div>
-        <div><label>Target Pockets</label><input type="number" id="target-count" value="28"></div>
+        <div><label>Target Count</label><input type="number" id="target-count" value="28"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
         <div class="full"><label>Lookback Window</label><select id="mult-in"><option value="1">Short</option><option value="2">Standard</option><option value="3" selected>Long</option><option value="ALL">ALL</option></select></div>
         <div class="full"><label>Terminal Mode (View)</label><select id="view-mode"><option value="AVOID" selected>AVOID</option><option value="PLACE">PLACE</option></select></div>
         <div><label>Unit Value ($)</label><input type="number" id="unit-cash" value="5"></div>
+        <div class="full"><label>Wheel Type</label><select id="wheel-type"><option value="EU" selected>European</option><option value="US">American</option><option value="TZ">Triple Zero</option></select></div>
     </div>
     <button class="btn-start" id="final-start">START SESSION</button>
 </div>
@@ -114,7 +113,7 @@
             <button onclick="window.location.reload()" style="background:#800; color:#fff; padding:15px; border:none; border-radius:6px; font-weight:bold;">RESET</button>
         </div>
         <table class="audit-table">
-            <thead><tr style="color:#888; font-size:0.75em;"><th>STREET / SN</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
+            <thead><tr style="color:#888; font-size:0.75em;"><th>UNIT</th><th>D</th><th>HITS</th><th>SCORE</th></tr></thead>
             <tbody id="audit-body"></tbody>
         </table>
     </div>
@@ -197,23 +196,20 @@
 
     function addRoll(n) {
         stack.push(JSON.stringify({p: state.profit, h: state.high, u: state.unit, b: state.isBetting, rolls: [...sessionRolls]}));
-        
         const winners = getStrategyWinners();
         const winnerIds = winners.map(p => p.id);
         const streetIdx = Math.floor((n-1)/3);
 
         if(state.isBetting) {
-            const isHitInStrategy = (conf.domain === '9ST') ? (n > 0 && n <= 36 && winnerIds.includes(streetIdx)) : winners.some(p => p.nums.includes(n));
-            
-            // MATH IS ALWAYS STRATEGY-BASED
-            let totalPocketsStrategy = 0; winners.forEach(p => totalPocketsStrategy += p.nums.length);
-            const totalStake = totalPocketsStrategy * state.unit * conf.unitVal;
+            const isHit = (conf.domain === '9ST') ? (n > 0 && n <= 36 && winnerIds.includes(streetIdx)) : winners.some(p => p.nums.includes(n));
+            let totalStrategyPockets = 0; winners.forEach(p => totalStrategyPockets += p.nums.length);
+            const stake = totalStrategyPockets * state.unit * conf.unitVal;
 
-            if(isHitInStrategy) {
-                state.profit += (state.unit * conf.unitVal * 36) - totalStake;
+            if(isHit) {
+                state.profit += (state.unit * conf.unitVal * 36) - stake;
                 if(state.profit >= state.high) state.unit = 1;
             } else {
-                state.profit -= totalStake; 
+                state.profit -= stake; 
                 state.unit *= 2; state.isBetting = false;
                 const btn = document.getElementById('bet-toggle');
                 btn.className = "bet-toggle-btn bet-off"; btn.innerText = "BET: OFF";
@@ -239,41 +235,47 @@
     }
 
     function refresh() {
-        const auditTableSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
+        const auditSorted = [...state.pockets].sort((a,b) => b.hs - a.hs);
         const winners = getStrategyWinners();
         const winnerIds = winners.map(p => p.id);
 
-        // VIEW LOGIC
-        let displayGroup = (conf.view === 'PLACE') ? winners : state.pockets.filter(p => !winnerIds.includes(p.id));
+        // STABILITY CHECK
+        let isStable = true;
+        if (conf.strategy === 'COLD') {
+            isStable = winners.every(p => p.hs < 0.4);
+        } else {
+            isStable = winners.every(p => p.hs > 0.6);
+        }
 
+        let displayGroup = (conf.view === 'PLACE') ? winners : state.pockets.filter(p => !winnerIds.includes(p.id));
         const warmup = sessionRolls.length < conf.warm;
+        
         document.getElementById('status-txt').innerText = warmup ? `WARMUP (${sessionRolls.length}/${conf.warm})` : (state.isBetting ? "BETTING ACTIVE" : "READY (WAITING)");
         document.getElementById('status-box').className = "status-box " + (state.isBetting ? "status-ready" : "status-wait");
         
         document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('glow-blue', 'glow-red'));
-        if(!warmup) {
-            // COLOR LOGIC: ALWAYS BLUE FOR COLD, RED FOR HOT
-            displayGroup.forEach(p => {
-                // If the pocket's HS is low (relative to the audit), it's cold.
-                // Simple check: Is this pocket in the "Bottom Half" of scores?
-                const isCold = p.hs < 0.45; 
-                const colorCls = isCold ? 'glow-blue' : 'glow-red';
-                p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(colorCls));
-            });
 
-            const labels = [...displayGroup].sort((a,b)=>a.id-b.id).map(p=>p.label);
-            document.getElementById('sig-box').innerHTML = `<div class="cmd-card ${state.isBetting?(conf.view==='AVOID'?'mode-avoid':'mode-place'):'mode-wait'}">
-                <div class="cmd-head">${state.isBetting ? conf.view : 'READY'} COMMANDER</div>
-                <div class="cmd-body">${labels.join(', ')}</div>
-            </div>`;
+        if(!warmup) {
+            if(isStable) {
+                displayGroup.forEach(p => {
+                    const hCls = p.hs <= 0.4 ? 'glow-blue' : (p.hs >= 0.6 ? 'glow-red' : null);
+                    if(hCls) p.nums.forEach(n => document.getElementById('nb-'+n)?.classList.add(hCls));
+                });
+                const labels = [...displayGroup].sort((a,b)=>a.id-b.id).map(p=>p.label);
+                document.getElementById('sig-box').innerHTML = `<div class="cmd-card ${state.isBetting?(conf.view==='AVOID'?'mode-avoid':'mode-place'):'mode-wait'}">
+                    <div class="cmd-head">${state.isBetting ? conf.view : 'READY'} COMMANDER</div>
+                    <div class="cmd-body">${labels.join(', ')}</div>
+                </div>`;
+            } else {
+                document.getElementById('sig-box').innerHTML = `<div class="cmd-card mode-wait"><div class="cmd-head">UNSTABLE</div><div class="cmd-body" style="font-size:0.7em">WAITING FOR ${conf.strategy} THRESHOLD</div></div>`;
+            }
         }
         
         document.getElementById('stat-p').innerText = `$${state.profit.toFixed(0)}`;
         document.getElementById('stat-h').innerText = `$${state.high.toFixed(0)}`;
         document.getElementById('stat-rolls').innerText = sessionRolls.length;
-
-        let strategyPockets = 0; winners.forEach(p => strategyPockets += p.nums.length);
-        document.getElementById('stat-b').innerText = state.isBetting ? `$${(strategyPockets * state.unit * conf.unitVal).toFixed(0)}` : "$0";
+        let stratStake = 0; winners.forEach(p => stratStake += p.nums.length);
+        document.getElementById('stat-b').innerText = state.isBetting ? `$${(stratStake * state.unit * conf.unitVal).toFixed(0)}` : "$0";
         
         const feed = document.getElementById('history-feed'); feed.innerHTML = '';
         sessionRolls.slice(-8).reverse().forEach(n => {
@@ -283,9 +285,9 @@
         });
 
         const bdy = document.getElementById('audit-body'); bdy.innerHTML = '';
-        auditTableSorted.forEach(p => {
+        auditSorted.forEach(p => {
             const tr = document.createElement('tr');
-            let color = p.hs >= 0.45 ? 'var(--red-pocket)' : 'var(--blue-high)';
+            let color = p.hs >= 0.6 ? 'var(--red-pocket)' : (p.hs <= 0.4 ? 'var(--blue-high)' : 'var(--yellow-mid)');
             const w = Math.min(100, (p.hs / 2) * 100);
             tr.innerHTML = `<td><b>${p.label}</b><div class="heat-bg"><div class="heat-fill" style="width:${w}%; background:${color}"></div></div></td><td>${p.d}</td><td>${p.hits}</td><td>${p.hs.toFixed(3)}</td>`;
             bdy.appendChild(tr);
