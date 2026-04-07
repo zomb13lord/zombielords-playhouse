@@ -296,12 +296,17 @@
             } 
         };
 
+        const wheelSequences = {
+            EU: ['0','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26'],
+            US: ['0','28','9','26','30','11','7','20','32','17','5','22','34','15','3','24','36','1','00','27','10','25','29','12','8','19','31','18','6','21','33','16','4','23','35','14','2'],
+            TZ: ['0','000','00','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26']
+        };
+
         function toggleVisibility(element, show, displayType = 'block') {
             if (!element) return;
             element.style.display = show ? displayType : 'none';
         }
 
-        // --- SYNCHRONOUS DOM POPULATION ---
         function bootstrapUI() {
             try {
                 document.getElementById('wheel-type').value = "US";
@@ -381,6 +386,13 @@
 
         function getPocketsForBet(betStr, wheel) {
             if (!betStr) return [];
+            
+            // Racetrack Sector Overrides
+            if (betStr === 'Zero Game') return ['12','35','3','26','0','32','15'];
+            if (betStr === 'Voisins') return ['22','18','29','7','28','12','35','3','26','0','32','15','19','4','21','2','25'];
+            if (betStr === 'Orphelins') return ['1','20','14','31','9','17','34','6'];
+            if (betStr === 'Tier') return ['27','13','36','11','30','8','23','10','5','24','16','33'];
+
             if (betStr.includes('-')) {
                 let parts = betStr.split(' ')[1] || betStr;
                 if(parts.includes('-')) {
@@ -448,11 +460,20 @@
 
         function handleFeltClick(e, btn) {
             const wheel = document.getElementById('wheel-type').value;
+            const domain = document.getElementById('main-domain').value;
             const category = document.getElementById('sub-domain').value;
             const type = document.getElementById('sub-type').value;
             const val = btn.dataset.val;
             
             let finalBetStr = val; 
+
+            // Racetrack Sector Bypass
+            if (domain === 'sectors') {
+                if (window.activeBetTargets.has(finalBetStr)) window.activeBetTargets.delete(finalBetStr);
+                else window.activeBetTargets.add(finalBetStr);
+                updateSelectionUI();
+                return;
+            }
 
             const isDesktop = window.innerWidth >= 768;
             const rect = btn.getBoundingClientRect();
@@ -600,12 +621,10 @@
             window.activeBetTargets.clear();
             document.getElementById('target-selection-label').innerText = "Target Selection";
 
-            const isInside = (domain === 'inside');
-
             const createFeltBtn = (label, bgClass, val, twClass = "", inlineStyle = "") => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = `felt-btn ${bgClass} ${twClass} p-1 md:p-2 rounded min-h-[35px] md:min-h-[45px]`;
+                btn.className = `felt-btn ${bgClass} ${twClass} rounded`;
                 if(inlineStyle) btn.style.cssText = inlineStyle;
                 btn.innerText = label;
                 btn.dataset.val = val;
@@ -615,6 +634,37 @@
 
             const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
+            // RACETRACK SECTOR OVERRIDE
+            if (domain === 'sectors') {
+                const trackContainer = document.createElement('div');
+                trackContainer.className = 'flex flex-col gap-6 w-full mt-2';
+
+                const macroRow = document.createElement('div');
+                macroRow.className = 'grid grid-cols-2 md:grid-cols-4 gap-2';
+                ['Zero Game', 'Voisins', 'Orphelins', 'Tier'].forEach(bt => {
+                    macroRow.appendChild(createFeltBtn(bt, 'bg-slate-800', bt, 'p-2 md:p-3 min-h-[35px] md:min-h-[45px] opacity-60 hover:opacity-100'));
+                });
+                trackContainer.appendChild(macroRow);
+
+                const seq = wheelSequences[wheel] || wheelSequences['US'];
+                const track = document.createElement('div');
+                track.className = 'flex flex-wrap gap-1 justify-center bg-slate-900/60 p-4 rounded-[2rem] border border-emerald-900/40 shadow-inner';
+                
+                seq.forEach(numStr => {
+                    const n = parseInt(numStr);
+                    const isZ = (numStr === '0' || numStr === '00' || numStr === '000');
+                    const bg = isZ ? 'bg-green-felt' : (redNums.includes(n) ? 'bg-red-felt' : 'bg-black-felt');
+                    const btn = createFeltBtn(numStr, bg, numStr, 'rounded-full w-8 h-8 md:w-10 md:h-10 !min-h-0 flex-shrink-0 !p-0 opacity-60 hover:opacity-100');
+                    track.appendChild(btn);
+                });
+
+                trackContainer.appendChild(track);
+                container.appendChild(trackContainer);
+                return;
+            }
+
+            // 1. DESKTOP GRID BUILDER 
+            const isInside = (domain === 'inside');
             const desktopGrid = document.createElement('div');
             desktopGrid.className = 'hidden md:grid gap-1 mb-2 w-full';
             desktopGrid.style.gridTemplateColumns = isInside ? '60px repeat(12, 1fr)' : '60px repeat(12, 1fr) 60px';
@@ -623,14 +673,14 @@
             const zeroDivD = document.createElement('div');
             zeroDivD.className = "flex flex-col gap-1";
             zeroDivD.style.cssText = "grid-column: 1; grid-row: 1 / span 3;";
-            if (wheel === 'EU') zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+            if (wheel === 'EU') zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1 opacity-60 hover:opacity-100 p-1'));
             else if (wheel === 'US') {
-                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1'));
-                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1 opacity-60 hover:opacity-100 p-1'));
+                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1 opacity-60 hover:opacity-100 p-1'));
             } else {
-                zeroDivD.appendChild(createFeltBtn('000', 'bg-green-felt', '000', 'flex-1'));
-                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1'));
-                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1'));
+                zeroDivD.appendChild(createFeltBtn('000', 'bg-green-felt', '000', 'flex-1 opacity-60 hover:opacity-100 p-1'));
+                zeroDivD.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'flex-1 opacity-60 hover:opacity-100 p-1'));
+                zeroDivD.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'flex-1 opacity-60 hover:opacity-100 p-1'));
             }
             desktopGrid.appendChild(zeroDivD);
 
@@ -638,24 +688,25 @@
                 const bg = redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt';
                 const col = Math.ceil(i/3) + 1;
                 const row = 3 - ((i-1)%3);
-                desktopGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), '', `grid-column: ${col}; grid-row: ${row};`));
+                desktopGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), 'opacity-60 hover:opacity-100 p-1', `grid-column: ${col}; grid-row: ${row};`));
             }
 
             if (!isInside) {
-                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', '', 'grid-column: 14; grid-row: 1;'));
-                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', '', 'grid-column: 14; grid-row: 2;'));
-                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', '', 'grid-column: 14; grid-row: 3;'));
-                desktopGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', '', 'grid-column: 2 / span 4; grid-row: 4;'));
-                desktopGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', '', 'grid-column: 6 / span 4; grid-row: 4;'));
-                desktopGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', '', 'grid-column: 10 / span 4; grid-row: 4;'));
-                desktopGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', '', 'grid-column: 2 / span 2; grid-row: 5;'));
-                desktopGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', '', 'grid-column: 4 / span 2; grid-row: 5;'));
-                desktopGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', '', 'grid-column: 6 / span 2; grid-row: 5;'));
-                desktopGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', '', 'grid-column: 8 / span 2; grid-row: 5;'));
-                desktopGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', '', 'grid-column: 10 / span 2; grid-row: 5;'));
-                desktopGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', '', 'grid-column: 12 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'opacity-60 hover:opacity-100', 'grid-column: 14; grid-row: 1;'));
+                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'opacity-60 hover:opacity-100', 'grid-column: 14; grid-row: 2;'));
+                desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'opacity-60 hover:opacity-100', 'grid-column: 14; grid-row: 3;'));
+                desktopGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', 'opacity-60 hover:opacity-100', 'grid-column: 2 / span 4; grid-row: 4;'));
+                desktopGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', 'opacity-60 hover:opacity-100', 'grid-column: 6 / span 4; grid-row: 4;'));
+                desktopGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', 'opacity-60 hover:opacity-100', 'grid-column: 10 / span 4; grid-row: 4;'));
+                desktopGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', 'opacity-60 hover:opacity-100', 'grid-column: 2 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', 'opacity-60 hover:opacity-100', 'grid-column: 4 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', 'opacity-60 hover:opacity-100', 'grid-column: 6 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', 'opacity-60 hover:opacity-100', 'grid-column: 8 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', 'opacity-60 hover:opacity-100', 'grid-column: 10 / span 2; grid-row: 5;'));
+                desktopGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'opacity-60 hover:opacity-100', 'grid-column: 12 / span 2; grid-row: 5;'));
             }
 
+            // 2. MOBILE GRID BUILDER
             const mobileGrid = document.createElement('div');
             mobileGrid.className = 'grid md:hidden gap-1 w-full';
             mobileGrid.style.gridTemplateColumns = 'repeat(6, 1fr)';
@@ -663,32 +714,32 @@
 
             const zeroDivM = document.createElement('div');
             zeroDivM.className = `col-span-6 grid gap-1 ${wheel === 'TZ' ? 'grid-cols-3' : (wheel === 'US' ? 'grid-cols-2' : 'grid-cols-1')}`;
-            if (wheel === 'EU') zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+            if (wheel === 'EU') zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'opacity-60 hover:opacity-100 p-1'));
             else if (wheel === 'US') {
-                zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+                zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'opacity-60 hover:opacity-100 p-1')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'opacity-60 hover:opacity-100 p-1'));
             } else {
-                zeroDivM.appendChild(createFeltBtn('000', 'bg-green-felt', '000')); zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0'));
+                zeroDivM.appendChild(createFeltBtn('000', 'bg-green-felt', '000', 'opacity-60 hover:opacity-100 p-1')); zeroDivM.appendChild(createFeltBtn('00', 'bg-green-felt', '00', 'opacity-60 hover:opacity-100 p-1')); zeroDivM.appendChild(createFeltBtn('0', 'bg-green-felt', '0', 'opacity-60 hover:opacity-100 p-1'));
             }
             mobileGrid.appendChild(zeroDivM);
 
             for(let i=1; i<=36; i++) {
                 const bg = redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt';
-                mobileGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), 'col-span-2'));
+                mobileGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), 'col-span-2 opacity-60 hover:opacity-100 p-1'));
             }
 
             if (!isInside) {
-                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-span-2 mt-1'));
-                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-span-2 mt-1'));
-                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-span-2 mt-1'));
-                mobileGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', 'col-span-2'));
-                mobileGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', 'col-span-2'));
-                mobileGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', 'col-span-2'));
-                mobileGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', 'col-span-3 mt-1'));
-                mobileGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', 'col-span-3 mt-1'));
-                mobileGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', 'col-span-3'));
-                mobileGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', 'col-span-3'));
-                mobileGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', 'col-span-3'));
-                mobileGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'col-span-3'));
+                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-span-2 mt-1 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-span-2 mt-1 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-span-2 mt-1 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('1st 12', 'bg-outside-felt', 'Dozen 1', 'col-span-2 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('2nd 12', 'bg-outside-felt', 'Dozen 2', 'col-span-2 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('3rd 12', 'bg-outside-felt', 'Dozen 3', 'col-span-2 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('1-18', 'bg-outside-felt', 'Low', 'col-span-3 mt-1 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('Even', 'bg-outside-felt', 'Even', 'col-span-3 mt-1 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('Red', 'bg-red-felt', 'Red', 'col-span-3 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('Black', 'bg-black-felt', 'Black', 'col-span-3 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('Odd', 'bg-outside-felt', 'Odd', 'col-span-3 opacity-60 hover:opacity-100 p-1'));
+                mobileGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'col-span-3 opacity-60 hover:opacity-100 p-1'));
             }
 
             container.appendChild(desktopGrid);
@@ -795,6 +846,37 @@
         }
 
         function loadValues(d) {
+            if(!d) {
+                document.getElementById('wheel-type').value = "US";
+                updateWheelSubtypes();
+                document.getElementById('wheel-subtype').value = "Standard";
+                
+                document.getElementById('main-domain').value = "inside";
+                updateSubDomains();
+                document.getElementById('sub-domain').value = "Streets";
+                updateSubTypes();
+                document.getElementById('sub-type').value = "Top Line";
+                document.getElementById('strategy').value = "cold";
+                
+                document.getElementById('warmup-n').value = 16;
+                document.getElementById('cd-trigger-n').value = 2;
+                document.getElementById('cd-length-n').value = 6;
+                document.getElementById('stabilization-n').value = 3;
+                document.getElementById('lookback-w').value = "long";
+                document.getElementById('bet-prompt').value = "avoid";
+
+                document.getElementById('hedge-commander').value = "always";
+                document.getElementById('hedge-progression').value = "push";
+
+                document.getElementById('base-unit').value = 5;
+                document.getElementById('neg-progression').value = "martingale";
+                document.getElementById('pos-progression').value = "flat";
+                document.getElementById('prog-multi').value = 2;
+
+                evaluateLogicFlows();
+                return;
+            }
+            
             document.getElementById('wheel-type').value = d.wheel || "US";
             updateWheelSubtypes();
             document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
