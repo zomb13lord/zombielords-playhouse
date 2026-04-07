@@ -70,7 +70,8 @@
             background-size: 16px; padding-right: 40px; cursor: pointer;
         }
         .config-input:focus { border-color: #10b981; box-shadow: 0 0 12px rgba(16,185,129,0.4); }
-        
+        .config-input option { background-color: #020617; color: #10b981; font-weight: 600; padding: 12px; }
+
         label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: #34d399; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
         .modal-offset { top: 76px; }
 
@@ -318,26 +319,27 @@
             element.style.display = show ? displayType : 'none';
         }
 
+        // --- SYNCHRONOUS DOM POPULATION FIX ---
         function updateWheelSubtypes() {
             const type = document.getElementById('wheel-type').value;
-            document.getElementById('wheel-subtype').innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
-            evaluateLogicFlows();
+            const subtypeMenu = document.getElementById('wheel-subtype');
+            subtypeMenu.innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
         }
 
         function updateSubDomains() {
             const d = document.getElementById('main-domain').value;
-            document.getElementById('sub-domain').innerHTML = Object.keys(domainMap[d]).map(k => `<option value="${k}">${k}</option>`).join('');
+            const subDomainMenu = document.getElementById('sub-domain');
+            subDomainMenu.innerHTML = Object.keys(domainMap[d]).map(k => `<option value="${k}">${k}</option>`).join('');
             updateSubTypes();
         }
 
         function updateSubTypes() {
             const d = document.getElementById('main-domain').value;
             const s = document.getElementById('sub-domain').value;
-            document.getElementById('sub-type').innerHTML = domainMap[d][s].map(t => `<option value="${t}">${t}</option>`).join('');
+            const typeMenu = document.getElementById('sub-type');
+            typeMenu.innerHTML = domainMap[d][s].map(t => `<option value="${t}">${t}</option>`).join('');
             evaluateLogicFlows();
         }
-
-        // ---------- SPATIAL LOGIC & ROULETTE FELT ----------
 
         function getPocketsForBet(betStr, wheel) {
             if (!betStr) return [];
@@ -394,7 +396,6 @@
                 getPocketsForBet(bet, wheel).forEach(p => allPockets.add(p));
             });
 
-            // Map visual highlight to all parsed inner pockets globally
             allPockets.forEach(p => {
                 const btn = document.querySelector(`.felt-btn[data-val="${p}"]`);
                 if (btn) {
@@ -518,8 +519,6 @@
             window.activeBetTargets.clear();
             document.getElementById('target-selection-label').innerText = "Target Selection";
 
-            const isInside = (domain === 'inside');
-
             const createFeltBtn = (label, bgClass, val, gridClasses = "") => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
@@ -532,11 +531,10 @@
 
             const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
-            // 1. DESKTOP GRID BUILDER
             const desktopGrid = document.createElement('div');
             desktopGrid.className = 'hidden md:grid gap-1 mb-2 w-full';
-            desktopGrid.style.gridTemplateColumns = isInside ? '60px repeat(12, 1fr)' : '60px repeat(12, 1fr) 60px';
-            desktopGrid.style.gridTemplateRows = isInside ? 'repeat(3, 45px)' : 'repeat(5, 45px)';
+            desktopGrid.style.gridTemplateColumns = (domain === 'inside') ? '60px repeat(12, 1fr)' : '60px repeat(12, 1fr) 60px';
+            desktopGrid.style.gridTemplateRows = (domain === 'inside') ? 'repeat(3, 45px)' : 'repeat(5, 45px)';
 
             const zeroDivD = document.createElement('div');
             zeroDivD.className = "flex flex-col gap-1 col-start-1 row-start-1 row-span-3";
@@ -558,7 +556,7 @@
                 desktopGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), `col-start-${col} row-start-${row}`));
             }
 
-            if (!isInside) {
+            if (domain === 'outside') {
                 desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-start-14 row-start-1'));
                 desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-start-14 row-start-2'));
                 desktopGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-start-14 row-start-3'));
@@ -573,7 +571,6 @@
                 desktopGrid.appendChild(createFeltBtn('19-36', 'bg-outside-felt', 'High', 'col-start-12 col-span-2 row-start-5'));
             }
 
-            // 2. MOBILE GRID BUILDER
             const mobileGrid = document.createElement('div');
             mobileGrid.className = 'grid md:hidden gap-1 w-full';
             mobileGrid.style.gridTemplateColumns = 'repeat(6, 1fr)';
@@ -594,7 +591,7 @@
                 mobileGrid.appendChild(createFeltBtn(i.toString(), bg, i.toString(), 'col-span-2'));
             }
 
-            if (!isInside) {
+            if (domain === 'outside') {
                 mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 1', 'col-span-2 mt-1'));
                 mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 2', 'col-span-2 mt-1'));
                 mobileGrid.appendChild(createFeltBtn('2to1', 'bg-outside-felt', 'Column 3', 'col-span-2 mt-1'));
@@ -712,6 +709,7 @@
             document.getElementById('vault-modal').classList.add('hidden'); 
         }
 
+        // --- HARDENED SYNCHRONOUS LOAD ---
         function loadValues(d) {
             if(!d) {
                 document.getElementById('wheel-type').value = "US";
