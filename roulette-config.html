@@ -76,7 +76,6 @@
         label { font-size: 10px; text-transform: uppercase; font-weight: 600; color: #34d399; margin-bottom: 8px; display: block; letter-spacing: 0.1em; }
         .modal-offset { top: 76px; }
 
-        /* THE UNIFIED ROULETTE FELT BOARD */
         .felt-btn {
             cursor: pointer; transition: all 0.15s ease-in-out;
             border: 1px solid rgba(255,255,255,0.05); user-select: none;
@@ -99,7 +98,6 @@
         .bg-green-felt { background-color: #065f46; }
         .bg-outside-felt { background-color: rgba(30, 41, 59, 0.6); }
 
-        /* Custom invisible scrollbar for mobile Racetrack */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -311,7 +309,6 @@
             element.style.display = show ? displayType : 'none';
         }
 
-        // --- SYNCHRONOUS DOM POPULATION ---
         function bootstrapUI() {
             try {
                 document.getElementById('wheel-type').value = "US";
@@ -442,20 +439,20 @@
             let allPockets = new Set();
             
             window.activeBetTargets.forEach(bet => {
-                const exactBtn = document.querySelector(`.felt-btn[data-val="${bet}"]`);
-                if (exactBtn) {
-                    exactBtn.classList.add('felt-selected');
-                    exactBtn.dataset.selected = 'true';
-                }
+                const exactBtn = document.querySelectorAll(`.felt-btn[data-val="${bet}"]`);
+                exactBtn.forEach(b => {
+                    b.classList.add('felt-selected');
+                    b.dataset.selected = 'true';
+                });
                 getPocketsForBet(bet, wheel).forEach(p => allPockets.add(p));
             });
 
             allPockets.forEach(p => {
-                const btn = document.querySelector(`.felt-btn[data-val="${p}"]`);
-                if (btn) {
-                    btn.classList.add('felt-selected');
-                    btn.dataset.selected = 'true';
-                }
+                const btns = document.querySelectorAll(`.felt-btn[data-val="${p}"]`);
+                btns.forEach(b => {
+                    b.classList.add('felt-selected');
+                    b.dataset.selected = 'true';
+                });
             });
 
             const label = document.getElementById('target-selection-label');
@@ -639,11 +636,20 @@
 
             // RACETRACK SECTOR OVERRIDE
             if (domain === 'sectors') {
-                const trackWrapper = document.createElement('div');
-                trackWrapper.className = 'w-full overflow-x-auto pb-4 no-scrollbar';
                 
-                const trackContainer = document.createElement('div');
-                trackContainer.className = 'flex flex-col gap-6 min-w-[700px] md:min-w-[800px] mx-auto mt-2';
+                // DESKTOP HORIZONTAL RACETRACK
+                const dWrapper = document.createElement('div');
+                dWrapper.className = 'hidden md:block w-full overflow-x-auto pb-4 no-scrollbar';
+                
+                const dContainer = document.createElement('div');
+                dContainer.className = 'flex flex-col gap-6 min-w-[800px] mx-auto mt-2';
+
+                const dMacroRow = document.createElement('div');
+                dMacroRow.className = 'grid grid-cols-4 gap-2';
+                ['Zero Game', 'Voisins', 'Orphelins', 'Tier'].forEach(bt => {
+                    dMacroRow.appendChild(createFeltBtn(bt, 'bg-slate-800', bt, 'p-3 min-h-[45px] opacity-60 hover:opacity-100'));
+                });
+                dContainer.appendChild(dMacroRow);
 
                 const seq = wheelSequences[wheel] || wheelSequences['US'];
                 const topLen = 17;
@@ -652,56 +658,101 @@
                 const topArr = seq.slice(topLen+2, topLen+2+topLen);
                 const rightArr = seq.slice(topLen+2+topLen).reverse();
 
-                const trackGrid = document.createElement('div');
-                trackGrid.className = 'grid gap-[2px] w-full';
-                trackGrid.style.gridTemplateColumns = '50px repeat(17, 1fr) 50px';
-                trackGrid.style.gridTemplateRows = '45px 45px 45px';
+                const dGrid = document.createElement('div');
+                dGrid.className = 'grid gap-[2px] w-full';
+                dGrid.style.gridTemplateColumns = '50px repeat(17, 1fr) 50px';
+                dGrid.style.gridTemplateRows = '45px 45px 45px';
 
                 topArr.forEach((numStr, idx) => {
                     const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
                     const btn = createFeltBtn(numStr, bg, numStr, 'rounded-t-xl border-b-0 opacity-70 hover:opacity-100');
                     btn.style.gridColumn = idx + 2; btn.style.gridRow = '1';
-                    trackGrid.appendChild(btn);
+                    dGrid.appendChild(btn);
                 });
 
                 bottomArr.forEach((numStr, idx) => {
                     const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
                     const btn = createFeltBtn(numStr, bg, numStr, 'rounded-b-xl border-t-0 opacity-70 hover:opacity-100');
                     btn.style.gridColumn = idx + 2; btn.style.gridRow = '3';
-                    trackGrid.appendChild(btn);
+                    dGrid.appendChild(btn);
                 });
 
-                const leftCapContainer = document.createElement('div');
-                leftCapContainer.style.gridColumn = '1'; leftCapContainer.style.gridRow = '1 / span 3';
-                leftCapContainer.className = 'flex flex-col gap-[2px] justify-between';
+                const dLeftCap = document.createElement('div');
+                dLeftCap.style.gridColumn = '1'; dLeftCap.style.gridRow = '1 / span 3';
+                dLeftCap.className = 'flex flex-col gap-[2px] justify-between';
                 leftArr.forEach((numStr, idx) => {
                     const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
-                    leftCapContainer.appendChild(createFeltBtn(numStr, bg, numStr, idx===0 ? 'rounded-tl-full h-[50%] opacity-70 hover:opacity-100' : 'rounded-bl-full h-[50%] opacity-70 hover:opacity-100'));
+                    dLeftCap.appendChild(createFeltBtn(numStr, bg, numStr, idx===0 ? 'rounded-tl-full h-[50%] opacity-70 hover:opacity-100' : 'rounded-bl-full h-[50%] opacity-70 hover:opacity-100'));
                 });
-                trackGrid.appendChild(leftCapContainer);
+                dGrid.appendChild(dLeftCap);
 
-                const rightCapContainer = document.createElement('div');
-                rightCapContainer.style.gridColumn = '19'; rightCapContainer.style.gridRow = '1 / span 3';
-                rightCapContainer.className = 'flex flex-col gap-[2px] justify-center h-full';
+                const dRightCap = document.createElement('div');
+                dRightCap.style.gridColumn = '19'; dRightCap.style.gridRow = '1 / span 3';
+                dRightCap.className = 'flex flex-col gap-[2px] justify-center h-full';
                 rightArr.forEach((numStr) => {
                     const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
-                    rightCapContainer.appendChild(createFeltBtn(numStr, bg, numStr, 'rounded-r-full flex-1 opacity-70 hover:opacity-100'));
+                    dRightCap.appendChild(createFeltBtn(numStr, bg, numStr, 'rounded-r-full flex-1 opacity-70 hover:opacity-100'));
                 });
-                trackGrid.appendChild(rightCapContainer);
+                dGrid.appendChild(dRightCap);
 
-                const macroContainer = document.createElement('div');
-                macroContainer.style.gridColumn = '2 / span 17'; macroContainer.style.gridRow = '2';
-                macroContainer.className = 'flex gap-[2px] h-full items-center';
-                const mBtns = [
-                    {l: 'Tiers', v: 'Tier', w: 'flex-[5]'}, {l: 'Orphelins', v: 'Orphelins', w: 'flex-[3]'},
-                    {l: 'Voisins', v: 'Voisins', w: 'flex-[7]'}, {l: 'Zero', v: 'Zero Game', w: 'flex-[2]'}
-                ];
-                mBtns.forEach(m => macroContainer.appendChild(createFeltBtn(m.l, 'bg-outside-felt', m.v, `${m.w} h-full rounded-sm opacity-80 hover:opacity-100`)));
-                trackGrid.appendChild(macroContainer);
+                dContainer.appendChild(dGrid);
+                dWrapper.appendChild(dContainer);
+                container.appendChild(dWrapper);
 
-                trackContainer.appendChild(trackGrid);
-                trackWrapper.appendChild(trackContainer);
-                container.appendChild(trackWrapper);
+                // MOBILE VERTICAL RACETRACK
+                const mContainer = document.createElement('div');
+                mContainer.className = 'flex md:hidden w-full justify-center mt-2 pb-6';
+
+                const mGrid = document.createElement('div');
+                mGrid.className = 'grid gap-[2px] w-full max-w-[320px]';
+                mGrid.style.gridTemplateColumns = '45px 1fr 45px';
+                mGrid.style.gridTemplateRows = '45px repeat(17, 40px) 45px';
+
+                const topCount = wheel === 'TZ' ? 3 : (wheel === 'US' ? 2 : 1);
+                const mTopArr = seq.slice(0, topCount);
+                const mRightArr = seq.slice(topCount, topCount + 17);
+                const mBottomArr = seq.slice(topCount + 17, topCount + 19).reverse();
+                const mLeftArr = seq.slice(topCount + 19).reverse();
+
+                const mTopCap = document.createElement('div');
+                mTopCap.className = 'col-span-3 row-start-1 flex justify-center gap-[2px]';
+                mTopArr.forEach(numStr => {
+                    const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
+                    mTopCap.appendChild(createFeltBtn(numStr, bg, numStr, 'rounded-t-full border-b-0 flex-1 opacity-70 hover:opacity-100'));
+                });
+                mGrid.appendChild(mTopCap);
+
+                mRightArr.forEach((numStr, idx) => {
+                    const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
+                    const btn = createFeltBtn(numStr, bg, numStr, 'opacity-70 hover:opacity-100 rounded-none border-l-0');
+                    btn.style.gridColumn = '3'; btn.style.gridRow = `${idx + 2}`;
+                    mGrid.appendChild(btn);
+                });
+
+                const mBottomCap = document.createElement('div');
+                mBottomCap.className = 'col-span-3 row-start-19 flex justify-center gap-[2px]';
+                mBottomArr.forEach(numStr => {
+                    const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
+                    mBottomCap.appendChild(createFeltBtn(numStr, bg, numStr, 'rounded-b-full border-t-0 flex-1 opacity-70 hover:opacity-100'));
+                });
+                mGrid.appendChild(mBottomCap);
+
+                mLeftArr.forEach((numStr, idx) => {
+                    const bg = (numStr==='0'||numStr==='00'||numStr==='000') ? 'bg-green-felt' : (redNums.includes(parseInt(numStr)) ? 'bg-red-felt' : 'bg-black-felt');
+                    const btn = createFeltBtn(numStr, bg, numStr, 'opacity-70 hover:opacity-100 rounded-none border-r-0');
+                    btn.style.gridColumn = '1'; btn.style.gridRow = `${idx + 2}`;
+                    mGrid.appendChild(btn);
+                });
+
+                const mCenter = document.createElement('div');
+                mCenter.className = 'col-start-2 row-start-2 row-span-17 flex flex-col gap-2 p-3 justify-center';
+                ['Zero Game', 'Voisins', 'Orphelins', 'Tier'].forEach(bt => {
+                    mCenter.appendChild(createFeltBtn(bt, 'bg-slate-800', bt, 'p-2 min-h-[50px] opacity-60 hover:opacity-100 rounded-md w-full'));
+                });
+                mGrid.appendChild(mCenter);
+
+                mContainer.appendChild(mGrid);
+                container.appendChild(mContainer);
                 return;
             }
 
@@ -843,7 +894,7 @@
             if (category === "Straight Up" && type === "Dynamic") {
                 showDynInput = true;
                 targetLabel.innerText = "Number of Pockets";
-            } else if (strategy === "fixed" || (category === "Straight Up" && type === "Fixed") || document.getElementById('main-domain').value === 'sectors') {
+            } else if (strategy === "fixed" || (category === "Straight Up" && type === "Fixed") || document.getElementById('main-domain').value === "sectors") {
                 showFelt = true;
                 targetLabel.innerText = "Target Selection";
                 renderFeltLayout(category, type, wheel);
@@ -922,11 +973,12 @@
             updateWheelSubtypes();
             document.getElementById('wheel-subtype').value = d.wheelSub || "Standard";
             
-            document.getElementById('strategy').value = d.strategy || "fixed";
             document.getElementById('main-domain').value = d.domain || "inside";
             updateSubDomains();
             document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
             updateSubTypes();
+
+            document.getElementById('strategy').value = d.strategy || "fixed";
             
             if (d.subCategory === "Neighbors" || (d.subCategory === "Straight Up" && d.protocol === "Dynamic")) {
                 document.getElementById('dynamic-type-input').value = d.dynamicValue || d.nSize || 1;
