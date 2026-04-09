@@ -646,7 +646,8 @@
         function renderFeltLayout(category, type, wheel) {
             const container = document.getElementById('felt-board-container');
             const domain = document.getElementById('main-domain').value;
-            const newSignature = `${domain}-${category}-${type}-${wheel}`;
+            const strategy = document.getElementById('strategy').value;
+            const newSignature = `${domain}-${category}-${type}-${wheel}-${strategy}`;
             
             if(container.dataset.signature === newSignature) return; 
             container.dataset.signature = newSignature;
@@ -926,7 +927,7 @@
             if (category === "Straight Up" && type === "Dynamic") {
                 showDynInput = true;
                 targetLabel.innerText = "Number of Pockets";
-            } else if (strategy === "fixed" || (category === "Straight Up" && type === "Fixed") || document.getElementById('main-domain').value === "sectors") {
+            } else if (strategy === "fixed") {
                 showFelt = true;
                 targetLabel.innerText = "Target Selection";
                 renderFeltLayout(category, type, wheel);
@@ -1022,7 +1023,7 @@
 
             evaluateLogicFlows(); 
 
-            if((d.strategy === "fixed" || d.protocol === "Fixed" || d.domain === "sectors") && d.targets) {
+            if(d.strategy === "fixed" && d.targets) {
                 window.activeBetTargets = new Set(d.targets);
                 updateSelectionUI();
             }
@@ -1077,6 +1078,7 @@
                 const existingRolls = (activeDoc.exists && activeDoc.data().rolls) ? activeDoc.data().rolls : [];
 
                 const config = {
+                    uid: user.uid,
                     wheel: document.getElementById('wheel-type').value,
                     wheelSub: document.getElementById('wheel-subtype').value,
                     strategy: document.getElementById('strategy').value,
@@ -1085,7 +1087,7 @@
                     protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
                     dynamicValue: ['Neighbors', 'Radar'].includes(cat) ? document.getElementById('dynamic-type-input').value : null,
                     numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
-                    targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") ? targetArray : null,
+                    targets: (document.getElementById('strategy').value === "fixed") ? targetArray : [],
                     warmup: document.getElementById('warmup-n').value,
                     cdTrigger: document.getElementById('cd-trigger-n').value,
                     cdLength: document.getElementById('cd-length-n').value,
@@ -1105,7 +1107,7 @@
                     rolls: existingRolls
                 };
                 
-                await activeDocRef.set(config);
+                await activeDocRef.set(config, { merge: true });
                 window.location.href = "roulette.html";
 
             } catch (error) {
