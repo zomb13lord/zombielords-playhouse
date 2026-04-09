@@ -26,19 +26,38 @@
         .cinzel { font-family: 'Cinzel', serif; }
         .emerald-text { color: var(--emerald); text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
 
-        /* NUMPAD - FIXED DIMENSIONS */
+        /* NUMPAD - INTERACTIVE UPGRADE */
         .numpad-btn { 
-            transition: all 0.1s ease; cursor: pointer; display: flex; 
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+            cursor: pointer; display: flex; 
             align-items: center; justify-content: center; user-select: none; 
             font-weight: 900; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1);
             width: 100%; height: 50px; font-size: 1.1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
         }
         
+        /* Desktop specific sizing - Expanded real estate */
         @media (min-width: 768px) {
-            .numpad-btn { width: 64px; height: 50px; }
+            .numpad-btn { width: 85px; height: 70px; font-size: 1.4rem; }
         }
 
-        .numpad-btn:active { transform: scale(0.92); filter: brightness(1.4); }
+        .numpad-btn:hover { 
+            transform: translateY(-3px) scale(1.05); 
+            z-index: 10;
+            filter: brightness(1.2);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Click highlight effect */
+        .selection-pulse {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 25px var(--gold) !important;
+            transform: scale(0.95) !important;
+        }
+
         .btn-red { background-color: #ef4444; color: white; }
         .btn-black { background-color: #000000; color: white; }
         .btn-green { background-color: #10b981; color: white; }
@@ -50,7 +69,7 @@
             border-radius: 50%; font-weight: 900; font-size: 0.9rem;
             border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
-        @media (min-width: 768px) { .chip { width: 44px; height: 44px; font-size: 1.1rem; } }
+        @media (min-width: 768px) { .chip { width: 48px; height: 48px; font-size: 1.2rem; } }
 
         .chip-red { background-color: #ef4444; }
         .chip-black { background-color: #1e293b; border-color: #475569; }
@@ -79,12 +98,12 @@
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center gap-4 p-4 w-full overflow-y-auto no-scrollbar pb-24">
+    <main class="flex-grow flex flex-col items-center gap-6 p-4 w-full overflow-y-auto no-scrollbar pb-24">
         
-        <div class="w-full max-w-4xl flex flex-col gap-4 items-center">
+        <div class="w-full max-w-[1200px] flex flex-col gap-6 items-center mt-4">
             
             <div class="shard p-4 md:p-6 w-full">
-                <div class="flex justify-between items-center mb-4 border-b border-emerald-900/30 pb-3">
+                <div class="flex justify-between items-center mb-6 border-b border-emerald-900/30 pb-3">
                     <div class="flex items-center gap-4">
                         <h3 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest cinzel">History</h3>
                         <span id="hud-count" class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black">0 ROLLS</span>
@@ -101,12 +120,12 @@
                     </div>
                 </div>
 
-                <div id="history-chips" class="flex flex-row justify-center items-end gap-2 md:gap-6 min-h-[60px]">
+                <div id="history-chips" class="flex flex-row justify-center items-end gap-3 md:gap-10 min-h-[60px]">
                     <span class="text-[10px] text-slate-700 uppercase font-bold tracking-[0.2em] italic">Awaiting Input...</span>
                 </div>
             </div>
 
-            <div id="numpad-container" class="flex justify-center w-full py-4"></div>
+            <div id="numpad-container" class="flex justify-center w-full py-4 transition-all duration-500"></div>
         </div>
     </main>
 
@@ -161,29 +180,40 @@
             if (isMobile) {
                 html += `<div style="width: 220px;">`; 
                 html += `<div class="grid grid-cols-${zeroes.length} gap-1 mb-1">`;
-                zeroes.forEach(z => { html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green">${z}</button>`; });
+                zeroes.forEach(z => { html += `<button onclick="processInput(this, '${z}')" class="numpad-btn btn-green">${z}</button>`; });
                 html += `</div><div class="grid grid-cols-3 gap-1">`;
-                for(let i=1; i<=36; i++) { html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${getNumColorClass(i.toString())}">${i}</button>`; }
+                for(let i=1; i<=36; i++) { html += `<button onclick="processInput(this, '${i}')" class="numpad-btn ${getNumColorClass(i.toString())}">${i}</button>`; }
                 html += `</div></div>`;
             } else {
-                html = `<div class="flex gap-1 items-start">`;
-                html += `<div class="flex flex-col gap-1">`;
+                html = `<div class="flex gap-1.5 items-start">`;
+                html += `<div class="flex flex-col gap-1.5">`;
                 zeroes.forEach(z => {
-                    const h = zeroes.length === 1 ? '152px' : (zeroes.length === 2 ? '74px' : '48px');
-                    html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green" style="height: ${h};">${z}</button>`;
+                    const h = zeroes.length === 1 ? '213px' : (zeroes.length === 2 ? '105px' : '68px');
+                    html += `<button onclick="processInput(this, '${z}')" class="numpad-btn btn-green" style="height: ${h};">${z}</button>`;
                 });
                 html += `</div>`;
                 for(let col = 0; col < 12; col++) {
-                    html += `<div class="flex flex-col gap-1">`;
+                    html += `<div class="flex flex-col gap-1.5">`;
                     for(let row = 0; row < 3; row++) {
                         const val = feltLayout[row][col];
-                        html += `<button onclick="inputRoll('${val}')" class="numpad-btn ${getNumColorClass(val.toString())}">${val}</button>`;
+                        html += `<button onclick="processInput(this, '${val}')" class="numpad-btn ${getNumColorClass(val.toString())}">${val}</button>`;
                     }
                     html += `</div>`;
                 }
                 html += `</div>`;
             }
             container.innerHTML = html;
+        }
+
+        async function processInput(btn, n) {
+            // Visual Highlight
+            btn.classList.add('selection-pulse');
+            setTimeout(() => btn.classList.remove('selection-pulse'), 400);
+
+            // Logic
+            sessionData.rolls.unshift({ n: n.toString(), t: Date.now() });
+            renderHistory();
+            await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ rolls: sessionData.rolls });
         }
 
         function renderHistory() {
@@ -201,12 +231,6 @@
                     <span class="chip-label">#${rollIndex}</span>
                 </div>`}).join('');
             document.getElementById('hud-count').innerText = `${rolls.length} ROLLS`;
-        }
-
-        async function inputRoll(n) {
-            sessionData.rolls.unshift({ n: n.toString(), t: Date.now() });
-            renderHistory();
-            await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ rolls: sessionData.rolls });
         }
 
         async function undoRoll() {
