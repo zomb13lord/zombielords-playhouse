@@ -1053,74 +1053,90 @@
             evaluateLogicFlows(); 
         }
 
-        async function commitAndLaunch() {
-            try {
-                const btn = document.getElementById('btn-start-session');
-                if(btn) {
-                    btn.innerText = "INITIALIZING...";
-                    btn.classList.add("opacity-50", "pointer-events-none");
-                }
-
-                const user = auth.currentUser;
-                if (!user) {
-                    alert("Authentication Error: Your session may have expired. Please log in again.");
-                    window.location.href = "index.html";
-                    return;
-                }
-
-                const activeDocRef = db.collection("users").doc(user.uid).collection("sessions").doc("active_session");
-                const activeDoc = await activeDocRef.get();
-                
-                const cat = document.getElementById('sub-domain').value;
-                const isDynamic = (cat === "Neighbors" || cat === "Radar" || 
-                                  (cat === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
-
-                const targetArray = Array.from(window.activeBetTargets);
-                const existingRolls = (activeDoc.exists && activeDoc.data().rolls) ? activeDoc.data().rolls : [];
-
-                const config = {
-                    wheel: document.getElementById('wheel-type').value,
-                    wheelSub: document.getElementById('wheel-subtype').value,
-                    strategy: document.getElementById('strategy').value,
-                    domain: document.getElementById('main-domain').value,
-                    subCategory: cat,
-                    protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
-                    dynamicValue: ['Neighbors', 'Radar'].includes(cat) ? Number(document.getElementById('dynamic-type-input').value) : null,
-                    numPockets: document.getElementById('sub-type').value === "Dynamic" ? Number(document.getElementById('target-dynamic-input').value) : null,
-                    targets: (document.getElementById('strategy').value === "fixed") ? targetArray : [],
-                    warmup: Number(document.getElementById('warmup-n').value),
-                    cdTrigger: Number(document.getElementById('cd-trigger-n').value),
-                    cdLength: Number(document.getElementById('cd-length-n').value),
-                    stabilization: Number(document.getElementById('stabilization-n').value),
-                    lookback: document.getElementById('lookback-w').value,
-                    betPrompt: document.getElementById('bet-prompt').value,
-                    hedgeCmd: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-commander').value : null,
-                    hedgeProg: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-progression').value : null,
-                    unit: Number(document.getElementById('base-unit').value),
-                    negProg: document.getElementById('neg-progression').value,
-                    posProg: document.getElementById('pos-progression').value,
-                    pMulti: Number(document.getElementById('prog-multi').value),
-                    pPlus: Number(document.getElementById('prog-plus').value),
-                    pInc: Number(document.getElementById('prog-inc').value),
-                    pDec: Number(document.getElementById('prog-dec').value),
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    rolls: existingRolls
-                };
-                
-                await activeDocRef.set(config, { merge: true });
-                window.location.href = "roulette.html";
-
-            } catch (error) {
-                console.error("Initialization Error:", error);
-                alert("Failed to initialize session: " + error.message);
-                
-                const btn = document.getElementById('btn-start-session');
-                if(btn) {
-                    btn.innerText = "START SESSION";
-                    btn.classList.remove("opacity-50", "pointer-events-none");
-                }
-            }
+async function commitAndLaunch() {
+    try {
+        const btn = document.getElementById('btn-start-session');
+        if(btn) {
+            btn.innerText = "INITIALIZING...";
+            btn.classList.add("opacity-50", "pointer-events-none");
         }
+
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Authentication Error: Your session may have expired. Please log in again.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        const activeDocRef = db.collection("users").doc(user.uid).collection("sessions").doc("active_session");
+        const activeDoc = await activeDocRef.get();
+        
+        const cat = document.getElementById('sub-domain').value;
+        const isDynamic = (cat === "Neighbors" || cat === "Radar" || 
+                          (cat === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
+
+        const targetArray = Array.from(window.activeBetTargets);
+        const existingRolls = (activeDoc.exists && activeDoc.data().rolls) ? activeDoc.data().rolls : [];
+
+        // Base config with strict typing to satisfy Firestore Rules
+        let config = {
+            uid: user.uid,
+            wheel: document.getElementById('wheel-type').value || "US",
+            wheelSub: document.getElementById('wheel-subtype').value || "Standard",
+            strategy: document.getElementById('strategy').value || "fixed",
+            domain: document.getElementById('main-domain').value || "inside",
+            subCategory: cat || "Straight Up",
+            protocol: isDynamic ? (document.getElementById('type-label').innerText || "Type") : (document.getElementById('sub-type').value || "Fixed"),
+            warmup: Number(document.getElementById('warmup-n').value) || 0,
+            cdTrigger: Number(document.getElementById('cd-trigger-n').value) || 0,
+            cdLength: Number(document.getElementById('cd-length-n').value) || 0,
+            stabilization: Number(document.getElementById('stabilization-n').value) || 0,
+            lookback: document.getElementById('lookback-w').value || "standard",
+            betPrompt: document.getElementById('bet-prompt').value || "avoid",
+            unit: Number(document.getElementById('base-unit').value) || 1,
+            negProg: document.getElementById('neg-progression').value || "flat",
+            posProg: document.getElementById('pos-progression').value || "flat",
+            pMulti: Number(document.getElementById('prog-multi').value) || 0,
+            pPlus: Number(document.getElementById('prog-plus').value) || 0,
+            pInc: Number(document.getElementById('prog-inc').value) || 0,
+            pDec: Number(document.getElementById('prog-dec').value) || 0,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            rolls: existingRolls
+        };
+
+        // Conditionally inject variables to avoid triggering 'null' rejections in Firestore
+        if (['Neighbors', 'Radar'].includes(cat)) {
+            config.dynamicValue = Number(document.getElementById('dynamic-type-input').value) || 1;
+        }
+        if (document.getElementById('sub-type').value === "Dynamic") {
+            config.numPockets = Number(document.getElementById('target-dynamic-input').value) || 1;
+        }
+        if (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") {
+            config.targets = targetArray;
+        }
+        if (document.getElementById('sub-type').value === "Top Line") {
+            config.hedgeCmd = document.getElementById('hedge-commander').value;
+            config.hedgeProg = document.getElementById('hedge-progression').value;
+        }
+        
+        // Execute a non-destructive merge
+        await activeDocRef.set(config, { merge: true });
+        window.location.href = "roulette.html";
+
+    } catch (error) {
+        console.error("Initialization Error:", error);
+        
+        // Alert gives us explicit insight if the rules reject it again
+        alert("Database Error: " + error.message);
+        
+        const btn = document.getElementById('btn-start-session');
+        if(btn) {
+            btn.innerText = "START SESSION";
+            btn.classList.remove("opacity-50", "pointer-events-none");
+        }
+    }
+}
+                
     </script>
 </body>
 </html>
