@@ -48,7 +48,7 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        .shard-btn:not(.disabled):hover { 
+        .shard-btn:hover { 
             border-color: #10b981; 
             background: rgba(16, 185, 129, 0.1);
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
@@ -192,13 +192,15 @@
                             <option value="fixed">Fixed</option>
                             <option value="cold">Cold</option>
                             <option value="hot">Hot</option>
-                            <option value="radar">Radar</option>
                         </select>
                     </div>
                 </div>
 
                 <div id="target-selection-box" style="display: none;" class="mt-8 bg-emerald-950/20 p-4 md:p-6 border border-emerald-900/30 rounded overflow-hidden">
-                    <label id="target-selection-label" class="mb-4">Target Selection</label>
+                    <div class="flex justify-between items-center mb-4">
+                        <label id="target-selection-label" style="margin-bottom: 0;">Target Selection</label>
+                        <button type="button" onclick="clearTargetSelection()" class="text-[9px] border border-red-500/40 text-red-400 px-3 py-1 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-bold tracking-widest rounded">Clear All</button>
+                    </div>
                     <input type="number" id="target-dynamic-input" style="display: none;" class="config-input mb-4" placeholder="Number of Pockets">
                     <div id="felt-board-container" class="w-full relative"></div>
                 </div>
@@ -294,7 +296,8 @@
             sectors: { 
                 "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], 
                 "Neighbors": ["Size (S)"], 
-                "Heat Map": ["Dynamic"] 
+                "Heat Map": ["Dynamic"],
+                "Radar": ["Size"]
             } 
         };
 
@@ -309,7 +312,6 @@
             element.style.display = show ? displayType : 'none';
         }
 
-        // --- SYNCHRONOUS DOM POPULATION ---
         function bootstrapUI() {
             try {
                 document.getElementById('wheel-type').value = "US";
@@ -387,6 +389,11 @@
             evaluateLogicFlows();
         }
 
+        function clearTargetSelection() {
+            window.activeBetTargets.clear();
+            updateSelectionUI();
+        }
+
         // ---------- SPATIAL LOGIC & ROULETTE FELT ----------
 
         function getPocketsForBet(betStr, wheel) {
@@ -396,6 +403,23 @@
             if (betStr === 'Voisins') return ['22','18','29','7','28','12','35','3','26','0','32','15','19','4','21','2','25'];
             if (betStr === 'Orphelins') return ['1','20','14','31','9','17','34','6'];
             if (betStr === 'Tier') return ['27','13','36','11','30','8','23','10','5','24','16','33'];
+
+            if (betStr.startsWith('Neighbors') || betStr.startsWith('Radar')) {
+                const parts = betStr.split(' ')[1].split('-');
+                const center = parts[0];
+                const size = parseInt(parts[1]);
+                const seq = wheelSequences[wheel] || wheelSequences['US'];
+                const idx = seq.indexOf(center);
+                if (idx === -1) return [];
+                const len = seq.length;
+                let res = [];
+                for(let i = -size; i <= size; i++) {
+                    let targetIdx = (idx + i) % len;
+                    if (targetIdx < 0) targetIdx += len;
+                    res.push(seq[targetIdx]);
+                }
+                return res;
+            }
 
             if (betStr.includes('-')) {
                 let parts = betStr.split(' ')[1] || betStr;
@@ -472,6 +496,13 @@
             let finalBetStr = val; 
 
             if (domain === 'sectors') {
+                if (category === "Neighbors" || category === "Radar") {
+                    if (!['Zero Game', 'Voisins', 'Orphelins', 'Tier'].includes(val)) {
+                        const size = document.getElementById('dynamic-type-input').value || 1;
+                        finalBetStr = `${category} ${val}-${size}`;
+                    }
+                }
+                
                 if (window.activeBetTargets.has(finalBetStr)) window.activeBetTargets.delete(finalBetStr);
                 else window.activeBetTargets.add(finalBetStr);
                 updateSelectionUI();
@@ -883,10 +914,10 @@
             
             typeLabel.innerText = "Type";
 
-            if (category === "Neighbors") {
+            if (category === "Neighbors" || category === "Radar") {
                 toggleVisibility(typeSelect, false);
                 toggleVisibility(dynBox, true);
-                typeLabel.innerText = "Neighbor Size (S)";
+                typeLabel.innerText = category === "Neighbors" ? "Neighbor Size (S)" : "Radar Size";
             } 
 
             let showFelt = false;
@@ -981,7 +1012,7 @@
 
             document.getElementById('strategy').value = d.strategy || "fixed";
             
-            if (d.subCategory === "Neighbors" || (d.subCategory === "Straight Up" && d.protocol === "Dynamic")) {
+            if (['Neighbors', 'Radar'].includes(d.subCategory) || (d.subCategory === "Straight Up" && d.protocol === "Dynamic")) {
                 document.getElementById('dynamic-type-input').value = d.dynamicValue || d.nSize || 1;
                 document.getElementById('target-dynamic-input').value = d.numPockets || 1;
                 document.getElementById('sub-type').value = d.protocol || "Dynamic";
@@ -1038,12 +1069,11 @@
                 const activeDocRef = db.collection("users").doc(user.uid).collection("sessions").doc("active_session");
                 const activeDoc = await activeDocRef.get();
                 
-                const isDynamic = (document.getElementById('sub-domain').value === "Neighbors" || 
-                                  (document.getElementById('sub-domain').value === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
+                const cat = document.getElementById('sub-domain').value;
+                const isDynamic = (cat === "Neighbors" || cat === "Radar" || 
+                                  (cat === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
 
                 const targetArray = Array.from(window.activeBetTargets);
-
-                // Safely grab rolls array to prevent undefined injection crash
                 const existingRolls = (activeDoc.exists && activeDoc.data().rolls) ? activeDoc.data().rolls : [];
 
                 const config = {
@@ -1051,9 +1081,9 @@
                     wheelSub: document.getElementById('wheel-subtype').value,
                     strategy: document.getElementById('strategy').value,
                     domain: document.getElementById('main-domain').value,
-                    subCategory: document.getElementById('sub-domain').value,
+                    subCategory: cat,
                     protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
-                    dynamicValue: document.getElementById('sub-domain').value === "Neighbors" ? document.getElementById('dynamic-type-input').value : null,
+                    dynamicValue: ['Neighbors', 'Radar'].includes(cat) ? document.getElementById('dynamic-type-input').value : null,
                     numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
                     targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") ? targetArray : null,
                     warmup: document.getElementById('warmup-n').value,
