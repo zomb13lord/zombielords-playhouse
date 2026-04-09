@@ -29,30 +29,36 @@
             transition: all 0.1s ease; cursor: pointer; display: flex; 
             align-items: center; justify-content: center; user-select: none; 
             font-weight: 900; border-radius: 4px; 
-            aspect-ratio: 1.4 / 1; font-size: 1.4rem;
+            aspect-ratio: 1.4 / 1; font-size: 1.2rem;
             border: 1px solid rgba(255,255,255,0.1);
         }
+        
+        /* Specific height fix for Zero buttons to prevent giant box syndrome */
+        .zero-btn { aspect-ratio: auto !important; height: 60px !important; }
+        @media (min-width: 768px) { .zero-btn { height: 100% !important; min-height: 50px; } }
+
         .numpad-btn:active { transform: scale(0.92); filter: brightness(1.4); }
-
-        .btn-red { background-color: #ef4444; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .btn-red { background-color: #ef4444; color: white; }
         .btn-black { background-color: #000000; color: white; }
-        .btn-green { background-color: #10b981; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .btn-green { background-color: #10b981; color: white; }
 
-        /* DATA CHIPS - ULTRA LEGIBILITY */
-        .chip-stack { display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.3s ease; }
+        /* DATA CHIPS - SCALED FOR PORTRAIT FIT */
+        .chip-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; transition: all 0.3s ease; }
         .chip { 
-            width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; 
-            border-radius: 50%; font-weight: 900; font-size: 1.2rem;
-            border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; font-weight: 900; font-size: 0.9rem;
+            border: 2px solid rgba(255,255,255,0.2); box-shadow: 0 3px 8px rgba(0,0,0,0.5);
         }
-        .chip-red { background-color: #ef4444; color: white; }
-        .chip-black { background-color: #1e293b; color: white; border-color: #475569; }
-        .chip-green { background-color: #10b981; color: white; }
+        @media (min-width: 768px) { .chip { width: 44px; height: 44px; font-size: 1.1rem; } }
+
+        .chip-red { background-color: #ef4444; }
+        .chip-black { background-color: #1e293b; border-color: #475569; }
+        .chip-green { background-color: #10b981; }
         
-        .chip-label { font-size: 9px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+        .chip-label { font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; }
         
-        .latest-chip-stack { transform: scale(1.15); z-index: 10; }
-        .latest-chip { border: 3px solid var(--gold) !important; box-shadow: 0 0 20px rgba(197, 160, 89, 0.4); }
+        .latest-chip-stack { transform: scale(1.1); z-index: 10; }
+        .latest-chip { border: 3px solid var(--gold) !important; box-shadow: 0 0 15px rgba(197, 160, 89, 0.4); }
         .latest-chip-stack .chip-label { color: var(--gold); }
 
         .config-select { background: #0f172a; border: 1px solid #334155; color: white; font-size: 11px; padding: 4px 10px; border-radius: 4px; outline: none; }
@@ -73,47 +79,48 @@
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center gap-6 p-4 w-full overflow-y-auto no-scrollbar pb-24">
+    <main class="flex-grow flex flex-col items-center gap-4 p-4 w-full overflow-y-auto no-scrollbar pb-24">
         
-        <div class="w-full max-w-xl flex flex-col gap-6">
-            <div class="shard p-6">
-                <div class="flex justify-between items-center mb-6 border-b border-emerald-900/30 pb-3">
+        <div class="w-full max-w-4xl flex flex-col gap-4">
+            <div class="shard p-4 md:p-6">
+                <div class="flex justify-between items-center mb-4 border-b border-emerald-900/30 pb-3">
                     <div class="flex items-center gap-4">
-                        <h3 class="text-[11px] font-black text-emerald-500 uppercase tracking-widest">Live Data Stream</h3>
+                        <h3 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Live Data Stream</h3>
                         <span id="hud-count" class="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-0.5 rounded font-black">0 ROLLS</span>
                     </div>
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 md:gap-4">
                         <select id="view-limit" class="config-select" onchange="renderHistory()">
-                            <option value="6">6 Chips</option>
-                            <option value="9" selected>9 Chips</option>
+                            <option value="5">5 Chips</option>
+                            <option value="7">7 Chips</option>
+                            <option value="9">9 Chips</option>
                             <option value="12">12 Chips</option>
                         </select>
-                        <button onclick="undoRoll()" class="text-slate-400 hover:text-white transition-all"><i class="fa-solid fa-rotate-left"></i></button>
-                        <button onclick="resetRolls()" class="text-red-500/70 hover:text-red-400 transition-all font-bold text-xs">RESET</button>
+                        <button onclick="undoRoll()" class="text-slate-400 hover:text-white transition-all p-1"><i class="fa-solid fa-rotate-left"></i></button>
+                        <button onclick="resetRolls()" class="text-red-500/70 hover:text-red-400 transition-all font-bold text-[10px]">RESET</button>
                     </div>
                 </div>
 
-                <div id="history-chips" class="flex flex-row justify-center items-end gap-5 md:gap-8 min-h-[80px]">
-                    <span class="text-xs text-slate-700 uppercase font-bold tracking-[0.2em] italic">Awaiting Input...</span>
+                <div id="history-chips" class="flex flex-row justify-center items-end gap-2 md:gap-6 min-h-[60px]">
+                    <span class="text-[10px] text-slate-700 uppercase font-bold tracking-[0.2em] italic">Awaiting Input...</span>
                 </div>
             </div>
 
-            <div id="numpad-container" class="w-full max-w-[380px] mx-auto flex flex-col gap-2">
+            <div id="numpad-container" class="w-full mx-auto">
                 </div>
         </div>
 
     </main>
 
     <div id="archive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md hidden">
-        <div class="max-w-sm w-full p-8 shard text-center border border-emerald-500/50 shadow-2xl">
-            <h2 class="cinzel text-2xl text-emerald-400 mb-4 uppercase font-black tracking-widest">Commit Archive</h2>
-            <input type="text" id="archive-name" placeholder="SESSION NAME" class="w-full bg-slate-950 border border-emerald-900/50 rounded p-4 mb-6 uppercase text-white text-center font-bold outline-none focus:border-emerald-400 transition-all">
+        <div class="max-w-sm w-full p-8 shard text-center border border-emerald-500/50">
+            <h2 class="cinzel text-2xl text-emerald-400 mb-4 uppercase font-black">Commit Archive</h2>
+            <input type="text" id="archive-name" placeholder="SESSION NAME" class="w-full bg-slate-950 border border-emerald-900/50 rounded p-4 mb-6 uppercase text-white text-center font-bold outline-none">
             <button onclick="confirmArchive()" class="w-full p-4 bg-emerald-900/40 border border-emerald-500 text-emerald-400 uppercase font-black tracking-widest rounded hover:bg-emerald-500 hover:text-slate-900 transition-all">Save to Vault</button>
-            <button onclick="document.getElementById('archive-modal').classList.add('hidden')" class="mt-4 text-[10px] text-slate-500 uppercase font-bold tracking-widest">Cancel</button>
+            <button onclick="document.getElementById('archive-modal').classList.add('hidden')" class="mt-4 text-[10px] text-slate-500 uppercase font-bold">Cancel</button>
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest opacity-0 transition-opacity pointer-events-none z-[200]">Data Synced</div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-8 py-3 rounded-full text-xs font-black uppercase tracking-widest opacity-0 transition-opacity pointer-events-none z-[200]">Synced</div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
@@ -128,31 +135,63 @@
             const doc = await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").get();
             if(doc.exists) {
                 sessionData = doc.data(); if(!sessionData.rolls) sessionData.rolls = [];
+                
+                // Set default view limits based on device
+                const isMobile = window.innerWidth < 768;
+                document.getElementById('view-limit').value = isMobile ? "7" : "12";
+                
                 document.getElementById('btn-save-archive').innerText = sessionData.name ? "SAVE" : "ARCHIVE";
                 renderNumpad(); renderHistory();
             } else window.location.assign('roulette-config.html');
         }
+
+        const feltLayout = [
+            [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], 
+            [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], 
+            [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]  
+        ];
 
         function getNumColorClass(n) {
             if(n === '0' || n === '00' || n === '000') return 'btn-green';
             return redNums.includes(parseInt(n)) ? 'btn-red' : 'btn-black';
         }
 
-        function getChipColor(n) {
-            if(n === '0' || n === '00' || n === '000') return 'chip-green';
-            return redNums.includes(parseInt(n)) ? 'chip-red' : 'chip-black';
-        }
-
         function renderNumpad() {
             const container = document.getElementById('numpad-container');
             const wheel = sessionData.wheel || "US";
             const zeroes = wheel === 'TZ' ? ['000','00','0'] : (wheel === 'US' ? ['00','0'] : ['0']);
+            const isMobile = window.innerWidth < 768;
             
-            let html = `<div class="grid grid-cols-${zeroes.length} gap-2 mb-2">`;
-            zeroes.forEach(z => { html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green">${z}</button>`; });
-            html += `</div><div class="grid grid-cols-3 gap-2">`;
-            for(let i=1; i<=36; i++) { html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${getNumColorClass(i.toString())}">${i}</button>`; }
-            html += `</div>`;
+            let html = '';
+
+            if (isMobile) {
+                // PORTRAIT: 0s on top, then 3x12 grid
+                html += `<div class="grid grid-cols-${zeroes.length} gap-2 mb-2">`;
+                zeroes.forEach(z => { html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green zero-btn">${z}</button>`; });
+                html += `</div><div class="grid grid-cols-3 gap-2">`;
+                for(let i=1; i<=36; i++) { html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${getNumColorClass(i.toString())}">${i}</button>`; }
+                html += `</div>`;
+            } else {
+                // LANDSCAPE: 13 Columns total (Zero column + 12 Number columns)
+                html = `<div class="grid grid-cols-13 gap-1.5 h-[300px]">`;
+                
+                // Zero Column (Left side)
+                html += `<div class="grid grid-rows-3 gap-1.5">`;
+                zeroes.forEach(z => html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green zero-btn text-xl">${z}</button>`);
+                for(let i=0; i < (3 - zeroes.length); i++) html += `<div class="opacity-0"></div>`; // Fill column
+                html += `</div>`;
+
+                // Numbers columns
+                for(let col = 0; col < 12; col++) {
+                    html += `<div class="grid grid-rows-3 gap-1.5">`;
+                    for(let row = 0; row < 3; row++) {
+                        const val = feltLayout[row][col];
+                        html += `<button onclick="inputRoll('${val}')" class="numpad-btn ${getNumColorClass(val.toString())} text-xl h-full">${val}</button>`;
+                    }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            }
             container.innerHTML = html;
         }
 
@@ -162,12 +201,14 @@
             const rolls = sessionData.rolls || [];
             if(rolls.length === 0) return;
 
+            const colorMap = (n) => n === '0' || n === '00' || n === '000' ? 'chip-green' : (redNums.includes(parseInt(n)) ? 'chip-red' : 'chip-black');
+
             container.innerHTML = rolls.slice(0, limit).map((r, i) => {
                 const rollIndex = rolls.length - i;
                 const isLatest = i === 0;
                 return `
                 <div class="chip-stack ${isLatest ? 'latest-chip-stack' : 'opacity-60'}">
-                    <div class="chip ${getChipColor(r.n)} ${isLatest ? 'latest-chip' : ''}">
+                    <div class="chip ${colorMap(r.n)} ${isLatest ? 'latest-chip' : ''}">
                         ${r.n}
                     </div>
                     <span class="chip-label">#${rollIndex}</span>
@@ -193,7 +234,7 @@
             if(confirm("Purge all recorded rolls?")) {
                 sessionData.rolls = []; renderHistory();
                 await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ rolls: [] });
-                document.getElementById('history-chips').innerHTML = '<span class="text-xs text-slate-700 uppercase font-bold tracking-[0.2em] italic">Awaiting Input...</span>';
+                document.getElementById('history-chips').innerHTML = '<span class="text-[10px] text-slate-700 uppercase font-bold italic">Awaiting Input...</span>';
                 document.getElementById('hud-count').innerText = `0 ROLLS`;
             }
         }
@@ -214,13 +255,15 @@
             await db.collection("users").doc(currentUid).collection("sessions").add(data);
             await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ name });
             sessionData.name = name; document.getElementById('archive-modal').classList.add('hidden');
-            document.getElementById('btn-save-archive').innerText = "SAVE"; showToast("Archive Saved");
+            document.getElementById('btn-save-archive').innerText = "SAVE"; showToast();
         }
 
-        function showToast(msg = "Data Synced") { 
-            const t = document.getElementById('toast'); t.innerText = msg;
-            t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'), 2000); 
+        function showToast() { 
+            const t = document.getElementById('toast'); t.classList.remove('opacity-0'); 
+            setTimeout(()=>t.classList.add('opacity-0'), 2000); 
         }
+
+        window.addEventListener('resize', renderNumpad);
     </script>
 </body>
 </html>
