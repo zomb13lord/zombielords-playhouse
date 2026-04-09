@@ -31,7 +31,7 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            overflow: hidden; /* Prevents body scroll, handles scrolling internally */
+            overflow: hidden; 
         }
 
         .cinzel { font-family: 'Cinzel', serif; }
@@ -63,85 +63,83 @@
         .btn-green { background: rgba(6, 95, 70, 0.4); border: 1px solid rgba(16, 185, 129, 0.5); color: #6ee7b7; }
         .btn-green:hover, .btn-green:active { background: rgba(5, 150, 105, 0.9); border-color: #34d399; color: white; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
 
-        .history-pill { 
-            background: rgba(2, 6, 23, 0.6); 
-            border: 1px solid rgba(255,255,255,0.05); 
-            border-radius: 4px;
-            padding: 8px 12px; 
-            margin-bottom: 6px; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s ease;
-        }
-        .history-pill:hover { background: rgba(15, 23, 42, 0.9); border-color: rgba(16, 185, 129, 0.3); }
-
         .metric-box {
             background: rgba(2, 6, 23, 0.8);
             border: 1px solid rgba(16, 185, 129, 0.2);
             border-radius: 4px;
         }
 
-        /* Hide scrollbar for sleekness */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body>
 
-    <nav class="p-4 flex justify-between items-center bg-slate-950/80 backdrop-blur-xl border-b border-emerald-900/40 sticky top-0 z-[50] h-[70px] flex-shrink-0">
+    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px] flex-shrink-0">
         <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
-            <h2 class="text-sm font-black text-emerald-500 tracking-tighter uppercase leading-none drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">Live Node</h2>
-            <span id="protocol-tag" class="text-[8px] text-slate-400 tracking-[0.2em] uppercase font-bold mt-1">Initializing...</span>
+            <h2 class="text-sm font-black text-emerald-500 tracking-tighter uppercase leading-none drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">Zombie Lord's</h2>
+            <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         
-        <div class="flex items-center gap-3 md:gap-6">
-            <button onclick="window.location.assign('roulette-config.html')" class="text-[9px] text-slate-400 hover:text-emerald-400 transition-all uppercase font-bold tracking-widest"><i class="fa-solid fa-gear md:mr-1"></i> <span class="hidden md:inline">Config</span></button>
-            <button onclick="triggerArchive()" class="text-[9px] border border-emerald-500/40 px-3 py-1.5 bg-emerald-950/30 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all uppercase font-black tracking-widest rounded"><i class="fa-solid fa-vault md:mr-1"></i> <span class="hidden md:inline">Archive</span></button>
+        <div class="flex items-center gap-4 md:gap-6">
+            <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            
+            <button onclick="window.location.assign('roulette-config.html')" class="text-[10px] text-slate-400 hover:text-emerald-400 transition-all uppercase font-bold tracking-[0.2em]"><i class="fa-solid fa-gear md:mr-1"></i> <span class="hidden md:inline">Config</span></button>
+            
+            <button id="btn-save-archive" onclick="handleSaveArchive()" class="text-[10px] text-emerald-400 hover:text-emerald-300 transition-all uppercase font-bold tracking-[0.2em]"><i class="fa-solid fa-vault md:mr-1"></i> <span class="hidden md:inline">Archive</span></button>
+            
+            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col md:flex-row gap-4 p-4 w-full max-w-6xl mx-auto overflow-hidden">
+    <main class="flex-grow flex flex-col gap-4 p-4 w-full max-w-4xl mx-auto overflow-hidden">
         
-        <div class="w-full md:w-1/3 lg:w-1/4 shard flex flex-col overflow-hidden order-2 md:order-1 h-48 md:h-full">
-            <div class="p-3 border-b border-emerald-900/40 bg-slate-900/50 flex justify-between items-center">
-                <h3 class="text-[10px] cinzel text-emerald-500 uppercase font-black tracking-[0.2em]">Data Stream</h3>
-                <span id="hud-count" class="text-[10px] text-slate-400 font-bold">0 Rolls</span>
+        <div class="shard p-4 flex gap-4 justify-between items-center flex-shrink-0">
+            <div class="metric-box flex-1 p-3 text-center">
+                <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Latest Signature</div>
+                <div id="hud-last" class="cinzel text-slate-500 text-3xl md:text-4xl font-black">--</div>
             </div>
-            <div id="history-log" class="overflow-y-auto flex-grow p-3 no-scrollbar space-y-1">
-                <div class="text-center text-slate-600 text-xs mt-4 italic uppercase tracking-widest">Awaiting Input...</div>
-            </div>
-        </div>
-
-        <div class="w-full md:w-2/3 lg:w-3/4 flex flex-col gap-4 overflow-hidden order-1 md:order-2 h-[calc(100vh-320px)] md:h-full">
             
-            <div class="shard p-4 flex gap-4 justify-between items-center flex-shrink-0">
-                <div class="metric-box flex-1 p-3 text-center">
-                    <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Latest Signature</div>
-                    <div id="hud-last" class="cinzel text-emerald-400 text-4xl md:text-5xl font-black drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">--</div>
+            <div class="metric-box flex-1 p-3 text-center hidden sm:block">
+                <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Target Status</div>
+                <div class="cinzel text-slate-300 text-xl font-bold mt-2">STANDBY</div>
+            </div>
+            
+            <div class="metric-box flex-1 p-3 text-center">
+                <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Current Action</div>
+                <div class="cinzel text-emerald-500 text-xl font-bold mt-2 animate-pulse">OBSERVE</div>
+            </div>
+        </div>
+
+        <div class="shard p-4 flex flex-col gap-3 flex-shrink-0">
+            <div class="flex justify-between items-center border-b border-emerald-900/30 pb-2">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-[10px] cinzel text-emerald-500 uppercase font-black tracking-[0.2em]">Data Stream</h3>
+                    <span id="hud-count" class="text-[9px] bg-slate-900 border border-slate-700 text-slate-400 px-2 py-0.5 rounded font-bold">0 Rolls</span>
                 </div>
-                
-                <div class="metric-box flex-1 p-3 text-center hidden sm:block">
-                    <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Target Status</div>
-                    <div class="cinzel text-slate-300 text-xl md:text-2xl font-bold mt-2">STANDBY</div>
-                </div>
-                
-                <div class="metric-box flex-1 p-3 text-center">
-                    <div class="text-[9px] text-slate-500 uppercase tracking-widest mb-1 font-bold">Current Action</div>
-                    <div class="cinzel text-emerald-500 text-xl md:text-2xl font-bold mt-2 animate-pulse">OBSERVE</div>
+                <div class="flex gap-2">
+                    <button onclick="undoRoll()" class="text-[9px] border border-slate-700 px-3 py-1 bg-slate-900/80 text-slate-300 hover:bg-slate-700 hover:text-white transition-all uppercase font-bold tracking-widest rounded shadow-sm"><i class="fa-solid fa-rotate-left"></i> Undo</button>
+                    <button onclick="resetRolls()" class="text-[9px] border border-red-900/50 px-3 py-1 bg-red-950/30 text-red-400 hover:bg-red-600 hover:text-white transition-all uppercase font-bold tracking-widest rounded shadow-sm"><i class="fa-solid fa-trash-can"></i> Reset</button>
                 </div>
             </div>
+            
+            <div id="history-chips" class="flex flex-wrap gap-2 min-h-[36px] items-center">
+                <span class="text-[10px] text-slate-600 uppercase tracking-widest italic">Awaiting Input...</span>
+            </div>
+        </div>
 
-            <div id="numpad-container" class="shard p-4 flex-grow overflow-y-auto no-scrollbar flex flex-col justify-center">
+        <div class="shard p-4 flex-grow overflow-y-auto no-scrollbar">
+            <div id="numpad-container" class="w-full max-w-2xl mx-auto h-full flex flex-col justify-start">
                 </div>
         </div>
+        
     </main>
 
     <div id="archive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md hidden">
         <div class="max-w-sm w-full p-8 shard text-center relative border border-emerald-500/50 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
-            <button onclick="closeArchive()" class="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <button onclick="closeArchiveModal()" class="absolute top-4 right-4 text-slate-500 hover:text-red-400 transition-colors"><i class="fa-solid fa-xmark text-xl"></i></button>
             <h2 class="cinzel text-2xl text-emerald-400 mb-2 uppercase tracking-widest font-black">Commit to Vault</h2>
-            <p class="text-xs text-slate-400 mb-6 uppercase tracking-widest">Finalize Session Data</p>
+            <p class="text-xs text-slate-400 mb-6 uppercase tracking-widest">Create New Session Archive</p>
             
             <label class="block text-left text-[9px] text-emerald-500 uppercase tracking-widest font-bold mb-2">Designation</label>
             <input type="text" id="archive-name" placeholder="E.g. ALPHA RUN 01" class="w-full bg-slate-950 border border-emerald-900/50 rounded p-3 mb-6 uppercase text-white outline-none focus:border-emerald-400 focus:shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all font-bold tracking-wider text-sm">
@@ -152,6 +150,10 @@
         </div>
     </div>
 
+    <div id="toast-notification" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-emerald-500 text-slate-900 px-6 py-3 rounded shadow-[0_0_20px_rgba(16,185,129,0.5)] font-bold uppercase tracking-widest text-xs transition-opacity duration-300 opacity-0 pointer-events-none z-[100]">
+        Session Saved Successfully
+    </div>
+
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
@@ -159,34 +161,44 @@
         const db = firebase.firestore();
         
         let sessionData = null;
+        let currentUid = null;
         const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
-        // Ensure user is logged in
         auth.onAuthStateChanged(user => { 
-            if (!user) window.location.href = "index.html"; 
-            else initTracker(); 
+            if (!user) {
+                window.location.href = "index.html"; 
+            } else {
+                currentUid = user.uid;
+                document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
+                initTracker(); 
+            }
         });
+
+        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
 
         async function initTracker() {
             try {
-                const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
+                const doc = await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").get();
                 if (doc.exists) {
                     sessionData = doc.data();
-                    const strat = sessionData.strategy ? sessionData.strategy.toUpperCase() : "FIXED";
+                    if(!sessionData.rolls) sessionData.rolls = [];
+                    
                     const wheel = sessionData.wheel || "US";
                     
-                    document.getElementById('protocol-tag').innerText = `PROTOCOL: ${strat} | WHEEL: ${wheel}`;
-                    
-                    if(sessionData.rolls && sessionData.rolls.length > 0) {
-                        const lastRoll = sessionData.rolls[0].n;
-                        document.getElementById('hud-last').innerText = lastRoll;
-                        document.getElementById('hud-last').className = `cinzel text-4xl md:text-5xl font-black drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] ${getColorTextClass(lastRoll)}`;
+                    // Determine if Save or Archive Mode
+                    const btnSaveArchive = document.getElementById('btn-save-archive');
+                    if (sessionData.name) {
+                        btnSaveArchive.dataset.mode = 'save';
+                        btnSaveArchive.innerHTML = `<i class="fa-solid fa-floppy-disk md:mr-1"></i> <span class="hidden md:inline">Save</span>`;
+                    } else {
+                        btnSaveArchive.dataset.mode = 'archive';
+                        btnSaveArchive.innerHTML = `<i class="fa-solid fa-vault md:mr-1"></i> <span class="hidden md:inline">Archive</span>`;
                     }
                     
                     renderNumpad(wheel);
+                    updateHUD();
                     renderHistory();
                 } else {
-                    // No active session found, force them to config
                     window.location.assign('roulette-config.html');
                 }
             } catch (err) {
@@ -204,84 +216,140 @@
             const container = document.getElementById('numpad-container');
             let html = '';
             
-            // Build the Zero row based on wheel type
             let zeroes = ['0'];
             if(wheelType === 'US') zeroes = ['00', '0'];
             if(wheelType === 'TZ') zeroes = ['000', '00', '0'];
             
             html += `<div class="grid grid-cols-${zeroes.length} gap-2 mb-2">`;
             zeroes.forEach(z => {
-                html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green cinzel text-2xl md:text-3xl py-4 md:py-6 rounded-md font-black shadow-md">${z}</button>`;
+                html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green cinzel text-3xl py-5 rounded font-black shadow-md">${z}</button>`;
             });
             html += `</div>`;
 
-            // Build the 1-36 Grid
-            html += `<div class="grid grid-cols-3 gap-2">`;
+            html += `<div class="grid grid-cols-3 gap-2 pb-6">`;
             for(let i=1; i<=36; i++) {
                 const isRed = redNums.includes(i);
                 const btnClass = isRed ? 'btn-red' : 'btn-black';
-                html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${btnClass} cinzel text-2xl md:text-3xl py-3 md:py-5 rounded-md font-black shadow-md">${i}</button>`;
+                html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${btnClass} cinzel text-2xl py-4 rounded font-black shadow-md">${i}</button>`;
             }
             html += `</div>`;
 
             container.innerHTML = html;
         }
 
-        async function inputRoll(n) {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const roll = { n: n.toString(), t: timeStr };
+        function updateHUD() {
+            document.getElementById('hud-count').innerText = `${sessionData.rolls.length} Rolls`;
             
-            if(!sessionData.rolls) sessionData.rolls = [];
-            sessionData.rolls.unshift(roll); // Add to beginning of array
-            
-            // Update HUD
-            document.getElementById('hud-last').innerText = n;
-            document.getElementById('hud-last').className = `cinzel text-4xl md:text-5xl font-black drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] ${getColorTextClass(n)}`;
-            
-            renderHistory();
-            
-            // Background save to Firestore
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").update({ 
-                    rolls: sessionData.rolls 
-                });
-            } catch (err) {
-                console.error("Failed to sync roll to database:", err);
+            if(sessionData.rolls.length > 0) {
+                const lastRoll = sessionData.rolls[0].n;
+                document.getElementById('hud-last').innerText = lastRoll;
+                document.getElementById('hud-last').className = `cinzel text-4xl md:text-5xl font-black drop-shadow-[0_0_15px_rgba(255,255,255,0.2)] ${getColorTextClass(lastRoll)}`;
+            } else {
+                document.getElementById('hud-last').innerText = "--";
+                document.getElementById('hud-last').className = `cinzel text-3xl md:text-4xl font-black text-slate-500`;
             }
         }
 
         function renderHistory() {
-            if(!sessionData.rolls || sessionData.rolls.length === 0) return;
+            const container = document.getElementById('history-chips');
+            if(!sessionData.rolls || sessionData.rolls.length === 0) {
+                container.innerHTML = `<span class="text-[10px] text-slate-600 uppercase tracking-widest italic">Awaiting Input...</span>`;
+                return;
+            }
             
-            document.getElementById('hud-count').innerText = `${sessionData.rolls.length} ROLLS`;
+            // Show only the last 9 rolls (which are the first 9 elements since we unshift)
+            const displayRolls = sessionData.rolls.slice(0, 9);
+            const totalRolls = sessionData.rolls.length;
             
-            const historyHtml = sessionData.rolls.map((r, index) => {
+            const historyHtml = displayRolls.map((r, index) => {
                 const colorClass = getColorTextClass(r.n);
-                const isLatest = index === 0 ? 'border-l-2 border-l-emerald-400 bg-slate-800/80' : '';
+                const rollIndex = totalRolls - index; // Calculate actual roll number
+                const isLatest = index === 0 ? 'border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)] bg-slate-800' : 'border-emerald-900/30 bg-slate-900/80 opacity-80';
                 
                 return `
-                    <div class="history-pill ${isLatest}">
-                        <div class="flex items-center gap-3">
-                            <span class="text-[9px] text-slate-500 font-bold w-4">#${sessionData.rolls.length - index}</span>
-                            <span class="cinzel text-lg font-black ${colorClass}">${r.n}</span>
-                        </div>
-                        <span class="text-[9px] text-slate-500 tracking-widest uppercase">${r.t}</span>
+                    <div class="px-2 py-1 rounded border ${isLatest} flex items-center gap-1.5 transition-all">
+                        <span class="text-[8px] text-slate-500 font-bold hidden sm:inline">#${rollIndex}</span>
+                        <span class="cinzel font-black text-sm md:text-base ${colorClass}">${r.n}</span>
                     </div>
                 `;
             }).join('');
             
-            document.getElementById('history-log').innerHTML = historyHtml;
+            container.innerHTML = historyHtml;
         }
 
-        // Modal Controls
-        function triggerArchive() { 
-            // Pre-fill name if it exists
+        async function syncActiveSession() {
+            try {
+                await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ 
+                    rolls: sessionData.rolls 
+                });
+            } catch (err) {
+                console.error("Database Sync Failed:", err);
+            }
+        }
+
+        async function inputRoll(n) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            sessionData.rolls.unshift({ n: n.toString(), t: timeStr });
+            updateHUD();
+            renderHistory();
+            await syncActiveSession();
+        }
+
+        async function undoRoll() {
+            if (!sessionData.rolls || sessionData.rolls.length === 0) return;
+            sessionData.rolls.shift(); // Remove the most recent roll
+            updateHUD();
+            renderHistory();
+            await syncActiveSession();
+        }
+
+        async function resetRolls() {
+            if (!sessionData.rolls || sessionData.rolls.length === 0) return;
+            if (confirm("Are you sure you want to clear all rolls for this session?")) {
+                sessionData.rolls = [];
+                updateHUD();
+                renderHistory();
+                await syncActiveSession();
+            }
+        }
+
+        // --- SAVE / ARCHIVE LOGIC ---
+        
+        async function handleSaveArchive() {
+            const mode = document.getElementById('btn-save-archive').dataset.mode;
+            
+            if (mode === 'save') {
+                // Find original document by name and update it
+                try {
+                    const snapshot = await db.collection("users").doc(currentUid).collection("sessions")
+                        .where("name", "==", sessionData.name).get();
+                    
+                    if (!snapshot.empty) {
+                        const docId = snapshot.docs[0].id;
+                        await db.collection("users").doc(currentUid).collection("sessions").doc(docId).update({
+                            rolls: sessionData.rolls,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        showToast();
+                    } else {
+                        // Original archive was deleted or renamed, fallback to creating a new one
+                        triggerArchiveModal();
+                    }
+                } catch (e) {
+                    console.error("Error saving to archive:", e);
+                    triggerArchiveModal(); // Fallback
+                }
+            } else {
+                triggerArchiveModal();
+            }
+        }
+
+        function triggerArchiveModal() { 
             if(sessionData.name) document.getElementById('archive-name').value = sessionData.name;
             document.getElementById('archive-modal').classList.remove('hidden'); 
         }
         
-        function closeArchive() { 
+        function closeArchiveModal() { 
             document.getElementById('archive-modal').classList.add('hidden'); 
         }
         
@@ -290,24 +358,39 @@
             const archiveName = nameInput !== "" ? nameInput.toUpperCase() : "TRIAL_NODE_" + Math.floor(Math.random()*1000);
             
             try {
-                // Prep data payload
                 const archivedData = { 
                     ...sessionData, 
                     name: archiveName, 
                     timestamp: firebase.firestore.FieldValue.serverTimestamp() 
                 };
                 
-                // Add to general sessions collection (creates new doc with auto-ID)
-                await db.collection("users").doc(auth.currentUser.uid).collection("sessions").add(archivedData);
+                await db.collection("users").doc(currentUid).collection("sessions").add(archivedData);
                 
-                // Delete active session to clean slate
-                await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").delete();
+                // Update active session to now reflect that it IS saved
+                sessionData.name = archiveName;
+                await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ name: archiveName });
                 
-                window.location.assign("archives.html");
+                closeArchiveModal();
+                showToast("Archive Created Successfully");
+                
+                // Switch button to Save mode
+                const btnSaveArchive = document.getElementById('btn-save-archive');
+                btnSaveArchive.dataset.mode = 'save';
+                btnSaveArchive.innerHTML = `<i class="fa-solid fa-floppy-disk md:mr-1"></i> <span class="hidden md:inline">Save</span>`;
+                
             } catch (err) {
                 console.error("Archive Failed:", err);
                 alert("Failed to commit archive to database.");
             }
+        }
+
+        function showToast(msg = "Session Saved Successfully") {
+            const toast = document.getElementById('toast-notification');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+            }, 3000);
         }
     </script>
 </body>
