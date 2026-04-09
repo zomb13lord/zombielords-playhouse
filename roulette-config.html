@@ -48,7 +48,7 @@
             width: 100%;
             margin-bottom: 12px;
         }
-        .shard-btn:hover { 
+        .shard-btn:not(.disabled):hover { 
             border-color: #10b981; 
             background: rgba(16, 185, 129, 0.1);
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
@@ -264,7 +264,7 @@
                 </div>
             </div>
 
-            <button onclick="commitAndLaunch()" class="shard-btn w-full cinzel emerald-text text-xl tracking-[0.5em] primary-shard py-6 font-black">
+            <button id="btn-start-session" onclick="commitAndLaunch()" class="shard-btn w-full cinzel emerald-text text-xl tracking-[0.5em] primary-shard py-6 font-black">
                 START SESSION
             </button>
         </div>
@@ -309,6 +309,7 @@
             element.style.display = show ? displayType : 'none';
         }
 
+        // --- SYNCHRONOUS DOM POPULATION ---
         function bootstrapUI() {
             try {
                 document.getElementById('wheel-type').value = "US";
@@ -339,7 +340,9 @@
                 document.getElementById('prog-multi').value = 2;
 
                 evaluateLogicFlows();
-            } catch(e) {}
+            } catch(e) {
+                console.error("Bootstrap Error:", e);
+            }
         }
 
         window.addEventListener('DOMContentLoaded', bootstrapUI);
@@ -621,6 +624,8 @@
             window.activeBetTargets.clear();
             document.getElementById('target-selection-label').innerText = "Target Selection";
 
+            const isInside = (domain === 'inside');
+
             const createFeltBtn = (label, bgClass, val, twClass = "", inlineStyle = "") => {
                 const btn = document.createElement('button');
                 btn.type = 'button';
@@ -636,8 +641,6 @@
 
             // RACETRACK SECTOR OVERRIDE
             if (domain === 'sectors') {
-                
-                // DESKTOP HORIZONTAL RACETRACK
                 const dWrapper = document.createElement('div');
                 dWrapper.className = 'hidden md:block w-full overflow-x-auto pb-4 no-scrollbar';
                 
@@ -699,7 +702,6 @@
                 dWrapper.appendChild(dContainer);
                 container.appendChild(dWrapper);
 
-                // MOBILE VERTICAL RACETRACK
                 const mContainer = document.createElement('div');
                 mContainer.className = 'flex md:hidden w-full justify-center mt-2 pb-6';
 
@@ -757,7 +759,6 @@
             }
 
             // STANDARD GRID BUILDER
-            const isInside = (domain === 'inside');
             const desktopGrid = document.createElement('div');
             desktopGrid.className = 'hidden md:grid gap-1 mb-2 w-full';
             desktopGrid.style.gridTemplateColumns = isInside ? '60px repeat(12, 1fr)' : '60px repeat(12, 1fr) 60px';
@@ -1020,44 +1021,73 @@
         }
 
         async function commitAndLaunch() {
-            const user = auth.currentUser;
-            const activeDoc = await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").get();
-            
-            const isDynamic = (document.getElementById('sub-domain').value === "Neighbors" || 
-                              (document.getElementById('sub-domain').value === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
+            try {
+                const btn = document.getElementById('btn-start-session');
+                if(btn) {
+                    btn.innerText = "INITIALIZING...";
+                    btn.classList.add("opacity-50", "pointer-events-none");
+                }
 
-            const targetArray = Array.from(window.activeBetTargets);
+                const user = auth.currentUser;
+                if (!user) {
+                    alert("Authentication Error: Your session may have expired. Please log in again.");
+                    window.location.href = "index.html";
+                    return;
+                }
 
-            const config = {
-                wheel: document.getElementById('wheel-type').value,
-                wheelSub: document.getElementById('wheel-subtype').value,
-                strategy: document.getElementById('strategy').value,
-                domain: document.getElementById('main-domain').value,
-                subCategory: document.getElementById('sub-domain').value,
-                protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
-                dynamicValue: document.getElementById('sub-domain').value === "Neighbors" ? document.getElementById('dynamic-type-input').value : null,
-                numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
-                targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") ? targetArray : null,
-                warmup: document.getElementById('warmup-n').value,
-                cdTrigger: document.getElementById('cd-trigger-n').value,
-                cdLength: document.getElementById('cd-length-n').value,
-                stabilization: document.getElementById('stabilization-n').value,
-                lookback: document.getElementById('lookback-w').value,
-                betPrompt: document.getElementById('bet-prompt').value,
-                hedgeCmd: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-commander').value : null,
-                hedgeProg: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-progression').value : null,
-                unit: document.getElementById('base-unit').value,
-                negProg: document.getElementById('neg-progression').value,
-                posProg: document.getElementById('pos-progression').value,
-                pMulti: document.getElementById('prog-multi').value,
-                pPlus: document.getElementById('prog-plus').value,
-                pInc: document.getElementById('prog-inc').value,
-                pDec: document.getElementById('prog-dec').value,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                rolls: activeDoc.exists ? activeDoc.data().rolls : []
-            };
-            await db.collection("users").doc(user.uid).collection("sessions").doc("active_session").set(config);
-            window.location.href = "roulette.html";
+                const activeDocRef = db.collection("users").doc(user.uid).collection("sessions").doc("active_session");
+                const activeDoc = await activeDocRef.get();
+                
+                const isDynamic = (document.getElementById('sub-domain').value === "Neighbors" || 
+                                  (document.getElementById('sub-domain').value === "Straight Up" && document.getElementById('sub-type').value === "Dynamic"));
+
+                const targetArray = Array.from(window.activeBetTargets);
+
+                // Safely grab rolls array to prevent undefined injection crash
+                const existingRolls = (activeDoc.exists && activeDoc.data().rolls) ? activeDoc.data().rolls : [];
+
+                const config = {
+                    wheel: document.getElementById('wheel-type').value,
+                    wheelSub: document.getElementById('wheel-subtype').value,
+                    strategy: document.getElementById('strategy').value,
+                    domain: document.getElementById('main-domain').value,
+                    subCategory: document.getElementById('sub-domain').value,
+                    protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
+                    dynamicValue: document.getElementById('sub-domain').value === "Neighbors" ? document.getElementById('dynamic-type-input').value : null,
+                    numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
+                    targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") ? targetArray : null,
+                    warmup: document.getElementById('warmup-n').value,
+                    cdTrigger: document.getElementById('cd-trigger-n').value,
+                    cdLength: document.getElementById('cd-length-n').value,
+                    stabilization: document.getElementById('stabilization-n').value,
+                    lookback: document.getElementById('lookback-w').value,
+                    betPrompt: document.getElementById('bet-prompt').value,
+                    hedgeCmd: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-commander').value : null,
+                    hedgeProg: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-progression').value : null,
+                    unit: document.getElementById('base-unit').value,
+                    negProg: document.getElementById('neg-progression').value,
+                    posProg: document.getElementById('pos-progression').value,
+                    pMulti: document.getElementById('prog-multi').value,
+                    pPlus: document.getElementById('prog-plus').value,
+                    pInc: document.getElementById('prog-inc').value,
+                    pDec: document.getElementById('prog-dec').value,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    rolls: existingRolls
+                };
+                
+                await activeDocRef.set(config);
+                window.location.href = "roulette.html";
+
+            } catch (error) {
+                console.error("Initialization Error:", error);
+                alert("Failed to initialize session: " + error.message);
+                
+                const btn = document.getElementById('btn-start-session');
+                if(btn) {
+                    btn.innerText = "START SESSION";
+                    btn.classList.remove("opacity-50", "pointer-events-none");
+                }
+            }
         }
     </script>
 </body>
