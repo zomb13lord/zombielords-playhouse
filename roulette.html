@@ -11,34 +11,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;600;800&display=swap');
-        
-        :root { --emerald: #10b981; --bg-dark: #020617; }
+        :root { --emerald: #10b981; --gold: #c5a059; --bg-dark: #020617; }
 
         body { 
             margin: 0; padding: 0; background-color: var(--bg-dark); color: #f8fafc; 
             font-family: 'Montserrat', sans-serif; min-height: 100vh; display: flex; flex-direction: column;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7) 0%, rgba(2, 6, 23, 0.95) 100%), 
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.8) 0%, rgba(2, 6, 23, 0.98) 100%), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover; background-position: center; background-attachment: fixed;
+            overflow: hidden;
         }
 
         .cinzel { font-family: 'Cinzel', serif; }
-        .shard { background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(16px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; }
+        .shard { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; }
 
-        /* Numpad Button Logic */
-        .numpad-btn { transition: all 0.1s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; font-weight: 800; }
-        .numpad-btn:active { transform: scale(0.95); filter: brightness(1.2); }
+        /* Numpad Styling */
+        .numpad-btn { transition: all 0.1s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; user-select: none; font-weight: 800; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .numpad-btn:active { transform: scale(0.95); filter: brightness(1.3); }
 
-        /* Color States */
-        .chip-red, .btn-red { background-color: #b91c1c; color: white; border: 1px solid rgba(255,255,255,0.1); }
-        .chip-black, .btn-black { background-color: #0f172a; color: white; border: 1px solid rgba(255,255,255,0.1); }
-        .chip-green, .btn-green { background-color: #059669; color: white; border: 1px solid rgba(255,255,255,0.1); }
+        .btn-red { background-color: #991b1b; color: white; }
+        .btn-black { background-color: #0f172a; color: white; }
+        .btn-green { background-color: #065f46; color: white; }
 
-        .latest-chip { border: 2px solid var(--gold); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); z-index: 10; transform: scale(1.1); }
+        /* History Chip Styling */
+        .chip { width: 42px; height: 42px; display: flex; items-center: center; justify-content: center; border-radius: 50%; font-weight: 900; font-family: 'Cinzel'; border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .latest-chip { border-color: var(--gold); box-shadow: 0 0 20px rgba(197, 160, 89, 0.4); transform: scale(1.15); }
 
-        /* Custom Dropdown */
-        .config-select { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; font-size: 10px; padding: 4px 8px; border-radius: 4px; outline: none; cursor: pointer; }
-
+        .config-select { background: #020617; border: 1px solid #334155; color: #94a3b8; font-size: 11px; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -56,45 +55,39 @@
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col gap-4 p-4 w-full max-w-6xl mx-auto no-scrollbar overflow-y-auto">
+    <main class="flex-grow flex flex-col gap-4 p-4 w-full max-w-[1400px] mx-auto overflow-hidden">
         
-        <div class="shard p-4 grid grid-cols-2 md:grid-cols-3 gap-4 items-center">
-            <div class="bg-black/40 p-3 rounded text-center">
-                <div class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1">Last Signature</div>
-                <div id="hud-last" class="cinzel text-3xl font-black">--</div>
-            </div>
-            <div class="bg-black/40 p-3 rounded text-center hidden md:block border-x border-emerald-900/20">
-                <div class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1">Status</div>
-                <div class="cinzel text-emerald-500 text-xl font-bold animate-pulse">OBSERVE</div>
-            </div>
-            <div class="bg-black/40 p-3 rounded text-center">
-                <div class="text-[9px] text-slate-500 uppercase tracking-widest font-bold mb-1">Session Data</div>
-                <div id="hud-count" class="cinzel text-xl text-slate-300 font-bold">0 ROLLS</div>
-            </div>
-        </div>
-
-        <div class="shard p-4 flex flex-col gap-4">
-            <div class="flex justify-between items-center border-b border-emerald-900/20 pb-3">
-                <h3 class="text-[10px] cinzel text-emerald-500 uppercase font-black tracking-[0.2em]">Data Stream</h3>
-                <div class="flex items-center gap-3">
+        <div class="shard p-4 flex flex-col gap-6 flex-shrink-0">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div class="text-center px-4 border-r border-emerald-900/30">
+                        <div class="text-[8px] text-slate-500 uppercase tracking-widest font-bold">Total</div>
+                        <div id="hud-count" class="text-lg cinzel text-white">0</div>
+                    </div>
+                    <div>
+                        <h3 class="text-[10px] cinzel text-emerald-500 uppercase font-black tracking-[0.2em]">Data Stream</h3>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
                     <select id="view-limit" class="config-select" onchange="renderHistory()">
-                        <option value="3">Show 3</option>
-                        <option value="6">Show 6</option>
-                        <option value="9" selected>Show 9</option>
-                        <option value="12">Show 12</option>
+                        <option value="6">6 Chips</option>
+                        <option value="9" selected>9 Chips</option>
+                        <option value="12">12 Chips</option>
                     </select>
-                    <button onclick="undoRoll()" class="text-[9px] text-slate-400 hover:text-white uppercase font-bold"><i class="fa-solid fa-rotate-left mr-1"></i> Undo</button>
-                    <button onclick="resetRolls()" class="text-[9px] text-red-400 hover:text-red-200 uppercase font-bold"><i class="fa-solid fa-trash mr-1"></i> Reset</button>
+                    <button onclick="undoRoll()" class="text-[10px] text-slate-400 hover:text-white uppercase font-bold transition-colors"><i class="fa-solid fa-rotate-left mr-1"></i> Undo</button>
+                    <button onclick="resetRolls()" class="text-[10px] text-red-500/70 hover:text-red-400 uppercase font-bold transition-colors">Reset</button>
                 </div>
             </div>
-            
-            <div id="history-chips" class="flex flex-row-reverse justify-center flex-wrap gap-3 py-2 min-h-[50px]">
-                </div>
+
+            <div id="history-chips" class="flex flex-row-reverse justify-center gap-4 md:gap-6 min-h-[50px]">
+                <span class="text-xs text-slate-700 uppercase tracking-[0.3em] italic">Awaiting Input</span>
+            </div>
         </div>
 
-        <div id="numpad-container" class="shard p-4 mb-10">
-            </div>
-
+        <div class="shard flex-grow overflow-hidden flex flex-col p-2 md:p-4">
+            <div id="numpad-container" class="w-full h-full">
+                </div>
+        </div>
     </main>
 
     <div id="archive-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-md hidden">
@@ -106,7 +99,7 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest opacity-0 transition-opacity pointer-events-none z-[200]">Saved</div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest opacity-0 transition-opacity pointer-events-none z-[200]">Sync Complete</div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
@@ -121,35 +114,75 @@
             const doc = await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").get();
             if(doc.exists) {
                 sessionData = doc.data(); if(!sessionData.rolls) sessionData.rolls = [];
-                const btn = document.getElementById('btn-save-archive');
-                btn.innerText = sessionData.name ? "SAVE" : "ARCHIVE";
+                document.getElementById('btn-save-archive').innerText = sessionData.name ? "SAVE" : "ARCHIVE";
                 renderNumpad(); renderHistory(); updateHUD();
             } else window.location.assign('roulette-config.html');
         }
 
-        function getChipColor(n) {
-            if(n === '0' || n === '00' || n === '000') return 'chip-green';
-            return redNums.includes(parseInt(n)) ? 'chip-red' : 'chip-black';
+        // PHYSICAL TABLE MAPPING
+        // Rows on a roulette table (3 to 36, 2 to 35, 1 to 34)
+        const feltLayout = [
+            [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], // Top Row
+            [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], // Mid Row
+            [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]  // Bottom Row
+        ];
+
+        function getNumColor(n) {
+            if(n === '0' || n === '00' || n === '000') return 'btn-green';
+            return redNums.includes(parseInt(n)) ? 'btn-red' : 'btn-black';
         }
 
         function renderNumpad() {
             const container = document.getElementById('numpad-container');
             const wheel = sessionData.wheel || "US";
-            let zeroes = wheel === 'TZ' ? ['000','00','0'] : (wheel === 'US' ? ['00','0'] : ['0']);
-            
-            let html = `<div class="grid grid-cols-2 md:grid-cols-9 gap-2">`;
-            
-            // Render Zeroes first
-            zeroes.forEach(z => {
-                html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green h-16 md:h-20 rounded-md text-2xl cinzel">${z}</button>`;
-            });
+            const zeroes = wheel === 'TZ' ? ['000','00','0'] : (wheel === 'US' ? ['00','0'] : ['0']);
+            const isMobile = window.innerWidth < 768;
 
-            // Render 1-36
-            for(let i=1; i<=36; i++) {
-                const c = redNums.includes(i) ? 'btn-red' : 'btn-black';
-                html += `<button onclick="inputRoll('${i}')" class="numpad-btn ${c} h-16 md:h-20 rounded-md text-2xl cinzel">${i}</button>`;
+            let html = '';
+
+            if(!isMobile) {
+                // DESKTOP: 13-column grid (1 for zeroes, 12 for numbers)
+                html = `<div class="grid grid-cols-13 h-full gap-1.5">`;
+                
+                // Zero Column
+                html += `<div class="grid grid-rows-3 gap-1.5">`;
+                zeroes.forEach(z => html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green text-xl">${z}</button>`);
+                // Fill empty zero slots if necessary to keep 3 height
+                for(let i=0; i < (3 - zeroes.length); i++) html += `<div class="opacity-0"></div>`;
+                html += `</div>`;
+
+                // Numbers 1-36 (12 Columns)
+                for(let col = 0; col < 12; col++) {
+                    html += `<div class="grid grid-rows-3 gap-1.5">`;
+                    for(let row = 0; row < 3; row++) {
+                        const val = feltLayout[row][col];
+                        html += `<button onclick="inputRoll('${val}')" class="numpad-btn ${getNumColor(val)} text-xl">${val}</button>`;
+                    }
+                    html += `</div>`;
+                }
+                html += `</div>`;
+            } else {
+                // MOBILE: 3-column grid (Roulette Portrait)
+                html = `<div class="grid grid-cols-3 h-full gap-1.5">`;
+                
+                // Zero Header
+                const zSpan = zeroes.length === 1 ? 'col-span-3' : (zeroes.length === 2 ? 'col-span-1' : 'col-span-1');
+                zeroes.forEach(z => {
+                    const mobileSpan = zeroes.length === 1 ? 'col-span-3' : (zeroes.length === 2 && z === '00' ? 'col-span-1' : (zeroes.length === 2 ? 'col-span-2' : 'col-span-1'));
+                    html += `<button onclick="inputRoll('${z}')" class="numpad-btn btn-green ${mobileSpan} h-14 text-lg">${z}</button>`;
+                });
+
+                // Numbers 1-36 (Rows of 3)
+                for(let col = 0; col < 12; col++) {
+                    // Mobile reads bottom to top of column or left to right? 
+                    // Standard mobile app layout matches felt columns:
+                    const rowVals = [feltLayout[2][col], feltLayout[1][col], feltLayout[0][col]];
+                    rowVals.forEach(val => {
+                        html += `<button onclick="inputRoll('${val}')" class="numpad-btn ${getNumColor(val)} h-14 text-lg">${val}</button>`;
+                    });
+                }
+                html += `</div>`;
             }
-            html += `</div>`;
             container.innerHTML = html;
         }
 
@@ -157,27 +190,27 @@
             const limit = parseInt(document.getElementById('view-limit').value);
             const container = document.getElementById('history-chips');
             const rolls = sessionData.rolls || [];
-            
-            if(rolls.length === 0) {
-                container.innerHTML = `<span class="text-[10px] text-slate-600 uppercase tracking-widest italic">Awaiting Input...</span>`;
-                return;
-            }
+            if(rolls.length === 0) return;
 
-            const slice = rolls.slice(0, limit);
-            container.innerHTML = slice.map((r, i) => `
-                <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full font-black text-lg shadow-lg transition-all ${getChipColor(r.n)} ${i === 0 ? 'latest-chip' : 'opacity-80 scale-90'}">
+            container.innerHTML = rolls.slice(0, limit).map((r, i) => `
+                <div class="chip ${getChipColor(r.n)} ${i === 0 ? 'latest-chip' : 'opacity-60 scale-90'}">
                     ${r.n}
                 </div>
             `).join('');
         }
 
+        function getChipColor(n) {
+            if(n === '0' || n === '00' || n === '000') return 'chip-green';
+            return redNums.includes(parseInt(n)) ? 'chip-red' : 'chip-black';
+        }
+
         function updateHUD() {
             const rolls = sessionData.rolls || [];
-            document.getElementById('hud-count').innerText = `${rolls.length} ROLLS`;
+            document.getElementById('hud-count').innerText = rolls.length;
             const last = rolls[0] ? rolls[0].n : '--';
             const el = document.getElementById('hud-last');
             el.innerText = last;
-            el.className = `cinzel text-3xl font-black ${last==='--' ? 'text-slate-600' : (getChipColor(last).replace('chip','text'))}`;
+            el.className = `cinzel text-4xl font-black ${last==='--' ? 'text-slate-700' : (getChipColor(last).replace('chip','text'))}`;
         }
 
         async function inputRoll(n) {
@@ -194,7 +227,7 @@
         }
 
         async function resetRolls() {
-            if(confirm("Wipe session rolls?")) {
+            if(confirm("Purge all rolls?")) {
                 sessionData.rolls = []; renderHistory(); updateHUD();
                 await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").update({ rolls: [] });
             }
@@ -219,10 +252,9 @@
             document.getElementById('btn-save-archive').innerText = "SAVE"; showToast();
         }
 
-        function showToast() { 
-            const t = document.getElementById('toast'); t.classList.remove('opacity-0'); 
-            setTimeout(()=>t.classList.add('opacity-0'), 2000); 
-        }
+        function showToast() { const t = document.getElementById('toast'); t.classList.remove('opacity-0'); setTimeout(()=>t.classList.add('opacity-0'), 2000); }
+
+        window.addEventListener('resize', renderNumpad);
     </script>
 </body>
 </html>
