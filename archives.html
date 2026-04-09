@@ -11,98 +11,42 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;600&display=swap');
-        
-        :root { 
-            --gold: #c5a059; 
-            --bg-dark: #020617; 
-            --emerald: #10b981; 
-        }
-
+        :root { --gold: #c5a059; --bg-dark: #020617; --emerald: #10b981; }
         body { 
-            margin: 0; padding: 0;
-            background-color: var(--bg-dark); 
-            color: #f8fafc; 
-            font-family: 'Cinzel', serif; 
-            min-height: 100vh;
+            margin: 0; padding: 0; background-color: var(--bg-dark); color: #f8fafc; 
+            font-family: 'Cinzel', serif; min-height: 100vh;
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center; background-attachment: fixed;
         }
-
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        
-        .shard { 
-            background: rgba(15, 23, 42, 0.6); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(16, 185, 129, 0.3); 
-            transition: all 0.3s ease;
-        }
-        .shard:hover {
-            border-color: rgba(16, 185, 129, 0.6);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
-        }
-
+        .shard { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; transition: all 0.3s ease; }
+        .shard:hover { border-color: rgba(16, 185, 129, 0.6); }
         .shard-btn { 
-            background: rgba(15, 23, 42, 0.8); 
-            border: 1px solid rgba(16, 185, 129, 0.3); 
-            padding: 12px 20px; 
-            transition: 0.3s ease; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px;
-            border-radius: 4px; 
-            text-transform: uppercase;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            font-size: 11px;
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px 20px; 
+            transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            gap: 10px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif;
+            font-weight: 700; letter-spacing: 0.1em; font-size: 11px;
         }
-        .shard-btn:not(:disabled):hover { 
-            border-color: #10b981; 
-            background: rgba(16, 185, 129, 0.15);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
-            transform: translateY(-2px);
-        }
-        .shard-btn:disabled {
-            opacity: 0.3; cursor: not-allowed; filter: grayscale(1);
-        }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        
-        .badge {
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            font-weight: 600;
-        }
+        .badge { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 4px 8px; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-size: 9px; text-transform: uppercase; font-weight: 600; }
     </style>
 </head>
 <body class="flex flex-col">
-
-    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px]">
+    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px] flex-shrink-0">
         <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
             <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
-        
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center justify-start p-4 md:p-8 pt-8">
-        <div class="w-full max-w-5xl">
-            
+    <main class="flex-grow p-4 md:p-8 pt-8">
+        <div class="w-full max-w-5xl mx-auto">
             <div class="text-center mb-10">
                 <h1 class="cinzel text-3xl md:text-4xl emerald-text uppercase tracking-[0.3em] font-black">The Vault</h1>
                 <p class="text-xs text-slate-400 tracking-widest uppercase mt-3 font-montserrat">Session Archives</p>
@@ -112,8 +56,7 @@
                 <div class="border-b border-emerald-900/40 pb-3 mb-6">
                     <h2 class="cinzel text-lg text-white uppercase tracking-widest">Current Session</h2>
                 </div>
-                
-                <div id="active-session-container" class="w-full">
+                <div id="active-session-container">
                     <div class="text-center p-8 text-slate-500 text-sm tracking-widest uppercase border border-dashed border-slate-800 rounded">Checking systems...</div>
                 </div>
             </div>
@@ -122,229 +65,118 @@
                 <div class="border-b border-emerald-900/40 pb-3 mb-6">
                     <h2 class="cinzel text-lg text-slate-300 uppercase tracking-widest">Saved Archives</h2>
                 </div>
-                
-                <div id="archive-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    </div>
+                <div id="archive-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
             </div>
-
         </div>
     </main>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); 
-        const db = firebase.firestore();
-
+        const auth = firebase.auth(); const db = firebase.firestore();
         let currentUid = null;
 
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
-            document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
             currentUid = user.uid;
+            document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
             fetchVaultData();
         });
 
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
-
-        function formatDate(timestamp) {
-            if(!timestamp) return "Unknown Date";
-            const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
-        }
-
-        async function editSessionName(docId, currentName) {
-            const newName = window.prompt("Enter new session designation:", currentName || "");
-            if (newName !== null && newName.trim() !== "") {
-                try {
-                    await db.collection("users").doc(currentUid).collection("sessions").doc(docId).update({
-                        name: newName.trim().toUpperCase()
-                    });
-                    fetchVaultData(); 
-                } catch (error) {
-                    console.error("Error renaming session:", error);
-                    alert("Database communication failed while renaming.");
-                }
-            }
-        }
-
         async function fetchVaultData() {
             const sessionsRef = db.collection("users").doc(currentUid).collection("sessions");
-            
             try {
-                // Fetch Active Session
                 const activeDoc = await sessionsRef.doc("active_session").get();
                 const activeContainer = document.getElementById('active-session-container');
-                
                 if (activeDoc.exists) {
                     const data = activeDoc.data();
-                    const sessionName = data.name ? data.name.toUpperCase() : "ACTIVE DEPLOYMENT";
-                    const activeRollCount = Array.isArray(data.rolls) ? data.rolls.length : 0;
-                    
+                    const sessionName = data.name || "ACTIVE DEPLOYMENT";
+                    const rollCount = data.rolls ? data.rolls.length : 0;
                     activeContainer.innerHTML = `
-                        <div class="shard p-6 rounded-lg border-l-4 border-l-emerald-500 relative overflow-hidden">
+                        <div class="shard p-6 border-l-4 border-l-emerald-500 relative overflow-hidden">
                             <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[9px] px-3 py-1 font-bold tracking-widest rounded-bl-lg">ACTIVE</div>
                             <div class="flex flex-col md:flex-row justify-between md:items-center gap-6">
                                 <div>
-                                    <h3 class="text-xl text-white cinzel font-bold mb-2 flex items-center gap-3">
-                                        ${sessionName} 
-                                        <button onclick="editSessionName('active_session', '${data.name || ''}')" class="text-sm text-slate-500 hover:text-emerald-400 transition-colors" title="Rename Session">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </button>
-                                    </h3>
+                                    <h3 class="text-xl text-white font-bold mb-2 flex items-center gap-3">${sessionName} <button onclick="editSessionName('active_session', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-sm"></i></button></h3>
                                     <div class="flex flex-wrap gap-2 mb-4">
-                                        <span class="badge">${data.wheel || 'US'} Wheel</span>
-                                        <span class="badge">${data.domain || 'INSIDE'}</span>
-                                        <span class="badge">${data.subCategory || 'STREETS'}</span>
-                                        <span class="badge">${data.strategy ? data.strategy.toUpperCase() : 'FIXED'}</span>
+                                        <span class="badge">${data.wheel || 'US'} Wheel</span><span class="badge">${data.strategy || 'FIXED'}</span>
                                     </div>
-                                    <p class="text-xs text-slate-400 font-montserrat mt-2">Rolls Logged: <span class="text-emerald-400 font-bold">${activeRollCount}</span></p>
+                                    <p class="text-xs text-slate-400 font-montserrat mt-2">Rolls Logged: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
                                 </div>
                                 <div class="flex flex-col gap-3 min-w-[140px]">
-                                    <button onclick="window.location.assign('roulette.html')" class="shard-btn primary-shard text-white w-full"><i class="fa-solid fa-play"></i> Resume</button>
+                                    <button onclick="resumeArchive('active_session')" class="shard-btn primary-shard text-white w-full"><i class="fa-solid fa-play"></i> Resume</button>
                                     <button onclick="window.location.assign('roulette-config.html')" class="shard-btn text-emerald-400 w-full"><i class="fa-solid fa-gear"></i> Config</button>
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 } else {
-                    activeContainer.innerHTML = `
-                        <div class="shard p-8 rounded-lg text-center border border-dashed border-emerald-900/50">
-                            <p class="text-slate-400 text-sm tracking-widest uppercase mb-4">No Active Session Found</p>
-                            <button onclick="startNewSession()" class="shard-btn primary-shard mx-auto"><i class="fa-solid fa-gear"></i> Configure New Session</button>
-                        </div>
-                    `;
+                    activeContainer.innerHTML = `<button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto"><i class="fa-solid fa-gear"></i> Configure New Session</button>`;
                 }
 
-                // Fetch Historical Archives (ordered locally)
-                const allDocsSnap = await sessionsRef.get();
-                let archives = [];
-                allDocsSnap.forEach(doc => {
+                const snap = await sessionsRef.get();
+                let html = '';
+                snap.forEach(doc => {
                     if(doc.id !== "active_session") {
-                        archives.push({ id: doc.id, ...doc.data() });
-                    }
-                });
-
-                // Sort newest first
-                archives.sort((a, b) => {
-                    const timeA = a.timestamp ? (a.timestamp.seconds || 0) : 0;
-                    const timeB = b.timestamp ? (b.timestamp.seconds || 0) : 0;
-                    return timeB - timeA;
-                });
-
-                const archiveContainer = document.getElementById('archive-container');
-                if (archives.length === 0) {
-                    archiveContainer.innerHTML = `<div class="col-span-1 lg:col-span-2 p-8 text-center text-slate-500 text-sm tracking-widest uppercase border border-dashed border-slate-800 rounded">No saved archives found.</div>`;
-                } else {
-                    let html = '';
-                    archives.forEach(arc => {
-                        const targetArray = arc.targets || [];
-                        const targetPreview = targetArray.length > 0 ? targetArray.slice(0, 4).join(', ') + (targetArray.length > 4 ? '...' : '') : 'None';
-                        const archiveName = arc.name ? arc.name.toUpperCase() : `SESSION ${arc.id.substring(0,6).toUpperCase()}`;
-                        const negProgName = arc.negProg ? arc.negProg.replace('_', ' ') : 'N/A';
-                        const rollCount = Array.isArray(arc.rolls) ? arc.rolls.length : 0;
-                        
+                        const arc = doc.data();
+                        const archiveName = arc.name || `SESSION ${doc.id.substring(0,6)}`;
+                        const rollCount = arc.rolls ? arc.rolls.length : 0;
                         html += `
-                            <div class="shard p-6 rounded-lg flex flex-col justify-between h-full">
-                                <div>
-                                    <div class="flex justify-between items-start mb-4">
-                                        <h3 class="text-emerald-400 cinzel font-bold text-sm tracking-widest flex items-center gap-2" title="${archiveName}">
-                                            <span class="truncate max-w-[200px]">${archiveName}</span>
-                                            <button onclick="editSessionName('${arc.id}', '${arc.name || ''}')" class="text-[11px] text-slate-500 hover:text-emerald-400 transition-colors" title="Rename Archive">
-                                                <i class="fa-solid fa-pen-to-square"></i>
-                                            </button>
-                                        </h3>
-                                        <span class="text-[9px] text-slate-500 font-montserrat flex-shrink-0">${formatDate(arc.timestamp)}</span>
-                                    </div>
-                                    
-                                    <div class="flex flex-wrap gap-1.5 mb-5">
-                                        <span class="badge border-slate-700 text-slate-300 bg-slate-900">${arc.wheel || 'US'} Wheel</span>
-                                        <span class="badge border-slate-700 text-slate-300 bg-slate-900">${(arc.domain || 'inside').toUpperCase()}: ${arc.subCategory || ''}</span>
-                                        <span class="badge border-slate-700 text-slate-300 bg-slate-900">${arc.protocol || ''}</span>
-                                        <span class="badge border-slate-700 text-slate-300 bg-slate-900">${(arc.strategy || 'fixed').toUpperCase()}</span>
-                                    </div>
-                                    
-                                    <div class="grid grid-cols-2 gap-y-3 gap-x-4 mb-4 border-t border-emerald-900/30 pt-4">
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Unit: <span class="text-white font-bold">$${arc.unit || 0}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Progression: <span class="text-white font-bold capitalize">${negProgName}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">CD Rule: <span class="text-white font-bold">${arc.cdTrigger || 0}x / ${arc.cdLength || 0}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Rolls Logged: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Targets: <span class="text-white font-bold truncate max-w-[70px] text-right" title="${targetArray.join(', ')}">${targetPreview}</span></p>
-                                    </div>
+                        <div class="shard p-6 flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start mb-4">
+                                    <h3 class="text-emerald-400 font-bold text-sm tracking-widest flex items-center gap-2">${archiveName} <button onclick="editSessionName('${doc.id}', '${arc.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button></h3>
+                                    <span class="text-[9px] text-slate-500">${new Date(arc.timestamp?.toDate()).toLocaleDateString()}</span>
                                 </div>
-                                
-                                <div class="flex gap-2 mt-2 pt-4 border-t border-emerald-900/30">
-                                    <button onclick="resumeArchive('${arc.id}')" class="shard-btn primary-shard flex-1 !py-2.5 px-2"><i class="fa-solid fa-play"></i> Resume</button>
-                                    <button onclick="loadArchive('${arc.id}')" class="shard-btn text-white flex-1 !py-2.5 px-2"><i class="fa-solid fa-gear"></i> Config</button>
-                                    <button onclick="deleteArchive('${arc.id}')" class="shard-btn text-red-400 hover:!bg-red-900/30 hover:!border-red-500/50 !py-2.5 px-3"><i class="fa-solid fa-trash"></i></button>
+                                <div class="grid grid-cols-2 gap-y-2 border-t border-emerald-900/30 pt-4">
+                                    <p class="text-[9px] text-slate-400 uppercase">Strategy: <span class="text-white">${arc.strategy || 'N/A'}</span></p>
+                                    <p class="text-[9px] text-slate-400 uppercase text-right">Rolls: <span class="text-emerald-400">${rollCount}</span></p>
                                 </div>
                             </div>
-                        `;
-                    });
-                    archiveContainer.innerHTML = html;
-                }
-
-            } catch (error) {
-                console.error("Error fetching vault:", error);
-                document.getElementById('active-session-container').innerHTML = `<p class="text-red-500 p-4">Error communicating with the database.</p>`;
-            }
-        }
-
-        async function startNewSession() {
-            try {
-                await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").delete();
-                window.location.assign("roulette-config.html");
-            } catch(e) {
-                console.error(e);
-                window.location.assign("roulette-config.html");
-            }
+                            <div class="flex gap-2 mt-6 pt-4 border-t border-emerald-900/30">
+                                <button onclick="resumeArchive('${doc.id}')" class="shard-btn primary-shard flex-1 !py-2.5"><i class="fa-solid fa-play"></i> Resume</button>
+                                <button onclick="loadArchive('${doc.id}')" class="shard-btn text-white flex-1 !py-2.5"><i class="fa-solid fa-gear"></i> Config</button>
+                                <button onclick="deleteArchive('${doc.id}')" class="shard-btn text-red-400 !py-2.5"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>`;
+                    }
+                });
+                document.getElementById('archive-container').innerHTML = html;
+            } catch (e) { console.error(e); }
         }
 
         async function resumeArchive(docId) {
             try {
-                const docRef = db.collection("users").doc(currentUid).collection("sessions").doc(docId);
-                const doc = await docRef.get();
-                
+                const doc = await db.collection("users").doc(currentUid).collection("sessions").doc(docId).get();
                 if(doc.exists) {
                     const data = doc.data();
-                    data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
+                    data.originId = docId === "active_session" ? (data.originId || null) : docId;
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
                     window.location.assign("roulette.html");
                 }
-            } catch (error) {
-                console.error("Error resuming archive:", error);
-                alert("Failed to resume archive.");
-            }
+            } catch (e) { alert("Resume failed."); }
         }
 
         async function loadArchive(docId) {
-            try {
-                const docRef = db.collection("users").doc(currentUid).collection("sessions").doc(docId);
-                const doc = await docRef.get();
-                
-                if(doc.exists) {
-                    const data = doc.data();
-                    data.rolls = [];
-                    data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
-                    await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
-                    window.location.assign("roulette-config.html");
-                }
-            } catch (error) {
-                console.error("Error loading archive:", error);
-                alert("Failed to load config.");
+            const doc = await db.collection("users").doc(currentUid).collection("sessions").doc(docId).get();
+            if(doc.exists) {
+                const data = doc.data(); data.rolls = []; data.originId = docId;
+                await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
+                window.location.assign("roulette-config.html");
             }
         }
 
-        async function deleteArchive(docId) {
-            if(confirm("Are you sure you want to permanently incinerate this archive?")) {
-                try {
-                    await db.collection("users").doc(currentUid).collection("sessions").doc(docId).delete();
-                    fetchVaultData(); 
-                } catch (error) {
-                    console.error("Error deleting archive:", error);
-                    alert("Failed to delete archive.");
-                }
+        async function editSessionName(docId, oldName) {
+            const name = prompt("New designation:", oldName);
+            if(name) {
+                await db.collection("users").doc(currentUid).collection("sessions").doc(docId).update({ name: name.toUpperCase() });
+                fetchVaultData();
+            }
+        }
+
+        async function deleteArchive(id) {
+            if(confirm("Delete permanently?")) {
+                await db.collection("users").doc(currentUid).collection("sessions").doc(id).delete();
+                fetchVaultData();
             }
         }
     </script>
