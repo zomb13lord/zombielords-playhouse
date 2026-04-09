@@ -923,13 +923,15 @@
             let showFelt = false;
             let showDynInput = false;
 
-            if (category === "Straight Up" && type === "Dynamic") {
-                showDynInput = true;
-                targetLabel.innerText = "Number of Pockets";
-            } else if (strategy === "fixed" || (category === "Straight Up" && type === "Fixed") || document.getElementById('main-domain').value === "sectors") {
-                showFelt = true;
-                targetLabel.innerText = "Target Selection";
-                renderFeltLayout(category, type, wheel);
+            if (strategy === "fixed") {
+                if (category === "Straight Up" && type === "Dynamic") {
+                    showDynInput = true;
+                    targetLabel.innerText = "Number of Pockets";
+                } else {
+                    showFelt = true;
+                    targetLabel.innerText = "Target Selection";
+                    renderFeltLayout(category, type, wheel);
+                }
             }
 
             if (showDynInput || showFelt) {
@@ -1022,7 +1024,7 @@
 
             evaluateLogicFlows(); 
 
-            if((d.strategy === "fixed" || d.protocol === "Fixed" || d.domain === "sectors") && d.targets) {
+            if(d.strategy === "fixed" && d.targets) {
                 window.activeBetTargets = new Set(d.targets);
                 updateSelectionUI();
             }
@@ -1083,29 +1085,29 @@
                     domain: document.getElementById('main-domain').value,
                     subCategory: cat,
                     protocol: isDynamic ? document.getElementById('type-label').innerText : document.getElementById('sub-type').value,
-                    dynamicValue: ['Neighbors', 'Radar'].includes(cat) ? document.getElementById('dynamic-type-input').value : null,
-                    numPockets: document.getElementById('sub-type').value === "Dynamic" ? document.getElementById('target-dynamic-input').value : null,
-                    targets: (document.getElementById('strategy').value === "fixed" || document.getElementById('sub-type').value === "Fixed" || document.getElementById('main-domain').value === "sectors") ? targetArray : null,
-                    warmup: document.getElementById('warmup-n').value,
-                    cdTrigger: document.getElementById('cd-trigger-n').value,
-                    cdLength: document.getElementById('cd-length-n').value,
-                    stabilization: document.getElementById('stabilization-n').value,
+                    dynamicValue: ['Neighbors', 'Radar'].includes(cat) ? Number(document.getElementById('dynamic-type-input').value) : null,
+                    numPockets: document.getElementById('sub-type').value === "Dynamic" ? Number(document.getElementById('target-dynamic-input').value) : null,
+                    targets: (document.getElementById('strategy').value === "fixed") ? targetArray : [],
+                    warmup: Number(document.getElementById('warmup-n').value),
+                    cdTrigger: Number(document.getElementById('cd-trigger-n').value),
+                    cdLength: Number(document.getElementById('cd-length-n').value),
+                    stabilization: Number(document.getElementById('stabilization-n').value),
                     lookback: document.getElementById('lookback-w').value,
                     betPrompt: document.getElementById('bet-prompt').value,
                     hedgeCmd: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-commander').value : null,
                     hedgeProg: document.getElementById('sub-type').value === "Top Line" ? document.getElementById('hedge-progression').value : null,
-                    unit: document.getElementById('base-unit').value,
+                    unit: Number(document.getElementById('base-unit').value),
                     negProg: document.getElementById('neg-progression').value,
                     posProg: document.getElementById('pos-progression').value,
-                    pMulti: document.getElementById('prog-multi').value,
-                    pPlus: document.getElementById('prog-plus').value,
-                    pInc: document.getElementById('prog-inc').value,
-                    pDec: document.getElementById('prog-dec').value,
+                    pMulti: Number(document.getElementById('prog-multi').value),
+                    pPlus: Number(document.getElementById('prog-plus').value),
+                    pInc: Number(document.getElementById('prog-inc').value),
+                    pDec: Number(document.getElementById('prog-dec').value),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     rolls: existingRolls
                 };
                 
-                await activeDocRef.set(config);
+                await activeDocRef.set(config, { merge: true });
                 window.location.href = "roulette.html";
 
             } catch (error) {
