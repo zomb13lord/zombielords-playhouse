@@ -84,15 +84,18 @@
             letter-spacing: 0.1em;
             font-weight: 600;
         }
+        
+        a.no-underline-custom { text-decoration: none !important; }
     </style>
 </head>
 <body class="flex flex-col">
 
     <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px]">
-        <div class="flex flex-col items-center cursor-pointer" onclick="window.location.href='lobby.html'">
+        <a href="lobby.html" class="flex flex-col items-center hover:opacity-80 transition-opacity no-underline-custom">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
             <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
-        </div>
+        </a>
+        
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
@@ -152,6 +155,22 @@
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         }
 
+        // --- NEW EDIT SESSION NAME LOGIC ---
+        async function editSessionName(docId, currentName) {
+            const newName = window.prompt("Enter new session designation:", currentName || "");
+            if (newName !== null && newName.trim() !== "") {
+                try {
+                    await db.collection("users").doc(currentUid).collection("sessions").doc(docId).update({
+                        name: newName.trim().toUpperCase()
+                    });
+                    fetchVaultData(); // Refresh UI instantly
+                } catch (error) {
+                    console.error("Error renaming session:", error);
+                    alert("Database communication failed while renaming.");
+                }
+            }
+        }
+
         async function fetchVaultData() {
             const sessionsRef = db.collection("users").doc(currentUid).collection("sessions");
             
@@ -163,20 +182,26 @@
                 if (activeDoc.exists) {
                     const data = activeDoc.data();
                     const sessionName = data.name ? data.name.toUpperCase() : "ACTIVE DEPLOYMENT";
+                    const activeRollCount = Array.isArray(data.rolls) ? data.rolls.length : 0;
                     
                     activeContainer.innerHTML = `
                         <div class="shard p-6 rounded-lg border-l-4 border-l-emerald-500 relative overflow-hidden">
                             <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[9px] px-3 py-1 font-bold tracking-widest rounded-bl-lg">ACTIVE</div>
                             <div class="flex flex-col md:flex-row justify-between md:items-center gap-6">
                                 <div>
-                                    <h3 class="text-xl text-white cinzel font-bold mb-2">${sessionName}</h3>
+                                    <h3 class="text-xl text-white cinzel font-bold mb-2 flex items-center gap-3">
+                                        ${sessionName} 
+                                        <button onclick="editSessionName('active_session', '${data.name || ''}')" class="text-sm text-slate-500 hover:text-emerald-400 transition-colors" title="Rename Session">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </button>
+                                    </h3>
                                     <div class="flex flex-wrap gap-2 mb-4">
                                         <span class="badge">${data.wheel || 'US'} Wheel</span>
                                         <span class="badge">${data.domain || 'INSIDE'}</span>
                                         <span class="badge">${data.subCategory || 'STREETS'}</span>
                                         <span class="badge">${data.strategy ? data.strategy.toUpperCase() : 'FIXED'}</span>
                                     </div>
-                                    <p class="text-xs text-slate-400 font-montserrat mt-2">Rolls Logged: <span class="text-emerald-400 font-bold">${data.rolls ? data.rolls.length : 0}</span></p>
+                                    <p class="text-xs text-slate-400 font-montserrat mt-2">Rolls Logged: <span class="text-emerald-400 font-bold">${activeRollCount}</span></p>
                                 </div>
                                 <div class="flex flex-col gap-3 min-w-[140px]">
                                     <button onclick="window.location.href='roulette.html'" class="shard-btn primary-shard text-white w-full"><i class="fa-solid fa-play"></i> Resume</button>
@@ -221,13 +246,20 @@
                         const targetPreview = targetArray.length > 0 ? targetArray.slice(0, 4).join(', ') + (targetArray.length > 4 ? '...' : '') : 'None';
                         const archiveName = arc.name ? arc.name.toUpperCase() : `SESSION ${arc.id.substring(0,6).toUpperCase()}`;
                         const negProgName = arc.negProg ? arc.negProg.replace('_', ' ') : 'N/A';
-                        const rollCount = arc.rolls ? arc.rolls.length : 0;
+                        
+                        // Enforced Array typing for roll count extraction
+                        const rollCount = Array.isArray(arc.rolls) ? arc.rolls.length : 0;
                         
                         html += `
                             <div class="shard p-6 rounded-lg flex flex-col justify-between h-full">
                                 <div>
                                     <div class="flex justify-between items-start mb-4">
-                                        <h3 class="text-emerald-400 cinzel font-bold text-sm tracking-widest truncate pr-2" title="${archiveName}">${archiveName}</h3>
+                                        <h3 class="text-emerald-400 cinzel font-bold text-sm tracking-widest flex items-center gap-2" title="${archiveName}">
+                                            <span class="truncate max-w-[200px]">${archiveName}</span>
+                                            <button onclick="editSessionName('${arc.id}', '${arc.name || ''}')" class="text-[11px] text-slate-500 hover:text-emerald-400 transition-colors" title="Rename Archive">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        </h3>
                                         <span class="text-[9px] text-slate-500 font-montserrat flex-shrink-0">${formatDate(arc.timestamp)}</span>
                                     </div>
                                     
@@ -243,7 +275,7 @@
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Progression: <span class="text-white font-bold capitalize">${negProgName}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">CD Rule: <span class="text-white font-bold">${arc.cdTrigger || 0}x / ${arc.cdLength || 0}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Rolls Logged: <span class="text-white font-bold">${rollCount}</span></p>
+                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Rolls Logged: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Targets: <span class="text-white font-bold truncate max-w-[70px] text-right" title="${targetArray.join(', ')}">${targetPreview}</span></p>
                                     </div>
                                 </div>
@@ -267,10 +299,12 @@
 
         async function startNewSession() {
             try {
+                // Delete active session so config page boots up clean
                 await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").delete();
                 window.location.href = "roulette-config.html";
             } catch(e) {
                 console.error(e);
+                // If it fails (e.g., doesn't exist), just route anyway
                 window.location.href = "roulette-config.html";
             }
         }
