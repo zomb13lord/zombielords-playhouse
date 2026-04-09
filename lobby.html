@@ -84,17 +84,15 @@
             letter-spacing: 0.1em;
             font-weight: 600;
         }
-        
-        a.no-underline-custom { text-decoration: none !important; }
     </style>
 </head>
 <body class="flex flex-col">
 
     <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px]">
-        <a href="lobby.html" class="flex flex-col items-center hover:opacity-80 transition-opacity no-underline-custom">
+        <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.href='lobby.html'">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
             <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
-        </a>
+        </div>
         
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
@@ -155,7 +153,6 @@
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute:'2-digit' });
         }
 
-        // --- NEW EDIT SESSION NAME LOGIC ---
         async function editSessionName(docId, currentName) {
             const newName = window.prompt("Enter new session designation:", currentName || "");
             if (newName !== null && newName.trim() !== "") {
@@ -163,7 +160,7 @@
                     await db.collection("users").doc(currentUid).collection("sessions").doc(docId).update({
                         name: newName.trim().toUpperCase()
                     });
-                    fetchVaultData(); // Refresh UI instantly
+                    fetchVaultData(); 
                 } catch (error) {
                     console.error("Error renaming session:", error);
                     alert("Database communication failed while renaming.");
@@ -241,13 +238,10 @@
                 } else {
                     let html = '';
                     archives.forEach(arc => {
-                        // Safely format data arrays and properties
                         const targetArray = arc.targets || [];
                         const targetPreview = targetArray.length > 0 ? targetArray.slice(0, 4).join(', ') + (targetArray.length > 4 ? '...' : '') : 'None';
                         const archiveName = arc.name ? arc.name.toUpperCase() : `SESSION ${arc.id.substring(0,6).toUpperCase()}`;
                         const negProgName = arc.negProg ? arc.negProg.replace('_', ' ') : 'N/A';
-                        
-                        // Enforced Array typing for roll count extraction
                         const rollCount = Array.isArray(arc.rolls) ? arc.rolls.length : 0;
                         
                         html += `
@@ -299,12 +293,10 @@
 
         async function startNewSession() {
             try {
-                // Delete active session so config page boots up clean
                 await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").delete();
                 window.location.href = "roulette-config.html";
             } catch(e) {
                 console.error(e);
-                // If it fails (e.g., doesn't exist), just route anyway
                 window.location.href = "roulette-config.html";
             }
         }
@@ -316,14 +308,8 @@
                 
                 if(doc.exists) {
                     const data = doc.data();
-                    
-                    // We DO NOT clear the rolls array here. We keep the historical rolls intact.
                     data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
-                    
-                    // Overwrite the active session with the selected archive
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
-                    
-                    // Route directly to the tracker, skipping the config screen entirely
                     window.location.href = "roulette.html";
                 }
             } catch (error) {
@@ -339,15 +325,9 @@
                 
                 if(doc.exists) {
                     const data = doc.data();
-                    
-                    // Wipe the old rolls array so it acts as a fresh template
                     data.rolls = [];
                     data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
-                    
-                    // Overwrite the active session
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
-                    
-                    // Route to config page so user can verify/edit before starting
                     window.location.href = "roulette-config.html";
                 }
             } catch (error) {
@@ -360,7 +340,7 @@
             if(confirm("Are you sure you want to permanently incinerate this archive?")) {
                 try {
                     await db.collection("users").doc(currentUid).collection("sessions").doc(docId).delete();
-                    fetchVaultData(); // Refresh the UI
+                    fetchVaultData(); 
                 } catch (error) {
                     console.error("Error deleting archive:", error);
                     alert("Failed to delete archive.");
