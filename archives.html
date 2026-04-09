@@ -94,20 +94,12 @@
             try {
                 const activeDoc = await sessionsRef.doc("active_session").get();
                 const activeContainer = document.getElementById('active-session-container');
-                
-                if (activeDoc.exists) {
-                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, activeDoc.data(), true);
-                } else {
-                    activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed"><button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto">Configure New Session</button></div>`;
-                }
+                if (activeDoc.exists) { activeContainer.innerHTML = generateCardHtml(activeDoc.id, activeDoc.data(), true); } 
+                else { activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed"><button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto">Configure New Session</button></div>`; }
 
                 const snap = await sessionsRef.get();
                 let html = '';
-                snap.forEach(doc => {
-                    if(doc.id !== "active_session") {
-                        html += generateCardHtml(doc.id, doc.data(), false);
-                    }
-                });
+                snap.forEach(doc => { if(doc.id !== "active_session") html += generateCardHtml(doc.id, doc.data(), false); });
                 document.getElementById('archive-container').innerHTML = html;
             } catch (e) { console.error(e); }
         }
@@ -116,7 +108,6 @@
             const rollCount = arc.rolls ? arc.rolls.length : 0;
             const archiveName = arc.name || (isActive ? "ACTIVE DEPLOYMENT" : `SESSION ${id.substring(0,6)}`);
             const targetPreview = arc.targets ? arc.targets.slice(0, 3).join(', ') + (arc.targets.length > 3 ? '...' : '') : 'N/A';
-            
             return `
                 <div class="shard p-6 ${isActive ? 'border-l-4 border-l-emerald-500 relative' : ''}">
                     ${isActive ? '<div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[8px] px-2 py-1 font-bold tracking-widest">ACTIVE</div>' : ''}
@@ -127,13 +118,11 @@
                         </h3>
                         <span class="text-[9px] text-slate-500 font-montserrat">${arc.timestamp ? new Date(arc.timestamp.toDate()).toLocaleDateString() : 'New'}</span>
                     </div>
-                    
                     <div class="flex flex-wrap gap-1.5 mb-4">
                         <span class="badge">${arc.wheel || 'US'} Wheel</span>
                         <span class="badge">${(arc.strategy || 'fixed').toUpperCase()}</span>
                         <span class="badge">${arc.subCategory || 'N/A'}</span>
                     </div>
-
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-emerald-900/30 pt-4 mb-6">
                         <p class="text-[9px] text-slate-400 uppercase tracking-wider">Unit: <span class="text-white font-bold">$${arc.unit || 0}</span></p>
                         <p class="text-[9px] text-slate-400 uppercase tracking-wider text-right">Prog: <span class="text-white font-bold">${arc.negProg || 'None'}</span></p>
@@ -141,7 +130,6 @@
                         <p class="text-[9px] text-slate-400 uppercase tracking-wider text-right">Rolls: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
                         <p class="text-[9px] text-slate-400 uppercase tracking-wider col-span-2">Targets: <span class="text-white font-bold">${targetPreview}</span></p>
                     </div>
-
                     <div class="flex gap-2">
                         <button onclick="resumeArchive('${id}')" class="shard-btn primary-shard flex-1"><i class="fa-solid fa-play"></i> Resume</button>
                         <button onclick="loadArchive('${id}')" class="shard-btn text-white flex-1"><i class="fa-solid fa-gear"></i> Config</button>
