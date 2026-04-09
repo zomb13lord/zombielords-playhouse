@@ -53,8 +53,9 @@
             </div>
 
             <div class="mb-12">
-                <div class="border-b border-emerald-900/40 pb-3 mb-6">
+                <div class="flex justify-between items-end border-b border-emerald-900/40 pb-3 mb-6">
                     <h2 class="cinzel text-lg text-white uppercase tracking-widest">Current Session</h2>
+                    <button onclick="startNewSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all"><i class="fa-solid fa-plus mr-2"></i>New Session</button>
                 </div>
                 <div id="active-session-container"></div>
             </div>
@@ -81,6 +82,13 @@
             fetchVaultData();
         });
 
+        async function startNewSession() {
+            if(confirm("Discard current active data and start fresh?")) {
+                await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").delete();
+                window.location.assign('roulette-config.html');
+            }
+        }
+
         async function fetchVaultData() {
             const sessionsRef = db.collection("users").doc(currentUid).collection("sessions");
             try {
@@ -88,9 +96,7 @@
                 const activeContainer = document.getElementById('active-session-container');
                 
                 if (activeDoc.exists) {
-                    const data = activeDoc.data();
-                    const sessionName = data.name || "ACTIVE DEPLOYMENT";
-                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, data, true);
+                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, activeDoc.data(), true);
                 } else {
                     activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed"><button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto">Configure New Session</button></div>`;
                 }
@@ -113,7 +119,7 @@
             
             return `
                 <div class="shard p-6 ${isActive ? 'border-l-4 border-l-emerald-500 relative' : ''}">
-                    ${isActive ? '<div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[8px] px-2 py-1 font-bold">ACTIVE</div>' : ''}
+                    ${isActive ? '<div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[8px] px-2 py-1 font-bold tracking-widest">ACTIVE</div>' : ''}
                     <div class="flex justify-between items-start mb-4">
                         <h3 class="text-emerald-400 font-bold text-sm tracking-widest flex items-center gap-2">
                             ${archiveName} 
@@ -129,11 +135,11 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-emerald-900/30 pt-4 mb-6">
-                        <p class="text-[9px] text-slate-400 uppercase">Unit: <span class="text-white font-bold">$${arc.unit || 0}</span></p>
-                        <p class="text-[9px] text-slate-400 uppercase text-right">Prog: <span class="text-white font-bold">${arc.negProg || 'None'}</span></p>
-                        <p class="text-[9px] text-slate-400 uppercase">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
-                        <p class="text-[9px] text-slate-400 uppercase text-right">Rolls: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
-                        <p class="text-[9px] text-slate-400 uppercase col-span-2">Targets: <span class="text-white font-bold">${targetPreview}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Unit: <span class="text-white font-bold">$${arc.unit || 0}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider text-right">Prog: <span class="text-white font-bold">${arc.negProg || 'None'}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider text-right">Rolls: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase tracking-wider col-span-2">Targets: <span class="text-white font-bold">${targetPreview}</span></p>
                     </div>
 
                     <div class="flex gap-2">
@@ -149,7 +155,6 @@
                 const doc = await db.collection("users").doc(currentUid).collection("sessions").doc(docId).get();
                 if(doc.exists) {
                     const data = doc.data();
-                    // Crucial: originId keeps the link to the archive
                     data.originId = (docId === "active_session") ? (data.originId || null) : docId;
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
                     window.location.assign("roulette.html");
