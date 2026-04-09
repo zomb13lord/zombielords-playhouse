@@ -95,8 +95,7 @@
         </div>
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
-            <a href="lobby.html" class="text-[9px] tracking-[0.2em] uppercase text-slate-400 hover:text-emerald-400 font-bold transition-all">Lobby</a>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Extinguish</button>
+            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
@@ -109,9 +108,8 @@
             </div>
 
             <div class="mb-12">
-                <div class="flex justify-between items-end border-b border-emerald-900/40 pb-3 mb-6">
+                <div class="border-b border-emerald-900/40 pb-3 mb-6">
                     <h2 class="cinzel text-lg text-white uppercase tracking-widest">Current Session</h2>
-                    <button onclick="startNewSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all"><i class="fa-solid fa-plus mr-2"></i>New Session</button>
                 </div>
                 
                 <div id="active-session-container" class="w-full">
@@ -182,7 +180,7 @@
                                 </div>
                                 <div class="flex flex-col gap-3 min-w-[140px]">
                                     <button onclick="window.location.href='roulette.html'" class="shard-btn primary-shard text-white w-full"><i class="fa-solid fa-play"></i> Resume</button>
-                                    <button onclick="window.location.href='roulette-config.html'" class="shard-btn text-emerald-400 w-full"><i class="fa-solid fa-pen-ruler"></i> Configure</button>
+                                    <button onclick="window.location.href='roulette-config.html'" class="shard-btn text-emerald-400 w-full"><i class="fa-solid fa-gear"></i> Config</button>
                                 </div>
                             </div>
                         </div>
@@ -223,6 +221,7 @@
                         const targetPreview = targetArray.length > 0 ? targetArray.slice(0, 4).join(', ') + (targetArray.length > 4 ? '...' : '') : 'None';
                         const archiveName = arc.name ? arc.name.toUpperCase() : `SESSION ${arc.id.substring(0,6).toUpperCase()}`;
                         const negProgName = arc.negProg ? arc.negProg.replace('_', ' ') : 'N/A';
+                        const rollCount = arc.rolls ? arc.rolls.length : 0;
                         
                         html += `
                             <div class="shard p-6 rounded-lg flex flex-col justify-between h-full">
@@ -244,14 +243,15 @@
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Progression: <span class="text-white font-bold capitalize">${negProgName}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">CD Rule: <span class="text-white font-bold">${arc.cdTrigger || 0}x / ${arc.cdLength || 0}</span></p>
-                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Lookback: <span class="text-white font-bold capitalize">${arc.lookback || 'N/A'}</span></p>
+                                        <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Rolls Logged: <span class="text-white font-bold">${rollCount}</span></p>
                                         <p class="text-[9px] text-slate-400 font-montserrat uppercase tracking-widest flex justify-between">Targets: <span class="text-white font-bold truncate max-w-[70px] text-right" title="${targetArray.join(', ')}">${targetPreview}</span></p>
                                     </div>
                                 </div>
                                 
-                                <div class="flex gap-3 mt-2 pt-4 border-t border-emerald-900/30">
-                                    <button onclick="loadArchive('${arc.id}')" class="shard-btn text-white flex-1 !py-2.5"><i class="fa-solid fa-download"></i> Load Config</button>
-                                    <button onclick="deleteArchive('${arc.id}')" class="shard-btn text-red-400 hover:!bg-red-900/30 hover:!border-red-500/50 !py-2.5 px-4"><i class="fa-solid fa-trash"></i></button>
+                                <div class="flex gap-2 mt-2 pt-4 border-t border-emerald-900/30">
+                                    <button onclick="resumeArchive('${arc.id}')" class="shard-btn primary-shard flex-1 !py-2.5 px-2"><i class="fa-solid fa-play"></i> Resume</button>
+                                    <button onclick="loadArchive('${arc.id}')" class="shard-btn text-white flex-1 !py-2.5 px-2"><i class="fa-solid fa-gear"></i> Config</button>
+                                    <button onclick="deleteArchive('${arc.id}')" class="shard-btn text-red-400 hover:!bg-red-900/30 hover:!border-red-500/50 !py-2.5 px-3"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </div>
                         `;
@@ -267,13 +267,34 @@
 
         async function startNewSession() {
             try {
-                // Delete active session so config page boots up clean
                 await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").delete();
                 window.location.href = "roulette-config.html";
             } catch(e) {
                 console.error(e);
-                // If it fails (e.g., doesn't exist), just route anyway
                 window.location.href = "roulette-config.html";
+            }
+        }
+
+        async function resumeArchive(docId) {
+            try {
+                const docRef = db.collection("users").doc(currentUid).collection("sessions").doc(docId);
+                const doc = await docRef.get();
+                
+                if(doc.exists) {
+                    const data = doc.data();
+                    
+                    // We DO NOT clear the rolls array here. We keep the historical rolls intact.
+                    data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
+                    
+                    // Overwrite the active session with the selected archive
+                    await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
+                    
+                    // Route directly to the tracker, skipping the config screen entirely
+                    window.location.href = "roulette.html";
+                }
+            } catch (error) {
+                console.error("Error resuming archive:", error);
+                alert("Failed to resume archive.");
             }
         }
 
@@ -285,19 +306,19 @@
                 if(doc.exists) {
                     const data = doc.data();
                     
-                    // Wipe the old rolls array so it starts as a fresh session using old params
+                    // Wipe the old rolls array so it acts as a fresh template
                     data.rolls = [];
                     data.timestamp = firebase.firestore.FieldValue.serverTimestamp(); 
                     
                     // Overwrite the active session
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
                     
-                    // Route to config page so user can verify before starting
+                    // Route to config page so user can verify/edit before starting
                     window.location.href = "roulette-config.html";
                 }
             } catch (error) {
                 console.error("Error loading archive:", error);
-                alert("Failed to load archive.");
+                alert("Failed to load config.");
             }
         }
 
