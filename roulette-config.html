@@ -89,7 +89,6 @@
         .bg-red-felt { background-color: #7f1d1d; }
         .bg-black-felt { background-color: #0f172a; }
         .bg-green-felt { background-color: #065f46; }
-        .bg-outside-felt { background-color: rgba(30, 41, 59, 0.6); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
@@ -172,7 +171,6 @@
                         <label id="target-selection-label" style="margin-bottom: 0;">Target Selection</label>
                         <button type="button" onclick="clearTargetSelection()" class="text-[9px] border border-red-500/40 text-red-400 px-3 py-1 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-bold rounded">Clear All</button>
                     </div>
-                    <input type="number" id="target-dynamic-input" style="display: none;" class="config-input mb-4" placeholder="Number of Pockets">
                     <div id="felt-board-container" class="w-full relative"></div>
                 </div>
             </div>
@@ -204,7 +202,7 @@
                 <div class="border-b border-emerald-900/30 pb-4 mb-6">
                     <h2 class="cinzel emerald-text text-lg uppercase tracking-widest font-black">Progression</h2>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div><label>Base Unit ($)</label><input type="number" id="base-unit" class="config-input" value="5" step="0.1"></div>
                     <div>
                         <label>Neg. Progression</label>
@@ -242,18 +240,11 @@
             sectors: { "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], "Neighbors": ["Size (S)"] } 
         };
 
-        const wheelSequences = {
-            EU: ['0','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26'],
-            US: ['0','28','9','26','30','11','7','20','32','17','5','22','34','15','3','24','36','1','00','27','10','25','29','12','8','19','31','18','6','21','33','16','4','23','35','14','2'],
-            TZ: ['0','000','00','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26']
-        };
-
         function bootstrapUI() {
             document.getElementById('wheel-type').value = "US";
             updateWheelSubtypes();
             document.getElementById('main-domain').value = "inside";
             updateSubDomains();
-            evaluateLogicFlows();
         }
 
         window.addEventListener('DOMContentLoaded', bootstrapUI);
@@ -296,9 +287,9 @@
 
         function evaluateLogicFlows() {
             const cat = document.getElementById('sub-domain').value;
-            const type = document.getElementById('sub-type').value;
             const strat = document.getElementById('strategy').value;
             const wheel = document.getElementById('wheel-type').value;
+            const type = document.getElementById('sub-type').value;
 
             toggleVisibility(document.getElementById('dynamic-value-box'), (cat === "Neighbors"));
             toggleVisibility(document.getElementById('target-selection-box'), (strat === "fixed"));
@@ -311,13 +302,11 @@
         function renderFeltLayout(category, type, wheel) {
             const container = document.getElementById('felt-board-container');
             container.innerHTML = '';
-            const isDesktop = window.innerWidth >= 768;
             const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
             
             const grid = document.createElement('div');
             grid.className = 'grid grid-cols-13 gap-1 w-full';
             
-            // Render Zero(s)
             const zeroCol = document.createElement('div');
             zeroCol.className = 'flex flex-col gap-1';
             const zeroes = wheel === 'EU' ? ['0'] : (wheel === 'US' ? ['00','0'] : ['000','00','0']);
@@ -331,7 +320,6 @@
             });
             grid.appendChild(zeroCol);
 
-            // Render 1-36
             for(let i=1; i<=36; i++) {
                 const btn = document.createElement('button');
                 btn.className = `felt-btn h-[45px] rounded ${redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt'}`;
@@ -363,9 +351,21 @@
             updateWheelSubtypes();
             document.getElementById('main-domain').value = d.domain || "inside";
             updateSubDomains();
+            document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
+            updateSubTypes();
             document.getElementById('strategy').value = d.strategy || "fixed";
             if(d.targets) window.activeBetTargets = new Set(d.targets);
+            
+            document.getElementById('warmup-n').value = d.warmup || 16;
+            document.getElementById('base-unit').value = d.unit || 5;
+            document.getElementById('neg-progression').value = d.negProg || "flat";
+            
             evaluateLogicFlows();
+        }
+
+        function clearTargetSelection() {
+            window.activeBetTargets.clear();
+            updateSelectionUI();
         }
 
         async function commitAndLaunch() {
@@ -386,7 +386,8 @@
                 negProg: document.getElementById('neg-progression').value,
                 targets: Array.from(window.activeBetTargets),
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                rolls: existingRolls
+                rolls: existingRolls,
+                originId: activeDoc.exists ? (activeDoc.data().originId || null) : null
             };
 
             await activeDocRef.set(config, { merge: true });
