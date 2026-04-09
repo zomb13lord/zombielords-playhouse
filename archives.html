@@ -23,14 +23,14 @@
         .shard { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; transition: all 0.3s ease; }
         .shard:hover { border-color: rgba(16, 185, 129, 0.6); }
         .shard-btn { 
-            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 12px 20px; 
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; 
             transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; 
-            gap: 10px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif;
-            font-weight: 700; letter-spacing: 0.1em; font-size: 11px;
+            gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif;
+            font-weight: 700; letter-spacing: 0.1em; font-size: 10px;
         }
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .badge { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 4px 8px; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-size: 9px; text-transform: uppercase; font-weight: 600; }
+        .badge { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 3px 6px; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-size: 8px; text-transform: uppercase; font-weight: 600; }
     </style>
 </head>
 <body class="flex flex-col">
@@ -56,9 +56,7 @@
                 <div class="border-b border-emerald-900/40 pb-3 mb-6">
                     <h2 class="cinzel text-lg text-white uppercase tracking-widest">Current Session</h2>
                 </div>
-                <div id="active-session-container">
-                    <div class="text-center p-8 text-slate-500 text-sm tracking-widest uppercase border border-dashed border-slate-800 rounded">Checking systems...</div>
-                </div>
+                <div id="active-session-container"></div>
             </div>
 
             <div>
@@ -88,60 +86,62 @@
             try {
                 const activeDoc = await sessionsRef.doc("active_session").get();
                 const activeContainer = document.getElementById('active-session-container');
+                
                 if (activeDoc.exists) {
                     const data = activeDoc.data();
                     const sessionName = data.name || "ACTIVE DEPLOYMENT";
-                    const rollCount = data.rolls ? data.rolls.length : 0;
-                    activeContainer.innerHTML = `
-                        <div class="shard p-6 border-l-4 border-l-emerald-500 relative overflow-hidden">
-                            <div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[9px] px-3 py-1 font-bold tracking-widest rounded-bl-lg">ACTIVE</div>
-                            <div class="flex flex-col md:flex-row justify-between md:items-center gap-6">
-                                <div>
-                                    <h3 class="text-xl text-white font-bold mb-2 flex items-center gap-3">${sessionName} <button onclick="editSessionName('active_session', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-sm"></i></button></h3>
-                                    <div class="flex flex-wrap gap-2 mb-4">
-                                        <span class="badge">${data.wheel || 'US'} Wheel</span><span class="badge">${data.strategy || 'FIXED'}</span>
-                                    </div>
-                                    <p class="text-xs text-slate-400 font-montserrat mt-2">Rolls Logged: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
-                                </div>
-                                <div class="flex flex-col gap-3 min-w-[140px]">
-                                    <button onclick="resumeArchive('active_session')" class="shard-btn primary-shard text-white w-full"><i class="fa-solid fa-play"></i> Resume</button>
-                                    <button onclick="window.location.assign('roulette-config.html')" class="shard-btn text-emerald-400 w-full"><i class="fa-solid fa-gear"></i> Config</button>
-                                </div>
-                            </div>
-                        </div>`;
+                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, data, true);
                 } else {
-                    activeContainer.innerHTML = `<button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto"><i class="fa-solid fa-gear"></i> Configure New Session</button>`;
+                    activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed"><button onclick="window.location.assign('roulette-config.html')" class="shard-btn primary-shard mx-auto">Configure New Session</button></div>`;
                 }
 
                 const snap = await sessionsRef.get();
                 let html = '';
                 snap.forEach(doc => {
                     if(doc.id !== "active_session") {
-                        const arc = doc.data();
-                        const archiveName = arc.name || `SESSION ${doc.id.substring(0,6)}`;
-                        const rollCount = arc.rolls ? arc.rolls.length : 0;
-                        html += `
-                        <div class="shard p-6 flex flex-col justify-between">
-                            <div>
-                                <div class="flex justify-between items-start mb-4">
-                                    <h3 class="text-emerald-400 font-bold text-sm tracking-widest flex items-center gap-2">${archiveName} <button onclick="editSessionName('${doc.id}', '${arc.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button></h3>
-                                    <span class="text-[9px] text-slate-500">${new Date(arc.timestamp?.toDate()).toLocaleDateString()}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-y-2 border-t border-emerald-900/30 pt-4">
-                                    <p class="text-[9px] text-slate-400 uppercase">Strategy: <span class="text-white">${arc.strategy || 'N/A'}</span></p>
-                                    <p class="text-[9px] text-slate-400 uppercase text-right">Rolls: <span class="text-emerald-400">${rollCount}</span></p>
-                                </div>
-                            </div>
-                            <div class="flex gap-2 mt-6 pt-4 border-t border-emerald-900/30">
-                                <button onclick="resumeArchive('${doc.id}')" class="shard-btn primary-shard flex-1 !py-2.5"><i class="fa-solid fa-play"></i> Resume</button>
-                                <button onclick="loadArchive('${doc.id}')" class="shard-btn text-white flex-1 !py-2.5"><i class="fa-solid fa-gear"></i> Config</button>
-                                <button onclick="deleteArchive('${doc.id}')" class="shard-btn text-red-400 !py-2.5"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>`;
+                        html += generateCardHtml(doc.id, doc.data(), false);
                     }
                 });
                 document.getElementById('archive-container').innerHTML = html;
             } catch (e) { console.error(e); }
+        }
+
+        function generateCardHtml(id, arc, isActive) {
+            const rollCount = arc.rolls ? arc.rolls.length : 0;
+            const archiveName = arc.name || (isActive ? "ACTIVE DEPLOYMENT" : `SESSION ${id.substring(0,6)}`);
+            const targetPreview = arc.targets ? arc.targets.slice(0, 3).join(', ') + (arc.targets.length > 3 ? '...' : '') : 'N/A';
+            
+            return `
+                <div class="shard p-6 ${isActive ? 'border-l-4 border-l-emerald-500 relative' : ''}">
+                    ${isActive ? '<div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[8px] px-2 py-1 font-bold">ACTIVE</div>' : ''}
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-emerald-400 font-bold text-sm tracking-widest flex items-center gap-2">
+                            ${archiveName} 
+                            <button onclick="editSessionName('${id}', '${arc.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                        </h3>
+                        <span class="text-[9px] text-slate-500 font-montserrat">${arc.timestamp ? new Date(arc.timestamp.toDate()).toLocaleDateString() : 'New'}</span>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-1.5 mb-4">
+                        <span class="badge">${arc.wheel || 'US'} Wheel</span>
+                        <span class="badge">${(arc.strategy || 'fixed').toUpperCase()}</span>
+                        <span class="badge">${arc.subCategory || 'N/A'}</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-emerald-900/30 pt-4 mb-6">
+                        <p class="text-[9px] text-slate-400 uppercase">Unit: <span class="text-white font-bold">$${arc.unit || 0}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase text-right">Prog: <span class="text-white font-bold">${arc.negProg || 'None'}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase">Warmup: <span class="text-white font-bold">${arc.warmup || 0}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase text-right">Rolls: <span class="text-emerald-400 font-bold">${rollCount}</span></p>
+                        <p class="text-[9px] text-slate-400 uppercase col-span-2">Targets: <span class="text-white font-bold">${targetPreview}</span></p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="resumeArchive('${id}')" class="shard-btn primary-shard flex-1"><i class="fa-solid fa-play"></i> Resume</button>
+                        <button onclick="loadArchive('${id}')" class="shard-btn text-white flex-1"><i class="fa-solid fa-gear"></i> Config</button>
+                        ${!isActive ? `<button onclick="deleteArchive('${id}')" class="shard-btn text-red-400 px-3"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </div>
+                </div>`;
         }
 
         async function resumeArchive(docId) {
@@ -149,7 +149,8 @@
                 const doc = await db.collection("users").doc(currentUid).collection("sessions").doc(docId).get();
                 if(doc.exists) {
                     const data = doc.data();
-                    data.originId = docId === "active_session" ? (data.originId || null) : docId;
+                    // Crucial: originId keeps the link to the archive
+                    data.originId = (docId === "active_session") ? (data.originId || null) : docId;
                     await db.collection("users").doc(currentUid).collection("sessions").doc("active_session").set(data);
                     window.location.assign("roulette.html");
                 }
