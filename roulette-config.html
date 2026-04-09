@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Configuration | Zombie Lord's</title>
+    <title>Roulette Calibration | Zombie Lord's</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -12,50 +12,18 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;600&display=swap');
         
-        :root { 
-            --gold: #c5a059; 
-            --bg-dark: #020617; 
-            --emerald: #10b981; 
-        }
+        :root { --gold: #c5a059; --bg-dark: #020617; --emerald: #10b981; }
 
         body { 
-            margin: 0; padding: 0;
-            background-color: var(--bg-dark); 
-            color: #f8fafc; 
-            font-family: 'Cinzel', serif; 
-            min-height: 100vh;
+            margin: 0; padding: 0; background-color: var(--bg-dark); color: #f8fafc; 
+            font-family: 'Cinzel', serif; min-height: 100vh;
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), 
                               url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-size: cover; background-position: center; background-attachment: fixed;
         }
 
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        
-        .shard-btn { 
-            background: rgba(15, 23, 42, 0.75); 
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(16, 185, 129, 0.2); 
-            padding: 18px 30px; 
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 15px;
-            border-radius: 4px; 
-            width: 100%;
-        }
-        .shard-btn:hover { 
-            border-color: #10b981; 
-            background: rgba(16, 185, 129, 0.1);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
-            transform: translateY(-3px);
-        }
-        .primary-shard { border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.05); }
-
-        .shard { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .shard { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; }
         
         .config-input { 
             background-color: #0f172a; border: 1px solid #059669; color: #f8fafc; 
@@ -82,13 +50,21 @@
         .felt-selected {
             border-color: #10b981 !important; color: #fff !important;
             box-shadow: inset 0 0 15px rgba(16, 185, 129, 0.4), 0 0 10px rgba(16, 185, 129, 0.6) !important;
-            opacity: 1 !important; background-color: rgba(16, 185, 129, 0.3) !important;
+            background-color: rgba(16, 185, 129, 0.3) !important;
             z-index: 5;
         }
 
         .bg-red-felt { background-color: #7f1d1d; }
-        .bg-black-felt { background-color: #0f172a; }
+        .bg-black-felt { background-color: #000000; }
         .bg-green-felt { background-color: #065f46; }
+
+        .shard-btn { 
+            background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.2); 
+            padding: 18px 30px; transition: 0.4s ease; cursor: pointer; border-radius: 4px; 
+            display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%;
+        }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.1); transform: translateY(-3px); }
+        .primary-shard { border-color: rgba(16, 185, 129, 0.6); background: rgba(16, 185, 129, 0.05); }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
@@ -103,7 +79,7 @@
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
             <a href="archives.html" class="text-[9px] tracking-[0.2em] uppercase text-slate-400 hover:text-emerald-400 font-bold transition-all">Vault</a>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
@@ -125,7 +101,9 @@
                     </div>
                     <div>
                         <label>Style</label>
-                        <select id="wheel-subtype" class="config-input" onchange="evaluateLogicFlows()"></select>
+                        <select id="wheel-subtype" class="config-input" onchange="evaluateLogicFlows()">
+                            <option value="Standard">Standard</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -145,13 +123,15 @@
                     </div>
                     <div>
                         <label>Category</label>
-                        <select id="sub-domain" class="config-input" onchange="updateSubTypes()"></select>
+                        <select id="sub-domain" class="config-input" onchange="updateSubTypes()">
+                            </select>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div id="type-container" class="relative">
                         <label id="type-label">Type</label>
-                        <select id="sub-type" class="config-input" onchange="evaluateLogicFlows()"></select>
+                        <select id="sub-type" class="config-input" onchange="evaluateLogicFlows()">
+                            </select>
                         <div id="dynamic-value-box" style="display: none;">
                             <input type="number" id="dynamic-type-input" class="config-input" value="1">
                         </div>
@@ -171,7 +151,8 @@
                         <label id="target-selection-label" style="margin-bottom: 0;">Target Selection</label>
                         <button type="button" onclick="clearTargetSelection()" class="text-[9px] border border-red-500/40 text-red-400 px-3 py-1 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-bold rounded">Clear All</button>
                     </div>
-                    <div id="felt-board-container" class="w-full relative"></div>
+                    <div id="felt-board-container" class="w-full relative overflow-x-auto no-scrollbar">
+                        </div>
                 </div>
             </div>
 
@@ -192,8 +173,19 @@
                         <label>Lookback</label>
                         <select id="lookback-w" class="config-input">
                             <option value="short">Short</option><option value="standard">Standard</option>
-                            <option value="long">Long</option><option value="all">All</option>
+                            <option value="long" selected>Long</option><option value="all">All</option>
                         </select>
+                    </div>
+                </div>
+                
+                <div id="hedge-commander-box" style="display: none;" class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-emerald-900/20">
+                    <div>
+                        <label>Top Line Hedge</label>
+                        <select id="hedge-commander" class="config-input"><option value="always">Always On</option><option value="dynamic">Dynamic</option></select>
+                    </div>
+                    <div>
+                        <label>Hedge Directive</label>
+                        <select id="hedge-progression" class="config-input"><option value="push">Push</option><option value="profit">Profit</option></select>
                     </div>
                 </div>
             </div>
@@ -206,8 +198,8 @@
                     <div><label>Base Unit ($)</label><input type="number" id="base-unit" class="config-input" value="5" step="0.1"></div>
                     <div>
                         <label>Neg. Progression</label>
-                        <select id="neg-progression" class="config-input" onchange="evaluateLogicFlows()">
-                            <option value="flat">Flat</option><option value="martingale">Martingale</option>
+                        <select id="neg-progression" class="config-input">
+                            <option value="flat">Flat</option><option value="martingale" selected>Martingale</option>
                             <option value="martingale_plus">Martingale Plus</option><option value="fibonacci">Fibonacci</option>
                             <option value="dalambert">D'Alambert</option><option value="ladder">Ladder</option>
                         </select>
@@ -228,26 +220,16 @@
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); 
-        const db = firebase.firestore();
+        const auth = firebase.auth(); const db = firebase.firestore();
 
         window.activeBetTargets = new Set();
+        const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
-        const wheelMap = { EU: ["Standard", "La Partage"], US: ["Standard"], TZ: ["Standard (Sands/Venetian)"] };
         const domainMap = { 
             inside: { "Straight Up": ["Fixed", "Dynamic"], "Streets": ["Standard", "Top Line"], "Corners": ["Standard"], "Lines": ["Standard", "Top Line"] }, 
             outside: { "Dozens/Columns": ["Dozens", "Columns"], "Even Money": ["Red/Black", "Odd/Even", "High/Low"] }, 
             sectors: { "Racetrack": ["Zero Game", "Voisins", "Orphelins", "Tier"], "Neighbors": ["Size (S)"] } 
         };
-
-        function bootstrapUI() {
-            document.getElementById('wheel-type').value = "US";
-            updateWheelSubtypes();
-            document.getElementById('main-domain').value = "inside";
-            updateSubDomains();
-        }
-
-        window.addEventListener('DOMContentLoaded', bootstrapUI);
 
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
@@ -258,14 +240,12 @@
         async function checkActiveSession() {
             const doc = await db.collection("users").doc(auth.currentUser.uid).collection("sessions").doc("active_session").get();
             if(doc.exists) loadValues(doc.data());
+            else bootstrapUI();
         }
 
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
-
-        function updateWheelSubtypes() {
-            const type = document.getElementById('wheel-type').value;
-            document.getElementById('wheel-subtype').innerHTML = wheelMap[type].map(s => `<option value="${s}">${s}</option>`).join('');
-            evaluateLogicFlows();
+        function bootstrapUI() {
+            document.getElementById('main-domain').value = "inside";
+            updateSubDomains();
         }
 
         function updateSubDomains() {
@@ -281,52 +261,60 @@
             evaluateLogicFlows();
         }
 
-        function toggleVisibility(element, show, displayType = 'block') {
-            if (element) element.style.display = show ? displayType : 'none';
-        }
-
         function evaluateLogicFlows() {
             const cat = document.getElementById('sub-domain').value;
             const strat = document.getElementById('strategy').value;
-            const wheel = document.getElementById('wheel-type').value;
             const type = document.getElementById('sub-type').value;
 
-            toggleVisibility(document.getElementById('dynamic-value-box'), (cat === "Neighbors"));
-            toggleVisibility(document.getElementById('target-selection-box'), (strat === "fixed"));
+            document.getElementById('dynamic-value-box').style.display = (cat === "Neighbors") ? 'block' : 'none';
+            document.getElementById('target-selection-box').style.display = (strat === "fixed") ? 'block' : 'none';
+            document.getElementById('hedge-commander-box').style.display = (type === "Top Line") ? 'grid' : 'none';
 
-            if (strat === "fixed") {
-                renderFeltLayout(cat, type, wheel);
-            }
+            if (strat === "fixed") renderFeltLayout();
         }
 
-        function renderFeltLayout(category, type, wheel) {
+        function renderFeltLayout() {
             const container = document.getElementById('felt-board-container');
+            const wheel = document.getElementById('wheel-type').value;
             container.innerHTML = '';
-            const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
             
             const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-13 gap-1 w-full';
+            grid.className = 'grid grid-cols-13 gap-1 min-w-[700px] h-[160px]';
             
+            // Zeros Column
             const zeroCol = document.createElement('div');
             zeroCol.className = 'flex flex-col gap-1';
             const zeroes = wheel === 'EU' ? ['0'] : (wheel === 'US' ? ['00','0'] : ['000','00','0']);
             zeroes.forEach(z => {
                 const btn = document.createElement('button');
-                btn.className = 'felt-btn bg-green-felt h-full min-h-[40px] rounded';
+                btn.className = 'felt-btn bg-green-felt h-full rounded';
                 btn.innerText = z;
-                btn.onclick = () => toggleTarget(z);
                 btn.dataset.val = z;
+                btn.onclick = () => toggleTarget(z);
                 zeroCol.appendChild(btn);
             });
             grid.appendChild(zeroCol);
 
-            for(let i=1; i<=36; i++) {
-                const btn = document.createElement('button');
-                btn.className = `felt-btn h-[45px] rounded ${redNums.includes(i) ? 'bg-red-felt' : 'bg-black-felt'}`;
-                btn.innerText = i;
-                btn.onclick = () => toggleTarget(i.toString());
-                btn.dataset.val = i.toString();
-                grid.appendChild(btn);
+            // Numbers 1-36 mapped to 3-row columns
+            const layout = [
+                [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36], 
+                [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35], 
+                [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34]  
+            ];
+
+            for(let col = 0; col < 12; col++) {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'flex flex-col gap-1';
+                for(let row = 0; row < 3; row++) {
+                    const n = layout[row][col];
+                    const btn = document.createElement('button');
+                    btn.className = `felt-btn flex-1 rounded ${redNums.includes(n) ? 'bg-red-felt' : 'bg-black-felt'}`;
+                    btn.innerText = n;
+                    btn.dataset.val = n.toString();
+                    btn.onclick = () => toggleTarget(n.toString());
+                    colDiv.appendChild(btn);
+                }
+                grid.appendChild(colDiv);
             }
             container.appendChild(grid);
             updateSelectionUI();
@@ -343,29 +331,29 @@
                 if (window.activeBetTargets.has(btn.dataset.val)) btn.classList.add('felt-selected');
                 else btn.classList.remove('felt-selected');
             });
-        }
-
-        function loadValues(d) {
-            if(!d) return;
-            document.getElementById('wheel-type').value = d.wheel || "US";
-            updateWheelSubtypes();
-            document.getElementById('main-domain').value = d.domain || "inside";
-            updateSubDomains();
-            document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
-            updateSubTypes();
-            document.getElementById('strategy').value = d.strategy || "fixed";
-            if(d.targets) window.activeBetTargets = new Set(d.targets);
-            
-            document.getElementById('warmup-n').value = d.warmup || 16;
-            document.getElementById('base-unit').value = d.unit || 5;
-            document.getElementById('neg-progression').value = d.negProg || "flat";
-            
-            evaluateLogicFlows();
+            const count = Array.from(window.activeBetTargets).length;
+            document.getElementById('target-selection-label').innerText = count > 0 ? `Target Selection (${count})` : "Target Selection";
         }
 
         function clearTargetSelection() {
             window.activeBetTargets.clear();
             updateSelectionUI();
+        }
+
+        function loadValues(d) {
+            document.getElementById('wheel-type').value = d.wheel || "US";
+            document.getElementById('main-domain').value = d.domain || "inside";
+            updateSubDomains();
+            document.getElementById('sub-domain').value = d.subCategory || "Straight Up";
+            updateSubTypes();
+            document.getElementById('sub-type').value = d.protocol || "Fixed";
+            document.getElementById('strategy').value = d.strategy || "fixed";
+            if(d.targets) window.activeBetTargets = new Set(d.targets);
+            
+            document.getElementById('warmup-n').value = d.warmup || 16;
+            document.getElementById('base-unit').value = d.unit || 5;
+            document.getElementById('neg-progression').value = d.negProg || "martingale";
+            evaluateLogicFlows();
         }
 
         async function commitAndLaunch() {
@@ -389,6 +377,11 @@
                 rolls: existingRolls,
                 originId: activeDoc.exists ? (activeDoc.data().originId || null) : null
             };
+
+            if (config.protocol === "Top Line") {
+                config.hedgeCmd = document.getElementById('hedge-commander').value;
+                config.hedgeProg = document.getElementById('hedge-progression').value;
+            }
 
             await activeDocRef.set(config, { merge: true });
             window.location.href = "roulette.html";
