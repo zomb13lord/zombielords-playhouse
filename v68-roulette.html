@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Roulette Tracker V71.1</title>
+    <title>Roulette Tracker V71.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -81,8 +81,15 @@
 
 <div id="config-page">
     <div class="config-grid">
-        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V71.1</h2>
-        <div class="full"><label>Audit Domain</label><select id="dom-sel"><option value="9ST" selected>9 Streets</option><option value="36SN">36 Singles</option></select></div>
+        <h2 class="full" style="margin:0; color:var(--accent);">Cycle Engine V71.2</h2>
+        <div class="full">
+            <label>Audit Domain</label>
+            <select id="dom-sel">
+                <option value="9ST" selected>9 Streets</option>
+                <option value="12SP">12 Splits</option>
+                <option value="36SN">36 Singles</option>
+            </select>
+        </div>
         <div class="full"><label>Strategy (Winners)</label><select id="strat-sel"><option value="COLD">Cold Hunt</option><option value="HOT" selected>Hot Hunt</option></select></div>
         <div><label>Target Count</label><input type="number" id="target-count" value="28"></div>
         <div><label>Warmup</label><input type="number" id="warm-in" value="16"></div>
@@ -150,6 +157,18 @@
                 let s = (i*3)+1;
                 state.pockets.push({id: i, label: 'ST '+s, nums: [s, s+1, s+2], hs:0, hits:0, d:0});
             }
+        } else if(conf.domain === '12SP') {
+            const splitDefinitions = [
+                {label: "1-4", nums: [1, 4]}, {label: "3-6", nums: [3, 6]},
+                {label: "7-10", nums: [7, 10]}, {label: "9-12", nums: [9, 12]},
+                {label: "13-16", nums: [13, 16]}, {label: "15-18", nums: [15, 18]},
+                {label: "19-22", nums: [19, 22]}, {label: "21-24", nums: [21, 24]},
+                {label: "25-28", nums: [25, 28]}, {label: "24-27", nums: [24, 27]},
+                {label: "31-34", nums: [31, 34]}, {label: "33-36", nums: [33, 36]}
+            ];
+            splitDefinitions.forEach((sp, idx) => {
+                state.pockets.push({id: idx, label: sp.label, nums: sp.nums, hs:0, hits:0, d:0});
+            });
         } else {
             [...zeros, ...Array.from({length:36},(_,i)=>i+1)].forEach((n, idx) => {
                 state.pockets.push({id: idx, label: (n==37?'00':(n==38?'000':n.toString())), nums:[n], hs:0, hits:0, d:0});
@@ -201,11 +220,17 @@
         const streetIdx = Math.floor((n-1)/3);
 
         if(state.isBetting) {
-            const isHit = (conf.domain === '9ST') ? (n > 0 && n <= 36 && winnerIds.includes(streetIdx)) : winners.some(p => p.nums.includes(n));
+            let isHitInStrategy = false;
+            if(conf.domain === '9ST') {
+                isHitInStrategy = (n > 0 && n <= 36 && winnerIds.includes(streetIdx));
+            } else {
+                isHitInStrategy = winners.some(p => p.nums.includes(n));
+            }
+            
             let totalStrategyPockets = 0; winners.forEach(p => totalStrategyPockets += p.nums.length);
             const stake = totalStrategyPockets * state.unit * conf.unitVal;
 
-            if(isHit) {
+            if(isHitInStrategy) {
                 state.profit += (state.unit * conf.unitVal * 36) - stake;
                 if(state.profit >= state.high) state.unit = 1;
             } else {
@@ -221,14 +246,17 @@
 
     function engine() {
         state.pockets.forEach(p => {
-            const cycle = (conf.domain === '9ST' ? 12 : 36);
+            const cycle = conf.domain === '9ST' ? 12 : (conf.domain === '12SP' ? 18 : 36);
             let winSize = conf.mult === 'ALL' ? sessionRolls.length : (cycle * conf.mult) + 1;
             const actualWin = Math.max(1, Math.min(sessionRolls.length, winSize));
+            
             let h = 0; const winArr = sessionRolls.slice(-actualWin);
             winArr.forEach(r => { if(p.nums.includes(r)) h++; });
             p.hits = h;
+            
             let d = 0; for(let i=sessionRolls.length-1; i>=0; i--) { if(p.nums.includes(sessionRolls[i])) break; d++; }
             p.d = d;
+            
             const fr = (h / actualWin) / (p.nums.length / 36);
             p.hs = fr * (1 / (1 + (d / cycle)));
         });
@@ -239,7 +267,6 @@
         const winners = getStrategyWinners();
         const winnerIds = winners.map(p => p.id);
 
-        // STABILITY CHECK
         let isStable = true;
         if (conf.strategy === 'COLD') {
             isStable = winners.every(p => p.hs < 0.4);
