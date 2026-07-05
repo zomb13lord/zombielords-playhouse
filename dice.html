@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.4.1</title>
+    <title>Dice Tracker v1.4.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -360,7 +360,7 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="version-tag">VERSION 1.4.1</div>
+        <div class="version-tag">VERSION 1.4.2</div>
     </nav>
 
     <div class="main-wrapper">
@@ -462,9 +462,11 @@
 
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
+        // Unified Guard Initialization Execution Pass
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
+            initDualPads();
             fetchCloudState();
         });
 
@@ -608,7 +610,6 @@
             }
         }
 
-        // Firestore Unified Sync Hooks matching archives layout rules
         async function pushCloudState(docId, customName = null) {
             if(!currentUid) return;
             const payload = {
@@ -649,6 +650,8 @@
                     state.rawSequenceLog.forEach(v => {
                         renderUserInterfaceComponents(v, false, 'node-normal');
                     });
+                    renderUserInterfaceComponents(0, false, 'node-normal');
+                } else {
                     renderUserInterfaceComponents(0, false, 'node-normal');
                 }
             });
@@ -705,10 +708,6 @@
                 document.getElementById(`r-pad-${i}`).classList.remove('active');
             }
         }
-
-        window.onload = function() {
-            initDualPads();
-        };
     </script>
 </body>
 </html>
