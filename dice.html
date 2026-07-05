@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.4.0</title>
+    <title>Dice Tracker v1.4.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --bg-primary: #020617;
@@ -153,7 +155,6 @@
             display: none;
         }
 
-        /* Temp Status Badge Overlay */
         .temp-chip {
             position: absolute;
             top: 4px;
@@ -179,8 +180,8 @@
             font-size: 12px;
         }
 
-        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; transition: background-color 0.3s; }
-        .sub-left.ats-active { background-color: #047857 !important; color: #fff; } /* ATS Clear State Green Background */
+        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
+        .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
         .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
 
         .diagnostics-panel {
@@ -244,10 +245,8 @@
             justify-content: center;
             padding: 20px 0;
         }
-        
         .m-cell-hand { background-color: #000000; }   
         .m-cell-session { background-color: #1e293b; } 
-        
         .m-label { font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
         .m-val { font-size: 36px; font-weight: 900; color: #ffffff; margin-top: 6px; }
 
@@ -327,12 +326,26 @@
         .btn-blue { background: #3b82f6; color: white; }
         .btn-red { background: #ef4444; color: white; }
 
+        .archive-controls {
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+            margin-top: 5px;
+        }
+
+        .archive-input {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+            flex-grow: 1;
+            border-radius: 4px;
+        }
+
         @media (min-width: 1024px) {
-            .board-stack {
-                display: grid;
-                grid-template-columns: repeat(12, 1fr);
-                gap: 6px;
-            }
+            .board-stack { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
             .grid-row-segment:nth-child(1) { grid-column: span 5; }
             .diagnostics-panel { grid-column: span 2; height: 100%; }
             .grid-row-segment:nth-child(3) { grid-column: span 5; }
@@ -343,11 +356,11 @@
 <body>
 
     <nav class="zombie-nav-header">
-        <a href="lobby.html" class="brand-box">
+        <div class="brand-box" onclick="window.location.assign('lobby.html')">
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
-        </a>
-        <div class="version-tag">VERSION 1.4.0</div>
+        </div>
+        <div class="version-tag">VERSION 1.4.1</div>
     </nav>
 
     <div class="main-wrapper">
@@ -412,48 +425,53 @@
                 <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last Roll</button>
                 <button class="act-btn btn-red" onclick="executeClearReset()">Reset All Rolls</button>
             </div>
+
+            <div class="archive-controls">
+                <input type="text" id="sessionNameInput" class="archive-input" placeholder="DESIGNATE ARCHIVE SESSION NAME...">
+                <button class="act-btn btn-green" style="padding:0 25px;" onclick="commitArchiveSession()">Commit Archive</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Initialize Core Firebase Configuration Mapped Components
         const firebaseConfig = {
             apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
             authDomain: "zombielords-playhouse.firebaseapp.com",
             projectId: "zombielords-playhouse",
-            databaseURL: "https://zombielords-playhouse-default-rtdb.firebaseio.com",
             storageBucket: "zombielords-playhouse.firebasestorage.app",
             messagingSenderId: "795162260246",
             appId: "1:795162260246:web:97f0361751ac1359b31637"
         };
         
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUid = null;
 
         const state = {
             totalRolls: 0, currentHandRolls: 0,
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
-            totalPointsMade: 0,
-            activePoint: null, shooterHistory: [],
-            
+            totalPointsMade: 0, activePoint: null, shooterHistory: [],
             selectedLeft: null, selectedRight: null,
-            rollHistoryLog: [],
-            rawSequenceLog: [], // Plain integer array log tracking lookback lookups
-
+            rollHistoryLog: [], rawSequenceLog: [],
             matrix: {
                 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
                 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
             }
         };
 
-        // Window limits mapped inverse configuration vectors
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
+
+        auth.onAuthStateChanged(user => {
+            if (!user) { window.location.href = "index.html"; return; }
+            currentUid = user.uid;
+            fetchCloudState();
+        });
 
         function initDualPads() {
             const lPad = document.getElementById('leftPadContainer');
             const rPad = document.getElementById('rightPadContainer');
             lPad.innerHTML = ''; rPad.innerHTML = '';
-            
             for(let i=1; i<=6; i++) {
                 lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
                 rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
@@ -473,21 +491,20 @@
         }
 
         function submitRoll(isAbsolute) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Selection vector mapping incomplete.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
 
-            const historicalSnapshot = {
+            state.rollHistoryLog.push(JSON.parse(JSON.stringify({
                 selectedLeft: state.selectedLeft, selectedRight: state.selectedRight,
                 totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls,
                 sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout,
                 totalPointsMade: state.totalPointsMade, activePoint: state.activePoint,
                 shooterHistory: [...state.shooterHistory], rawSequenceLog: [...state.rawSequenceLog],
                 matrixState: JSON.parse(JSON.stringify(state.matrix))
-            };
-            state.rollHistoryLog.push(historicalSnapshot);
+            })));
 
             executeCalculationsLoop(state.selectedLeft, state.selectedRight, isAbsolute);
             clearSelectionPads();
-            pushCloudState();
+            pushCloudState("active_session");
         }
 
         function executeCalculationsLoop(d1, d2, isAbsolute) {
@@ -535,17 +552,14 @@
         }
 
         function renderUserInterfaceComponents(lastRoll, isHardway, ribbonType) {
-            // Rebuild sub-rows mapping ATS rules parameters
             for(let i=2; i<=12; i++) {
                 if(i === 7) continue;
                 document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
-                
                 const curLeftCell = document.getElementById(`cur-${i}`);
                 curLeftCell.innerText = state.matrix[i].cur;
                 document.getElementById(`tot-${i}`).innerText = state.matrix[i].tot;
                 document.getElementById(`puck-${i}`).style.display = 'none';
 
-                // ATS Visual Class Assignment Rule
                 if(state.matrix[i].cur >= 1) curLeftCell.classList.add('ats-active');
                 else curLeftCell.classList.remove('ats-active');
             }
@@ -554,7 +568,6 @@
                 document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
             }
 
-            // Sync Core Variance Analytics
             evaluateRollingTemperatures();
 
             document.getElementById('summary-total').innerText = state.totalRolls;
@@ -562,8 +575,6 @@
 
             const totalShooters = state.shooterHistory.length + (state.currentHandRolls > 0 ? 1 : 0);
             const sor = totalShooters > 0 ? (state.totalRolls / totalShooters).toFixed(1) : "0.0";
-            
-            // Dynamic startup tracking normalizer calibration loop matching SOR layout baseline properties
             const srr = state.sevensTotal > 0 ? (state.totalRolls / state.sevensTotal).toFixed(1) : (state.totalRolls > 0 ? state.totalRolls.toFixed(1) : "0.0");
             const psr = state.sevensRed > 0 ? (state.totalPointsMade / state.sevensRed).toFixed(1) : "0.0";
 
@@ -583,73 +594,108 @@
         }
 
         function evaluateRollingTemperatures() {
-            // Scans lookback arrays mapping specific numerical probability thresholds
             for (let num in probabilityWindows) {
                 const windowSize = probabilityWindows[num];
                 const sampleSlice = state.rawSequenceLog.slice(-windowSize);
                 const hitCount = sampleSlice.filter(x => x == parseInt(num)).length;
-                
                 const chip = document.getElementById(`temp-${num}`);
                 if (!chip) continue;
 
-                if (state.totalRolls < windowSize) {
-                    chip.innerText = ''; // Insufficient volume data parameters to flag skew
-                } else if (hitCount > 1) {
-                    chip.innerText = '🔥';
-                } else if (hitCount < 1) {
-                    chip.innerText = '❄️';
-                } else {
-                    chip.innerText = '';
-                }
+                if (state.totalRolls < windowSize) chip.innerText = '';
+                else if (hitCount > 1) chip.innerText = '🔥';
+                else if (hitCount < 1) chip.innerText = '❄️';
+                else chip.innerText = '';
             }
         }
 
-        function pushCloudState() {
-            db.ref('playhouse/diceTracker/currentSession').set({
-                stateObj: JSON.stringify(state)
-            });
+        // Firestore Unified Sync Hooks matching archives layout rules
+        async function pushCloudState(docId, customName = null) {
+            if(!currentUid) return;
+            const payload = {
+                totalRolls: state.totalRolls,
+                currentHandRolls: state.currentHandRolls,
+                sevensTotal: state.sevensTotal,
+                sevensRed: state.sevensRed,
+                sevensComeout: state.sevensComeout,
+                totalPointsMade: state.totalPointsMade,
+                activePoint: state.activePoint,
+                shooterHistory: state.shooterHistory,
+                rawSequenceLog: state.rawSequenceLog,
+                rollHistoryLog: JSON.stringify(state.rollHistoryLog),
+                matrix: JSON.stringify(state.matrix),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(customName) payload.name = customName.toUpperCase();
+            await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).set(payload, { merge: true });
         }
 
         function fetchCloudState() {
-            db.ref('playhouse/diceTracker/currentSession').once('value', snapshot => {
-                const data = snapshot.val();
-                if(data && data.stateObj) {
-                    const parsed = JSON.parse(data.stateObj);
-                    Object.assign(state, parsed);
-                    
-                    // Rebuild Ribbon nodes from sequence stack map
+            db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").get().then(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    state.totalRolls = data.totalRolls || 0;
+                    state.currentHandRolls = data.currentHandRolls || 0;
+                    state.sevensTotal = data.sevensTotal || 0;
+                    state.sevensRed = data.sevensRed || 0;
+                    state.sevensComeout = data.sevensComeout || 0;
+                    state.totalPointsMade = data.totalPointsMade || 0;
+                    state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
+                    state.shooterHistory = data.shooterHistory || [];
+                    state.rawSequenceLog = data.rawSequenceLog || [];
+                    state.rollHistoryLog = data.rollHistoryLog ? JSON.parse(data.rollHistoryLog) : [];
+                    state.matrix = data.matrix ? JSON.parse(data.matrix) : state.matrix;
+
                     document.getElementById('historyContainer').innerHTML = '';
                     state.rawSequenceLog.forEach(v => {
-                        // Mimics local simulation loops to restore styles
-                        const mockIsHard = (v % 2 === 0) && state.rollHistoryLog.some(h => h.totalRolls === state.rawSequenceLog.indexOf(v) && h.selectedLeft === h.selectedRight);
-                        renderUserInterfaceComponents(v, mockIsHard, 'node-normal');
+                        renderUserInterfaceComponents(v, false, 'node-normal');
                     });
                     renderUserInterfaceComponents(0, false, 'node-normal');
                 }
             });
         }
 
+        async function commitArchiveSession() {
+            const inputField = document.getElementById('sessionNameInput');
+            const sessionName = inputField.value.trim();
+            if(!sessionName) return alert("Designate a valid name string prior to archive creation.");
+            
+            const newDocId = "archive_" + Date.now();
+            await pushCloudState(newDocId, sessionName);
+            alert("Session archived successfully.");
+            inputField.value = '';
+        }
+
         function executeUndo() {
-            if(state.rollHistoryLog.length === 0) return alert("No operations in stack memory cache.");
+            if(state.rollHistoryLog.length === 0) return alert("History underflow.");
             const target = state.rollHistoryLog.pop();
             
-            Object.assign(state, target);
+            state.totalRolls = target.totalRolls;
+            state.currentHandRolls = target.currentHandRolls;
+            state.sevensTotal = target.sevensTotal;
+            state.sevensRed = target.sevensRed;
+            state.sevensComeout = target.sevensComeout;
+            state.totalPointsMade = target.totalPointsMade;
+            state.activePoint = target.activePoint;
+            state.shooterHistory = target.shooterHistory;
+            state.rawSequenceLog = target.rawSequenceLog;
+            state.matrix = target.matrixState;
+
             const ribbon = document.getElementById('historyContainer');
             if(ribbon.lastChild) ribbon.removeChild(ribbon.lastChild);
 
             renderUserInterfaceComponents(0, false, 'node-normal');
-            pushCloudState();
+            pushCloudState("active_session");
         }
 
         function executeClearReset() {
-            if(!confirm("Reset metrics data schema?")) return;
+            if(!confirm("Clear active metrics dataset?")) return;
             state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
             state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = []; state.rawSequenceLog = [];
             for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
             document.getElementById('historyContainer').innerHTML = '';
             clearSelectionPads();
             renderUserInterfaceComponents(0, false, 'node-normal');
-            pushCloudState();
+            pushCloudState("active_session");
         }
 
         function clearSelectionPads() {
@@ -662,10 +708,7 @@
 
         window.onload = function() {
             initDualPads();
-            fetchCloudState(); // Execute Firebase snapshot initialization callback sequence
-            renderUserInterfaceComponents(0, false, 'node-normal');
         };
     </script>
 </body>
 </html>
-
