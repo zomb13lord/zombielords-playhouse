@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.4.2</title>
+    <title>Dice Tracker v1.4.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -344,6 +344,54 @@
             border-radius: 4px;
         }
 
+        /* Standard Vault UI Panels Section Styles matching archives.html */
+        .vault-panel-header {
+            border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #fff;
+            padding-bottom: 6px;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        @media(min-width: 768px) {
+            .vault-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .vault-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .vault-card-title {
+            color: var(--emerald-accent);
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+        }
+
+        .vault-card-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+
         @media (min-width: 1024px) {
             .board-stack { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
             .grid-row-segment:nth-child(1) { grid-column: span 5; }
@@ -360,7 +408,7 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="version-tag">VERSION 1.4.2</div>
+        <div class="version-tag">VERSION 1.4.3</div>
     </nav>
 
     <div class="main-wrapper">
@@ -431,6 +479,9 @@
                 <button class="act-btn btn-green" style="padding:0 25px;" onclick="commitArchiveSession()">Commit Archive</button>
             </div>
         </div>
+
+        <div class="vault-panel-header">The Vault / Dice Session Archives</div>
+        <div id="vaultArchiveContainer" class="vault-grid"></div>
     </div>
 
     <script>
@@ -462,12 +513,12 @@
 
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
-        // Unified Guard Initialization Execution Pass
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
             initDualPads();
             fetchCloudState();
+            fetchVaultArchiveList(); // Triggers loading panel inventory pull on handshake completion
         });
 
         function initDualPads() {
@@ -495,14 +546,14 @@
         function submitRoll(isAbsolute) {
             if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
 
-            state.rollHistoryLog.push(JSON.parse(JSON.stringify({
+            state.rollHistoryLog.push({
                 selectedLeft: state.selectedLeft, selectedRight: state.selectedRight,
                 totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls,
                 sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout,
                 totalPointsMade: state.totalPointsMade, activePoint: state.activePoint,
                 shooterHistory: [...state.shooterHistory], rawSequenceLog: [...state.rawSequenceLog],
                 matrixState: JSON.parse(JSON.stringify(state.matrix))
-            })));
+            });
 
             executeCalculationsLoop(state.selectedLeft, state.selectedRight, isAbsolute);
             clearSelectionPads();
@@ -633,28 +684,124 @@
         function fetchCloudState() {
             db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").get().then(doc => {
                 if(doc.exists) {
-                    const data = doc.data();
-                    state.totalRolls = data.totalRolls || 0;
-                    state.currentHandRolls = data.currentHandRolls || 0;
-                    state.sevensTotal = data.sevensTotal || 0;
-                    state.sevensRed = data.sevensRed || 0;
-                    state.sevensComeout = data.sevensComeout || 0;
-                    state.totalPointsMade = data.totalPointsMade || 0;
-                    state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
-                    state.shooterHistory = data.shooterHistory || [];
-                    state.rawSequenceLog = data.rawSequenceLog || [];
-                    state.rollHistoryLog = data.rollHistoryLog ? JSON.parse(data.rollHistoryLog) : [];
-                    state.matrix = data.matrix ? JSON.parse(data.matrix) : state.matrix;
-
-                    document.getElementById('historyContainer').innerHTML = '';
-                    state.rawSequenceLog.forEach(v => {
-                        renderUserInterfaceComponents(v, false, 'node-normal');
-                    });
-                    renderUserInterfaceComponents(0, false, 'node-normal');
+                    rebuildUIFromStoredData(doc.data());
                 } else {
                     renderUserInterfaceComponents(0, false, 'node-normal');
                 }
             });
+        }
+
+        // State Machine Reconstruction Logic Engine to prevent White History node bleeding
+        function rebuildUIFromStoredData(data) {
+            state.totalRolls = data.totalRolls || 0;
+            state.currentHandRolls = data.currentHandRolls || 0;
+            state.sevensTotal = data.sevensTotal || 0;
+            state.sevensRed = data.sevensRed || 0;
+            state.sevensComeout = data.sevensComeout || 0;
+            state.totalPointsMade = data.totalPointsMade || 0;
+            state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
+            state.shooterHistory = data.shooterHistory || [];
+            state.rawSequenceLog = data.rawSequenceLog || [];
+            state.rollHistoryLog = data.rollHistoryLog ? JSON.parse(data.rollHistoryLog) : [];
+            state.matrix = data.matrix ? JSON.parse(data.matrix) : state.matrix;
+
+            document.getElementById('historyContainer').innerHTML = '';
+            
+            // Evaluates and restores exact color states node by node from history snapshot matrices
+            let localActivePoint = null;
+            state.rawSequenceLog.forEach((v, index) => {
+                let nodeType = 'node-normal';
+                
+                // Read historic snapshot properties to detect Hardways combinations
+                const historyMatch = state.rollHistoryLog[index];
+                const isHard = historyMatch ? (historyMatch.selectedLeft === historyMatch.selectedRight && [4,6,8,10].includes(v)) : false;
+
+                if (v === 7) {
+                    nodeType = (localActivePoint === null) ? 'node-point-made' : 'node-seven-out';
+                    localActivePoint = null;
+                } else if (v === 11 && localActivePoint === null) {
+                    nodeType = 'node-point-made';
+                } else {
+                    if (localActivePoint === null) {
+                        if ([4,5,6,8,9,10].includes(v)) {
+                            localActivePoint = v;
+                        } else {
+                            nodeType = 'color-dark';
+                        }
+                    } else if (v === localActivePoint) {
+                        nodeType = 'node-point-made';
+                        localActivePoint = null;
+                    } else {
+                        nodeType = 'color-dark';
+                    }
+                }
+
+                if (isHard && nodeType === 'node-normal') nodeType = 'node-hard';
+                
+                // Directly forces ribbon printing with computed style parameters
+                const ribbon = document.getElementById('historyContainer');
+                let label = v.toString();
+                if (isHard) label += '<sup>(H)</sup>';
+                ribbon.innerHTML += `<div class="history-node ${nodeType}">${label}</div>`;
+            });
+
+            renderUserInterfaceComponents(0, false, 'node-normal');
+        }
+
+        // Vault Inventory Queries Loader Module
+        async function fetchVaultArchiveList() {
+            if(!currentUid) return;
+            try {
+                const snap = await db.collection("users").doc(currentUid).collection("dice_sessions").get();
+                const container = document.getElementById('vaultArchiveContainer');
+                container.innerHTML = '';
+                
+                let foundArchivesCount = 0;
+                snap.forEach(doc => {
+                    if(doc.id !== "active_session") {
+                        foundArchivesCount++;
+                        const data = doc.data();
+                        container.innerHTML += generateArchiveCardHtml(doc.id, data);
+                    }
+                });
+
+                if(foundArchivesCount === 0) {
+                    container.innerHTML = `<div class="text-xs text-slate-500 uppercase p-4 italic">No archived session files found in database path.</div>`;
+                }
+            } catch (e) { console.error("Vault Query Failure:", e); }
+        }
+
+        function generateArchiveCardHtml(id, data) {
+            const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : 'ARCHIVE';
+            return `
+                <div class="vault-card">
+                    <div class="flex justify-between items-center">
+                        <span class="vault-card-title">${data.name || 'UNNAMED DEPLOYMENT'}</span>
+                        <span class="text-[10px] text-slate-500 font-bold">${dateStr}</span>
+                    </div>
+                    <div class="vault-card-meta">
+                        <span>TOTAL ROLLS: <b class="text-white">${data.totalRolls || 0}</b></span>
+                        <span>SEVENS OUT: <b class="text-red-400">${data.sevensRed || 0}</b></span>
+                    </div>
+                    <button onclick="resumeArchivedSession('${id}')" class="act-btn btn-green py-2 text-xs font-black">
+                        Resume Session State
+                    </button>
+                </div>
+            `;
+        }
+
+        async function resumeArchivedSession(docId) {
+            if(!confirm("Overwrite active workspace with this saved session state?")) return;
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    // Sync values over to active workspace node
+                    await db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").set(data);
+                    rebuildUIFromStoredData(data);
+                    alert("Vault Session state recovered.");
+                }
+            } catch (e) { alert("Session recovery execution aborted."); }
         }
 
         async function commitArchiveSession() {
@@ -666,28 +813,34 @@
             await pushCloudState(newDocId, sessionName);
             alert("Session archived successfully.");
             inputField.value = '';
+            fetchVaultArchiveList(); // Refresh lists immediately to show new card
         }
 
         function executeUndo() {
             if(state.rollHistoryLog.length === 0) return alert("History underflow.");
-            const target = state.rollHistoryLog.pop();
+            state.rollHistoryLog.pop();
             
-            state.totalRolls = target.totalRolls;
-            state.currentHandRolls = target.currentHandRolls;
-            state.sevensTotal = target.sevensTotal;
-            state.sevensRed = target.sevensRed;
-            state.sevensComeout = target.sevensComeout;
-            state.totalPointsMade = target.totalPointsMade;
-            state.activePoint = target.activePoint;
-            state.shooterHistory = target.shooterHistory;
-            state.rawSequenceLog = target.rawSequenceLog;
-            state.matrix = target.matrixState;
-
-            const ribbon = document.getElementById('historyContainer');
-            if(ribbon.lastChild) ribbon.removeChild(ribbon.lastChild);
-
-            renderUserInterfaceComponents(0, false, 'node-normal');
-            pushCloudState("active_session");
+            // Clear cloud pointer and rebuild using full historic re-trace fallback checks
+            if(state.rollHistoryLog.length === 0) {
+                executeClearReset();
+            } else {
+                const lastValidCheckpoint = state.rollHistoryLog[state.rollHistoryLog.length - 1];
+                const recreatedDataPayload = {
+                    totalRolls: lastValidCheckpoint.totalRolls,
+                    currentHandRolls: lastValidCheckpoint.currentHandRolls,
+                    sevensTotal: lastValidCheckpoint.sevensTotal,
+                    sevensRed: lastValidCheckpoint.sevensRed,
+                    sevensComeout: lastValidCheckpoint.sevensComeout,
+                    totalPointsMade: lastValidCheckpoint.totalPointsMade,
+                    activePoint: lastValidCheckpoint.activePoint,
+                    shooterHistory: lastValidCheckpoint.shooterHistory,
+                    rawSequenceLog: state.rawSequenceLog.slice(0, -1),
+                    rollHistoryLog: JSON.stringify(state.rollHistoryLog),
+                    matrix: JSON.stringify(lastValidCheckpoint.matrixState)
+                };
+                rebuildUIFromStoredData(recreatedDataPayload);
+                pushCloudState("active_session");
+            }
         }
 
         function executeClearReset() {
