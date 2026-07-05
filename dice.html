@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.1.0</title>
+    <title>Dice Tracker v1.2.0</title>
     <style>
         :root {
             --bg-primary: #020617;
@@ -12,6 +12,7 @@
             --emerald-accent: #10b981;
             --amber-accent: #f59e0b;
             --border-color: #334155;
+            --puck-on: #e11d48;
         }
 
         body {
@@ -23,10 +24,9 @@
             box-sizing: border-box;
         }
 
-        /* Top Zombie Lord Bar */
+        /* Top Navigation Header Bar */
         .zombie-nav-header {
             background-color: #020617;
-            border-b: 1px solid rgba(16, 185, 129, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -70,14 +70,18 @@
         }
 
         .main-wrapper {
-            padding: 20px;
-            max-width: 1600px;
+            padding: 15px;
+            max-width: 100%;
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        /* History Ribbon */
+        /* Chronological Top Ribbon Tracker: Left-to-Right Flow with Auto-Scroll to End */
         .history-ribbon {
             display: flex;
+            flex-direction: row;
             overflow-x: auto;
             background-color: #000;
             padding: 12px;
@@ -85,7 +89,6 @@
             min-height: 35px;
             align-items: center;
             border: 1px solid var(--border-color);
-            margin-bottom: 20px;
         }
 
         .history-node {
@@ -95,22 +98,30 @@
             border-radius: 2px;
             min-width: 28px;
             text-align: center;
+            flex-shrink: 0;
         }
 
-        .node-normal { background-color: #fff; color: #000; }
-        .node-hard { background-color: #fff; color: #000; border: 2px dashed #000; }
+        .node-normal { background-color: var(--white-point, #fff); color: #000; }
+        .node-hard { background-color: var(--white-point, #fff); color: #000; border: 2px dashed #000; }
         .node-point-made { background-color: var(--emerald-accent); color: #fff; }
         .node-seven-out { background-color: #ef4444; color: #fff; }
 
-        /* Unified 12-Column Grid Framework */
-        .grid-layout {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 6px;
-            margin-bottom: 25px;
+        /* Mobile Adaptive Top-to-Bottom Layout Stack */
+        .board-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             width: 100%;
         }
 
+        .grid-row-segment {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 100%;
+        }
+
+        /* Standardized Tracking Component Box Frame */
         .box-container {
             background-color: var(--panel-bg);
             border: 1px solid var(--border-color);
@@ -118,6 +129,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
         }
 
         .box-num-header {
@@ -129,10 +141,25 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        /* Specific Board Row Colors */
+        /* Puck Overlay Element styling */
+        .puck-chip {
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--puck-on);
+            color: #fff;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 1px 6px;
+            border-radius: 9999px;
+            border: 1px solid #fff;
+            display: none;
+            letter-spacing: 0.05em;
+        }
+
         .color-dark { background-color: #000000; }
         .color-red { background-color: #450a0a; }
-        .color-center { background-color: #090d16; }
 
         .box-count {
             font-size: 24px;
@@ -148,60 +175,122 @@
             font-size: 12px;
         }
 
+        /* Corrected Mapping Coordinates (Left: Current Hand, Right: Session Total) */
         .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
         .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
 
-        /* Center Analytics Cell Structures */
-        .center-metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            height: 100%;
+        /* Unified Diagnostics Display Panel Module */
+        .diagnostics-panel {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
         }
 
-        .c-cell {
+        .diag-title {
+            font-size: 13px;
+            color: #94a3b8;
+            padding: 12px;
+            background: #020617;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .diag-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            padding: 15px 0;
+        }
+
+        .d-cell {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             border-right: 1px solid var(--border-color);
         }
-        .c-cell:last-child { border-right: none; }
-        .c-label { font-size: 11px; color: #64748b; font-weight: bold; }
-        .c-val { font-size: 18px; font-weight: bold; color: #ffffff; margin-top: 6px; }
+        .d-cell:last-child { border-right: none; }
+        .d-label { font-size: 14px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; }
+        .d-val { font-size: 26px; font-weight: bold; color: #ffffff; margin-top: 6px; }
 
-        /* Unified Input Controller Panel */
+        /* Master Summary Counter Frame Container Override */
+        .master-rolls-box {
+            background-color: #000000;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .master-rolls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 15px 0;
+        }
+
+        .m-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .m-cell:first-child { border-right: 1px solid var(--border-color); }
+        .m-label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; }
+        .m-val-session { font-size: 32px; font-weight: 900; color: var(--emerald-accent); margin-top: 4px; }
+        .m-val-hand { font-size: 32px; font-weight: 900; color: var(--amber-accent); margin-top: 4px; }
+
+        /* High-Efficiency Permanent Dual-Pad Component Window */
         .controller-panel {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            padding: 20px;
-        }
-
-        .prompt-header {
-            font-size: 14px;
-            font-weight: bold;
-            color: var(--amber-accent);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .pad-grid {
+            padding: 15px;
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dual-axis-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .axis-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .axis-label {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--amber-accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        .pad-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
         }
 
         .pad-btn {
             background: #020617;
             color: #fff;
             border: 1px solid var(--border-color);
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             cursor: pointer;
             border-radius: 4px;
-            transition: all 0.2s;
         }
 
         .pad-btn.active {
@@ -210,78 +299,117 @@
             border-color: #ffffff;
         }
 
-        .action-container { display: flex; gap: 12px; }
-        .act-btn { padding: 12px 24px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
+        /* Combined Interactive Controls Grid Section Layout */
+        .action-matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .act-btn { 
+            padding: 12px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
         .btn-green { background: var(--emerald-accent); color: white; }
         .btn-orange { background: #f97316; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-red { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
 
+    <!-- Global Navigation Header Navigation Anchor -->
     <nav class="zombie-nav-header">
         <a href="lobby.html" class="brand-box">
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </a>
-        <div class="version-tag">VERSION 1.1.0</div>
+        <div class="version-tag">VERSION 1.2.0</div>
     </nav>
 
     <div class="main-wrapper">
+        <!-- Chronological Run String Container Layout -->
         <div class="history-ribbon" id="historyContainer"></div>
 
-        <div class="grid-layout">
-            <div class="box-container color-dark"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
-            <div class="box-container color-dark"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
-            <div class="box-container color-red"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
-            <div class="box-container color-red"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
-            <div class="box-container color-red"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
-
-            <div class="box-container color-center">
-                <div class="box-num-header" style="font-size:12px; color:#94a3b8; padding:15px 0;">ZOMBIELORD DIAGNOSTICS</div>
-                <div class="center-metrics-grid">
-                    <div class="c-cell"><div class="c-label">RED</div><div class="c-val" id="stat-red">0</div></div>
-                    <div class="c-cell"><div class="c-label">SOR</div><div class="c-val" id="stat-sor">0.0</div></div>
-                    <div class="c-cell"><div class="c-label">SRR</div><div class="c-val" id="stat-srr">0.0</div></div>
-                    <div class="c-cell"><div class="c-label">CO7</div><div class="c-val" id="stat-co7">0</div></div>
-                </div>
-                <div style="border-top:1px solid var(--border-color); height:29px; background:#000;"></div>
+        <div class="board-stack">
+            <!-- Left Side Core Box Number Groupings (2-6) -->
+            <div class="grid-row-segment">
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
             </div>
 
-            <div class="box-container color-red"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
-            <div class="box-container color-red"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
-            <div class="box-container color-red"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
-            <div class="box-container color-dark"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
-            <div class="box-container color-dark"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            <!-- Enhanced High-Visibility Central Diagnostic Frame Grid Layer -->
+            <div class="diagnostics-panel">
+                <div class="diag-title">ZOMBIELORD DIAGNOSTICS</div>
+                <div class="diag-metrics-grid">
+                    <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
+                    <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
+                    <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
+                    <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
+                </div>
+            </div>
 
-            <div class="box-container color-dark">
-                <div class="box-num-header" style="color:#94a3b8; font-size:14px; padding:14px 0;">ROLLS</div>
-                <div class="box-count" id="summary-total">0</div>
-                <div class="box-sub-metrics">
-                    <div class="sub-left" style="grid-column: span 2; background:#000;" id="summary-current">0</div>
+            <!-- Right Side Core Box Number Groupings (8-12) -->
+            <div class="grid-row-segment">
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            </div>
+
+            <!-- Color-Differentiated Core Session Totals Frame -->
+            <div class="master-rolls-box">
+                <div class="diag-title" style="padding:8px; font-size:11px;">SESSION COUNTER ACTIVITY MAP</div>
+                <div class="master-rolls-grid">
+                    <div class="m-cell"><div class="m-label">Total Session Rolls</div><div class="m-val-session" id="summary-total">0</div></div>
+                    <div class="m-cell"><div class="m-label">Current Shooter Hand</div><div class="m-val-hand" id="summary-current">0</div></div>
                 </div>
             </div>
         </div>
 
+        <!-- High-Performance Consolidated Continuous Input Matrix Frame -->
         <div class="controller-panel">
-            <div class="prompt-header" id="inputPrompt">Input Left Die Outcome</div>
-            <div class="pad-grid" id="inputPad"></div>
+            <div class="dual-axis-wrapper">
+                <div class="axis-column">
+                    <div class="axis-label">Left Die</div>
+                    <div class="pad-matrix-grid" id="leftPadContainer"></div>
+                </div>
+                <div class="axis-column">
+                    <div class="axis-label">Right Die</div>
+                    <div class="pad-matrix-grid" id="rightPadContainer"></div>
+                </div>
+            </div>
             
-            <div class="action-container">
-                <button class="act-btn btn-green" onclick="confirmInput(true)">Confirm (Absolute)</button>
-                <button class="act-btn btn-orange" onclick="confirmInput(false)">Unconfirm (Ambiguous)</button>
+            <!-- Unified Matrix Grid Controls Interface Row Mapping -->
+            <div class="action-matrix-grid">
+                <button class="act-btn btn-green" onclick="submitRoll(true)">Confirm (Absolute)</button>
+                <button class="act-btn btn-orange" onclick="submitRoll(false)">Unconfirm (Ambiguous)</button>
+                <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last Roll</button>
+                <button class="act-btn btn-red" onclick="executeClearReset()">Reset All Rolls</button>
             </div>
         </div>
     </div>
 
     <script>
-        const engine = {
+        const state = {
             totalRolls: 0, currentHandRolls: 0,
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
             activePoint: null, shooterHistory: [],
             
-            // Core Input Toggle State (1: Left Die, 2: Right Die)
-            inputStage: 1, 
-            rollLeft: null, rollRight: null,
+            selectedLeft: null, selectedRight: null,
+            rollHistoryLog: [], // Core stack memory cache structural tracker
 
             matrix: {
                 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
@@ -289,111 +417,197 @@
             }
         };
 
-        function initPad() {
-            const pad = document.getElementById('inputPad');
-            pad.innerHTML = '';
-            for(let i=1; i<=6; i++) {
-                pad.innerHTML += `<button class="pad-btn" id="pad-${i}" onclick="selectValue(${i})">${i}</button>`;
-            }
-        }
-
-        let selectedValueCache = null;
-        function selectValue(val) {
-            for(let i=1; i<=6; i++) document.getElementById(`pad-${i}`).classList.remove('active');
-            selectedValueCache = val;
-            document.getElementById(`pad-${val}`).classList.add('active');
-        }
-
-        function confirmInput(isAbsolute) {
-            if(!selectedValueCache) return alert("Select a face value via the keypad.");
+        function initDualPads() {
+            const lPad = document.getElementById('leftPadContainer');
+            const rPad = document.getElementById('rightPadContainer');
+            lPad.innerHTML = ''; rPad.innerHTML = '';
             
-            const val = selectedValueCache;
-            resetPadSelection();
-
-            if(engine.inputStage === 1) {
-                engine.rollLeft = val;
-                engine.inputStage = 2;
-                document.getElementById('inputPrompt').innerText = "Input Right Die Outcome";
-            } else {
-                engine.rollRight = val;
-                executeRollCycle(engine.rollLeft, engine.rollRight, isAbsolute);
-                
-                engine.inputStage = 1;
-                document.getElementById('inputPrompt').innerText = "Input Left Die Outcome";
+            for(let i=1; i<=6; i++) {
+                lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
+                rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
             }
         }
 
-        function resetPadSelection() {
-            selectedValueCache = null;
-            for(let i=1; i<=6; i++) document.getElementById(`pad-${i}`).classList.remove('active');
+        function selectMatrixDie(axis, val) {
+            if(axis === 'left') {
+                for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active');
+                state.selectedLeft = val;
+                document.getElementById(`l-pad-${val}`).classList.add('active');
+            } else {
+                for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active');
+                state.selectedRight = val;
+                document.getElementById(`r-pad-${val}`).classList.add('active');
+            }
         }
 
-        function executeRollCycle(d1, d2, isAbsolute) {
+        function submitRoll(isAbsolute) {
+            if(!state.selectedLeft || !state.selectedRight) {
+                alert("Execution Error: Selection vector mapping incomplete.");
+                return;
+            }
+
+            // Commit transaction map checkpoint snapshot to stack history layer
+            const historicalSnapshot = {
+                selectedLeft: state.selectedLeft, selectedRight: state.selectedRight,
+                totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls,
+                sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout,
+                activePoint: state.activePoint, shooterHistory: [...state.shooterHistory],
+                matrixState: JSON.parse(JSON.stringify(state.matrix))
+            };
+            state.rollHistoryLog.push(historicalSnapshot);
+
+            executeCalculationsLoop(state.selectedLeft, state.selectedRight, isAbsolute);
+            clearSelectionPads();
+        }
+
+        function executeCalculationsLoop(d1, d2, isAbsolute) {
             const sum = d1 + d2;
-            engine.totalRolls++;
-            engine.currentHandRolls++;
+            state.totalRolls++;
+            state.currentHandRolls++;
 
             const isHardway = (d1 === d2) && [4,6,8,10].includes(sum);
+            let ribbonType = 'node-normal';
 
-            engine.matrix[sum].tot++;
-            engine.matrix[sum].cur++;
+            state.matrix[sum].tot++;
+            state.matrix[sum].cur++;
 
             if(sum === 7) {
-                engine.sevensTotal++;
-                if(engine.activePoint === null) {
-                    engine.sevensComeout++;
+                state.sevensTotal++;
+                if(state.activePoint === null) {
+                    state.sevensComeout++;
+                    ribbonType = 'node-point-made'; // Comeout 7 tracking logic background green map rule
                 } else {
-                    engine.sevensRed++;
-                    engine.shooterHistory.push(engine.currentHandRolls);
-                    engine.currentHandRolls = 0;
-                    engine.activePoint = null;
-                    for (let k in engine.matrix) engine.matrix[k].cur = 0;
+                    state.sevensRed++;
+                    ribbonType = 'node-seven-out'; // Seven Out tracking logic background red map rule
+                    state.shooterHistory.push(state.currentHandRolls);
+                    state.currentHandRolls = 0;
+                    state.activePoint = null;
+                    for (let k in state.matrix) state.matrix[k].cur = 0;
                 }
+            } else if (sum === 11 && state.activePoint === null) {
+                ribbonType = 'node-point-made'; // Comeout 11 tracking logic background green map rule
             } else {
-                if(engine.activePoint === null) {
-                    if([4,5,6,8,9,10].includes(sum)) engine.activePoint = sum;
-                } else if(sum === engine.activePoint) {
-                    engine.activePoint = null;
+                if(state.activePoint === null) {
+                    if([4,5,6,8,9,10].includes(sum)) {
+                        state.activePoint = sum; // Establish Point State Match
+                    } else {
+                        ribbonType = 'color-dark'; // Craps numbers (2, 3, 12) on come out default color mapping
+                    }
+                } else if(sum === state.activePoint) {
+                    ribbonType = 'node-point-made'; // Point Made sequence tracking logic background green map rule
+                    state.activePoint = null;
+                } else {
+                    ribbonType = 'color-dark'; // Established intermediate tracking points background black map rule
                 }
             }
 
-            renderInterfaceBoard(sum, isHardway);
+            if(isHardway && ribbonType === 'node-normal') ribbonType = 'node-hard';
+
+            renderUserInterfaceComponents(sum, isHardway, ribbonType);
         }
 
-        function renderInterfaceBoard(lastRoll, isHardway) {
-            // Update Dynamic Board Counters
+        function renderUserInterfaceComponents(lastRoll, isHardway, ribbonType) {
+            // Flush and rebuild visual data boxes mapping indexes
             for(let i=2; i<=12; i++) {
                 if(i === 7) continue;
-                document.getElementById(`count-${i}`).innerText = engine.matrix[i].tot;
-                document.getElementById(`cur-${i}`).innerText = engine.matrix[i].cur;
-                document.getElementById(`tot-${i}`).innerText = engine.matrix[i].tot;
+                document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
+                document.getElementById(`cur-${i}`).innerText = state.matrix[i].cur;
+                document.getElementById(`tot-${i}`).innerText = state.matrix[i].tot;
+                
+                // Clear state chips on evaluate
+                document.getElementById(`puck-${i}`).style.display = 'none';
             }
 
-            document.getElementById('summary-total').innerText = engine.totalRolls;
-            document.getElementById('summary-current').innerText = engine.currentHandRolls;
+            // Sync structural puck overlays
+            if(state.activePoint !== null) {
+                document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
+            }
 
-            const totalShooters = engine.shooterHistory.length + (engine.currentHandRolls > 0 ? 1 : 0);
-            const sor = totalShooters > 0 ? (engine.totalRolls / totalShooters).toFixed(1) : "0.0";
-            const srr = engine.sevensTotal > 0 ? (engine.totalRolls / engine.sevensTotal).toFixed(1) : "0.0";
+            // Real-Time Calculation adjustments synchronizing math variables execution metrics
+            document.getElementById('summary-total').innerText = state.totalRolls;
+            document.getElementById('summary-current').innerText = state.currentHandRolls;
 
-            document.getElementById('stat-red').innerText = engine.sevensRed;
+            const totalShooters = state.shooterHistory.length + (state.currentHandRolls > 0 ? 1 : 0);
+            const sor = totalShooters > 0 ? (state.totalRolls / totalShooters).toFixed(1) : "0.0";
+            const srr = state.sevensTotal > 0 ? (state.totalRolls / state.sevensTotal).toFixed(1) : "0.0";
+
+            document.getElementById('stat-red').innerText = state.sevensRed;
             document.getElementById('stat-sor').innerText = sor;
             document.getElementById('stat-srr').innerText = srr;
-            document.getElementById('stat-co7').innerText = engine.sevensComeout;
+            document.getElementById('stat-co7').innerText = state.sevensComeout;
 
-            // Render Dynamic History Sequence Stream Node
-            const container = document.getElementById('historyContainer');
-            let nodeClass = 'node-normal';
-            if (isHardway) nodeClass = 'node-hard';
-            if (lastRoll === 7) nodeClass = engine.activePoint === null && engine.currentHandRolls > 0 ? 'node-point-made' : 'node-seven-out';
-            
+            // Render Append Node Stream Sequence Track Logic
+            const ribbon = document.getElementById('historyContainer');
             let label = lastRoll.toString();
             if(isHardway) label += '<sup>(H)</sup>';
+
+            ribbon.innerHTML += `<div class="history-node ${ribbonType}">${label}</div>`;
             
-            container.innerHTML += `<div class="history-node ${nodeClass}">${label}</div>`;
+            // Constrain view focus context targeting the latest elements added
+            ribbon.scrollLeft = ribbon.scrollWidth;
         }
 
-        window.onload = initPad;
+        function executeUndo() {
+            if(state.rollHistoryLog.length === 0) {
+                alert("Matrix Underflow: No transactions available in log memory.");
+                return;
+            }
+
+            const targetCheckpoint = state.rollHistoryLog.pop();
+            
+            // Revert state indicators back to pre-transaction coordinate values
+            state.totalRolls = targetCheckpoint.totalRolls;
+            state.currentHandRolls = targetCheckpoint.currentHandRolls;
+            state.sevensTotal = targetCheckpoint.sevensTotal;
+            state.sevensRed = targetCheckpoint.sevensRed;
+            state.sevensComeout = targetCheckpoint.sevensComeout;
+            state.activePoint = targetCheckpoint.activePoint;
+            state.shooterHistory = targetCheckpoint.shooterHistory;
+            state.matrix = targetCheckpoint.matrixState;
+
+            // Rollback historical ribbon visualization track
+            const ribbon = document.getElementById('historyContainer');
+            if(ribbon.lastChild) ribbon.removeChild(ribbon.lastChild);
+
+            // Re-render UI components mapping
+            renderUserInterfaceComponents(0, false, 'node-normal');
+            
+            // Clear visual puck if point reverted back to null state
+            for(let i=2; i<=12; i++) {
+                if(i === 7) continue;
+                document.getElementById(`puck-${i}`).style.display = 'none';
+            }
+            if(state.activePoint !== null) {
+                document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
+            }
+        }
+
+        function executeClearReset() {
+            if(!confirm("Execute master clear reset command over session data matrix?")) return;
+            
+            state.totalRolls = 0; state.currentHandRolls = 0;
+            state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0;
+            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = [];
+            
+            for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            document.getElementById('historyContainer').innerHTML = '';
+            
+            clearSelectionPads();
+            renderUserInterfaceComponents(0, false, 'node-normal');
+        }
+
+        function clearSelectionPads() {
+            state.selectedLeft = null; state.selectedRight = null;
+            for(let i=1; i<=6; i++) {
+                document.getElementById(`l-pad-${i}`).classList.remove('active');
+                document.getElementById(`r-pad-${i}`).classList.remove('active');
+            }
+        }
+
+        window.onload = function() {
+            initDualPads();
+            renderUserInterfaceComponents(0, false, 'node-normal');
+        };
     </script>
 </body>
 </html>
