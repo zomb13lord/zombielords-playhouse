@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.4.4</title>
+    <title>Dice Tracker v1.5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -327,7 +327,31 @@
         .btn-blue { background: #3b82f6; color: white; }
         .btn-red { background: #ef4444; color: white; }
 
-        /* The Storage Vault Section Styles matching archives.html */
+        .meta-context-bar {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media(min-width: 1024px) {
+            .meta-context-bar { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .select-element {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            font-family: monospace;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 12px;
+        }
+
         .vault-panel-header {
             border-bottom: 1px solid rgba(16, 185, 129, 0.4);
             font-size: 16px;
@@ -383,6 +407,18 @@
             padding-top: 8px;
         }
 
+        .kinematic-readout-strip {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--amber-accent);
+        }
+
         @media (min-width: 1024px) {
             .board-stack { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
             .grid-row-segment:nth-child(1) { grid-column: span 5; }
@@ -399,13 +435,54 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="version-tag">VERSION 1.4.4</div>
+        <div class="version-tag">VERSION 1.5.0</div>
     </nav>
 
     <div class="main-wrapper">
+        <!-- Relational Context Management Header Interface -->
+        <div class="meta-context-bar">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Identity</label>
+                <select id="ctxShooterSelect" class="select-element" onchange="handleContextShooterToggle()"></select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
+                <select id="ctxLocationSelect" class="select-element" onchange="handleContextLocationToggle()"></select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
+                <select id="ctxDiceSetSelect" class="select-element" onchange="handleContextDiceSetToggle()">
+                    <option value="NONE">NONE (NULL PAIR)</option>
+                    <option value="3V">3V SET (3/6 - 3/2)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Analytical Filter View</label>
+                <select id="ctxFilterScopeSelect" class="select-element" onchange="executeAnalyticalFilterEngine()">
+                    <option value="FULL">FULL SESSION MASTER TIMELINE</option>
+                    <option value="ISOLATE_SHOOTER">ISOLATE CURRENT SHOOTER</option>
+                    <option value="ISOLATE_LOCATION">ISOLATE CURRENT LOCATION</option>
+                    <option value="ISOLATE_COMBINED">ISOLATE TARGET COMBINED SIGNATURE</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Optional Annotation Input Buffer Box -->
+        <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Shooter Notes:</span>
+            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER TEXT FIELD NOTES BEFORE SUBMITTING ROLL INDEX...">
+        </div>
+
         <div class="history-ribbon" id="historyContainer"></div>
 
+        <!-- Kinematic Axial Transformation Real-Time Vector Readout Grid -->
+        <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
+            <span>LEFT DIE KINEMATICS: <b class="text-white" id="k-left-readout">N/A</b></span>
+            <span>RIGHT DIE KINEMATICS: <b class="text-white" id="k-right-readout">N/A</b></span>
+        </div>
+
         <div class="board-stack">
+            <!-- 2-6 Boxes -->
             <div class="grid-row-segment">
                 <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
                 <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
@@ -414,6 +491,7 @@
                 <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
             </div>
 
+            <!-- Diagnostics Matrix -->
             <div class="diagnostics-panel">
                 <div class="diag-title">ZOMBIELORD DIAGNOSTICS</div>
                 <div class="diag-metrics-grid">
@@ -429,6 +507,7 @@
                 </div>
             </div>
 
+            <!-- 8-12 Boxes -->
             <div class="grid-row-segment">
                 <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
                 <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
@@ -437,6 +516,7 @@
                 <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
             </div>
 
+            <!-- Activity Map -->
             <div class="master-rolls-box">
                 <div class="diag-title" style="padding:8px; font-size:11px;">SESSION COUNTER ACTIVITY MAP</div>
                 <div class="master-rolls-grid">
@@ -466,8 +546,9 @@
             </div>
         </div>
 
+        <!-- The Storage Vault Selector Interface Segment matching archives.html specifications -->
         <div class="vault-panel-header">
-            <span>The Vault / Dice Session Archives</span>
+            <span>The Vault / Relational Dice Sessions</span>
             <button onclick="commitArchiveSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all">
                 <i class="fa-solid fa-plus mr-1"></i>Save Current Session
             </button>
@@ -490,12 +571,14 @@
         const db = firebase.firestore();
         let currentUid = null;
 
+        // Base structural definitions preserves fundamental tracking metrics layers
         const state = {
             totalRolls: 0, currentHandRolls: 0,
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
             totalPointsMade: 0, activePoint: null, shooterHistory: [],
             selectedLeft: null, selectedRight: null,
-            rollHistoryLog: [], rawSequenceLog: [],
+            rollHistoryLog: [], // Holds full relational tracking rows objects now
+            rawSequenceLog: [], // Persistent unbroken array for true lookback calculations
             matrix: {
                 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
                 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
@@ -504,13 +587,68 @@
 
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
+        // Dictionaries management structures
+        let userShootersList = ["ME", "TONY", "RANDOM RANDY", "SETTEM RANDY", "RANDOM SALLY", "SETTEM SALLY"];
+        let userLocationsList = ["BALLY'S", "AMERISTAR", "GRAND Z"];
+
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
+            syncConfigurationDropdowns();
             initDualPads();
             fetchCloudState();
             fetchVaultArchiveList();
         });
+
+        function syncConfigurationDropdowns() {
+            const sSel = document.getElementById('ctxShooterSelect');
+            const lSel = document.getElementById('ctxLocationSelect');
+            
+            sSel.innerHTML = '';
+            userShootersList.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
+            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
+
+            lSel.innerHTML = '';
+            userLocationsList.forEach(l => lSel.innerHTML += `<option value="${l}">${l}</option>`);
+            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
+        }
+
+        function handleContextShooterToggle() {
+            const el = document.getElementById('ctxShooterSelect');
+            if(el.value === 'ADD_NEW') {
+                const name = prompt("REGISTER UNIQUE SHOOTER IDENTITY ID TAG:");
+                if(name && name.trim()) {
+                    const cleanName = name.trim().toUpperCase();
+                    if(!userShootersList.includes(cleanName)) userShootersList.push(cleanName);
+                    syncConfigurationDropdowns();
+                    el.value = cleanName;
+                } else {
+                    el.value = "ME";
+                }
+            }
+        }
+
+        function handleContextLocationToggle() {
+            const el = document.getElementById('ctxLocationSelect');
+            if(el.value === 'ADD_NEW') {
+                const loc = prompt("REGISTER NEW CASINO VENUE LOCATION KEY:");
+                if(loc && loc.trim()) {
+                    const cleanLoc = loc.trim().toUpperCase();
+                    if(!userLocationsList.includes(cleanLoc)) userLocationsList.push(cleanLoc);
+                    syncConfigurationDropdowns();
+                    el.value = cleanLoc;
+                } else {
+                    el.value = "BALLY'S";
+                }
+            }
+        }
+
+        function handleContextDiceSetToggle() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const strip = document.getElementById('kinematicReadoutPanel');
+            if(ds === 'NONE') strip.style.display = 'none';
+            else strip.style.display = 'flex';
+        }
 
         function initDualPads() {
             const lPad = document.getElementById('leftPadContainer');
@@ -520,6 +658,7 @@
                 lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
                 rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
             }
+            handleContextDiceSetToggle();
         }
 
         function selectMatrixDie(axis, val) {
@@ -532,34 +671,86 @@
                 state.selectedRight = val;
                 document.getElementById(`r-pad-${val}`).classList.add('active');
             }
+            calculateLiveKinematicsPreview();
+        }
+
+        // 3D Spatial Vector Kinematic Transformation Formula Evaluation Block
+        function calculateLiveKinematicsPreview() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const lRead = document.getElementById('k-left-readout');
+            const rRead = document.getElementById('k-right-readout');
+
+            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) {
+                lRead.innerText = "N/A"; rRead.innerText = "N/A";
+                return;
+            }
+
+            // Left Die Kinematics Evaluation (3/6 3V Configuration Setup Alignment Map)
+            let lRot = "N/A", lAx = "0";
+            if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; }
+            else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; }
+            else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; }
+            else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; }
+            else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; }
+            else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
+
+            // Right Die Kinematics Evaluation (3/2 3V Configuration Setup Alignment Map)
+            let rRot = "N/A", rAx = "0";
+            if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; }
+            else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; }
+            else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; }
+            else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; }
+            else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; }
+            else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
+
+            lRead.innerText = `ROTATION: [${lRot}] | AXIS DELTA: [${lAx}]`;
+            rRead.innerText = `ROTATION: [${rRot}] | AXIS DELTA: [${rAx}]`;
         }
 
         function submitRoll(isAbsolute) {
             if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
 
-            state.rollHistoryLog.push({
-                selectedLeft: state.selectedLeft, selectedRight: state.selectedRight,
-                totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls,
-                sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout,
-                totalPointsMade: state.totalPointsMade, activePoint: state.activePoint,
-                shooterHistory: [...state.shooterHistory], rawSequenceLog: [...state.rawSequenceLog],
-                matrixState: JSON.parse(JSON.stringify(state.matrix))
-            });
+            const activeShooter = document.getElementById('ctxShooterSelect').value;
+            const activeLocation = document.getElementById('ctxLocationSelect').value;
+            const activeDiceSet = document.getElementById('ctxDiceSetSelect').value;
+            const notes = document.getElementById('ctxDescriptionInput').value.trim();
 
-            executeCalculationsLoop(state.selectedLeft, state.selectedRight, isAbsolute);
+            // Computes deltas parameters matching string fields values
+            let lRot = "N/A", lAx = "0", rRot = "N/A", rAx = "0";
+            if(activeDiceSet === '3V') {
+                if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; } else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; } else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; } else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; } else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; } else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
+                if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; } else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; } else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; } else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; } else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; } else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
+            }
+
+            // Injects absolute relational transaction row object payload
+            const rollRowRecord = {
+                leftDie: state.selectedLeft,
+                rightDie: state.selectedRight,
+                sum: state.selectedLeft + state.selectedRight,
+                shooterId: activeShooter,
+                locationId: activeLocation,
+                diceSetId: activeDiceSet,
+                kinematicsLeft: { rot: lRot, ax: lAx },
+                kinematicsRight: { rot: rRot, ax: rAx },
+                description: notes,
+                puckBeforeRoll: state.activePoint
+            };
+
+            state.rollHistoryLog.push(rollRowRecord);
+            state.rawSequenceLog.push(rollRowRecord.sum);
+
+            executeCalculationsLoop(rollRowRecord);
             clearSelectionPads();
+            document.getElementById('ctxDescriptionInput').value = '';
             pushCloudState("active_session");
         }
 
-        function executeCalculationsLoop(d1, d2, isAbsolute) {
-            const sum = d1 + d2;
+        function executeCalculationsLoop(record) {
+            const sum = record.sum;
             state.totalRolls++;
             state.currentHandRolls++;
-            state.rawSequenceLog.push(sum);
 
-            const isHardway = (d1 === d2) && [4,6,8,10].includes(sum);
-            let ribbonType = 'node-normal';
-
+            const isHardway = (record.leftDie === record.rightDie) && [4,6,8,10].includes(sum);
             state.matrix[sum].tot++;
             state.matrix[sum].cur++;
 
@@ -567,77 +758,145 @@
                 state.sevensTotal++;
                 if(state.activePoint === null) {
                     state.sevensComeout++;
-                    ribbonType = 'node-point-made';
                 } else {
                     state.sevensRed++;
-                    ribbonType = 'node-seven-out';
                     state.shooterHistory.push(state.currentHandRolls);
                     state.currentHandRolls = 0;
                     state.activePoint = null;
                     for (let k in state.matrix) state.matrix[k].cur = 0;
                 }
             } else if (sum === 11 && state.activePoint === null) {
-                ribbonType = 'node-point-made';
+                // Natural roll state bypass parameter
             } else {
                 if(state.activePoint === null) {
                     if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum;
-                    else ribbonType = 'color-dark';
                 } else if(sum === state.activePoint) {
-                    ribbonType = 'node-point-made';
                     state.totalPointsMade++;
                     state.activePoint = null;
-                } else {
-                    ribbonType = 'color-dark';
                 }
             }
 
-            if(isHardway && ribbonType === 'node-normal') ribbonType = 'node-hard';
-            renderUserInterfaceComponents(sum, isHardway, ribbonType);
+            executeAnalyticalFilterEngine();
         }
 
-        function renderUserInterfaceComponents(lastRoll, isHardway, ribbonType) {
+        // The Filtering Engine & Dynamic Interface Modulator Slicing Pipeline
+        function executeAnalyticalFilterEngine() {
+            const mode = document.getElementById('ctxFilterScopeSelect').value;
+            const targetShooter = document.getElementById('ctxShooterSelect').value;
+            const targetLocation = document.getElementById('ctxLocationSelect').value;
+
+            // Safe fallback initialization clone objects to re-compute local views frames
+            let filteredSet = [];
+            
+            if(mode === 'FULL') {
+                filteredSet = [...state.rollHistoryLog];
+            } else if(mode === 'ISOLATE_SHOOTER') {
+                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter);
+            } else if(mode === 'ISOLATE_LOCATION') {
+                filteredSet = state.rollHistoryLog.filter(r => r.locationId === targetLocation);
+            } else if(mode === 'ISOLATE_COMBINED') {
+                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter && r.locationId === targetLocation);
+            }
+
+            // Zero local viewport metrics caches before execution population loop runs
+            let localMatrix = { 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localAtsMap = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localSevensTotal = 0, localSevensRed = 0, localSevensComeout = 0, localPointsMade = 0;
+            let localShooterHistory = [], localCurrentHandRolls = 0, localActivePoint = null;
+
+            document.getElementById('historyContainer').innerHTML = '';
+
+            filteredSet.forEach((v, index) => {
+                localMatrix[v.sum]++;
+                
+                let ribbonClass = 'node-normal';
+                const isHard = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
+
+                localCurrentHandRolls++;
+                localAtsMap[v.sum] = 1;
+
+                if(v.sum === 7) {
+                    localSevensTotal++;
+                    if(localActivePoint === null) {
+                        localSevensComeout++;
+                        ribbonClass = 'node-point-made';
+                    } else {
+                        localSevensRed++;
+                        ribbonClass = 'node-seven-out';
+                        localShooterHistory.push(localCurrentHandRolls);
+                        localCurrentHandRolls = 0;
+                        localActivePoint = null;
+                        for(let k in localAtsMap) localAtsMap[k] = 0;
+                    }
+                } else if(v.sum === 11 && localActivePoint === null) {
+                    ribbonClass = 'node-point-made';
+                } else {
+                    if(localActivePoint === null) {
+                        if([4,5,6,8,9,10].includes(v.sum)) {
+                            localActivePoint = v.sum;
+                            ribbonClass = 'color-dark';
+                        } else {
+                            ribbonClass = 'color-dark';
+                        }
+                    } else if(v.sum === localActivePoint) {
+                        ribbonClass = 'node-point-made';
+                        localPointsMade++;
+                        localActivePoint = null;
+                    } else {
+                        ribbonClass = 'color-dark';
+                    }
+                }
+
+                if(isHard && ribbonClass === 'node-normal') ribbonClass = 'node-hard';
+
+                // Repopulate timeline display ribbon
+                const ribbon = document.getElementById('historyContainer');
+                let label = v.sum.toString();
+                if(isHard) label += '<sup>(H)</sup>';
+                ribbon.innerHTML += `<div class="history-node ${ribbonClass}">${label}</div>`;
+            });
+
+            // Push evaluated local totals out to layout containers view
             for(let i=2; i<=12; i++) {
                 if(i === 7) continue;
                 document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
-                const curLeftCell = document.getElementById(`cur-${i}`);
-                curLeftCell.innerText = state.matrix[i].cur;
-                document.getElementById(`tot-${i}`).innerText = state.matrix[i].tot;
+                
+                const leftCell = document.getElementById(`cur-${i}`);
+                leftCell.innerText = localMatrix[i];
+                document.getElementById(`tot-${i}`).innerText = localMatrix[i];
                 document.getElementById(`puck-${i}`).style.display = 'none';
 
-                if(state.matrix[i].cur >= 1) curLeftCell.classList.add('ats-active');
-                else curLeftCell.classList.remove('ats-active');
+                if(localAtsMap[i] >= 1) leftCell.classList.add('ats-active');
+                else leftCell.classList.remove('ats-active');
             }
 
-            if(state.activePoint !== null) {
-                document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
+            if(localActivePoint !== null) {
+                document.getElementById(`puck-${localActivePoint}`).style.display = 'block';
             }
 
+            // Evaluate persistent continuous hot cold temperature bounds
             evaluateRollingTemperatures();
 
             document.getElementById('summary-total').innerText = state.totalRolls;
-            document.getElementById('summary-current').innerText = state.currentHandRolls;
+            document.getElementById('summary-current').innerText = mode === 'FULL' ? state.currentHandRolls : localCurrentHandRolls;
 
-            const totalShooters = state.shooterHistory.length + (state.currentHandRolls > 0 ? 1 : 0);
-            const sor = totalShooters > 0 ? (state.totalRolls / totalShooters).toFixed(1) : "0.0";
-            const srr = state.sevensTotal > 0 ? (state.totalRolls / state.sevensTotal).toFixed(1) : (state.totalRolls > 0 ? state.totalRolls.toFixed(1) : "0.0");
-            const psr = state.sevensRed > 0 ? (state.totalPointsMade / state.sevensRed).toFixed(1) : "0.0";
+            const totalShooters = localShooterHistory.length + (localCurrentHandRolls > 0 ? 1 : 0);
+            const sor = totalShooters > 0 ? (filteredSet.length / totalShooters).toFixed(1) : "0.0";
+            const srr = localSevensTotal > 0 ? (filteredSet.length / localSevensTotal).toFixed(1) : (filteredSet.length > 0 ? filteredSet.length.toFixed(1) : "0.0");
+            const psr = localSevensRed > 0 ? (localPointsMade / localSevensRed).toFixed(1) : "0.0";
 
-            document.getElementById('stat-red').innerText = state.sevensRed;
+            document.getElementById('stat-red').innerText = localSevensRed;
             document.getElementById('stat-sor').innerText = sor;
             document.getElementById('stat-psr').innerText = psr;
             document.getElementById('stat-srr').innerText = srr;
-            document.getElementById('stat-co7').innerText = state.sevensComeout;
+            document.getElementById('stat-co7').innerText = localSevensComeout;
 
-            if (lastRoll !== 0) {
-                const ribbon = document.getElementById('historyContainer');
-                let label = lastRoll.toString();
-                if(isHardway) label += '<sup>(H)</sup>';
-                ribbon.innerHTML += `<div class="history-node ${ribbonType}">${label}</div>`;
-                ribbon.scrollLeft = ribbon.scrollWidth;
-            }
+            const ribbonContainer = document.getElementById('historyContainer');
+            ribbonContainer.scrollLeft = ribbonContainer.scrollWidth;
         }
 
         function evaluateRollingTemperatures() {
+            // Hot Cold engine remains fully bound to continuous master array parameters tracking metrics
             for (let num in probabilityWindows) {
                 const windowSize = probabilityWindows[num];
                 const sampleSlice = state.rawSequenceLog.slice(-windowSize);
@@ -666,6 +925,8 @@
                 rawSequenceLog: state.rawSequenceLog,
                 rollHistoryLog: JSON.stringify(state.rollHistoryLog),
                 matrix: JSON.stringify(state.matrix),
+                userShootersList: userShootersList,
+                userLocationsList: userLocationsList,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
             if(customName) payload.name = customName.toUpperCase();
@@ -675,9 +936,13 @@
         function fetchCloudState() {
             db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").get().then(doc => {
                 if(doc.exists) {
-                    rebuildUIFromStoredData(doc.data());
+                    const data = doc.data();
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
+                    rebuildUIFromStoredData(data);
                 } else {
-                    renderUserInterfaceComponents(0, false, 'node-normal');
+                    executeAnalyticalFilterEngine();
                 }
             });
         }
@@ -695,40 +960,7 @@
             state.rollHistoryLog = data.rollHistoryLog ? JSON.parse(data.rollHistoryLog) : [];
             state.matrix = data.matrix ? JSON.parse(data.matrix) : state.matrix;
 
-            document.getElementById('historyContainer').innerHTML = '';
-            
-            let localActivePoint = null;
-            state.rawSequenceLog.forEach((v, index) => {
-                let nodeType = 'node-normal';
-                const historyMatch = state.rollHistoryLog[index];
-                const isHard = historyMatch ? (historyMatch.selectedLeft === historyMatch.selectedRight && [4,6,8,10].includes(v)) : false;
-
-                if (v === 7) {
-                    nodeType = (localActivePoint === null) ? 'node-point-made' : 'node-seven-out';
-                    localActivePoint = null;
-                } else if (v === 11 && localActivePoint === null) {
-                    nodeType = 'node-point-made';
-                } else {
-                    if (localActivePoint === null) {
-                        if ([4,5,6,8,9,10].includes(v)) localActivePoint = v;
-                        else nodeType = 'color-dark';
-                    } else if (v === localActivePoint) {
-                        nodeType = 'node-point-made';
-                        localActivePoint = null;
-                    } else {
-                        nodeType = 'color-dark';
-                    }
-                }
-
-                if (isHard && nodeType === 'node-normal') nodeType = 'node-hard';
-                
-                const ribbon = document.getElementById('historyContainer');
-                let label = v.toString();
-                if (isHard) label += '<sup>(H)</sup>';
-                ribbon.innerHTML += `<div class="history-node ${nodeType}">${label}</div>`;
-            });
-
-            renderUserInterfaceComponents(0, false, 'node-normal');
+            executeAnalyticalFilterEngine();
         }
 
         async function fetchVaultArchiveList() {
@@ -786,6 +1018,9 @@
                 if(doc.exists) {
                     const data = doc.data();
                     await db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").set(data);
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
                     rebuildUIFromStoredData(data);
                     alert("Vault Session state recovered.");
                 }
@@ -819,26 +1054,28 @@
 
         function executeUndo() {
             if(state.rollHistoryLog.length === 0) return alert("History underflow.");
+            
             state.rollHistoryLog.pop();
+            state.rawSequenceLog.pop();
             
             if(state.rollHistoryLog.length === 0) {
                 executeClearReset();
             } else {
-                const lastValidCheckpoint = state.rollHistoryLog[state.rollHistoryLog.length - 1];
-                const recreatedDataPayload = {
-                    totalRolls: lastValidCheckpoint.totalRolls,
-                    currentHandRolls: lastValidCheckpoint.currentHandRolls,
-                    sevensTotal: lastValidCheckpoint.sevensTotal,
-                    sevensRed: lastValidCheckpoint.sevensRed,
-                    sevensComeout: lastValidCheckpoint.sevensComeout,
-                    totalPointsMade: lastValidCheckpoint.totalPointsMade,
-                    activePoint: lastValidCheckpoint.activePoint,
-                    shooterHistory: lastValidCheckpoint.shooterHistory,
-                    rawSequenceLog: state.rawSequenceLog.slice(0, -1),
-                    rollHistoryLog: JSON.stringify(state.rollHistoryLog),
-                    matrix: JSON.stringify(lastValidCheckpoint.matrixState)
-                };
-                rebuildUIFromStoredData(recreatedDataPayload);
+                // Completely recalibrate standard states back by processing baseline trace arrays
+                state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+                state.activePoint = null; state.shooterHistory = [];
+                for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+
+                const backupLog = [...state.rollHistoryLog];
+                state.rollHistoryLog = [];
+                state.rawSequenceLog = [];
+
+                backupLog.forEach(row => {
+                    state.rollHistoryLog.push(row);
+                    state.rawSequenceLog.push(row.sum);
+                    executeCalculationsLoop(row);
+                });
+
                 pushCloudState("active_session");
             }
         }
@@ -850,7 +1087,7 @@
             for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
             document.getElementById('historyContainer').innerHTML = '';
             clearSelectionPads();
-            renderUserInterfaceComponents(0, false, 'node-normal');
+            executeAnalyticalFilterEngine();
             pushCloudState("active_session");
         }
 
@@ -860,6 +1097,7 @@
                 document.getElementById(`l-pad-${i}`).classList.remove('active');
                 document.getElementById(`r-pad-${i}`).classList.remove('active');
             }
+            calculateLiveKinematicsPreview();
         }
     </script>
 </body>
