@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker - Clean Architecture</title>
+    <title>Dice Tracker v1.0.1</title>
     <style>
         :root {
             --bg-primary: #030712;
             --panel-bg: #0f172a;
             --text-main: #f8fafc;
-            --text-accent: #f59e0b;
+            --text-accent: #10b981; /* Emerald theme matching lobby */
+            --amber-accent: #f59e0b;
             --white-point: #ffffff;
             --green-point: #10b981;
             --red-seven: #ef4444;
@@ -21,6 +22,59 @@
             color: var(--text-main);
             font-family: monospace;
             margin: 0;
+            padding: 0;
+        }
+
+        /* Global Zombie Lord Header Bar */
+        .zombie-nav-header {
+            background-color: #020617;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .brand-box {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .brand-title {
+            color: var(--text-accent);
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+            margin: 0;
+        }
+
+        .brand-subtitle {
+            color: #f8fafc;
+            font-size: 9px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .version-tag {
+            background-color: #1e293b;
+            color: #94a3b8;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 3px;
+            letter-spacing: 0.1em;
+        }
+
+        /* Interface Spacing Overrides */
+        .main-wrapper {
             padding: 15px;
         }
 
@@ -76,7 +130,7 @@
         .box-num-header {
             font-size: 26px;
             font-weight: 900;
-            color: var(--text-accent);
+            color: var(--amber-accent);
             padding: 10px 0;
             background: #020617;
         }
@@ -143,7 +197,7 @@
         .prompt-header {
             font-size: 16px;
             font-weight: bold;
-            color: var(--text-accent);
+            color: var(--amber-accent);
             margin-bottom: 10px;
             text-transform: uppercase;
         }
@@ -167,7 +221,7 @@
         }
 
         .pad-btn.active {
-            background: var(--text-accent);
+            background: var(--amber-accent);
             color: #000;
             border-color: #fff;
         }
@@ -180,41 +234,51 @@
 </head>
 <body>
 
-    <div class="history-ribbon" id="historyContainer"></div>
+    <nav class="zombie-nav-header">
+        <a href="lobby.html" class="brand-box">
+            <h2 class="brand-title">Zombie Lord's</h2>
+            <span class="brand-subtitle">Playhouse</span>
+        </a>
+        <div class="version-tag">VERSION 1.0.1</div>
+    </nav>
 
-    <div class="grid-layout">
-        <div class="box-container color-2"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
-        <div class="box-container color-3"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
-        <div class="box-container color-4"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
-        <div class="box-container color-5"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
-        <div class="box-container color-6"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+    <div class="main-wrapper">
+        <div class="history-ribbon" id="historyContainer"></div>
 
-        <div class="center-block">
-            <div class="center-title">Craps Nation / SideshowGamble</div>
-            <div class="center-metrics">
-                <div class="c-cell"><div class="c-label">RED</div><div class="c-val" id="stat-red">0</div></div>
-                <div class="c-cell"><div class="c-label">SOR</div><div class="c-val" id="stat-sor">0.0</div></div>
-                <div class="c-cell"><div class="c-label">SRR</div><div class="c-val" id="stat-srr">0.0</div></div>
-                <div class="c-cell"><div class="c-label">CO7</div><div class="c-val" id="stat-co7">0</div></div>
+        <div class="grid-layout">
+            <div class="box-container color-2"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+            <div class="box-container color-3"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+            <div class="box-container color-4"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+            <div class="box-container color-5"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+            <div class="box-container color-6"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+
+            <div class="center-block">
+                <div class="center-title">Craps Nation / SideshowGamble</div>
+                <div class="center-metrics">
+                    <div class="c-cell"><div class="c-label">RED</div><div class="c-val" id="stat-red">0</div></div>
+                    <div class="c-cell"><div class="c-label">SOR</div><div class="c-val" id="stat-sor">0.0</div></div>
+                    <div class="c-cell"><div class="c-label">SRR</div><div class="c-val" id="stat-srr">0.0</div></div>
+                    <div class="c-cell"><div class="c-label">CO7</div><div class="c-val" id="stat-co7">0</div></div>
+                </div>
             </div>
+
+            <div class="box-container color-8"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+            <div class="box-container color-9"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+            <div class="box-container color-10"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+            <div class="box-container color-11"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+            <div class="box-container color-12"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+
+            <div class="box-container" style="background:#000;"><div class="box-num-header" style="color:#aaa; font-size:16px;">ROLL</div><div class="box-count" style="font-size:26px;" id="summary-total">0</div><div class="box-sub-metrics"><div class="sub-left" id="summary-current" style="background:#222; font-size:16px;">0</div></div></div>
         </div>
 
-        <div class="box-container color-8"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
-        <div class="box-container color-9"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
-        <div class="box-container color-10"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
-        <div class="box-container color-11"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
-        <div class="box-container color-12"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
-
-        <div class="box-container" style="background:#000;"><div class="box-num-header" style="color:#aaa; font-size:16px;">ROLL</div><div class="box-count" style="font-size:26px;" id="summary-total">0</div><div class="box-sub-metrics"><div class="sub-left" id="summary-current" style="background:#222; font-size:16px;">0</div></div></div>
-    </div>
-
-    <div class="controller-panel">
-        <div class="prompt-header" id="inputPrompt">Setup Phase: Select Left Die Top Face</div>
-        <div class="pad-grid" id="inputPad"></div>
-        
-        <div class="action-container">
-            <button class="act-btn btn-green" onclick="confirmInput(true)">Confirm (Absolute)</button>
-            <button class="act-btn btn-orange" onclick="confirmInput(false)">Unconfirm (Ambiguous)</button>
+        <div class="controller-panel">
+            <div class="prompt-header" id="inputPrompt">Setup Phase: Select Left Die Top Face</div>
+            <div class="pad-grid" id="inputPad"></div>
+            
+            <div class="action-container">
+                <button class="act-btn btn-green" onclick="confirmInput(true)">Confirm (Absolute)</button>
+                <button class="act-btn btn-orange" onclick="confirmInput(false)">Unconfirm (Ambiguous)</button>
+            </div>
         </div>
     </div>
 
@@ -224,11 +288,7 @@
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
             activePoint: null, shooterHistory: [],
             
-            // Loop Stages
-            // 1: Set L-Top, 2: Set L-Face, 3: Set R-Top, 4: Set R-Face
-            // 5: Roll L-Result, 6: Roll R-Result
             inputStage: 1, 
-            
             setupConfig: { lTop: null, lFace: null, rTop: null, rFace: null },
             rollResult: { left: null, right: null },
 
@@ -268,7 +328,6 @@
             const val = selectedValueCache;
             resetPadSelection();
 
-            // Advance through input loop steps sequentially
             if(engine.inputStage === 1) {
                 engine.setupConfig.lTop = val;
                 engine.inputStage = 2;
@@ -286,11 +345,7 @@
                 engine.inputStage = 6;
             } else if(engine.inputStage === 6) {
                 engine.rollResult.right = val;
-                
-                // Both dice inputs acquired -> process calculations
                 executeRollCycle(engine.rollResult.left, engine.rollResult.right, isAbsolute);
-                
-                // Return loop to active rolling phase (Steps 5 & 6) for next throws
                 engine.inputStage = 5;
             }
             
@@ -322,8 +377,6 @@
                     engine.currentHandRolls = 0;
                     engine.activePoint = null;
                     for (let k in engine.matrix) engine.matrix[k].cur = 0;
-                    
-                    // Reset to initial setup phase for new shooter hand selection
                     engine.inputStage = 1; 
                 }
             } else {
