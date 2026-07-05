@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.3.2</title>
+    <title>Dice Tracker v1.4.0</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg-primary: #020617;
@@ -140,16 +142,24 @@
         .puck-chip {
             position: absolute;
             top: 4px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 6px;
             background-color: var(--puck-on);
             color: #fff;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 900;
-            padding: 1px 6px;
-            border-radius: 9999px;
+            padding: 1px 4px;
+            border-radius: 3px;
             border: 1px solid #fff;
             display: none;
+        }
+
+        /* Temp Status Badge Overlay */
+        .temp-chip {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 10px;
+            font-weight: bold;
         }
 
         .color-dark { background-color: #000000; }
@@ -169,7 +179,8 @@
             font-size: 12px;
         }
 
-        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
+        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; transition: background-color 0.3s; }
+        .sub-left.ats-active { background-color: #047857 !important; color: #fff; } /* ATS Clear State Green Background */
         .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
 
         .diagnostics-panel {
@@ -203,12 +214,12 @@
             justify-content: center;
             align-items: center;
             border-right: 1px solid var(--border-color);
+            position: relative;
         }
         .d-cell:last-child { border-right: none; }
         .d-label { font-size: 14px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; }
         .d-val { font-size: 26px; font-weight: bold; color: #ffffff; margin-top: 6px; }
 
-        /* Master Summary Counter Framework Block Layout */
         .master-rolls-box {
             background-color: #020617;
             border: 1px solid var(--border-color);
@@ -234,9 +245,8 @@
             padding: 20px 0;
         }
         
-        /* Harmonized Background Definitions Syncing Box-Sub Styles */
-        .m-cell-hand { background-color: #000000; }   /* Black background for current */
-        .m-cell-session { background-color: #1e293b; } /* Slate background for total */
+        .m-cell-hand { background-color: #000000; }   
+        .m-cell-session { background-color: #1e293b; } 
         
         .m-label { font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
         .m-val { font-size: 36px; font-weight: 900; color: #ffffff; margin-top: 6px; }
@@ -323,19 +333,10 @@
                 grid-template-columns: repeat(12, 1fr);
                 gap: 6px;
             }
-            .grid-row-segment:nth-child(1) {
-                grid-column: span 5;
-            }
-            .diagnostics-panel {
-                grid-column: span 2;
-                height: 100%;
-            }
-            .grid-row-segment:nth-child(3) {
-                grid-column: span 5;
-            }
-            .master-rolls-box {
-                grid-column: span 12;
-            }
+            .grid-row-segment:nth-child(1) { grid-column: span 5; }
+            .diagnostics-panel { grid-column: span 2; height: 100%; }
+            .grid-row-segment:nth-child(3) { grid-column: span 5; }
+            .master-rolls-box { grid-column: span 12; }
         }
     </style>
 </head>
@@ -346,7 +347,7 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </a>
-        <div class="version-tag">VERSION 1.3.2</div>
+        <div class="version-tag">VERSION 1.4.0</div>
     </nav>
 
     <div class="main-wrapper">
@@ -354,11 +355,11 @@
 
         <div class="board-stack">
             <div class="grid-row-segment">
-                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
-                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
-                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
-                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
-                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
             </div>
 
             <div class="diagnostics-panel">
@@ -367,17 +368,21 @@
                     <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
                     <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
                     <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
-                    <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
+                    <div class="d-cell">
+                        <div class="temp-chip" id="temp-7" style="top:-2px; right:2px;"></div>
+                        <div class="d-label">SRR</div>
+                        <div class="d-val" id="stat-srr">0.0</div>
+                    </div>
                     <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
                 </div>
             </div>
 
             <div class="grid-row-segment">
-                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
-                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
-                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
-                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
-                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
             </div>
 
             <div class="master-rolls-box">
@@ -411,6 +416,20 @@
     </div>
 
     <script>
+        // Initialize Core Firebase Configuration Mapped Components
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
+            projectId: "zombielords-playhouse",
+            databaseURL: "https://zombielords-playhouse-default-rtdb.firebaseio.com",
+            storageBucket: "zombielords-playhouse.firebasestorage.app",
+            messagingSenderId: "795162260246",
+            appId: "1:795162260246:web:97f0361751ac1359b31637"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         const state = {
             totalRolls: 0, currentHandRolls: 0,
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
@@ -419,12 +438,16 @@
             
             selectedLeft: null, selectedRight: null,
             rollHistoryLog: [],
+            rawSequenceLog: [], // Plain integer array log tracking lookback lookups
 
             matrix: {
                 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
                 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
             }
         };
+
+        // Window limits mapped inverse configuration vectors
+        const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
         function initDualPads() {
             const lPad = document.getElementById('leftPadContainer');
@@ -450,29 +473,28 @@
         }
 
         function submitRoll(isAbsolute) {
-            if(!state.selectedLeft || !state.selectedRight) {
-                alert("Execution Error: Selection vector mapping incomplete.");
-                return;
-            }
+            if(!state.selectedLeft || !state.selectedRight) return alert("Selection vector mapping incomplete.");
 
             const historicalSnapshot = {
                 selectedLeft: state.selectedLeft, selectedRight: state.selectedRight,
                 totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls,
                 sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout,
-                totalPointsMade: state.totalPointsMade,
-                activePoint: state.activePoint, shooterHistory: [...state.shooterHistory],
+                totalPointsMade: state.totalPointsMade, activePoint: state.activePoint,
+                shooterHistory: [...state.shooterHistory], rawSequenceLog: [...state.rawSequenceLog],
                 matrixState: JSON.parse(JSON.stringify(state.matrix))
             };
             state.rollHistoryLog.push(historicalSnapshot);
 
             executeCalculationsLoop(state.selectedLeft, state.selectedRight, isAbsolute);
             clearSelectionPads();
+            pushCloudState();
         }
 
         function executeCalculationsLoop(d1, d2, isAbsolute) {
             const sum = d1 + d2;
             state.totalRolls++;
             state.currentHandRolls++;
+            state.rawSequenceLog.push(sum);
 
             const isHardway = (d1 === d2) && [4,6,8,10].includes(sum);
             let ribbonType = 'node-normal';
@@ -497,11 +519,8 @@
                 ribbonType = 'node-point-made';
             } else {
                 if(state.activePoint === null) {
-                    if([4,5,6,8,9,10].includes(sum)) {
-                        state.activePoint = sum;
-                    } else {
-                        ribbonType = 'color-dark';
-                    }
+                    if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum;
+                    else ribbonType = 'color-dark';
                 } else if(sum === state.activePoint) {
                     ribbonType = 'node-point-made';
                     state.totalPointsMade++;
@@ -512,29 +531,40 @@
             }
 
             if(isHardway && ribbonType === 'node-normal') ribbonType = 'node-hard';
-
             renderUserInterfaceComponents(sum, isHardway, ribbonType);
         }
 
         function renderUserInterfaceComponents(lastRoll, isHardway, ribbonType) {
+            // Rebuild sub-rows mapping ATS rules parameters
             for(let i=2; i<=12; i++) {
                 if(i === 7) continue;
                 document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
-                document.getElementById(`cur-${i}`).innerText = state.matrix[i].cur;
+                
+                const curLeftCell = document.getElementById(`cur-${i}`);
+                curLeftCell.innerText = state.matrix[i].cur;
                 document.getElementById(`tot-${i}`).innerText = state.matrix[i].tot;
                 document.getElementById(`puck-${i}`).style.display = 'none';
+
+                // ATS Visual Class Assignment Rule
+                if(state.matrix[i].cur >= 1) curLeftCell.classList.add('ats-active');
+                else curLeftCell.classList.remove('ats-active');
             }
 
             if(state.activePoint !== null) {
                 document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
             }
 
+            // Sync Core Variance Analytics
+            evaluateRollingTemperatures();
+
             document.getElementById('summary-total').innerText = state.totalRolls;
             document.getElementById('summary-current').innerText = state.currentHandRolls;
 
             const totalShooters = state.shooterHistory.length + (state.currentHandRolls > 0 ? 1 : 0);
             const sor = totalShooters > 0 ? (state.totalRolls / totalShooters).toFixed(1) : "0.0";
-            const srr = state.sevensTotal > 0 ? (state.totalRolls / state.sevensTotal).toFixed(1) : "0.0";
+            
+            // Dynamic startup tracking normalizer calibration loop matching SOR layout baseline properties
+            const srr = state.sevensTotal > 0 ? (state.totalRolls / state.sevensTotal).toFixed(1) : (state.totalRolls > 0 ? state.totalRolls.toFixed(1) : "0.0");
             const psr = state.sevensRed > 0 ? (state.totalPointsMade / state.sevensRed).toFixed(1) : "0.0";
 
             document.getElementById('stat-red').innerText = state.sevensRed;
@@ -547,56 +577,79 @@
                 const ribbon = document.getElementById('historyContainer');
                 let label = lastRoll.toString();
                 if(isHardway) label += '<sup>(H)</sup>';
-
                 ribbon.innerHTML += `<div class="history-node ${ribbonType}">${label}</div>`;
                 ribbon.scrollLeft = ribbon.scrollWidth;
             }
         }
 
-        function executeUndo() {
-            if(state.rollHistoryLog.length === 0) {
-                alert("Matrix Underflow: No transactions available in log memory.");
-                return;
+        function evaluateRollingTemperatures() {
+            // Scans lookback arrays mapping specific numerical probability thresholds
+            for (let num in probabilityWindows) {
+                const windowSize = probabilityWindows[num];
+                const sampleSlice = state.rawSequenceLog.slice(-windowSize);
+                const hitCount = sampleSlice.filter(x => x == parseInt(num)).length;
+                
+                const chip = document.getElementById(`temp-${num}`);
+                if (!chip) continue;
+
+                if (state.totalRolls < windowSize) {
+                    chip.innerText = ''; // Insufficient volume data parameters to flag skew
+                } else if (hitCount > 1) {
+                    chip.innerText = '🔥';
+                } else if (hitCount < 1) {
+                    chip.innerText = '❄️';
+                } else {
+                    chip.innerText = '';
+                }
             }
+        }
 
-            const targetCheckpoint = state.rollHistoryLog.pop();
+        function pushCloudState() {
+            db.ref('playhouse/diceTracker/currentSession').set({
+                stateObj: JSON.stringify(state)
+            });
+        }
+
+        function fetchCloudState() {
+            db.ref('playhouse/diceTracker/currentSession').once('value', snapshot => {
+                const data = snapshot.val();
+                if(data && data.stateObj) {
+                    const parsed = JSON.parse(data.stateObj);
+                    Object.assign(state, parsed);
+                    
+                    // Rebuild Ribbon nodes from sequence stack map
+                    document.getElementById('historyContainer').innerHTML = '';
+                    state.rawSequenceLog.forEach(v => {
+                        // Mimics local simulation loops to restore styles
+                        const mockIsHard = (v % 2 === 0) && state.rollHistoryLog.some(h => h.totalRolls === state.rawSequenceLog.indexOf(v) && h.selectedLeft === h.selectedRight);
+                        renderUserInterfaceComponents(v, mockIsHard, 'node-normal');
+                    });
+                    renderUserInterfaceComponents(0, false, 'node-normal');
+                }
+            });
+        }
+
+        function executeUndo() {
+            if(state.rollHistoryLog.length === 0) return alert("No operations in stack memory cache.");
+            const target = state.rollHistoryLog.pop();
             
-            state.totalRolls = targetCheckpoint.totalRolls;
-            state.currentHandRolls = targetCheckpoint.currentHandRolls;
-            state.sevensTotal = targetCheckpoint.sevensTotal;
-            state.sevensRed = targetCheckpoint.sevensRed;
-            state.sevensComeout = targetCheckpoint.sevensComeout;
-            state.totalPointsMade = targetCheckpoint.totalPointsMade;
-            state.activePoint = targetCheckpoint.activePoint;
-            state.shooterHistory = targetCheckpoint.shooterHistory;
-            state.matrix = targetCheckpoint.matrixState;
-
+            Object.assign(state, target);
             const ribbon = document.getElementById('historyContainer');
             if(ribbon.lastChild) ribbon.removeChild(ribbon.lastChild);
 
             renderUserInterfaceComponents(0, false, 'node-normal');
-            
-            for(let i=2; i<=12; i++) {
-                if(i === 7) continue;
-                document.getElementById(`puck-${i}`).style.display = 'none';
-            }
-            if(state.activePoint !== null) {
-                document.getElementById(`puck-${state.activePoint}`).style.display = 'block';
-            }
+            pushCloudState();
         }
 
         function executeClearReset() {
-            if(!confirm("Execute master clear reset command over session data matrix?")) return;
-            
-            state.totalRolls = 0; state.currentHandRolls = 0;
-            state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
-            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = [];
-            
+            if(!confirm("Reset metrics data schema?")) return;
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = []; state.rawSequenceLog = [];
             for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
             document.getElementById('historyContainer').innerHTML = '';
-            
             clearSelectionPads();
             renderUserInterfaceComponents(0, false, 'node-normal');
+            pushCloudState();
         }
 
         function clearSelectionPads() {
@@ -609,6 +662,7 @@
 
         window.onload = function() {
             initDualPads();
+            fetchCloudState(); // Execute Firebase snapshot initialization callback sequence
             renderUserInterfaceComponents(0, false, 'node-normal');
         };
     </script>
