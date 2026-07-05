@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.4.3</title>
+    <title>Dice Tracker v1.4.4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-primary: #020617;
@@ -326,34 +327,19 @@
         .btn-blue { background: #3b82f6; color: white; }
         .btn-red { background: #ef4444; color: white; }
 
-        .archive-controls {
-            display: flex;
-            gap: 10px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-            margin-top: 5px;
-        }
-
-        .archive-input {
-            background-color: #020617;
-            border: 1px solid var(--border-color);
-            color: #fff;
-            font-family: monospace;
-            padding: 10px;
-            flex-grow: 1;
-            border-radius: 4px;
-        }
-
-        /* Standard Vault UI Panels Section Styles matching archives.html */
+        /* The Storage Vault Section Styles matching archives.html */
         .vault-panel-header {
             border-bottom: 1px solid rgba(16, 185, 129, 0.4);
             font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.15em;
             color: #fff;
-            padding-bottom: 6px;
-            margin: 20px 0 10px 0;
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
         .vault-grid {
@@ -383,6 +369,9 @@
             font-weight: bold;
             font-size: 13px;
             letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .vault-card-meta {
@@ -390,6 +379,8 @@
             color: #94a3b8;
             display: flex;
             justify-content: space-between;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding-top: 8px;
         }
 
         @media (min-width: 1024px) {
@@ -408,7 +399,7 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="version-tag">VERSION 1.4.3</div>
+        <div class="version-tag">VERSION 1.4.4</div>
     </nav>
 
     <div class="main-wrapper">
@@ -473,14 +464,14 @@
                 <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last Roll</button>
                 <button class="act-btn btn-red" onclick="executeClearReset()">Reset All Rolls</button>
             </div>
-
-            <div class="archive-controls">
-                <input type="text" id="sessionNameInput" class="archive-input" placeholder="DESIGNATE ARCHIVE SESSION NAME...">
-                <button class="act-btn btn-green" style="padding:0 25px;" onclick="commitArchiveSession()">Commit Archive</button>
-            </div>
         </div>
 
-        <div class="vault-panel-header">The Vault / Dice Session Archives</div>
+        <div class="vault-panel-header">
+            <span>The Vault / Dice Session Archives</span>
+            <button onclick="commitArchiveSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all">
+                <i class="fa-solid fa-plus mr-1"></i>Save Current Session
+            </button>
+        </div>
         <div id="vaultArchiveContainer" class="vault-grid"></div>
     </div>
 
@@ -518,7 +509,7 @@
             currentUid = user.uid;
             initDualPads();
             fetchCloudState();
-            fetchVaultArchiveList(); // Triggers loading panel inventory pull on handshake completion
+            fetchVaultArchiveList();
         });
 
         function initDualPads() {
@@ -691,7 +682,6 @@
             });
         }
 
-        // State Machine Reconstruction Logic Engine to prevent White History node bleeding
         function rebuildUIFromStoredData(data) {
             state.totalRolls = data.totalRolls || 0;
             state.currentHandRolls = data.currentHandRolls || 0;
@@ -707,12 +697,9 @@
 
             document.getElementById('historyContainer').innerHTML = '';
             
-            // Evaluates and restores exact color states node by node from history snapshot matrices
             let localActivePoint = null;
             state.rawSequenceLog.forEach((v, index) => {
                 let nodeType = 'node-normal';
-                
-                // Read historic snapshot properties to detect Hardways combinations
                 const historyMatch = state.rollHistoryLog[index];
                 const isHard = historyMatch ? (historyMatch.selectedLeft === historyMatch.selectedRight && [4,6,8,10].includes(v)) : false;
 
@@ -723,11 +710,8 @@
                     nodeType = 'node-point-made';
                 } else {
                     if (localActivePoint === null) {
-                        if ([4,5,6,8,9,10].includes(v)) {
-                            localActivePoint = v;
-                        } else {
-                            nodeType = 'color-dark';
-                        }
+                        if ([4,5,6,8,9,10].includes(v)) localActivePoint = v;
+                        else nodeType = 'color-dark';
                     } else if (v === localActivePoint) {
                         nodeType = 'node-point-made';
                         localActivePoint = null;
@@ -738,7 +722,6 @@
 
                 if (isHard && nodeType === 'node-normal') nodeType = 'node-hard';
                 
-                // Directly forces ribbon printing with computed style parameters
                 const ribbon = document.getElementById('historyContainer');
                 let label = v.toString();
                 if (isHard) label += '<sup>(H)</sup>';
@@ -748,7 +731,6 @@
             renderUserInterfaceComponents(0, false, 'node-normal');
         }
 
-        // Vault Inventory Queries Loader Module
         async function fetchVaultArchiveList() {
             if(!currentUid) return;
             try {
@@ -760,15 +742,14 @@
                 snap.forEach(doc => {
                     if(doc.id !== "active_session") {
                         foundArchivesCount++;
-                        const data = doc.data();
-                        container.innerHTML += generateArchiveCardHtml(doc.id, data);
+                        container.innerHTML += generateArchiveCardHtml(doc.id, doc.data());
                     }
                 });
 
                 if(foundArchivesCount === 0) {
                     container.innerHTML = `<div class="text-xs text-slate-500 uppercase p-4 italic">No archived session files found in database path.</div>`;
                 }
-            } catch (e) { console.error("Vault Query Failure:", e); }
+            } catch (e) { console.error(e); }
         }
 
         function generateArchiveCardHtml(id, data) {
@@ -776,16 +757,24 @@
             return `
                 <div class="vault-card">
                     <div class="flex justify-between items-center">
-                        <span class="vault-card-title">${data.name || 'UNNAMED DEPLOYMENT'}</span>
+                        <span class="vault-card-title">
+                            ${data.name || 'UNNAMED DEPLOYMENT'}
+                            <button onclick="renameArchiveSession('${id}', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400 ml-1"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                        </span>
                         <span class="text-[10px] text-slate-500 font-bold">${dateStr}</span>
                     </div>
                     <div class="vault-card-meta">
                         <span>TOTAL ROLLS: <b class="text-white">${data.totalRolls || 0}</b></span>
                         <span>SEVENS OUT: <b class="text-red-400">${data.sevensRed || 0}</b></span>
                     </div>
-                    <button onclick="resumeArchivedSession('${id}')" class="act-btn btn-green py-2 text-xs font-black">
-                        Resume Session State
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="resumeArchivedSession('${id}')" class="act-btn btn-green py-2 text-xs font-black flex-1">
+                            <i class="fa-solid fa-play mr-1"></i>Resume
+                        </button>
+                        <button onclick="deleteArchiveSession('${id}')" class="act-btn btn-red py-2 px-3 text-xs font-black">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -796,31 +785,42 @@
                 const doc = await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).get();
                 if(doc.exists) {
                     const data = doc.data();
-                    // Sync values over to active workspace node
                     await db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").set(data);
                     rebuildUIFromStoredData(data);
                     alert("Vault Session state recovered.");
                 }
-            } catch (e) { alert("Session recovery execution aborted."); }
+            } catch (e) { alert("Session recovery aborted."); }
+        }
+
+        async function renameArchiveSession(docId, oldName) {
+            const name = prompt("New designation:", oldName);
+            if(name) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).update({ name: name.toUpperCase() });
+                fetchVaultArchiveList();
+            }
+        }
+
+        async function deleteArchiveSession(docId) {
+            if(confirm("Delete this archive card permanently from database storage?")) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).delete();
+                fetchVaultArchiveList();
+            }
         }
 
         async function commitArchiveSession() {
-            const inputField = document.getElementById('sessionNameInput');
-            const sessionName = inputField.value.trim();
-            if(!sessionName) return alert("Designate a valid name string prior to archive creation.");
+            const sessionName = prompt("DESIGNATE ARCHIVE SESSION NAME:");
+            if(!sessionName || !sessionName.trim()) return alert("Designate a valid name string prior to archive creation.");
             
             const newDocId = "archive_" + Date.now();
-            await pushCloudState(newDocId, sessionName);
+            await pushCloudState(newDocId, sessionName.trim());
             alert("Session archived successfully.");
-            inputField.value = '';
-            fetchVaultArchiveList(); // Refresh lists immediately to show new card
+            fetchVaultArchiveList();
         }
 
         function executeUndo() {
             if(state.rollHistoryLog.length === 0) return alert("History underflow.");
             state.rollHistoryLog.pop();
             
-            // Clear cloud pointer and rebuild using full historic re-trace fallback checks
             if(state.rollHistoryLog.length === 0) {
                 executeClearReset();
             } else {
