@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.0.1</title>
+    <title>Dice Tracker v1.1.0</title>
     <style>
         :root {
-            --bg-primary: #030712;
+            --bg-primary: #020617;
             --panel-bg: #0f172a;
             --text-main: #f8fafc;
-            --text-accent: #10b981; /* Emerald theme matching lobby */
+            --emerald-accent: #10b981;
             --amber-accent: #f59e0b;
-            --white-point: #ffffff;
-            --green-point: #10b981;
-            --red-seven: #ef4444;
-            --border-color: #1e293b;
+            --border-color: #334155;
         }
 
         body {
@@ -23,17 +20,18 @@
             font-family: monospace;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Global Zombie Lord Header Bar */
+        /* Top Zombie Lord Bar */
         .zombie-nav-header {
             background-color: #020617;
-            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            border-b: 1px solid rgba(16, 185, 129, 0.3);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .brand-box {
@@ -44,12 +42,11 @@
         }
 
         .brand-title {
-            color: var(--text-accent);
+            color: var(--emerald-accent);
             font-size: 14px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -0.05em;
-            text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
             margin: 0;
         }
 
@@ -70,52 +67,48 @@
             font-weight: bold;
             padding: 4px 10px;
             border-radius: 3px;
-            letter-spacing: 0.1em;
         }
 
-        /* Interface Spacing Overrides */
         .main-wrapper {
-            padding: 15px;
+            padding: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
-        /* Chronological Top Ribbon Tracker */
+        /* History Ribbon */
         .history-ribbon {
             display: flex;
             overflow-x: auto;
-            background-color: #020617;
+            background-color: #000;
             padding: 12px;
             gap: 6px;
-            min-height: 45px;
+            min-height: 35px;
             align-items: center;
             border: 1px solid var(--border-color);
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .history-node {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-weight: bold;
             font-size: 16px;
             padding: 4px 8px;
             border-radius: 2px;
             min-width: 28px;
             text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .node-normal { background-color: var(--white-point); color: #000; }
-        .node-hard { background-color: var(--white-point); color: #000; border: 2px dashed #000; }
-        .node-point-made { background-color: var(--green-point); color: #fff; }
-        .node-seven-out { background-color: var(--red-seven); color: #fff; }
+        .node-normal { background-color: #fff; color: #000; }
+        .node-hard { background-color: #fff; color: #000; border: 2px dashed #000; }
+        .node-point-made { background-color: var(--emerald-accent); color: #fff; }
+        .node-seven-out { background-color: #ef4444; color: #fff; }
 
-        /* Main Grid Board Layout */
+        /* Unified 12-Column Grid Framework */
         .grid-layout {
             display: grid;
-            grid-template-columns: repeat(6, 1fr) 2.2fr repeat(5, 1fr);
-            gap: 4px;
-            max-width: 1400px;
-            margin: 0 auto 15px auto;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
+            margin-bottom: 25px;
+            width: 100%;
         }
 
         .box-container {
@@ -128,49 +121,41 @@
         }
 
         .box-num-header {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 900;
             color: var(--amber-accent);
-            padding: 10px 0;
-            background: #020617;
+            padding: 8px 0;
+            background: #090d16;
+            border-bottom: 1px solid var(--border-color);
         }
-        
-        .color-4, .color-5, .color-6, .color-8, .color-9, .color-10 { background: #450a0a; }
-        .color-2, .color-3, .color-11, .color-12 { background: #000000; }
 
-        .box-count { font-size: 20px; font-weight: bold; color: #fff; padding: 5px 0; }
+        /* Specific Board Row Colors */
+        .color-dark { background-color: #000000; }
+        .color-red { background-color: #450a0a; }
+        .color-center { background-color: #090d16; }
+
+        .box-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 15px 0;
+        }
 
         .box-sub-metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
             border-top: 1px solid var(--border-color);
-            font-size: 13px;
-        }
-
-        .sub-left { background-color: #000000; color: #fff; padding: 4px 0; border-right: 1px solid var(--border-color); }
-        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
-
-        /* Central Analytics Block */
-        .center-block {
-            background-color: #090d16;
-            border: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .center-title {
             font-size: 12px;
-            color: #94a3b8;
-            padding: 4px;
-            background: #020617;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
         }
 
-        .center-metrics {
+        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
+
+        /* Center Analytics Cell Structures */
+        .center-metrics-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            flex-grow: 1;
+            height: 100%;
         }
 
         .c-cell {
@@ -181,54 +166,53 @@
             border-right: 1px solid var(--border-color);
         }
         .c-cell:last-child { border-right: none; }
-
         .c-label { font-size: 11px; color: #64748b; font-weight: bold; }
-        .c-val { font-size: 16px; font-weight: bold; color: #fff; margin-top: 4px; }
+        .c-val { font-size: 18px; font-weight: bold; color: #ffffff; margin-top: 6px; }
 
-        /* Input Controller Component */
+        /* Unified Input Controller Panel */
         .controller-panel {
-            max-width: 1400px;
-            margin: 0 auto;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            padding: 15px;
+            padding: 20px;
         }
 
         .prompt-header {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             color: var(--amber-accent);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
         .pad-grid {
             display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .pad-btn {
             background: #020617;
             color: #fff;
             border: 1px solid var(--border-color);
-            font-size: 20px;
+            font-size: 22px;
             font-weight: bold;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             cursor: pointer;
             border-radius: 4px;
+            transition: all 0.2s;
         }
 
         .pad-btn.active {
             background: var(--amber-accent);
             color: #000;
-            border-color: #fff;
+            border-color: #ffffff;
         }
 
-        .action-container { display: flex; gap: 10px; }
-        .act-btn { padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; }
-        .btn-green { background: var(--green-point); color: white; }
+        .action-container { display: flex; gap: 12px; }
+        .act-btn { padding: 12px 24px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 14px; text-transform: uppercase; }
+        .btn-green { background: var(--emerald-accent); color: white; }
         .btn-orange { background: #f97316; color: white; }
     </style>
 </head>
@@ -239,40 +223,47 @@
             <h2 class="brand-title">Zombie Lord's</h2>
             <span class="brand-subtitle">Playhouse</span>
         </a>
-        <div class="version-tag">VERSION 1.0.1</div>
+        <div class="version-tag">VERSION 1.1.0</div>
     </nav>
 
     <div class="main-wrapper">
         <div class="history-ribbon" id="historyContainer"></div>
 
         <div class="grid-layout">
-            <div class="box-container color-2"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
-            <div class="box-container color-3"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
-            <div class="box-container color-4"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
-            <div class="box-container color-5"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
-            <div class="box-container color-6"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+            <div class="box-container color-dark"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+            <div class="box-container color-dark"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
 
-            <div class="center-block">
-                <div class="center-title">Craps Nation / SideshowGamble</div>
-                <div class="center-metrics">
+            <div class="box-container color-center">
+                <div class="box-num-header" style="font-size:12px; color:#94a3b8; padding:15px 0;">ZOMBIELORD DIAGNOSTICS</div>
+                <div class="center-metrics-grid">
                     <div class="c-cell"><div class="c-label">RED</div><div class="c-val" id="stat-red">0</div></div>
                     <div class="c-cell"><div class="c-label">SOR</div><div class="c-val" id="stat-sor">0.0</div></div>
                     <div class="c-cell"><div class="c-label">SRR</div><div class="c-val" id="stat-srr">0.0</div></div>
                     <div class="c-cell"><div class="c-label">CO7</div><div class="c-val" id="stat-co7">0</div></div>
                 </div>
+                <div style="border-top:1px solid var(--border-color); height:29px; background:#000;"></div>
             </div>
 
-            <div class="box-container color-8"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
-            <div class="box-container color-9"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
-            <div class="box-container color-10"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
-            <div class="box-container color-11"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
-            <div class="box-container color-12"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+            <div class="box-container color-red"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+            <div class="box-container color-dark"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+            <div class="box-container color-dark"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
 
-            <div class="box-container" style="background:#000;"><div class="box-num-header" style="color:#aaa; font-size:16px;">ROLL</div><div class="box-count" style="font-size:26px;" id="summary-total">0</div><div class="box-sub-metrics"><div class="sub-left" id="summary-current" style="background:#222; font-size:16px;">0</div></div></div>
+            <div class="box-container color-dark">
+                <div class="box-num-header" style="color:#94a3b8; font-size:14px; padding:14px 0;">ROLLS</div>
+                <div class="box-count" id="summary-total">0</div>
+                <div class="box-sub-metrics">
+                    <div class="sub-left" style="grid-column: span 2; background:#000;" id="summary-current">0</div>
+                </div>
+            </div>
         </div>
 
         <div class="controller-panel">
-            <div class="prompt-header" id="inputPrompt">Setup Phase: Select Left Die Top Face</div>
+            <div class="prompt-header" id="inputPrompt">Input Left Die Outcome</div>
             <div class="pad-grid" id="inputPad"></div>
             
             <div class="action-container">
@@ -288,23 +279,14 @@
             sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
             activePoint: null, shooterHistory: [],
             
+            // Core Input Toggle State (1: Left Die, 2: Right Die)
             inputStage: 1, 
-            setupConfig: { lTop: null, lFace: null, rTop: null, rFace: null },
-            rollResult: { left: null, right: null },
+            rollLeft: null, rollRight: null,
 
             matrix: {
                 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
                 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
             }
-        };
-
-        const stagePrompts = {
-            1: "Setup Phase: Select Left Die Top Face",
-            2: "Setup Phase: Select Left Die Facing Shooter",
-            3: "Setup Phase: Select Right Die Top Face",
-            4: "Setup Phase: Select Right Die Facing Shooter",
-            5: "Active Roll: Input Left Die Outcome",
-            6: "Active Roll: Input Right Die Outcome"
         };
 
         function initPad() {
@@ -323,33 +305,22 @@
         }
 
         function confirmInput(isAbsolute) {
-            if(!selectedValueCache) return alert("Select a face value.");
+            if(!selectedValueCache) return alert("Select a face value via the keypad.");
             
             const val = selectedValueCache;
             resetPadSelection();
 
             if(engine.inputStage === 1) {
-                engine.setupConfig.lTop = val;
+                engine.rollLeft = val;
                 engine.inputStage = 2;
-            } else if(engine.inputStage === 2) {
-                engine.setupConfig.lFace = val;
-                engine.inputStage = 3;
-            } else if(engine.inputStage === 3) {
-                engine.setupConfig.rTop = val;
-                engine.inputStage = 4;
-            } else if(engine.inputStage === 4) {
-                engine.setupConfig.rFace = val;
-                engine.inputStage = 5;
-            } else if(engine.inputStage === 5) {
-                engine.rollResult.left = val;
-                engine.inputStage = 6;
-            } else if(engine.inputStage === 6) {
-                engine.rollResult.right = val;
-                executeRollCycle(engine.rollResult.left, engine.rollResult.right, isAbsolute);
-                engine.inputStage = 5;
+                document.getElementById('inputPrompt').innerText = "Input Right Die Outcome";
+            } else {
+                engine.rollRight = val;
+                executeRollCycle(engine.rollLeft, engine.rollRight, isAbsolute);
+                
+                engine.inputStage = 1;
+                document.getElementById('inputPrompt').innerText = "Input Left Die Outcome";
             }
-            
-            document.getElementById('inputPrompt').innerText = stagePrompts[engine.inputStage];
         }
 
         function resetPadSelection() {
@@ -377,7 +348,6 @@
                     engine.currentHandRolls = 0;
                     engine.activePoint = null;
                     for (let k in engine.matrix) engine.matrix[k].cur = 0;
-                    engine.inputStage = 1; 
                 }
             } else {
                 if(engine.activePoint === null) {
@@ -391,6 +361,7 @@
         }
 
         function renderInterfaceBoard(lastRoll, isHardway) {
+            // Update Dynamic Board Counters
             for(let i=2; i<=12; i++) {
                 if(i === 7) continue;
                 document.getElementById(`count-${i}`).innerText = engine.matrix[i].tot;
@@ -410,6 +381,7 @@
             document.getElementById('stat-srr').innerText = srr;
             document.getElementById('stat-co7').innerText = engine.sevensComeout;
 
+            // Render Dynamic History Sequence Stream Node
             const container = document.getElementById('historyContainer');
             let nodeClass = 'node-normal';
             if (isHardway) nodeClass = 'node-hard';
