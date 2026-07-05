@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Master - Analytics Module</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --panel-bg: #141414;
+            --text-main: #ffffff;
+            --text-accent: #ffd700;
+            --white-point: #ffffff;
+            --green-point: #008744;
+            --red-seven: #d62d20;
+            --border-color: #333333;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* Chronological Roll History String Ribbon */
+        .history-ribbon {
+            display: flex;
+            overflow-x: auto;
+            background-color: #000;
+            padding: 10px;
+            gap: 5px;
+            min-height: 40px;
+            align-items: center;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .history-node {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 5px 10px;
+            border-radius: 2px;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .node-point-normal { background-color: var(--white-point); color: #000; }
+        .node-point-made { background-color: var(--green-point); color: #fff; }
+        .node-seven-out { background-color: var(--red-seven); color: #fff; }
+
+        /* Main Grid Grid and Analytics Block */
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid-row {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            gap: 5px;
+        }
+
+        /* Core Boxes */
+        .number-box {
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            text-align: center;
+            padding: 10px 5px;
+        }
+
+        .number-title {
+            color: var(--text-accent);
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .sub-row-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            margin-top: 8px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .sub-box-left {
+            border-right: 1px solid var(--border-color);
+            background-color: #000;
+            padding: 2px;
+        }
+
+        .sub-box-right {
+            background-color: #222;
+            padding: 2px;
+        }
+
+        /* Central Analytics Core */
+        .analytics-panel {
+            grid-column: span 3;
+            background-color: #111;
+            border: 2px solid var(--border-color);
+            display: grid;
+            grid-template-rows: auto auto;
+            text-align: center;
+        }
+
+        .analytics-header {
+            font-size: 12px;
+            color: #aaa;
+            padding: 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .analytics-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .metric-cell {
+            border-right: 1px solid var(--border-color);
+            padding: 5px 2px;
+        }
+        .metric-cell:last-child { border-right: none; }
+
+        .metric-label { font-size: 11px; color: #888; }
+        .metric-value { font-size: 16px; font-weight: bold; margin-top: 4px; }
+
+        /* Input Controls Panel */
+        .input-panel {
+            background-color: var(--panel-bg);
+            border: 2px solid var(--border-color);
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .dice-btn {
+            background-color: #222;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .dice-btn.selected {
+            background-color: var(--text-accent);
+            color: #000;
+            border-color: #fff;
+        }
+
+        .action-btn {
+            padding: 10px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-confirm { background-color: var(--green-point); color: white; }
+        .btn-unconfirm { background-color: #e67e22; color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Chronological Roll History String -->
+    <div class="history-ribbon" id="historyRibbon"></div>
+
+    <div class="dashboard-container">
+        <!-- Main Dice Roll Grid -->
+        <div class="grid-row" id="diceGrid">
+            <!-- Dynamic JavaScript injections populate cells 2-6 here -->
+            
+            <!-- Central Analytics Block (Positioned dynamically or hardcoded in sequence) -->
+            <div class="analytics-panel" id="centralAnalytics">
+                <div class="analytics-header">Craps Nation / SideshowGamble</div>
+                <div class="analytics-metrics-grid">
+                    <div class="metric-cell"><div class="metric-label">RED</div><div class="metric-value" id="valRed">0</div></div>
+                    <div class="metric-cell"><div class="metric-label">SOR</div><div class="metric-value" id="valSor">0.0</div></div>
+                    <div class="metric-cell"><div class="metric-label">SRR</div><div class="metric-value" id="valSrr">0.0</div></div>
+                    <div class="metric-cell"><div class="metric-label">CO7</div><div class="metric-value" id="valCo7">0</div></div>
+                </div>
+            </div>
+
+            <!-- Cells 8-12 + Total Roll Panel populate here -->
+        </div>
+
+        <!-- Input Module Controls Interface -->
+        <div class="input-panel">
+            <h3>Configuration Input Engine</h3>
+            
+            <div class="input-group">
+                <label>Set Pre-Config (Left Top, Left Facing, Right Top, Right Facing):</label>
+                <div class="button-row" id="preSetControls">
+                    <!-- Setup state selection tools -->
+                    <button class="dice-btn" onclick="setDicePreConfig(2,4,2,4)">Hardway Set (2,4,2,4)</button>
+                    <button class="dice-btn" onclick="setDicePreConfig(3,3,3,3)">3V Set (3,3,3,3)</button>
+                </div>
+            </div>
+
+            <hr style="border-color: var(--border-color); margin: 15px 0;">
+
+            <div class="input-group">
+                <label>Input Left Die Outcome:</label>
+                <div class="button-row" id="leftDieRow"></div>
+            </div>
+
+            <div class="input-group">
+                <label>Input Right Die Outcome:</label>
+                <div class="button-row" id="rightDieRow"></div>
+            </div>
+
+            <div class="button-row" style="margin-top: 20px;">
+                <button class="action-btn btn-confirm" onclick="processRoll(true)">Confirm (Absolute)</button>
+                <button class="action-btn btn-unconfirm" onclick="processRoll(false)">Unconfirm (Ambiguous)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Core Architectural Engine State
+        const state = {
+            sessionRolls: 0,
+            currentShooterRolls: 0,
+            totalSevens: 0,
+            redSevens: 0,
+            coSevens: 0,
+            currentPoint: null,
+            shooterHistory: [], // Array tracking roll lengths per shooter hand
+            
+            // Initial Preset Dice Configurations
+            currentPreSet: { leftTop: 2, leftFacing: 4, rightTop: 2, rightFacing: 4 },
+            
+            // Selections
+            selectedLeft: null,
+            selectedRight: null,
+
+            // Core Analytics Arrays per box number
+            boxData: {
+                2:  { current: 0, total: 0, combos: { '1-1': 0 } },
+                3:  { current: 0, total: 0, combos: { '1-2': 0, '2-1': 0 } },
+                4:  { current: 0, total: 0, combos: { '1-3': 0, '3-1': 0, '2-2': 0 } }, // split: easy vs hard
+                5:  { current: 0, total: 0, combos: { '1-4': 0, '4-1': 0, '2-3': 0, '3-2': 0 } },
+                6:  { current: 0, total: 0, combos: { '1-5': 0, '5-1': 0, '2-4': 0, '4-2': 0, '3-3': 0 } },
+                7:  { current: 0, total: 0, combos: { '1-6': 0, '6-1': 0, '2-5': 0, '5-2': 0, '3-4': 0, '4-3': 0 } },
+                8:  { current: 0, total: 0, combos: { '2-6': 0, '6-2': 0, '3-5': 0, '5-3': 0, '4-4': 0 } },
+                9:  { current: 0, total: 0, combos: { '3-6': 0, '6-3': 0, '4-5': 0, '5-4': 0 } },
+                10: { current: 0, total: 0, combos: { '4-6': 0, '6-4': 0, '5-5': 0 } },
+                11: { current: 0, total: 0, combos: { '5-6': 0, '6-5': 0 } },
+                12: { current: 0, total: 0, combos: { '6-6': 0 } }
+            }
+        };
+
+        // Initialize UI Elements
+        function initUI() {
+            const leftRow = document.getElementById('leftDieRow');
+            const rightRow = document.getElementById('rightDieRow');
+            leftRow.innerHTML = ''; rightRow.innerHTML = '';
+
+            for(let i = 1; i <= 6; i++) {
+                leftRow.innerHTML += `<button class="dice-btn" id="l-btn-${i}" onclick="selectDie('left', ${i})">${i}</button>`;
+                rightRow.innerHTML += `<button class="dice-btn" id="r-btn-${i}" onclick="selectDie('right', ${i})">${i}</button>`;
+            }
+            renderGrid();
+        }
+
+        function selectDie(side, value) {
+            if(side === 'left') {
+                if(state.selectedLeft) document.getElementById(`l-btn-${state.selectedLeft}`).classList.remove('selected');
+                state.selectedLeft = value;
+                document.getElementById(`l-btn-${value}`).classList.add('selected');
+            } else {
+                if(state.selectedRight) document.getElementById(`r-btn-${state.selectedRight}`).classList.remove('selected');
+                state.selectedRight = value;
+                document.getElementById(`r-btn-${value}`).classList.add('selected');
+            }
+        }
+
+        function setDicePreConfig(lt, lf, rt, rf) {
+            state.currentPreSet = { leftTop: lt, leftFacing: lf, rightTop: rt, rightFacing: rf };
+        }
+
+        // Logic Processor for Roll Outcomes
+        function processRoll(isAbsolute) {
+            if(!state.selectedLeft || !state.selectedRight) {
+                alert("Execution Error: Missing physical die resolution parameters.");
+                return;
+            }
+
+            const d1 = state.selectedLeft;
+            const d2 = state.selectedRight;
+            const total = d1 + d2;
+            
+            // Increment counters
+            state.sessionRolls++;
+            state.currentShooterRolls++;
+
+            // Evaluate Hardway State
+            const isHardway = (d1 === d2) && [4,6,8,10].includes(total);
+
+            // Execute Rules Engine Sequence
+            handleCrapsLogic(total, d1, d2, isHardway, isAbsolute);
+            
+            // Render updates
+            renderGrid();
+            updateAnalyticsUI();
+            appendHistoryRibbon(total, isHardway);
+            
+            // Clear inputs for next loop
+            clearInputs();
+        }
+
+        function handleCrapsLogic(total, d1, d2, isHardway, isAbsolute) {
+            // Update counts inside distribution structure
+            state.boxData[total].total++;
+            state.boxData[total].current++;
+
+            if (total === 7) {
+                state.totalSevens++;
+                if (state.currentPoint === null) {
+                    // Come out 7
+                    state.coSevens++;
+                } else {
+                    // Seven Out: Player loses control of the dice
+                    state.redSevens++;
+                    state.shooterHistory.push(state.currentShooterRolls);
+                    state.currentShooterRolls = 0; // Reset current shooter
+                    state.currentPoint = null;     // Clear Point
+                    // Reset box tracking counts for current shooter
+                    for (let key in state.boxData) { state.boxData[key].current = 0; }
+                }
+            } else {
+                // Point Logic Management
+                if (state.currentPoint === null) {
+                    if ([4,5,6,8,9,10].includes(total)) {
+                        state.currentPoint = total; // Set point
+                    }
+                } else if (total === state.currentPoint) {
+                    // Point Made condition
+                    state.currentPoint = null; // Clear point, remains same shooter
+                }
+            }
+
+            // Axis Transformation calculations stub for Goal 2 expansion processing
+            if (!isAbsolute) {
+                // Flag inverse probability matrices: (d2, d1) mapping alternatives
+                console.log(`Ambiguity Triggered: Evaluating inverse state [${d2}-${d1}] against initial orientation configuration.`);
+            }
+        }
+
+        function renderGrid() {
+            // Implementation renders data metrics mapped in state.boxData directly to visual DOM
+            // Calculates SOR and SRR based on strict user constraints formulas
+            const totalShooters = state.shooterHistory.length + (state.currentShooterRolls > 0 ? 1 : 0);
+            
+            const sor = totalShooters > 0 ? (state.sessionRolls / totalShooters).toFixed(1) : (0.0).toFixed(1);
+            const srr = state.totalSevens > 0 ? (state.sessionRolls / state.totalSevens).toFixed(1) : (0.0).toFixed(1);
+
+            document.getElementById('valRed').innerText = state.redSevens;
+            document.getElementById('valSor').innerText = sor;
+            document.getElementById('valSrr').innerText = srr;
+            document.getElementById('valCo7').innerText = state.coSevens;
+        }
+
+        function appendHistoryRibbon(total, isHardway) {
+            const ribbon = document.getElementById('historyRibbon');
+            let styleClass = 'node-point-normal';
+            let label = total.toString();
+
+            if (isHardway) label += '<sup>(H)</sup>';
+
+            if (total === 7) {
+                styleClass = state.currentPoint === null && state.currentShooterRolls > 0 ? 'node-point-made' : 'node-seven-out';
+            } else if (state.currentPoint === null && [4,5,6,8,9,10].includes(total)) {
+                styleClass = 'node-point-made'; // Resolved Point Made display logic matches green condition
+            }
+
+            ribbon.innerHTML += `<div class="history-node ${styleClass}">${label}</div>`;
+        }
+
+        function clearInputs() {
+            if(state.selectedLeft) document.getElementById(`l-btn-${state.selectedLeft}`).classList.remove('selected');
+            if(state.selectedRight) document.getElementById(`r-btn-${state.selectedRight}`).classList.remove('selected');
+            state.selectedLeft = null;
+            state.selectedRight = null;
+        }
+
+        window.onload = initUI;
+    </script>
+</body>
+</html>
