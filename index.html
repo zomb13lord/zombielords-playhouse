@@ -142,10 +142,6 @@
                 console.error("Authentication Error:", error);
             }
         }
-
-        function routeToDiceModule() {
-            window.location.href = "dice.html";
-        }
     </script>
 </head>
 <body>
@@ -156,21 +152,17 @@
     </div>
 
     <div class="bottom-module">
-        <p class="text-slate-300 text-[12px] italic mb-6 leading-relaxed font-serif px-2 text-shadow-heavy">
+        <p class="text-slate-300 text-[12px] italic mb-8 leading-relaxed font-serif px-2 text-shadow-heavy">
             "Humble yourself before the <span class="text-emerald-400 font-bold">Emerald Throne</span>, upon which the <span class="text-emerald-500/80 uppercase font-bold">Zombie Lord</span> reigns.<br>
             Surrender your fate to the odds of the damned."
         </p>
 
-        <button onclick="loginWithGoogle()" class="wicked-btn w-full py-4 flex items-center justify-center gap-3 mb-3">
+        <button onclick="loginWithGoogle()" class="wicked-btn w-full py-4 flex items-center justify-center gap-3">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="16" alt="G" style="filter: brightness(0) invert(1) opacity(0.8);">
             <span class="text-[13px]">Accept The Odds</span>
         </button>
 
-        <button onclick="routeToDiceModule()" class="wicked-btn w-full py-3 flex items-center justify-center gap-3 opacity-90 scale-95 hover:opacity-100 hover:scale-100">
-            <span class="text-[12px] text-emerald-300">Enter Dice Master Module</span>
-        </button>
-
-        <p class="mt-6 text-[8px] tracking-[0.6em] text-emerald-500/40 font-bold uppercase text-shadow-heavy">System M11 Active</p>
+        <p class="mt-8 text-[8px] tracking-[0.6em] text-emerald-500/40 font-bold uppercase text-shadow-heavy">System M11 Active</p>
     </div>
 
 </body>
