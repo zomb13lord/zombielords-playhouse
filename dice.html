@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Master - Analytics Module</title>
+    <title>Dice Tracker - Clean Architecture</title>
     <style>
         :root {
-            --bg-primary: #0a0a0a;
-            --panel-bg: #141414;
-            --text-main: #ffffff;
-            --text-accent: #ffd700;
+            --bg-primary: #030712;
+            --panel-bg: #0f172a;
+            --text-main: #f8fafc;
+            --text-accent: #f59e0b;
             --white-point: #ffffff;
-            --green-point: #008744;
-            --red-seven: #d62d20;
-            --border-color: #333333;
+            --green-point: #10b981;
+            --red-seven: #ef4444;
+            --border-color: #1e293b;
         }
 
         body {
             background-color: var(--bg-primary);
             color: var(--text-main);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: monospace;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
         }
 
-        /* Chronological Roll History String Ribbon */
+        /* Chronological Top Ribbon Tracker */
         .history-ribbon {
             display: flex;
             overflow-x: auto;
-            background-color: #000;
-            padding: 10px;
-            gap: 5px;
-            min-height: 40px;
+            background-color: #020617;
+            padding: 12px;
+            gap: 6px;
+            min-height: 45px;
             align-items: center;
             border: 1px solid var(--border-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .history-node {
@@ -42,367 +42,333 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 18px;
-            padding: 5px 10px;
+            font-size: 16px;
+            padding: 4px 8px;
             border-radius: 2px;
-            min-width: 30px;
+            min-width: 28px;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .node-point-normal { background-color: var(--white-point); color: #000; }
+        .node-normal { background-color: var(--white-point); color: #000; }
+        .node-hard { background-color: var(--white-point); color: #000; border: 2px dashed #000; }
         .node-point-made { background-color: var(--green-point); color: #fff; }
         .node-seven-out { background-color: var(--red-seven); color: #fff; }
 
-        /* Main Grid Grid and Analytics Block */
-        .dashboard-container {
+        /* Main Grid Board Layout */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr) 2.2fr repeat(5, 1fr);
+            gap: 4px;
+            max-width: 1400px;
+            margin: 0 auto 15px auto;
+        }
+
+        .box-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            max-width: 1200px;
-            margin: 0 auto;
+            justify-content: space-between;
         }
 
-        .grid-row {
-            display: grid;
-            grid-template-columns: repeat(11, 1fr);
-            gap: 5px;
-        }
-
-        /* Core Boxes */
-        .number-box {
-            background-color: var(--panel-bg);
-            border: 2px solid var(--border-color);
-            text-align: center;
-            padding: 10px 5px;
-        }
-
-        .number-title {
+        .box-num-header {
+            font-size: 26px;
+            font-weight: 900;
             color: var(--text-accent);
-            font-size: 24px;
-            font-weight: bold;
+            padding: 10px 0;
+            background: #020617;
         }
+        
+        .color-4, .color-5, .color-6, .color-8, .color-9, .color-10 { background: #450a0a; }
+        .color-2, .color-3, .color-11, .color-12 { background: #000000; }
 
-        .sub-row-metrics {
+        .box-count { font-size: 20px; font-weight: bold; color: #fff; padding: 5px 0; }
+
+        .box-sub-metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            margin-top: 8px;
             border-top: 1px solid var(--border-color);
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        .sub-box-left {
-            border-right: 1px solid var(--border-color);
-            background-color: #000;
-            padding: 2px;
+        .sub-left { background-color: #000000; color: #fff; padding: 4px 0; border-right: 1px solid var(--border-color); }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
+
+        /* Central Analytics Block */
+        .center-block {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
         }
 
-        .sub-box-right {
-            background-color: #222;
-            padding: 2px;
-        }
-
-        /* Central Analytics Core */
-        .analytics-panel {
-            grid-column: span 3;
-            background-color: #111;
-            border: 2px solid var(--border-color);
-            display: grid;
-            grid-template-rows: auto auto;
-            text-align: center;
-        }
-
-        .analytics-header {
+        .center-title {
             font-size: 12px;
-            color: #aaa;
+            color: #94a3b8;
             padding: 4px;
+            background: #020617;
+            text-align: center;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .analytics-metrics-grid {
+        .center-metrics {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
+            flex-grow: 1;
         }
 
-        .metric-cell {
+        .c-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             border-right: 1px solid var(--border-color);
-            padding: 5px 2px;
         }
-        .metric-cell:last-child { border-right: none; }
+        .c-cell:last-child { border-right: none; }
 
-        .metric-label { font-size: 11px; color: #888; }
-        .metric-value { font-size: 16px; font-weight: bold; margin-top: 4px; }
+        .c-label { font-size: 11px; color: #64748b; font-weight: bold; }
+        .c-val { font-size: 16px; font-weight: bold; color: #fff; margin-top: 4px; }
 
-        /* Input Controls Panel */
-        .input-panel {
-            background-color: var(--panel-bg);
-            border: 2px solid var(--border-color);
+        /* Input Controller Component */
+        .controller-panel {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
             padding: 15px;
-            margin-top: 20px;
         }
 
-        .input-group {
+        .prompt-header {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--text-accent);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .pad-grid {
+            display: flex;
+            gap: 8px;
             margin-bottom: 15px;
         }
 
-        .button-row {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .dice-btn {
-            background-color: #222;
-            color: var(--text-main);
+        .pad-btn {
+            background: #020617;
+            color: #fff;
             border: 1px solid var(--border-color);
-            padding: 10px 20px;
-            font-size: 18px;
+            font-size: 20px;
+            font-weight: bold;
+            width: 50px;
+            height: 50px;
             cursor: pointer;
             border-radius: 4px;
         }
 
-        .dice-btn.selected {
-            background-color: var(--text-accent);
+        .pad-btn.active {
+            background: var(--text-accent);
             color: #000;
             border-color: #fff;
         }
 
-        .action-btn {
-            padding: 10px 25px;
-            font-weight: bold;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-
-        .btn-confirm { background-color: var(--green-point); color: white; }
-        .btn-unconfirm { background-color: #e67e22; color: white; }
+        .action-container { display: flex; gap: 10px; }
+        .act-btn { padding: 10px 20px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; }
+        .btn-green { background: var(--green-point); color: white; }
+        .btn-orange { background: #f97316; color: white; }
     </style>
 </head>
 <body>
 
-    <!-- Chronological Roll History String -->
-    <div class="history-ribbon" id="historyRibbon"></div>
+    <div class="history-ribbon" id="historyContainer"></div>
 
-    <div class="dashboard-container">
-        <!-- Main Dice Roll Grid -->
-        <div class="grid-row" id="diceGrid">
-            <!-- Dynamic JavaScript injections populate cells 2-6 here -->
-            
-            <!-- Central Analytics Block (Positioned dynamically or hardcoded in sequence) -->
-            <div class="analytics-panel" id="centralAnalytics">
-                <div class="analytics-header">Craps Nation / SideshowGamble</div>
-                <div class="analytics-metrics-grid">
-                    <div class="metric-cell"><div class="metric-label">RED</div><div class="metric-value" id="valRed">0</div></div>
-                    <div class="metric-cell"><div class="metric-label">SOR</div><div class="metric-value" id="valSor">0.0</div></div>
-                    <div class="metric-cell"><div class="metric-label">SRR</div><div class="metric-value" id="valSrr">0.0</div></div>
-                    <div class="metric-cell"><div class="metric-label">CO7</div><div class="metric-value" id="valCo7">0</div></div>
-                </div>
+    <div class="grid-layout">
+        <div class="box-container color-2"><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+        <div class="box-container color-3"><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+        <div class="box-container color-4"><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+        <div class="box-container color-5"><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+        <div class="box-container color-6"><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+
+        <div class="center-block">
+            <div class="center-title">Craps Nation / SideshowGamble</div>
+            <div class="center-metrics">
+                <div class="c-cell"><div class="c-label">RED</div><div class="c-val" id="stat-red">0</div></div>
+                <div class="c-cell"><div class="c-label">SOR</div><div class="c-val" id="stat-sor">0.0</div></div>
+                <div class="c-cell"><div class="c-label">SRR</div><div class="c-val" id="stat-srr">0.0</div></div>
+                <div class="c-cell"><div class="c-label">CO7</div><div class="c-val" id="stat-co7">0</div></div>
             </div>
-
-            <!-- Cells 8-12 + Total Roll Panel populate here -->
         </div>
 
-        <!-- Input Module Controls Interface -->
-        <div class="input-panel">
-            <h3>Configuration Input Engine</h3>
-            
-            <div class="input-group">
-                <label>Set Pre-Config (Left Top, Left Facing, Right Top, Right Facing):</label>
-                <div class="button-row" id="preSetControls">
-                    <!-- Setup state selection tools -->
-                    <button class="dice-btn" onclick="setDicePreConfig(2,4,2,4)">Hardway Set (2,4,2,4)</button>
-                    <button class="dice-btn" onclick="setDicePreConfig(3,3,3,3)">3V Set (3,3,3,3)</button>
-                </div>
-            </div>
+        <div class="box-container color-8"><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+        <div class="box-container color-9"><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+        <div class="box-container color-10"><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+        <div class="box-container color-11"><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+        <div class="box-container color-12"><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
 
-            <hr style="border-color: var(--border-color); margin: 15px 0;">
+        <div class="box-container" style="background:#000;"><div class="box-num-header" style="color:#aaa; font-size:16px;">ROLL</div><div class="box-count" style="font-size:26px;" id="summary-total">0</div><div class="box-sub-metrics"><div class="sub-left" id="summary-current" style="background:#222; font-size:16px;">0</div></div></div>
+    </div>
 
-            <div class="input-group">
-                <label>Input Left Die Outcome:</label>
-                <div class="button-row" id="leftDieRow"></div>
-            </div>
-
-            <div class="input-group">
-                <label>Input Right Die Outcome:</label>
-                <div class="button-row" id="rightDieRow"></div>
-            </div>
-
-            <div class="button-row" style="margin-top: 20px;">
-                <button class="action-btn btn-confirm" onclick="processRoll(true)">Confirm (Absolute)</button>
-                <button class="action-btn btn-unconfirm" onclick="processRoll(false)">Unconfirm (Ambiguous)</button>
-            </div>
+    <div class="controller-panel">
+        <div class="prompt-header" id="inputPrompt">Setup Phase: Select Left Die Top Face</div>
+        <div class="pad-grid" id="inputPad"></div>
+        
+        <div class="action-container">
+            <button class="act-btn btn-green" onclick="confirmInput(true)">Confirm (Absolute)</button>
+            <button class="act-btn btn-orange" onclick="confirmInput(false)">Unconfirm (Ambiguous)</button>
         </div>
     </div>
 
     <script>
-        // Core Architectural Engine State
-        const state = {
-            sessionRolls: 0,
-            currentShooterRolls: 0,
-            totalSevens: 0,
-            redSevens: 0,
-            coSevens: 0,
-            currentPoint: null,
-            shooterHistory: [], // Array tracking roll lengths per shooter hand
+        const engine = {
+            totalRolls: 0, currentHandRolls: 0,
+            sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
+            activePoint: null, shooterHistory: [],
             
-            // Initial Preset Dice Configurations
-            currentPreSet: { leftTop: 2, leftFacing: 4, rightTop: 2, rightFacing: 4 },
+            // Loop Stages
+            // 1: Set L-Top, 2: Set L-Face, 3: Set R-Top, 4: Set R-Face
+            // 5: Roll L-Result, 6: Roll R-Result
+            inputStage: 1, 
             
-            // Selections
-            selectedLeft: null,
-            selectedRight: null,
+            setupConfig: { lTop: null, lFace: null, rTop: null, rFace: null },
+            rollResult: { left: null, right: null },
 
-            // Core Analytics Arrays per box number
-            boxData: {
-                2:  { current: 0, total: 0, combos: { '1-1': 0 } },
-                3:  { current: 0, total: 0, combos: { '1-2': 0, '2-1': 0 } },
-                4:  { current: 0, total: 0, combos: { '1-3': 0, '3-1': 0, '2-2': 0 } }, // split: easy vs hard
-                5:  { current: 0, total: 0, combos: { '1-4': 0, '4-1': 0, '2-3': 0, '3-2': 0 } },
-                6:  { current: 0, total: 0, combos: { '1-5': 0, '5-1': 0, '2-4': 0, '4-2': 0, '3-3': 0 } },
-                7:  { current: 0, total: 0, combos: { '1-6': 0, '6-1': 0, '2-5': 0, '5-2': 0, '3-4': 0, '4-3': 0 } },
-                8:  { current: 0, total: 0, combos: { '2-6': 0, '6-2': 0, '3-5': 0, '5-3': 0, '4-4': 0 } },
-                9:  { current: 0, total: 0, combos: { '3-6': 0, '6-3': 0, '4-5': 0, '5-4': 0 } },
-                10: { current: 0, total: 0, combos: { '4-6': 0, '6-4': 0, '5-5': 0 } },
-                11: { current: 0, total: 0, combos: { '5-6': 0, '6-5': 0 } },
-                12: { current: 0, total: 0, combos: { '6-6': 0 } }
+            matrix: {
+                2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
+                7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
             }
         };
 
-        // Initialize UI Elements
-        function initUI() {
-            const leftRow = document.getElementById('leftDieRow');
-            const rightRow = document.getElementById('rightDieRow');
-            leftRow.innerHTML = ''; rightRow.innerHTML = '';
+        const stagePrompts = {
+            1: "Setup Phase: Select Left Die Top Face",
+            2: "Setup Phase: Select Left Die Facing Shooter",
+            3: "Setup Phase: Select Right Die Top Face",
+            4: "Setup Phase: Select Right Die Facing Shooter",
+            5: "Active Roll: Input Left Die Outcome",
+            6: "Active Roll: Input Right Die Outcome"
+        };
 
-            for(let i = 1; i <= 6; i++) {
-                leftRow.innerHTML += `<button class="dice-btn" id="l-btn-${i}" onclick="selectDie('left', ${i})">${i}</button>`;
-                rightRow.innerHTML += `<button class="dice-btn" id="r-btn-${i}" onclick="selectDie('right', ${i})">${i}</button>`;
-            }
-            renderGrid();
-        }
-
-        function selectDie(side, value) {
-            if(side === 'left') {
-                if(state.selectedLeft) document.getElementById(`l-btn-${state.selectedLeft}`).classList.remove('selected');
-                state.selectedLeft = value;
-                document.getElementById(`l-btn-${value}`).classList.add('selected');
-            } else {
-                if(state.selectedRight) document.getElementById(`r-btn-${state.selectedRight}`).classList.remove('selected');
-                state.selectedRight = value;
-                document.getElementById(`r-btn-${value}`).classList.add('selected');
+        function initPad() {
+            const pad = document.getElementById('inputPad');
+            pad.innerHTML = '';
+            for(let i=1; i<=6; i++) {
+                pad.innerHTML += `<button class="pad-btn" id="pad-${i}" onclick="selectValue(${i})">${i}</button>`;
             }
         }
 
-        function setDicePreConfig(lt, lf, rt, rf) {
-            state.currentPreSet = { leftTop: lt, leftFacing: lf, rightTop: rt, rightFacing: rf };
+        let selectedValueCache = null;
+        function selectValue(val) {
+            for(let i=1; i<=6; i++) document.getElementById(`pad-${i}`).classList.remove('active');
+            selectedValueCache = val;
+            document.getElementById(`pad-${val}`).classList.add('active');
         }
 
-        // Logic Processor for Roll Outcomes
-        function processRoll(isAbsolute) {
-            if(!state.selectedLeft || !state.selectedRight) {
-                alert("Execution Error: Missing physical die resolution parameters.");
-                return;
+        function confirmInput(isAbsolute) {
+            if(!selectedValueCache) return alert("Select a face value.");
+            
+            const val = selectedValueCache;
+            resetPadSelection();
+
+            // Advance through input loop steps sequentially
+            if(engine.inputStage === 1) {
+                engine.setupConfig.lTop = val;
+                engine.inputStage = 2;
+            } else if(engine.inputStage === 2) {
+                engine.setupConfig.lFace = val;
+                engine.inputStage = 3;
+            } else if(engine.inputStage === 3) {
+                engine.setupConfig.rTop = val;
+                engine.inputStage = 4;
+            } else if(engine.inputStage === 4) {
+                engine.setupConfig.rFace = val;
+                engine.inputStage = 5;
+            } else if(engine.inputStage === 5) {
+                engine.rollResult.left = val;
+                engine.inputStage = 6;
+            } else if(engine.inputStage === 6) {
+                engine.rollResult.right = val;
+                
+                // Both dice inputs acquired -> process calculations
+                executeRollCycle(engine.rollResult.left, engine.rollResult.right, isAbsolute);
+                
+                // Return loop to active rolling phase (Steps 5 & 6) for next throws
+                engine.inputStage = 5;
             }
-
-            const d1 = state.selectedLeft;
-            const d2 = state.selectedRight;
-            const total = d1 + d2;
             
-            // Increment counters
-            state.sessionRolls++;
-            state.currentShooterRolls++;
-
-            // Evaluate Hardway State
-            const isHardway = (d1 === d2) && [4,6,8,10].includes(total);
-
-            // Execute Rules Engine Sequence
-            handleCrapsLogic(total, d1, d2, isHardway, isAbsolute);
-            
-            // Render updates
-            renderGrid();
-            updateAnalyticsUI();
-            appendHistoryRibbon(total, isHardway);
-            
-            // Clear inputs for next loop
-            clearInputs();
+            document.getElementById('inputPrompt').innerText = stagePrompts[engine.inputStage];
         }
 
-        function handleCrapsLogic(total, d1, d2, isHardway, isAbsolute) {
-            // Update counts inside distribution structure
-            state.boxData[total].total++;
-            state.boxData[total].current++;
+        function resetPadSelection() {
+            selectedValueCache = null;
+            for(let i=1; i<=6; i++) document.getElementById(`pad-${i}`).classList.remove('active');
+        }
 
-            if (total === 7) {
-                state.totalSevens++;
-                if (state.currentPoint === null) {
-                    // Come out 7
-                    state.coSevens++;
+        function executeRollCycle(d1, d2, isAbsolute) {
+            const sum = d1 + d2;
+            engine.totalRolls++;
+            engine.currentHandRolls++;
+
+            const isHardway = (d1 === d2) && [4,6,8,10].includes(sum);
+
+            engine.matrix[sum].tot++;
+            engine.matrix[sum].cur++;
+
+            if(sum === 7) {
+                engine.sevensTotal++;
+                if(engine.activePoint === null) {
+                    engine.sevensComeout++;
                 } else {
-                    // Seven Out: Player loses control of the dice
-                    state.redSevens++;
-                    state.shooterHistory.push(state.currentShooterRolls);
-                    state.currentShooterRolls = 0; // Reset current shooter
-                    state.currentPoint = null;     // Clear Point
-                    // Reset box tracking counts for current shooter
-                    for (let key in state.boxData) { state.boxData[key].current = 0; }
+                    engine.sevensRed++;
+                    engine.shooterHistory.push(engine.currentHandRolls);
+                    engine.currentHandRolls = 0;
+                    engine.activePoint = null;
+                    for (let k in engine.matrix) engine.matrix[k].cur = 0;
+                    
+                    // Reset to initial setup phase for new shooter hand selection
+                    engine.inputStage = 1; 
                 }
             } else {
-                // Point Logic Management
-                if (state.currentPoint === null) {
-                    if ([4,5,6,8,9,10].includes(total)) {
-                        state.currentPoint = total; // Set point
-                    }
-                } else if (total === state.currentPoint) {
-                    // Point Made condition
-                    state.currentPoint = null; // Clear point, remains same shooter
+                if(engine.activePoint === null) {
+                    if([4,5,6,8,9,10].includes(sum)) engine.activePoint = sum;
+                } else if(sum === engine.activePoint) {
+                    engine.activePoint = null;
                 }
             }
 
-            // Axis Transformation calculations stub for Goal 2 expansion processing
-            if (!isAbsolute) {
-                // Flag inverse probability matrices: (d2, d1) mapping alternatives
-                console.log(`Ambiguity Triggered: Evaluating inverse state [${d2}-${d1}] against initial orientation configuration.`);
-            }
+            renderInterfaceBoard(sum, isHardway);
         }
 
-        function renderGrid() {
-            // Implementation renders data metrics mapped in state.boxData directly to visual DOM
-            // Calculates SOR and SRR based on strict user constraints formulas
-            const totalShooters = state.shooterHistory.length + (state.currentShooterRolls > 0 ? 1 : 0);
+        function renderInterfaceBoard(lastRoll, isHardway) {
+            for(let i=2; i<=12; i++) {
+                if(i === 7) continue;
+                document.getElementById(`count-${i}`).innerText = engine.matrix[i].tot;
+                document.getElementById(`cur-${i}`).innerText = engine.matrix[i].cur;
+                document.getElementById(`tot-${i}`).innerText = engine.matrix[i].tot;
+            }
+
+            document.getElementById('summary-total').innerText = engine.totalRolls;
+            document.getElementById('summary-current').innerText = engine.currentHandRolls;
+
+            const totalShooters = engine.shooterHistory.length + (engine.currentHandRolls > 0 ? 1 : 0);
+            const sor = totalShooters > 0 ? (engine.totalRolls / totalShooters).toFixed(1) : "0.0";
+            const srr = engine.sevensTotal > 0 ? (engine.totalRolls / engine.sevensTotal).toFixed(1) : "0.0";
+
+            document.getElementById('stat-red').innerText = engine.sevensRed;
+            document.getElementById('stat-sor').innerText = sor;
+            document.getElementById('stat-srr').innerText = srr;
+            document.getElementById('stat-co7').innerText = engine.sevensComeout;
+
+            const container = document.getElementById('historyContainer');
+            let nodeClass = 'node-normal';
+            if (isHardway) nodeClass = 'node-hard';
+            if (lastRoll === 7) nodeClass = engine.activePoint === null && engine.currentHandRolls > 0 ? 'node-point-made' : 'node-seven-out';
             
-            const sor = totalShooters > 0 ? (state.sessionRolls / totalShooters).toFixed(1) : (0.0).toFixed(1);
-            const srr = state.totalSevens > 0 ? (state.sessionRolls / state.totalSevens).toFixed(1) : (0.0).toFixed(1);
-
-            document.getElementById('valRed').innerText = state.redSevens;
-            document.getElementById('valSor').innerText = sor;
-            document.getElementById('valSrr').innerText = srr;
-            document.getElementById('valCo7').innerText = state.coSevens;
+            let label = lastRoll.toString();
+            if(isHardway) label += '<sup>(H)</sup>';
+            
+            container.innerHTML += `<div class="history-node ${nodeClass}">${label}</div>`;
         }
 
-        function appendHistoryRibbon(total, isHardway) {
-            const ribbon = document.getElementById('historyRibbon');
-            let styleClass = 'node-point-normal';
-            let label = total.toString();
-
-            if (isHardway) label += '<sup>(H)</sup>';
-
-            if (total === 7) {
-                styleClass = state.currentPoint === null && state.currentShooterRolls > 0 ? 'node-point-made' : 'node-seven-out';
-            } else if (state.currentPoint === null && [4,5,6,8,9,10].includes(total)) {
-                styleClass = 'node-point-made'; // Resolved Point Made display logic matches green condition
-            }
-
-            ribbon.innerHTML += `<div class="history-node ${styleClass}">${label}</div>`;
-        }
-
-        function clearInputs() {
-            if(state.selectedLeft) document.getElementById(`l-btn-${state.selectedLeft}`).classList.remove('selected');
-            if(state.selectedRight) document.getElementById(`r-btn-${state.selectedRight}`).classList.remove('selected');
-            state.selectedLeft = null;
-            state.selectedRight = null;
-        }
-
-        window.onload = initUI;
+        window.onload = initPad;
     </script>
 </body>
 </html>
