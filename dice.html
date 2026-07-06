@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Craps Kinematics Workspace</title>
+    <title>Premium Craps Kinematics Vault Terminal</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         :root {
-            --bg-main: #060a12;
-            --bg-panel: #0f1626;
+            --bg-main: #060a13;
+            --bg-panel: #0d1527;
+            --bg-card: #111b33;
             --bg-input: #1e293b;
-            --border-clr: #334155;
+            --border-clr: #1e293b;
             --text-main: #f8fafc;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --accent-blue: #2563eb;
-            --accent-green: #16a34a;
-            --accent-red: #dc2626;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-orange: #f97316;
             --accent-yellow: #eab308;
         }
 
@@ -28,57 +30,162 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
-            padding: 8px;
+            padding: 10px;
             user-select: none;
             overflow-x: hidden;
         }
 
-        /* 1. TOP PROFILE CONFIGURATION HEADER BAR */
-        .profile-header-bar {
+        /* [1] TOP-TIER AGGREGATE PANEL */
+        .top-tier-aggregate-panel {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
-            background: var(--bg-panel);
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border-clr);
             margin-bottom: 8px;
         }
 
-        .dropdown-box-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .aggregate-tag-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-clr);
+            padding: 8px 4px;
+            text-align: center;
+            border-radius: 2px;
         }
 
-        .dropdown-box-wrapper label {
+        .aggregate-tag-box .lbl {
             font-size: 0.65rem;
-            text-transform: uppercase;
+            color: #64748b;
             font-weight: 700;
-            color: #94a3b8;
+            text-transform: uppercase;
+        }
+
+        .aggregate-tag-box .val {
+            font-size: 1.25rem;
+            font-weight: 800;
+            font-family: monospace;
+            margin-top: 2px;
+        }
+
+        /* [2] BOX NUMBER MARGIN GRID */
+        .numerical-display-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .number-tracker-box {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-clr);
+            border-radius: 2px;
+            padding: 6px 2px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .number-tracker-box.has-puck-anchored {
+            border-color: #ffffff;
+            background: #1e293b;
+        }
+
+        .number-header-title {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--accent-orange);
+            margin-bottom: 4px;
+        }
+
+        .decoupled-subcounter-row {
+            display: flex;
+            justify-content: space-around;
+            background: #000000;
+            padding: 4px 2px;
+            margin-bottom: 6px;
+        }
+
+        .subcounter-container-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .subcounter-container-block .lbl {
+            font-size: 0.55rem;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .subcounter-container-block .val {
+            font-weight: 800;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .subcounter-container-block .val.current { color: var(--accent-green); }
+        .subcounter-container-block .val.total   { color: #94a3b8; }
+
+        .icon-indicator-tray {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            min-height: 16px;
+            margin-bottom: 4px;
+            align-items: center;
+        }
+
+        .wager-financial-display-field {
+            border-top: 1px solid #111b33;
+            padding-top: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--accent-yellow);
+            font-family: monospace;
+        }
+
+        /* [3] ACTIVITY COUNTER MAP */
+        .activity-counter-map {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-clr);
+            padding: 8px;
+            border-radius: 2px;
+            margin-bottom: 8px;
+        }
+
+        .activity-block {
+            text-align: center;
+            padding: 4px 0;
+        }
+
+        .activity-block .lbl {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
             letter-spacing: 0.02em;
         }
 
-        .dropdown-box-wrapper select {
-            width: 100%;
-            background: var(--bg-main);
-            color: #fff;
-            border: 1px solid var(--border-clr);
-            padding: 5px 6px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            outline: none;
+        .activity-block .val {
+            font-size: 1.5rem;
+            font-weight: 900;
+            font-family: monospace;
+            margin-top: 2px;
         }
 
-        /* 2. CHRONOLOGICAL HISTORY RIBBON */
+        .activity-block .val.session { color: var(--accent-green); }
+        .activity-block .val.hand    { color: var(--accent-orange); }
+
+        /* [4] CHRONOLOGICAL HISTORY STREAM */
         .history-ribbon-container {
             background: #000000;
             border: 1px solid var(--border-clr);
-            border-radius: 4px;
+            border-radius: 2px;
             padding: 6px;
             margin-bottom: 8px;
             overflow-x: auto;
@@ -88,7 +195,7 @@
             cursor: grab;
             scrollbar-width: none;
             align-items: center;
-            min-height: 46px;
+            min-height: 44px;
         }
         
         .history-ribbon-container::-webkit-scrollbar {
@@ -99,20 +206,20 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            height: 32px;
-            min-width: 44px;
+            height: 30px;
+            min-width: 40px;
             padding: 0 6px;
-            border-radius: 3px;
+            border-radius: 2px;
             font-weight: 900;
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             flex-shrink: 0;
             box-sizing: border-box;
         }
 
         .history-node.state-standard {
-            background: #111827;
+            background: #000000;
             color: #ffffff;
-            border: 1px solid #4b5563;
+            border: 1px solid #334155;
         }
 
         .history-node.state-point-anchor {
@@ -140,90 +247,49 @@
             vertical-align: sub;
         }
 
-        /* 3. PRIMARY NUMERICAL DISPLAY GRID MATRIX */
-        .numerical-display-matrix-grid {
+        /* [5] PROFILE OVERLAY SELECTORS */
+        .profile-header-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-            gap: 4px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+            background: var(--bg-panel);
+            padding: 8px;
+            border-radius: 2px;
+            border: 1px solid var(--border-clr);
             margin-bottom: 8px;
         }
 
-        .number-tracker-box {
-            background: var(--bg-panel);
+        .dropdown-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .dropdown-box-wrapper label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .dropdown-box-wrapper select {
+            width: 100%;
+            background: var(--bg-main);
+            color: #fff;
             border: 1px solid var(--border-clr);
-            border-radius: 4px;
-            padding: 6px 4px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .number-tracker-box.has-puck-anchored {
-            border-color: #ffffff;
-            box-shadow: inset 0 0 4px rgba(255,255,255,0.2);
-            background: #1e293b;
-        }
-
-        .number-header-title {
-            font-size: 1rem;
-            font-weight: 900;
-            margin-bottom: 2px;
-        }
-
-        .decoupled-subcounter-row {
-            display: flex;
-            justify-content: space-around;
-            background: #000;
-            padding: 2px;
+            padding: 4px 6px;
             border-radius: 2px;
-            font-size: 0.7rem;
-            margin-bottom: 4px;
-        }
-
-        .subcounter-container-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-        }
-
-        .subcounter-container-block .lbl {
-            font-size: 0.55rem;
-            color: #64748b;
+            font-size: 0.75rem;
             font-weight: 700;
+            cursor: pointer;
+            outline: none;
         }
 
-        .subcounter-container-block .val {
-            font-weight: 800;
-        }
-
-        .subcounter-container-block .val.current { color: var(--accent-green); }
-        .subcounter-container-block .val.total   { color: #ffffff; }
-
-        .icon-indicator-tray {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            font-size: 0.7rem;
-            min-height: 14px;
-            margin-bottom: 4px;
-            align-items: center;
-        }
-
-        .wager-financial-display-field {
-            border-top: 1px solid #1e293b;
-            padding-top: 2px;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: var(--accent-yellow);
-        }
-
-        /* 4. ISOLATED DICE ENTRY PAD */
+        /* [6] MOBILE-OPTIMIZED INPUT PAD */
         .input-pad-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 4px;
+            border-radius: 2px;
             padding: 8px;
             margin-bottom: 8px;
         }
@@ -244,10 +310,9 @@
 
         .dice-die-column h3 {
             margin: 0;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #94a3b8;
+            color: #475569;
         }
 
         .digit-button-grid {
@@ -264,157 +329,69 @@
             padding: 10px 0;
             font-size: 1.1rem;
             font-weight: 800;
-            border-radius: 3px;
+            border-radius: 2px;
             cursor: pointer;
-            text-align: center;
         }
 
-        /* Pure Blue Highlights Across Both Columns */
         .left-die-btn.is-active-left {
             background: var(--accent-blue) !important;
             border-color: #60a5fa !important;
-            color: #fff !important;
         }
 
         .right-die-btn.is-active-right {
             background: var(--accent-blue) !important;
             border-color: #60a5fa !important;
-            color: #fff !important;
         }
 
-        /* 5. OPERATIONAL CONTROLS STRIP */
+        /* [7] FLEXIBLE OPERATION STRIP */
         .operation-controls-strip {
             display: flex;
             gap: 4px;
-            justify-content: space-between;
             flex-wrap: wrap;
         }
 
         .action-execution-btn {
             flex: 1;
-            min-width: 60px;
+            min-width: 65px;
             padding: 10px 2px;
             font-weight: 800;
             font-size: 0.65rem;
             text-transform: uppercase;
             border: none;
-            border-radius: 3px;
+            border-radius: 2px;
             cursor: pointer;
             color: #fff;
             text-align: center;
         }
 
-        .action-execution-btn.btn-standard  { background: #475569; }
+        .action-execution-btn.btn-standard  { background: var(--accent-green); }
         .action-execution-btn.btn-kinematic { background: var(--accent-blue); }
         .action-execution-btn.btn-invalid   { background: var(--accent-red); }
-        .action-execution-btn.btn-undo      { background: #991b1b; }
-        .action-execution-btn.btn-reset     { background: #334155; }
+        .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
+        .action-execution-btn.btn-reset     { background: #b91c1c; }
         .action-execution-btn.btn-vault     { background: var(--accent-yellow); color: #000; }
 
-        /* 6. SESSION DIAGNOSTICS STATUS PANEL */
-        .diagnostics-metric-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            border-radius: 4px;
-            padding: 8px;
-            margin-bottom: 8px;
-        }
-
-        .diagnostics-metric-panel h4 {
-            margin: 0 0 6px 0;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #94a3b8;
-        }
-
-        .diagnostics-flex-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-        }
-
-        @media(min-width: 600px) {
-            .diagnostics-flex-row {
-                grid-template-columns: repeat(5, 1fr);
-            }
-        }
-
-        .diagnostic-data-tag {
-            background: var(--bg-main);
-            padding: 5px;
-            border-radius: 3px;
-            border: 1px solid var(--border-clr);
-            font-size: 0.7rem;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .diagnostic-data-tag span {
-            font-weight: 800;
-            color: #60a5fa;
-        }
-
-        /* 7. CALIBRATION SUITE BANNER */
+        /* BASE TELEMETRY BANNER ELEMENT */
         .calibration-telemetry-banner {
             background: var(--bg-panel);
             border: 1px dashed var(--border-clr);
-            border-radius: 4px;
             padding: 6px;
             text-align: center;
             font-size: 0.65rem;
             font-weight: 700;
-            color: #94a3b8;
+            color: #475569;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-    <header class="profile-header-bar">
-        <div class="dropdown-box-wrapper">
-            <label for="ctxShooterSelect">Shooter</label>
-            <select id="ctxShooterSelect" onchange="handleDropdownInterceptor('SHOOTER', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="TONY">TONY</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxLocationSelect">Location</label>
-            <select id="ctxLocationSelect" onchange="handleDropdownInterceptor('LOCATION', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="BALLY_S">BALLY'S</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxDiceSetSelect">Dice Set</label>
-            <select id="ctxDiceSetSelect" onchange="handleDropdownInterceptor('DIRESET', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="3V_SET">3V SET</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxStrategySelect">Strategy</label>
-            <select id="ctxStrategySelect" onchange="handleDropdownInterceptor('STRATEGY', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="IRON_CROSS">IRON CROSS</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-    </header>
-
-    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
+    <section class="top-tier-aggregate-panel">
+        <div class="aggregate-tag-box"><div class="lbl">RED</div><div id="diagSevensCount" class="val">0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">SOR</div><div id="diagTotalRolls" class="val">0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">SRR</div><div id="diagSRR" class="val">0.0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">CO7</div><div id="diagValidRolls" class="val">0</div></div>
+    </section>
 
     <main class="numerical-display-matrix-grid">
         <script>
@@ -446,6 +423,62 @@
         </script>
     </main>
 
+    <section class="activity-counter-map">
+        <div class="activity-block">
+            <div class="lbl">Total Session Rolls</div>
+            <div id="activityTotal" class="val session">0</div>
+        </div>
+        <div class="activity-block">
+            <div class="lbl">Current Shooter Hand</div>
+            <div id="activityHand" class="val hand">0</div>
+        </div>
+    </section>
+
+    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
+
+    <header class="profile-header-bar">
+        <div class="dropdown-box-wrapper">
+            <label for="ctxShooterSelect">Shooter ID</label>
+            <select id="ctxShooterSelect" onchange="handleDropdownInterceptor('SHOOTER', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="TONY">TONY</option>
+                <option disabled>──────</option>
+                <option value="EDIT">✎ EDIT</option>
+                <option value="ADD">+ ADD</option>
+            </select>
+        </div>
+        <div class="dropdown-box-wrapper">
+            <label for="ctxLocationSelect">Location ID</label>
+            <select id="ctxLocationSelect" onchange="handleDropdownInterceptor('LOCATION', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="BALLY_S">BALLY'S</option>
+                <option disabled>──────</option>
+                <option value="EDIT">✎ EDIT</option>
+                <option value="ADD">+ ADD</option>
+            </select>
+        </div>
+        <div class="dropdown-box-wrapper">
+            <label for="ctxDiceSetSelect">Dice Set ID</label>
+            <select id="ctxDiceSetSelect" onchange="handleDropdownInterceptor('DIRESET', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="3V_SET">3V SET</option>
+                <option disabled>──────</option>
+                <option value="EDIT">✎ EDIT</option>
+                <option value="ADD">+ ADD</option>
+            </select>
+        </div>
+        <div class="dropdown-box-wrapper">
+            <label for="ctxStrategySelect">Strategy ID</label>
+            <select id="ctxStrategySelect" onchange="handleDropdownInterceptor('STRATEGY', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="IRON_CROSS">IRON CROSS</option>
+                <option disabled>──────</option>
+                <option value="EDIT">✎ EDIT</option>
+                <option value="ADD">+ ADD</option>
+            </select>
+        </div>
+    </header>
+
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
             <div class="dice-die-column">
@@ -473,28 +506,17 @@
         </div>
 
         <div class="operation-controls-strip">
-            <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Standard</button>
+            <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Confirm</button>
             <button class="action-execution-btn btn-kinematic" onclick="executeCommitPipeline('KINEMATIC')">Kinematic</button>
-            <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Invalid</button>
-            <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo</button>
-            <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset</button>
+            <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Unconfirm</button>
+            <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo Last</button>
+            <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset All</button>
             <button class="action-execution-btn btn-vault" onclick="triggerVaultOverlayCall()">⚒ Vault</button>
         </div>
     </section>
 
-    <section class="diagnostics-metric-panel">
-        <h4>Session Metrics</h4>
-        <div class="diagnostics-flex-row">
-            <div class="diagnostic-data-tag">TOTAL: <span id="diagTotalRolls">0</span></div>
-            <div class="diagnostic-data-tag">VALID: <span id="diagValidRolls">0</span></div>
-            <div class="diagnostic-data-tag">7s: <span id="diagSevensCount">0</span></div>
-            <div class="diagnostic-data-tag">SRR: <span id="diagSRR">0.0</span></div>
-            <div class="diagnostic-data-tag">BANK: <span id="diagBankroll" style="color:var(--accent-yellow);">$1,000.00</span></div>
-        </div>
-    </section>
-
     <div id="telemetryCorrectionReadout" class="calibration-telemetry-banner">
-        📐 CALIBRATION SUITE: ACTIVE INTEGRATION MATRIX STANDBY
+        📐 CALIBRATION SUITE: SYSTEM LOG ACTIVE FILTER PROFILE
     </div>
 
     <script>
@@ -508,7 +530,7 @@
 
         function handleDropdownInterceptor(type, value) {
             if (value === "ADD" || value === "EDIT") {
-                alert(`Popup layout interface trigger: ${type}`);
+                alert(`Overlay Profile Prompt: ${type}`);
                 document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value = "ALL";
                 return;
             }
@@ -530,7 +552,6 @@
         function executeGlobalRecalculationEngine() {
             const selectedShooter = document.getElementById('ctxShooterSelect').value;
             const selectedLocation = document.getElementById('ctxLocationSelect').value;
-            const selectedStrategy = document.getElementById('ctxStrategySelect').value;
 
             let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
             
@@ -575,16 +596,15 @@
                 document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
             }
 
-            document.getElementById('diagTotalRolls').textContent = state.rollHistoryLog.length.toString();
+            // Top Panel Counters Sync
+            document.getElementById('diagTotalRolls').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll).length.toString();
             document.getElementById('diagValidRolls').textContent = validCount.toString();
             document.getElementById('diagSevensCount').textContent = sevensCount.toString();
             document.getElementById('diagSRR').textContent = sevensCount > 0 ? (validCount / sevensCount).toFixed(1) : validCount.toFixed(1);
 
-            if (selectedStrategy !== "ALL") {
-                document.getElementById('diagBankroll').textContent = `$${state.currentBankroll.toFixed(2)} [${selectedStrategy.substring(0,5)}]`;
-            } else {
-                document.getElementById('diagBankroll').textContent = `$${state.currentBankroll.toFixed(2)}`;
-            }
+            // Center Activity Counters Sync
+            document.getElementById('activityTotal').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll).length.toString();
+            document.getElementById('activityHand').textContent = currentHandRolls.length.toString();
 
             synchronizeHistoryRibbonViewport();
         }
@@ -602,9 +622,9 @@
                 node.innerHTML = isHardway ? `${r.Total_Sum}<sub>(H)</sub>` : `${r.Total_Sum}`;
 
                 if (r.Invalid_Roll) {
-                    node.style.background = "#334155";
-                    node.style.color = "#475569";
-                    node.style.borderColor = "#1e293b";
+                    node.style.background = "#1f2937";
+                    node.style.color = "#4b5563";
+                    node.style.borderColor = "#111827";
                     node.textContent = "INV";
                 } else if (r.Is_Point_Establishing || (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null)) {
                     node.className = 'history-node state-point-anchor';
@@ -618,7 +638,7 @@
             });
 
             if(state.rollHistoryLog.length === 0) {
-                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.65rem; text-align:center; background:#0f1626; border-color:#1e293b; color:#475569;">STANDBY</div>';
+                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.65rem; text-align:center; background:#000000; border-color:#1e293b; color:#475569;">STANDBY</div>';
             }
 
             ribbon.scrollLeft = ribbon.scrollWidth;
@@ -683,7 +703,7 @@
         }
 
         function executeWorkspaceLayoutWipe() {
-            if(!confirm("Wipe workspace data back to initialization defaults?")) return;
+            if(!confirm("Wipe workspace data rows completely?")) return;
             state.rollHistoryLog = [];
             state.activePoint = null;
             clearSelectionPads();
@@ -699,7 +719,7 @@
             });
         }
 
-        function triggerVaultOverlayCall() { alert("Vault popup loaded."); }
+        function triggerVaultOverlayCall() { alert("Vault overlay initialized."); }
 
         const ribbonContainer = document.getElementById('ctxHistoryRibbon');
         let isGrabbed = false, startingX, runningScrollLeft;
