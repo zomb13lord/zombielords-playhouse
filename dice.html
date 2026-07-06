@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium Craps Kinematics Vault Terminal</title>
+    <!-- Firebase SDK Core Layer Stubs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         :root {
-            --bg-main: #060a13;
-            --bg-panel: #0d1527;
-            --bg-card: #111b33;
+            --bg-main: #040712;
+            --bg-panel: #0b1124;
+            --bg-card: #0e1731;
             --bg-input: #1e293b;
             --border-clr: #1e293b;
             --text-main: #f8fafc;
@@ -20,6 +21,7 @@
             --accent-red: #ef4444;
             --accent-orange: #f97316;
             --accent-yellow: #eab308;
+            --high-gloss-glow: 0 0 12px rgba(37, 99, 235, 0.4);
         }
 
         * {
@@ -30,44 +32,248 @@
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             margin: 0;
-            padding: 10px;
+            padding: 8px;
             user-select: none;
             overflow-x: hidden;
         }
 
-        /* [1] TOP-TIER AGGREGATE PANEL */
-        .top-tier-aggregate-panel {
+        /* [1] FILTER DROP-DOWNS */
+        .profile-header-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 6px;
+            background: var(--bg-panel);
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-clr);
+            margin-bottom: 8px;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .dropdown-box-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .dropdown-box-wrapper label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .dropdown-box-wrapper select {
+            width: 100%;
+            background: var(--bg-main);
+            color: #fff;
+            border: 1px solid #1e293b;
+            padding: 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* [2] CHRONOLOGICAL HISTORY STREAM */
+        .history-ribbon-container {
+            background: #000000;
+            border: 1px solid var(--border-clr);
+            border-radius: 4px;
+            padding: 6px;
+            margin-bottom: 8px;
+            overflow-x: auto;
+            white-space: nowrap;
+            display: flex;
+            gap: 6px;
+            cursor: grab;
+            scrollbar-width: none;
+            align-items: center;
+            min-height: 44px;
+        }
+        
+        .history-ribbon-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .history-node {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+            min-width: 40px;
+            padding: 0 6px;
+            border-radius: 3px;
+            font-weight: 900;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .history-node.state-standard {
+            background: #000000;
+            color: #ffffff;
+            border: 1px solid #334155;
+        }
+
+        .history-node.state-point-anchor {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 1px solid #ffffff !important;
+            box-shadow: 0 0 8px #ffffff;
+        }
+
+        .history-node.state-comeout-win {
+            background: var(--accent-green) !important;
+            color: #ffffff !important;
+            border: 1px solid var(--accent-green) !important;
+        }
+
+        .history-node.state-losing-seven {
+            background: var(--accent-red) !important;
+            color: #ffffff !important;
+            border: 1px solid var(--accent-red) !important;
+        }
+
+        .history-node sub {
+            font-size: 0.55rem;
+            font-weight: 700;
+            margin-left: 1px;
+            vertical-align: sub;
+        }
+
+        /* [3] MOBILE-OPTIMIZED DICE INPUT PAD */
+        .input-pad-container {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-clr);
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .pad-grid-alignment {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .dice-die-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dice-die-column h3 {
+            margin: 0;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        /* 2x3 Compact Digit Matrix layout formatting specifications */
+        .digit-button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+            width: 100%;
+        }
+
+        .pad-digit-btn {
+            background: var(--bg-main);
+            color: #fff;
+            border: 1px solid var(--border-clr);
+            padding: 10px 0;
+            font-size: 1.15rem;
+            font-weight: 900;
+            border-radius: 3px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+        }
+
+        .left-die-btn.is-active-left {
+            background: var(--accent-blue) !important;
+            border-color: #60a5fa !important;
+            box-shadow: var(--high-gloss-glow);
+        }
+
+        .right-die-btn.is-active-right {
+            background: var(--accent-blue) !important;
+            border-color: #60a5fa !important;
+            box-shadow: var(--high-gloss-glow);
+        }
+
+        /* High-Gloss Operational Controls Stack Layout */
+        .operation-controls-strip {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .action-execution-btn {
+            flex: 1;
+            padding: 12px 0;
+            font-weight: 900;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            color: #fff;
+            text-align: center;
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .action-execution-btn.btn-standard  { background: var(--accent-green); }
+        .action-execution-btn.btn-kinematic { background: var(--accent-blue); }
+        .action-execution-btn.btn-invalid   { background: var(--accent-red); }
+        .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
+        .action-execution-btn.btn-reset     { background: #334155; }
+
+        /* [4] SESSION DIAGNOSTICS HOOK PANEL */
+        .top-tier-aggregate-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
             margin-bottom: 8px;
         }
 
         .aggregate-tag-box {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            padding: 8px 4px;
+            padding: 6px 2px;
             text-align: center;
-            border-radius: 2px;
+            border-radius: 3px;
         }
 
         .aggregate-tag-box .lbl {
-            font-size: 0.65rem;
-            color: #64748b;
+            font-size: 0.6rem;
+            color: #475569;
             font-weight: 700;
             text-transform: uppercase;
         }
 
         .aggregate-tag-box .val {
-            font-size: 1.25rem;
-            font-weight: 800;
+            font-size: 1.15rem;
+            font-weight: 900;
             font-family: monospace;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
-        /* [2] BOX NUMBER MARGIN GRID */
+        /* [5] BOX NUMBER DATA GRID */
         .numerical-display-matrix-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
@@ -78,7 +284,7 @@
         .number-tracker-box {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 2px;
+            border-radius: 3px;
             padding: 6px 2px;
             text-align: center;
             display: flex;
@@ -88,6 +294,7 @@
         .number-tracker-box.has-puck-anchored {
             border-color: #ffffff;
             background: #1e293b;
+            box-shadow: 0 0 6px rgba(255,255,255,0.15);
         }
 
         .number-header-title {
@@ -95,6 +302,7 @@
             font-weight: 900;
             color: var(--accent-orange);
             margin-bottom: 4px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
         }
 
         .decoupled-subcounter-row {
@@ -102,7 +310,8 @@
             justify-content: space-around;
             background: #000000;
             padding: 4px 2px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            border-radius: 2px;
         }
 
         .subcounter-container-block {
@@ -119,7 +328,7 @@
         }
 
         .subcounter-container-block .val {
-            font-weight: 800;
+            font-weight: 900;
             font-family: monospace;
             font-size: 0.8rem;
         }
@@ -146,296 +355,13 @@
             font-family: monospace;
         }
 
-        /* [3] ACTIVITY COUNTER MAP */
-        .activity-counter-map {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            padding: 8px;
-            border-radius: 2px;
-            margin-bottom: 8px;
-        }
-
-        .activity-block {
-            text-align: center;
-            padding: 4px 0;
-        }
-
-        .activity-block .lbl {
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-        }
-
-        .activity-block .val {
-            font-size: 1.5rem;
-            font-weight: 900;
-            font-family: monospace;
-            margin-top: 2px;
-        }
-
-        .activity-block .val.session { color: var(--accent-green); }
-        .activity-block .val.hand    { color: var(--accent-orange); }
-
-        /* [4] CHRONOLOGICAL HISTORY STREAM */
-        .history-ribbon-container {
-            background: #000000;
-            border: 1px solid var(--border-clr);
-            border-radius: 2px;
-            padding: 6px;
-            margin-bottom: 8px;
-            overflow-x: auto;
-            white-space: nowrap;
-            display: flex;
-            gap: 6px;
-            cursor: grab;
-            scrollbar-width: none;
-            align-items: center;
-            min-height: 44px;
-        }
-        
-        .history-ribbon-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .history-node {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 30px;
-            min-width: 40px;
-            padding: 0 6px;
-            border-radius: 2px;
-            font-weight: 900;
-            font-size: 1.05rem;
-            flex-shrink: 0;
-            box-sizing: border-box;
-        }
-
-        .history-node.state-standard {
-            background: #000000;
-            color: #ffffff;
-            border: 1px solid #334155;
-        }
-
-        .history-node.state-point-anchor {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #ffffff !important;
-        }
-
-        .history-node.state-comeout-win {
-            background: var(--accent-green) !important;
-            color: #ffffff !important;
-            border: 1px solid var(--accent-green) !important;
-        }
-
-        .history-node.state-losing-seven {
-            background: var(--accent-red) !important;
-            color: #ffffff !important;
-            border: 1px solid var(--accent-red) !important;
-        }
-
-        .history-node sub {
-            font-size: 0.55rem;
-            font-weight: 700;
-            margin-left: 1px;
-            vertical-align: sub;
-        }
-
-        /* [5] PROFILE OVERLAY SELECTORS */
-        .profile-header-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            background: var(--bg-panel);
-            padding: 8px;
-            border-radius: 2px;
-            border: 1px solid var(--border-clr);
-            margin-bottom: 8px;
-        }
-
-        .dropdown-box-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .dropdown-box-wrapper label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: #475569;
-        }
-
-        .dropdown-box-wrapper select {
-            width: 100%;
-            background: var(--bg-main);
-            color: #fff;
-            border: 1px solid var(--border-clr);
-            padding: 4px 6px;
-            border-radius: 2px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            outline: none;
-        }
-
-        /* [6] MOBILE-OPTIMIZED INPUT PAD */
-        .input-pad-container {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            border-radius: 2px;
-            padding: 8px;
-            margin-bottom: 8px;
-        }
-
-        .pad-grid-alignment {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .dice-die-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .dice-die-column h3 {
-            margin: 0;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #475569;
-        }
-
-        .digit-button-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            width: 100%;
-        }
-
-        .pad-digit-btn {
-            background: var(--bg-main);
-            color: #fff;
-            border: 1px solid var(--border-clr);
-            padding: 10px 0;
-            font-size: 1.1rem;
-            font-weight: 800;
-            border-radius: 2px;
-            cursor: pointer;
-        }
-
-        .left-die-btn.is-active-left {
-            background: var(--accent-blue) !important;
-            border-color: #60a5fa !important;
-        }
-
-        .right-die-btn.is-active-right {
-            background: var(--accent-blue) !important;
-            border-color: #60a5fa !important;
-        }
-
-        /* [7] FLEXIBLE OPERATION STRIP */
-        .operation-controls-strip {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .action-execution-btn {
-            flex: 1;
-            min-width: 65px;
-            padding: 10px 2px;
-            font-weight: 800;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 2px;
-            cursor: pointer;
-            color: #fff;
-            text-align: center;
-        }
-
-        .action-execution-btn.btn-standard  { background: var(--accent-green); }
-        .action-execution-btn.btn-kinematic { background: var(--accent-blue); }
-        .action-execution-btn.btn-invalid   { background: var(--accent-red); }
-        .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
-        .action-execution-btn.btn-reset     { background: #b91c1c; }
-        .action-execution-btn.btn-vault     { background: var(--accent-yellow); color: #000; }
-
-        /* BASE TELEMETRY BANNER ELEMENT */
-        .calibration-telemetry-banner {
-            background: var(--bg-panel);
-            border: 1px dashed var(--border-clr);
-            padding: 6px;
-            text-align: center;
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #475569;
-            margin-top: 8px;
-        }
+        /* HIDDEN TELEMETRY FRAMEWORK NODES */
+        .activity-counter-map { display: none; }
     </style>
 </head>
 <body>
 
-    <section class="top-tier-aggregate-panel">
-        <div class="aggregate-tag-box"><div class="lbl">RED</div><div id="diagSevensCount" class="val">0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">SOR</div><div id="diagTotalRolls" class="val">0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">SRR</div><div id="diagSRR" class="val">0.0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">CO7</div><div id="diagValidRolls" class="val">0</div></div>
-    </section>
-
-    <main class="numerical-display-matrix-grid">
-        <script>
-            for(let num = 2; num <= 12; num++) {
-                document.write(`
-                    <div id="boxNum_${num}" class="number-tracker-box">
-                        <div class="number-header-title">${num}</div>
-                        
-                        <div class="decoupled-subcounter-row">
-                            <div class="subcounter-container-block">
-                                <span class="lbl">CUR</span>
-                                <span id="cntCurrent_${num}" class="val current">0</span>
-                            </div>
-                            <div class="subcounter-container-block">
-                                <span class="lbl">TOT</span>
-                                <span id="cntTotal_${num}" class="val total">0</span>
-                            </div>
-                        </div>
-
-                        <div class="icon-indicator-tray">
-                            <span id="icoPuck_${num}" style="display:none;">🎲</span>
-                            <span id="icoVelocity_${num}">❄️</span>
-                        </div>
-
-                        <div id="wagerAmt_${num}" class="wager-financial-display-field">$0.00</div>
-                    </div>
-                `);
-            }
-        </script>
-    </main>
-
-    <section class="activity-counter-map">
-        <div class="activity-block">
-            <div class="lbl">Total Session Rolls</div>
-            <div id="activityTotal" class="val session">0</div>
-        </div>
-        <div class="activity-block">
-            <div class="lbl">Current Shooter Hand</div>
-            <div id="activityHand" class="val hand">0</div>
-        </div>
-    </section>
-
-    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
-
+    <!-- [1] FILTER DROP-DOWNS -->
     <header class="profile-header-bar">
         <div class="dropdown-box-wrapper">
             <label for="ctxShooterSelect">Shooter ID</label>
@@ -479,6 +405,10 @@
         </div>
     </header>
 
+    <!-- [2] CHRONOLOGICAL HISTORY STREAM -->
+    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
+
+    <!-- [3] MOBILE-OPTIMIZED DICE INPUT PAD (2x3 Grid Matrix Formatting Specification) -->
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
             <div class="dice-die-column">
@@ -506,26 +436,63 @@
         </div>
 
         <div class="operation-controls-strip">
-            <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Confirm</button>
-            <button class="action-execution-btn btn-kinematic" onclick="executeCommitPipeline('KINEMATIC')">Kinematic</button>
-            <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Unconfirm</button>
-            <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo Last</button>
-            <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset All</button>
-            <button class="action-execution-btn btn-vault" onclick="triggerVaultOverlayCall()">⚒ Vault</button>
+            <div class="control-row">
+                <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Standard</button>
+                <button class="action-execution-btn btn-kinematic" onclick="executeCommitPipeline('KINEMATIC')">Kinematic</button>
+            </div>
+            <div class="control-row" style="margin-top: 4px;">
+                <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Invalid</button>
+                <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo</button>
+                <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset</button>
+            </div>
         </div>
     </section>
 
-    <div id="telemetryCorrectionReadout" class="calibration-telemetry-banner">
-        📐 CALIBRATION SUITE: SYSTEM LOG ACTIVE FILTER PROFILE
-    </div>
+    <!-- [4] SESSION DIAGNOSTICS HOOK PANEL -->
+    <section class="top-tier-aggregate-panel">
+        <div class="aggregate-tag-box"><div class="lbl">RED</div><div id="diagSevensCount" class="val" style="color:var(--accent-red);">0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">SOR</div><div id="diagTotalRolls" class="val" style="color:var(--accent-green);">0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">SRR</div><div id="diagSRR" class="val" style="color:var(--accent-blue);">0.0</div></div>
+        <div class="aggregate-tag-box"><div class="lbl">CO7</div><div id="diagValidRolls" class="val" style="color:var(--accent-yellow);">0</div></div>
+    </section>
+
+    <!-- [5] BOX NUMBER DATA GRID -->
+    <main class="numerical-display-matrix-grid">
+        <script>
+            for(let num = 2; num <= 12; num++) {
+                document.write(`
+                    <div id="boxNum_${num}" class="number-tracker-box">
+                        <div class="number-header-title">${num}</div>
+                        
+                        <div class="decoupled-subcounter-row">
+                            <div class="subcounter-container-block">
+                                <span class="lbl">CUR</span>
+                                <span id="cntCurrent_${num}" class="val current">0</span>
+                            </div>
+                            <div class="subcounter-container-block">
+                                <span class="lbl">TOT</span>
+                                <span id="cntTotal_${num}" class="val total">0</span>
+                            </div>
+                        </div>
+
+                        <div class="icon-indicator-tray">
+                            <span id="icoPuck_${num}" style="display:none;">🎲</span>
+                            <span id="icoVelocity_${num}">❄️</span>
+                        </div>
+
+                        <div id="wagerAmt_${num}" class="wager-financial-display-field">$0.00</div>
+                    </div>
+                `);
+            }
+        </script>
+    </main>
 
     <script>
         let state = {
             rollHistoryLog: [],
             activePoint: null,
             selectedLeft: null,
-            selectedRight: null,
-            currentBankroll: 1000.00
+            selectedRight: null
         };
 
         function handleDropdownInterceptor(type, value) {
@@ -596,15 +563,10 @@
                 document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
             }
 
-            // Top Panel Counters Sync
-            document.getElementById('diagTotalRolls').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll).length.toString();
-            document.getElementById('diagValidRolls').textContent = validCount.toString();
+            document.getElementById('diagTotalRolls').textContent = validCount.toString();
+            document.getElementById('diagValidRolls').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll && r.Puck_Before_Roll === null && (r.Total_Sum === 7 || r.Total_Sum === 11)).length.toString();
             document.getElementById('diagSevensCount').textContent = sevensCount.toString();
             document.getElementById('diagSRR').textContent = sevensCount > 0 ? (validCount / sevensCount).toFixed(1) : validCount.toFixed(1);
-
-            // Center Activity Counters Sync
-            document.getElementById('activityTotal').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll).length.toString();
-            document.getElementById('activityHand').textContent = currentHandRolls.length.toString();
 
             synchronizeHistoryRibbonViewport();
         }
@@ -622,9 +584,9 @@
                 node.innerHTML = isHardway ? `${r.Total_Sum}<sub>(H)</sub>` : `${r.Total_Sum}`;
 
                 if (r.Invalid_Roll) {
-                    node.style.background = "#1f2937";
-                    node.style.color = "#4b5563";
-                    node.style.borderColor = "#111827";
+                    node.style.background = "#141b2e";
+                    node.style.color = "#334155";
+                    node.style.borderColor = "#0f172a";
                     node.textContent = "INV";
                 } else if (r.Is_Point_Establishing || (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null)) {
                     node.className = 'history-node state-point-anchor';
@@ -718,8 +680,6 @@
                 b.classList.remove('is-active-right');
             });
         }
-
-        function triggerVaultOverlayCall() { alert("Vault overlay initialized."); }
 
         const ribbonContainer = document.getElementById('ctxHistoryRibbon');
         let isGrabbed = false, startingX, runningScrollLeft;
