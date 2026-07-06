@@ -32,7 +32,7 @@
         /* Profile Selector Header Matrix */
         .profile-header-bar {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 15px;
             background: var(--bg-panel);
             padding: 15px;
@@ -67,7 +67,7 @@
             outline: none;
         }
 
-        /* Dynamic History Ribbon Layout */
+        /* Dynamic History Ribbon Layout (v1.15 Style Rules) */
         .history-ribbon-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
@@ -79,11 +79,11 @@
             display: flex;
             gap: 10px;
             cursor: grab;
-            scrollbar-width: none; /* Hide default bars */
+            scrollbar-width: none;
         }
         
         .history-ribbon-container::-webkit-scrollbar {
-            display: none; /* Hide default webkit scrollbar */
+            display: none;
         }
 
         .history-ribbon-container:active {
@@ -94,27 +94,51 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 45px;
+            padding: 0 12px;
             height: 45px;
+            min-width: 45px;
             border-radius: 6px;
             font-weight: 800;
             font-size: 1.25rem;
-            background: #fff;
-            color: #000;
             box-shadow: 0 4px 6px rgba(0,0,0,0.3);
             flex-shrink: 0;
-            position: relative;
-            border: 2px solid #cbd5e1;
+            box-sizing: border-box;
         }
 
-        .history-node.is-point-anchor {
-            background: var(--accent-blue) !important;
-            color: #fff !important;
-            border-color: #fff !important;
-            box-shadow: 0 0 12px var(--accent-blue);
+        /* v1.15 Exact High-Contrast Style Color Codes */
+        .history-node.state-standard {
+            background: #000000;
+            color: #ffffff;
+            border: 2px solid var(--border-clr);
         }
 
-        /* Tactile Dice Entry Interface Pad */
+        .history-node.state-point-anchor {
+            background: #ffffff !important;
+            color: #000000 !important;
+            border: 2px solid #ffffff !important;
+            box-shadow: 0 0 12px rgba(255,255,255,0.4);
+        }
+
+        .history-node.state-comeout-win {
+            background: var(--accent-green) !important;
+            color: #ffffff !important;
+            border: 2px solid var(--accent-green) !important;
+        }
+
+        .history-node.state-losing-seven {
+            background: var(--accent-red) !important;
+            color: #ffffff !important;
+            border: 2px solid var(--accent-red) !important;
+        }
+
+        .history-node sub {
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-left: 2px;
+            vertical-align: sub;
+        }
+
+        /* Isolated Dice Entry Interface Pad */
         .input-pad-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
@@ -170,16 +194,17 @@
             border-color: var(--accent-blue);
         }
 
-        .pad-digit-btn.is-active-selection-left {
+        /* Standardized Isolated Blue Highlight Rules */
+        .left-die-btn.is-active-left {
             background: var(--accent-blue) !important;
             color: #fff !important;
             box-shadow: 0 0 10px var(--accent-blue);
         }
 
-        .pad-digit-btn.is-active-selection-right {
-            background: var(--accent-green) !important;
+        .right-die-btn.is-active-right {
+            background: var(--accent-blue) !important;
             color: #fff !important;
-            box-shadow: 0 0 10px var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-blue);
         }
 
         .operation-controls-strip {
@@ -345,72 +370,74 @@
     <header class="profile-header-bar">
         <div class="dropdown-box-wrapper">
             <label for="ctxShooterSelect">Shooter ID</label>
-            <select id="ctxShooterSelect" onchange="watchShooterDropdownChange(); executeGlobalRecalculationEngine();">
-                <option value="ALL" selected>ALL PROFILE RECORDS</option>
+            <select id="ctxShooterSelect" onchange="handleDropdownInterceptor('SHOOTER', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="TONY">TONY</option>
+                <option disabled>───────────────────</option>
+                <option value="EDIT">✎ [ EDIT ACTIVE SELECTION ]</option>
+                <option value="ADD">+ [ REGISTER NEW ENTRY ]</option>
             </select>
         </div>
         <div class="dropdown-box-wrapper">
             <label for="ctxLocationSelect">Location ID</label>
-            <select id="ctxLocationSelect" onchange="watchLocationDropdownChange(); executeGlobalRecalculationEngine();">
-                <option value="ALL" selected>ALL VENUES / CASINOS</option>
+            <select id="ctxLocationSelect" onchange="handleDropdownInterceptor('LOCATION', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="BALLY_S">BALLY'S</option>
+                <option disabled>───────────────────</option>
+                <option value="EDIT">✎ [ EDIT ACTIVE SELECTION ]</option>
+                <option value="ADD">+ [ REGISTER NEW ENTRY ]</option>
             </select>
         </div>
         <div class="dropdown-box-wrapper">
             <label for="ctxDiceSetSelect">Dice Set ID</label>
-            <select id="ctxDiceSetSelect" onchange="watchDiceSetDropdownChange(); executeGlobalRecalculationEngine();">
-                <option value="ALL" selected>ALL BASELINE SETS</option>
+            <select id="ctxDiceSetSelect" onchange="handleDropdownInterceptor('DIRESET', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="3V_SET">3V SET (3/6 x 3/2)</option>
+                <option disabled>───────────────────</option>
+                <option value="EDIT">✎ [ EDIT ACTIVE SELECTION ]</option>
+                <option value="ADD">+ [ REGISTER NEW ENTRY ]</option>
             </select>
         </div>
         <div class="dropdown-box-wrapper">
-            <label for="ctxStrategySelect">Craps Strategy ID</label>
-            <select id="ctxStrategySelect" onchange="executeGlobalRecalculationEngine();">
-                <option value="ALL" selected>ALL STRATEGY LOGS</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxAnalyticalFilter">Analytical Filter</label>
-            <select id="ctxAnalyticalFilter" onchange="executeGlobalRecalculationEngine();">
-                <option value="ALL_ROLLS" selected>ALL VALID LOGS</option>
-                <option value="CURRENT_HAND">CURRENT ACTIVE HAND ONLY</option>
-                <option value="PRE_POINT_ONLY">PRE-POINT (COME OUT) ONLY</option>
-                <option value="POST_POINT_ONLY">POST-POINT (ON FELT) ONLY</option>
+            <label for="ctxStrategySelect">Strategy ID</label>
+            <select id="ctxStrategySelect" onchange="handleDropdownInterceptor('STRATEGY', this.value);">
+                <option value="ALL" selected>ALL</option>
+                <option value="IRON_CROSS">IRON CROSS</option>
+                <option disabled>───────────────────</option>
+                <option value="EDIT">✎ [ EDIT ACTIVE SELECTION ]</option>
+                <option value="ADD">+ [ REGISTER NEW ENTRY ]</option>
             </select>
         </div>
     </header>
 
     <section id="ctxHistoryRibbon" class="history-ribbon-container">
-        <div class="history-node is-point-anchor" style="font-size: 0.75rem; text-align:center; background:#475569; color:#fff;">STANDBY</div>
+        <div class="history-node state-standard" style="font-size: 0.75rem; text-align:center; background:#334155;">STANDBY</div>
     </section>
 
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
             <div class="dice-die-column">
-                <h3>Left Die Value</h3>
+                <h3>Left Die</h3>
                 <div class="digit-button-grid">
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 1)">1</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 2)">2</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 3)">3</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 4)">4</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 5)">5</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('LEFT', 6)">6</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 1, this)">1</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 2, this)">2</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 3, this)">3</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 4, this)">4</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 5, this)">5</button>
+                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 6, this)">6</button>
                 </div>
             </div>
             <div class="dice-die-column">
-                <h3>Right Die Value</h3>
+                <h3>Right Die</h3>
                 <div class="digit-button-grid">
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 1)">1</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 2)">2</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 3)">3</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 4)">4</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 5)">5</button>
-                    <button class="pad-digit-btn" onclick="assignDieStagingSelection('RIGHT', 6)">6</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 1, this)">1</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 2, this)">2</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 3, this)">3</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 4, this)">4</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 5, this)">5</button>
+                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 6, this)">6</button>
                 </div>
             </div>
-        </div>
-
-        <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 6px;">
-            <label style="font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted);" for="ctxDescriptionInput">Roll Note / Context Identifier Marker</label>
-            <input type="text" id="ctxDescriptionInput" placeholder="e.g. Hardways pressed, short throw rollout, floor call variance..." style="background: var(--bg-input); color: #fff; border: 1px solid var(--border-clr); padding: 10px; border-radius: 4px; outline: none;">
         </div>
 
         <div class="operation-controls-strip">
@@ -424,17 +451,17 @@
     </section>
 
     <div id="telemetryCorrectionReadout" class="calibration-telemetry-banner">
-        📐 CALIBRATION SUITE: DATA SYNCHRONIZATION STANDBY (CALCULATED ON FILTERS)
+        📐 CALIBRATION SUITE: SYSTEM RUNNING ON CURRENT BLOCK FILTER MATRIX
     </div>
 
     <section class="diagnostics-metric-panel">
-        <h4>Filtered Diagnostic Matrix Anchors</h4>
+        <h4>Filtered Session Metrics</h4>
         <div class="diagnostics-flex-row">
             <div class="diagnostic-data-tag">TOTAL LOGGED THROWS: <span id="diagTotalRolls">0</span></div>
             <div class="diagnostic-data-tag">VALID SEQUENCE COUNT: <span id="diagValidRolls">0</span></div>
             <div class="diagnostic-data-tag">SEVENS OBSERVED: <span id="diagSevensCount">0</span></div>
-            <div class="diagnostic-data-tag">SRR AT CURRENT BASELINE: <span id="diagSRR">0.0</span></div>
-            <div class="diagnostic-data-tag">NET CAPITAL VALUE: <span id="diagBankroll" style="color:var(--accent-yellow);">$1,000.00</span></div>
+            <div class="diagnostic-data-tag">SRR VALUE: <span id="diagSRR">0.0</span></div>
+            <div class="diagnostic-data-tag">NET BANKROLL: <span id="diagBankroll" style="color:var(--accent-yellow);">$1,000.00</span></div>
         </div>
     </section>
 
@@ -442,7 +469,6 @@
         <script>
             const numberMapLabels = ["TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE"];
             for(let num = 2; num <= 12; num++) {
-                const label = numberMapLabels[num - 2];
                 document.write(`
                     <div id="boxNum_${num}" class="number-tracker-box">
                         <div class="number-header-title">${num}</div>
@@ -459,7 +485,7 @@
                         </div>
 
                         <div class="icon-indicator-tray">
-                            <span id="icoPuck_${num}" style="display:none;">🎲</span>
+                            <span id="icoPuck_${num}" style="display:none; filter: grayscale(0);">🎲</span>
                             <span id="icoVelocity_${num}">❄️</span>
                         </div>
 
@@ -474,102 +500,256 @@
         // Core Internal State Management Register Dictionary Hooks
         let state = {
             rollHistoryLog: [],
-            rawSequenceLog: [],
             activePoint: null,
             selectedLeft: null,
             selectedRight: null,
             
-            // Money Tracking/Wager Allocation Framework States
+            // Money Tracking Framework States
             currentBankroll: 1000.00,
-            lastRollNetProfitLoss: 0.00,
-            betsActive: false,
             wagerMatrix: {2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0}
         };
 
-        // Static Array Key Indexes
-        let userShootersList = {};
-        let userLocationsList = {};
-        let userDiceSetsList = {};
-        let currentUid = "dummy_architect_preview";
-
         /**
-         * Dynamic Entry Array Value Selection Highlighter Interceptor Engine
+         * CRUD Dropdown Selector Action Interceptor
          */
-        function assignDieStagingSelection(targetNode, faceValue) {
-            const btns = document.querySelectorAll('.pad-digit-btn');
-            if (targetNode === 'LEFT') {
-                state.selectedLeft = faceValue;
-                // Wipe past active UI selections within node collection boundaries
-                btns.forEach(b => { if(b.textContent === faceValue.toString()) b.classList.add('is-active-selection-left'); else b.classList.remove('is-active-selection-left'); });
-            } else {
-                state.selectedRight = faceValue;
-                btns.forEach(b => { if(b.textContent === faceValue.toString()) b.classList.add('is-active-selection-right'); else b.classList.remove('is-active-selection-right'); });
+        function handleDropdownInterceptor(type, value) {
+            if (value === "ADD" || value === "EDIT") {
+                alert(`Triggering Module 2 popup modal overlay management interface window for: ${type}_PROFILES`);
+                document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value = "ALL";
+                return;
             }
-            // Trigger downstream Module 3 calculations pre-render displays instantly
-            if (typeof calculateLiveKinematicsPreview === 'function') calculateLiveKinematicsPreview();
+            // Strategy_ID has no filtering bearing on rolls; just executes re-calculation routines
+            executeGlobalRecalculationEngine();
         }
 
         /**
-         * Global Interceptor Recalculation Engine Matrix
+         * Isolated Highlight Dye Pad Controller
+         */
+        function assignIsolatedDieSelection(targetPad, faceValue, btnElement) {
+            if (targetPad === 'LEFT') {
+                state.selectedLeft = faceValue;
+                document.querySelectorAll('.left-die-btn').forEach(b => b.classList.remove('is-active-left'));
+                btnElement.classList.add('is-active-left');
+            } else {
+                state.selectedRight = faceValue;
+                document.querySelectorAll('.right-die-btn').forEach(b => b.classList.remove('is-active-right'));
+                btnElement.classList.add('is-active-right');
+            }
+        }
+
+        /**
+         * Consolidated Top-Down Recalculation Loop Sorter
          */
         function executeGlobalRecalculationEngine() {
-            console.log("Unified Selector State Modification Intercepted. Recalculating dashboard values...");
+            // Pull selector bounds
+            const selectedShooter = document.getElementById('ctxShooterSelect').value;
+            const selectedLocation = document.getElementById('ctxLocationSelect').value;
+            const selectedDiceSet = document.getElementById('ctxDiceSetSelect').value;
+            const selectedStrategy = document.getElementById('ctxStrategySelect').value;
+
+            // 1. Process Filtering Chains (Strategy_ID excluded from filtration checks)
+            let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
             
-            // 1. Read Current Configuration Filter Matrix Parameters
-            const currentFilter = document.getElementById('ctxAnalyticalFilter').value;
-            const currentShooter = document.getElementById('ctxShooterSelect').value;
-            
-            // 2. Refresh Diagnostic Aggregates & Counters based on current active dropdown states
+            if (selectedShooter !== "ALL") filteredRolls = filteredRolls.filter(r => r.Shooter_ID === selectedShooter);
+            if (selectedLocation !== "ALL") filteredRolls = filteredRolls.filter(r => r.Location_ID === selectedLocation);
+            if (selectedDiceSet !== "ALL") filteredRolls = filteredRolls.filter(r => r.Left_Set_Face === "3/6" && r.Right_Set_Face === "3/2");
+
+            // 2. Clear out view maps before tally calculation loop
+            for(let i=2; i<=12; i++) {
+                document.getElementById(`cntTotal_${i}`).textContent = "0";
+                document.getElementById(`cntCurrent_${i}`).textContent = "0";
+                document.getElementById(`icoPuck_${i}`).style.display = "none";
+                document.getElementById(`boxNum_${i}`).classList.remove('has-puck-anchored');
+            }
+
+            let validCount = 0;
+            let sevensCount = 0;
+
+            // 3. Populate Decoupled Metric Matrices
+            filteredRolls.forEach(r => {
+                validCount++;
+                if (r.Total_Sum === 7) sevensCount++;
+                
+                // Increment filtered total session metric display values
+                let currentTotalVal = parseInt(document.getElementById(`cntTotal_${r.Total_Sum}`).textContent);
+                document.getElementById(`cntTotal_${r.Total_Sum}`).textContent = (currentTotalVal + 1).toString();
+            });
+
+            // Tally current hand subcounters out of raw session history loop
+            let currentHandRolls = [];
+            for (let i = state.rollHistoryLog.length - 1; i >= 0; i--) {
+                const r = state.rollHistoryLog[i];
+                if (r.Invalid_Roll) continue;
+                currentHandRolls.unshift(r);
+                if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
+                    // Seven out broken cut line; drop trailing parameters
+                    currentHandRolls.shift();
+                    break;
+                }
+            }
+
+            currentHandRolls.forEach(r => {
+                let currentHandBoxVal = parseInt(document.getElementById(`cntCurrent_${r.Total_Sum}`).textContent);
+                document.getElementById(`cntCurrent_${r.Total_Sum}`).textContent = (currentHandBoxVal + 1).toString();
+            });
+
+            // 4. Update Puck DOM Positions
+            if (state.activePoint) {
+                document.getElementById(`icoPuck_${state.activePoint}`).style.display = "inline";
+                document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
+            }
+
+            // 5. Update Structural Statistics Targets
             document.getElementById('diagTotalRolls').textContent = state.rollHistoryLog.length.toString();
-            
-            // 3. Clear Pad Highlight Inversions
-            clearSelectionPads();
-            
-            // 4. Force Historical Ribbon Interface Synchronizations
+            document.getElementById('diagValidRolls').textContent = validCount.toString();
+            document.getElementById('diagSevensCount').textContent = sevensCount.toString();
+            document.getElementById('diagSRR').textContent = sevensCount > 0 ? (validCount / sevensCount).toFixed(1) : validCount.toFixed(1);
+
+            // Execute Capital / Money calculations based on Strategy Selector here
+            if (selectedStrategy !== "ALL") {
+                document.getElementById('diagBankroll').textContent = `$${state.currentBankroll.toFixed(2)} [${selectedStrategy.replace('_',' ')}]`;
+            } else {
+                document.getElementById('diagBankroll').textContent = `$${state.currentBankroll.toFixed(2)}`;
+            }
+
             synchronizeHistoryRibbonViewport();
+        }
+
+        /**
+         * v1.15 Exact High-Contrast History Ribbon Layout Renderer
+         */
+        function synchronizeHistoryRibbonViewport() {
+            const ribbon = document.getElementById('ctxHistoryRibbon');
+            if(!ribbon) return;
+            ribbon.innerHTML = '';
+            
+            // Build Chronologically: Oldest on Left -> Newest on Far Right
+            state.rollHistoryLog.forEach(r => {
+                const node = document.createElement('div');
+                node.className = 'history-node state-standard';
+                
+                // Assign Hardways Suffix Tag Verification
+                let isHardway = (!r.Invalid_Roll && r.Left_Die === r.Right_Die && [4,6,8,10].includes(r.Total_Sum));
+                node.innerHTML = isHardway ? `${r.Total_Sum}<sub>(H)</sub>` : `${r.Total_Sum}`;
+
+                if (r.Invalid_Roll) {
+                    node.style.background = "#475569";
+                    node.style.color = "#94a3b8";
+                    node.textContent = "INV";
+                } else if (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null) {
+                    // Point Anchor Hit State
+                    node.className = 'history-node state-point-anchor';
+                } else if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
+                    // Losing Seven State
+                    node.className = 'history-node state-losing-seven';
+                } else if ((r.Total_Sum === 7 || r.Total_Sum === 11) && r.Puck_Before_Roll === null) {
+                    // Comeout Natural Win State
+                    node.className = 'history-node state-comeout-win';
+                }
+
+                ribbon.appendChild(node);
+            });
+
+            if(state.rollHistoryLog.length === 0) {
+                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.75rem; text-align:center; background:#334155;">STANDBY</div>';
+            }
+
+            // Snap view window scroll axis coordinates straight to the right wall boundaries instantly
+            ribbon.scrollLeft = ribbon.scrollWidth;
+        }
+
+        /**
+         * Roll Submission Pipeline Entry Point Interceptor
+         */
+        function executeCommitPipeline(mode) {
+            if(state.selectedLeft === null || state.selectedRight === null) return alert("Select isolated dice values first.");
+            
+            let isInvalid = (mode === "INVALID");
+            let invalidNote = null;
+
+            if (isInvalid) {
+                invalidNote = prompt("Input Reason for Invalidating Roll Variance:");
+                if (invalidNote === null) return; // User canceled out of pop-up
+            }
+
+            const leftFaceStr = document.getElementById('ctxDiceSetSelect').value === "ALL" ? "3/6" : "3/6";
+            const rightFaceStr = document.getElementById('ctxDiceSetSelect').value === "ALL" ? "3/2" : "3/2";
+
+            const rowPayload = {
+                Time_Stamp: new Date().toISOString(),
+                Roll_Index: state.rollHistoryLog.length + 1,
+                Puck_Before_Roll: state.activePoint,
+                Left_Die: state.selectedLeft,
+                Right_Die: state.selectedRight,
+                Total_Sum: state.selectedLeft + state.selectedRight,
+                Shooter_ID: document.getElementById('ctxShooterSelect').value,
+                Location_ID: document.getElementById('ctxLocationSelect').value,
+                Left_Set_Face: leftFaceStr,
+                Right_Set_Face: rightFaceStr,
+                Kinematic_Status: (mode === "KINEMATIC"),
+                Left_Kinematic: (mode === "KINEMATIC" ? 1 : null), // Uses 1/2 physical die reference codes
+                Right_Kinematic: (mode === "KINEMATIC" ? 1 : null),
+                Invalid_Roll: isInvalid,
+                Notes: invalidNote
+            };
+
+            // Game State Machine Puck Evaluators
+            if (!isInvalid) {
+                let rolledTotal = rowPayload.Total_Sum;
+                if (state.activePoint === null) {
+                    if ([4,5,6,8,9,10].includes(rolledTotal)) {
+                        state.activePoint = rolledTotal; // Point Established
+                    }
+                } else {
+                    if (rolledTotal === 7 || rolledTotal === state.activePoint) {
+                        state.activePoint = null; // Point Cleared or Sevened Out
+                    }
+                }
+            }
+
+            state.rollHistoryLog.push(rowPayload);
+            clearSelectionPads();
+            executeGlobalRecalculationEngine();
+        }
+
+        function executeHistoryStepUndo() {
+            if(!state.rollHistoryLog.length) return;
+            const removed = state.rollHistoryLog.pop();
+            // Revert puck state back to preceding anchor state parameter
+            if (!removed.Invalid_Roll) {
+                state.activePoint = removed.Puck_Before_Roll;
+            }
+            executeGlobalRecalculationEngine();
+        }
+
+        function executeWorkspaceLayoutWipe() {
+            if(!confirm("Wipe working dashboard memory back to initialization defaults?")) return;
+            state.rollHistoryLog = [];
+            state.activePoint = null;
+            clearSelectionPads();
+            executeGlobalRecalculationEngine();
         }
 
         function clearSelectionPads() {
             state.selectedLeft = null;
             state.selectedRight = null;
             document.querySelectorAll('.pad-digit-btn').forEach(b => {
-                b.classList.remove('is-active-selection-left');
-                b.classList.remove('is-active-selection-right');
+                b.classList.remove('is-active-left');
+                b.classList.remove('is-active-right');
             });
         }
 
-        function synchronizeHistoryRibbonViewport() {
-            const ribbon = document.getElementById('ctxHistoryRibbon');
-            if(!ribbon) return;
-            ribbon.innerHTML = '';
-            
-            // Loop history inverse chronological layout order structure: Newest on far left
-            for (let i = state.rollHistoryLog.length - 1; i >= 0; i--) {
-                const node = document.createElement('div');
-                node.className = 'history-node';
-                node.textContent = state.rollHistoryLog[i].Total_Sum.toString();
-                if(state.rollHistoryLog[i].Total_Sum === state.activePoint) {
-                    node.classList.add('is-point-anchor');
-                }
-                ribbon.appendChild(node);
-            }
-            if(state.rollHistoryLog.length === 0) {
-                ribbon.innerHTML = '<div class="history-node" style="font-size:0.75rem; text-align:center; background:#475569; color:#fff;">STANDBY</div>';
-            }
-            // Reset horizontal scroll coordinates back to the left margin wall instantly on entry append
-            ribbon.scrollLeft = 0;
+        function triggerVaultOverlayCall() {
+            alert("Architect Overlay Trigger: Vault interface display called. Module 5 pop-up routine loaded.");
         }
 
-        // Horizontal Drag-to-Scroll UX Engine Setup Framework Logic
+        // Ribbon Drag-to-Scroll UX Binding Engine Hooks
         const ribbonContainer = document.getElementById('ctxHistoryRibbon');
-        let isGrabbed = false;
-        let startingXCoordinate;
-        let runningScrollLeftCoordinate;
-
+        let isGrabbed = false, startingX, runningScrollLeft;
         ribbonContainer.addEventListener('mousedown', (e) => {
             isGrabbed = true;
-            startingXCoordinate = e.pageX - ribbonContainer.offsetLeft;
-            runningScrollLeftCoordinate = ribbonContainer.scrollLeft;
+            startingX = e.pageX - ribbonContainer.offsetLeft;
+            runningScrollLeft = ribbonContainer.scrollLeft;
         });
         ribbonContainer.addEventListener('mouseleave', () => { isGrabbed = false; });
         ribbonContainer.addEventListener('mouseup', () => { isGrabbed = false; });
@@ -577,61 +757,8 @@
             if(!isGrabbed) return;
             e.preventDefault();
             const currentX = e.pageX - ribbonContainer.offsetLeft;
-            const shiftDistance = (currentX - startingXCoordinate) * 1.5; // Velocity dampener multiplier
-            ribbonContainer.scrollLeft = runningScrollLeftCoordinate - shiftDistance;
+            ribbonContainer.scrollLeft = runningScrollLeft - (currentX - startingX) * 1.5;
         });
-
-        /* Workspace Core Command Trigger Interfaces */
-        function executeCommitPipeline(mode) {
-            console.log(`Executing data commit validation pipeline. Mode: ${mode}`);
-            if(!state.selectedLeft || !state.selectedRight) return alert("Select dice inputs first.");
-            
-            // Dummy placeholder runtime record injection mapping updated 16 columns structure
-            const mockRow = {
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint,
-                Left_Die: state.selectedLeft,
-                Right_Die: state.selectedRight,
-                Total_Sum: state.selectedLeft + state.selectedRight,
-                Location_ID: "PREVIEW_VEN",
-                Table_Position: "SL1",
-                Shooter_ID: "PREVIEW_SHT",
-                Left_Set_Face: "3/6",
-                Right_Set_Face: "3/2",
-                Kinematic_Status: (mode === 'KINEMATIC'),
-                Left_Kinematic: (mode === 'KINEMATIC' ? 1 : null),
-                Right_Kinematic: (mode === 'KINEMATIC' ? 1 : null),
-                Invalid_Roll: (mode === 'INVALID'),
-                Notes: null
-            };
-            
-            state.rollHistoryLog.push(mockRow);
-            executeGlobalRecalculationEngine();
-        }
-
-        function executeHistoryStepUndo() {
-            if(state.rollHistoryLog.length === 0) return;
-            state.rollHistoryLog.pop();
-            executeGlobalRecalculationEngine();
-        }
-
-        function executeWorkspaceLayoutWipe() {
-            if(!confirm("Wipe working dashboard memory back to initialization defaults?")) return;
-            state.rollHistoryLog = [];
-            state.rawSequenceLog = [];
-            state.activePoint = null;
-            executeGlobalRecalculationEngine();
-        }
-
-        function triggerVaultOverlayCall() {
-            alert("Architect Overlay Trigger: Vault interface display called. Module 5 pop-up routine loaded.");
-        }
-
-        function watchShooterDropdownChange() {}
-        function watchLocationDropdownChange() {}
-        function watchDiceSetDropdownChange() {}
-        function pushCloudState() {}
     </script>
 </body>
 </html>
