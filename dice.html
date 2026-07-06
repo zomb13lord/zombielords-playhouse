@@ -2,1026 +2,1134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Craps Kinematics Vault Terminal - v1.15.Master</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Tracker v1.5.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-main: #040712;
-            --bg-panel: #0b1124;
-            --bg-card: #0e1731;
-            --bg-input: #1e293b;
-            --border-clr: #1e293b;
+            --bg-primary: #020617;
+            --panel-bg: #0f172a;
             --text-main: #f8fafc;
-            --text-muted: #475569;
-            --accent-blue: #2563eb;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-orange: #f97316;
-            --accent-yellow: #eab308;
-            --high-gloss-glow: 0 0 12px rgba(37, 99, 235, 0.5);
-            --overlay-bg: rgba(4, 7, 18, 0.85);
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            --emerald-accent: #10b981;
+            --amber-accent: #f59e0b;
+            --border-color: #334155;
+            --puck-on: #e11d48;
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg-primary);
             color: var(--text-main);
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-family: monospace;
             margin: 0;
-            padding: 8px;
-            user-select: none;
-            overflow-x: hidden;
-        }
-
-        /* [MODULE 1] FILTER DROP-DOWNS */
-        .profile-header-bar {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            background: var(--bg-panel);
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid var(--border-clr);
-            margin-bottom: 8px;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .dropdown-box-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .dropdown-box-wrapper label {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            font-weight: 700;
-            color: #64748b;
-        }
-
-        .dropdown-box-wrapper select {
-            width: 100%;
-            background: var(--bg-main);
-            color: #fff;
-            border: 1px solid #1e293b;
-            padding: 6px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            outline: none;
-        }
-
-        /* [MODULE 2] CHRONOLOGICAL HISTORY STREAM */
-        .history-ribbon-container {
-            background: #000000;
-            border: 1px solid var(--border-clr);
-            border-radius: 4px;
-            padding: 6px;
-            margin-bottom: 8px;
-            overflow-x: auto;
-            white-space: nowrap;
-            display: flex;
-            gap: 6px;
-            cursor: grab;
-            scrollbar-width: none;
-            align-items: center;
-            min-height: 44px;
-        }
-        
-        .history-ribbon-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .history-node {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 30px;
-            min-width: 40px;
-            padding: 0 6px;
-            border-radius: 3px;
-            font-weight: 900;
-            font-size: 1.05rem;
-            flex-shrink: 0;
+            padding: 0;
             box-sizing: border-box;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
-        .history-node.state-standard {
-            background: #000000;
-            color: #ffffff;
-            border: 1px solid #334155;
-        }
-
-        .history-node.state-point-anchor {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #ffffff !important;
-            box-shadow: 0 0 8px #ffffff;
-        }
-
-        .history-node.state-comeout-win {
-            background: var(--accent-green) !important;
-            color: #ffffff !important;
-            border: 1px solid var(--accent-green) !important;
-        }
-
-        .history-node.state-losing-seven {
-            background: var(--accent-red) !important;
-            color: #ffffff !important;
-            border: 1px solid var(--accent-red) !important;
-        }
-
-        .history-node sub {
-            font-size: 0.55rem;
-            font-weight: 700;
-            margin-left: 1px;
-            vertical-align: sub;
-        }
-
-        /* [MODULE 3] MOBILE-OPTIMIZED DICE INPUT PAD */
-        .input-pad-container {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            border-radius: 4px;
-            padding: 8px;
-            margin-bottom: 8px;
-        }
-
-        .pad-grid-alignment {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .dice-die-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .dice-die-column h3 {
-            margin: 0;
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #64748b;
-            font-weight: 700;
-        }
-
-        .digit-button-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 4px;
-            width: 100%;
-        }
-
-        .pad-digit-btn {
-            background: var(--bg-main);
-            color: #fff;
-            border: 1px solid var(--border-clr);
-            padding: 10px 0;
-            font-size: 1.15rem;
-            font-weight: 900;
-            border-radius: 3px;
-            cursor: pointer;
-            text-align: center;
-        }
-
-        .left-die-btn.is-active-left {
-            background: var(--accent-blue) !important;
-            border-color: #60a5fa !important;
-            box-shadow: var(--high-gloss-glow);
-        }
-
-        .right-die-btn.is-active-right {
-            background: var(--accent-blue) !important;
-            border-color: #60a5fa !important;
-            box-shadow: var(--high-gloss-glow);
-        }
-
-        .operation-controls-strip {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .control-row {
-            display: flex;
-            gap: 4px;
-            width: 100%;
-        }
-
-        .action-execution-btn {
-            flex: 1;
-            padding: 12px 0;
-            font-weight: 900;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            color: #fff;
-            text-align: center;
-        }
-
-        .action-execution-btn.btn-standard  { background: var(--accent-green); }
-        .action-execution-btn.btn-kinematic { background: var(--accent-blue); }
-        .action-execution-btn.btn-invalid   { background: var(--accent-red); }
-        .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
-        .action-execution-btn.btn-reset     { background: #334155; }
-
-        /* [MODULE 4] CUSTOM DIAGNOSTICS SUITE */
-        .diagnostics-wrapper-panel {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            border-radius: 4px;
-            padding: 8px;
-            margin-bottom: 8px;
-        }
-
-        .diagnostics-title {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            color: #64748b;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: 0.05em;
-        }
-
-        .three-column-diagnostics-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-        }
-
-        .diag-column-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .diag-row-item {
+        .zombie-nav-header {
+            background-color: #020617;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: var(--bg-main);
-            padding: 6px 8px;
-            border-radius: 2px;
-            border: 1px solid #1e293b;
-            font-size: 0.75rem;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .diag-row-item .lbl {
-            font-weight: 700;
-            color: #64748b;
+        .brand-box {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
         }
 
-        .diag-row-item .val {
+        .brand-title {
+            color: var(--emerald-accent);
+            font-size: 14px;
             font-weight: 900;
-            font-family: monospace;
-            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            margin: 0;
         }
 
-        /* [MODULE 5] BOX NUMBER DATA GRID */
-        .numerical-display-matrix-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
-            gap: 4px;
-            margin-bottom: 8px;
+        .brand-subtitle {
+            color: #f8fafc;
+            font-size: 9px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 2px;
         }
 
-        .number-tracker-box {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
+        .version-tag {
+            background-color: #1e293b;
+            color: #94a3b8;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 10px;
             border-radius: 3px;
-            padding: 6px 2px;
+        }
+
+        .main-wrapper {
+            padding: 15px;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-ribbon {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            background-color: #000;
+            padding: 12px;
+            gap: 6px;
+            min-height: 35px;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .history-node {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 2px;
+            min-width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .node-normal { background-color: #fff; color: #000; }
+        .node-hard { background-color: #fff; color: #000; border: 2px dashed #000; }
+        .node-point-made { background-color: var(--emerald-accent); color: #fff; }
+        .node-seven-out { background-color: #ef4444; color: #fff; }
+
+        .board-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .grid-row-segment {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 100%;
+        }
+
+        .box-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
             text-align: center;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
             position: relative;
         }
 
-        .number-tracker-box.has-puck-anchored {
-            border-color: #ffffff;
-            background: #1e293b;
-        }
-
-        .number-header-title {
-            font-size: 1.1rem;
+        .box-num-header {
+            font-size: 24px;
             font-weight: 900;
-            color: var(--accent-orange);
-            margin-bottom: 4px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+            color: var(--amber-accent);
+            padding: 8px 0;
+            background: #090d16;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .decoupled-subcounter-row {
+        .puck-chip {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            background-color: var(--puck-on);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 1px 4px;
+            border-radius: 3px;
+            border: 1px solid #fff;
+            display: none;
+        }
+
+        .temp-chip {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .color-dark { background-color: #000000; }
+        .color-red { background-color: #450a0a; }
+
+        .box-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 15px 0;
+        }
+
+        .box-sub-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
+        .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
+
+        .diagnostics-panel {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .diag-title {
+            font-size: 13px;
+            color: #94a3b8;
+            padding: 12px;
+            background: #020617;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .diag-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 15px 0;
+        }
+
+        .d-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+        .d-cell:last-child { border-right: none; }
+        .d-label { font-size: 14px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; }
+        .d-val { font-size: 26px; font-weight: bold; color: #ffffff; margin-top: 6px; }
+
+        .master-rolls-box {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .master-rolls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: var(--border-color);
+            gap: 1px;
+        }
+
+        .m-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .m-cell-hand { background-color: #000000; }   
+        .m-cell-session { background-color: #1e293b; } 
+        .m-label { font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
+        .m-val { font-size: 36px; font-weight: 900; color: #ffffff; margin-top: 6px; }
+
+        .controller-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dual-axis-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .axis-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .axis-label {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--amber-accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        .pad-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .pad-btn {
+            background: #020617;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            font-size: 20px;
+            font-weight: bold;
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pad-btn.active {
+            background: var(--amber-accent);
+            color: #000;
+            border-color: #ffffff;
+        }
+
+        .action-matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .act-btn { 
+            padding: 12px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            text-align: center;
+        }
+        .btn-green { background: var(--emerald-accent); color: white; }
+        .btn-orange { background: #f97316; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+
+        .meta-context-bar {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media(min-width: 1024px) {
+            .meta-context-bar { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .select-element {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            font-family: monospace;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .vault-panel-header {
+            border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #fff;
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        @media(min-width: 768px) {
+            .vault-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .vault-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .vault-card-title {
+            color: var(--emerald-accent);
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vault-card-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding-top: 8px;
+        }
+
+        .kinematic-readout-strip {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
             display: flex;
             justify-content: space-around;
-            background: #000000;
-            padding: 4px 2px;
-            margin-bottom: 4px;
-            border-radius: 2px;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--amber-accent);
         }
 
-        .subcounter-container-block {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-        }
-
-        .subcounter-container-block .lbl {
-            font-size: 0.55rem;
-            color: #475569;
-            font-weight: 700;
-        }
-
-        .subcounter-container-block .val {
-            font-weight: 900;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-        .subcounter-container-block .val.current { color: var(--accent-green); }
-        .subcounter-container-block .val.total   { color: #94a3b8; }
-
-        .puck-positioner-frame {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 20px;
-            margin-bottom: 4px;
-        }
-
-        .casino-puck-on-marker {
-            width: 20px;
-            height: 20px;
-            background: #ffffff;
-            color: #000000;
-            border-radius: 50%;
-            font-size: 0.6rem;
-            font-weight: 900;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 6px #ffffff;
-            letter-spacing: -0.05em;
-        }
-
-        .velocity-indicator-tray {
-            font-size: 0.75rem;
-            min-height: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .wager-financial-display-field {
-            border-top: 1px solid #111b33;
-            padding-top: 4px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            color: var(--accent-yellow);
-            font-family: monospace;
-        }
-
-        /* ADVANCED CONFIGURATION MODALS INTERFACE (FULL ENGINE ADDITION) */
-        .vault-modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--overlay-bg);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 15px;
-        }
-
-        .vault-modal-card {
-            background: var(--bg-panel);
-            border: 1px solid #334155;
-            border-radius: 6px;
-            max-width: 450px;
-            width: 100%;
-            padding: 16px;
-            box-shadow: var(--high-gloss-glow);
-        }
-
-        .vault-modal-card h2 {
-            margin: 0 0 12px 0;
-            font-size: 0.9rem;
-            color: var(--accent-orange);
-            text-transform: uppercase;
-        }
-
-        .form-group-block {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 12px;
-        }
-
-        .form-group-block label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #94a3b8;
-        }
-
-        .form-group-block input {
-            background: var(--bg-main);
-            border: 1px solid var(--border-clr);
-            color: #fff;
-            padding: 8px;
-            border-radius: 3px;
-            outline: none;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-        .modal-btn-strip {
-            display: flex;
-            gap: 6px;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-
-        .modal-btn {
-            padding: 8px 16px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
+        @media (min-width: 1024px) {
+            .board-stack { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
+            .grid-row-segment:nth-child(1) { grid-column: span 5; }
+            .diagnostics-panel { grid-column: span 2; height: 100%; }
+            .grid-row-segment:nth-child(3) { grid-column: span 5; }
+            .master-rolls-box { grid-column: span 12; }
         }
     </style>
 </head>
 <body>
 
-    <header class="profile-header-bar">
-        <div class="dropdown-box-wrapper">
-            <label for="ctxShooterSelect">Shooter ID</label>
-            <select id="ctxShooterSelect" onchange="handleDropdownInterceptor('SHOOTER', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="TONY">TONY</option>
-                <option value="DIESEL">DIESEL</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
+    <nav class="zombie-nav-header">
+        <div class="brand-box" onclick="window.location.assign('lobby.html')">
+            <h2 class="brand-title">Zombie Lord's</h2>
+            <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxLocationSelect">Location ID</label>
-            <select id="ctxLocationSelect" onchange="handleDropdownInterceptor('LOCATION', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="BALLY_S">BALLY'S</option>
-                <option value="BELLAGIO">BELLAGIO</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxDiceSetSelect">Dice Set ID</label>
-            <select id="ctxDiceSetSelect" onchange="handleDropdownInterceptor('DIRESET', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="3V_SET">3V SET</option>
-                <option value="2V_SET">2V SET</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-        <div class="dropdown-box-wrapper">
-            <label for="ctxStrategySelect">Strategy ID</label>
-            <select id="ctxStrategySelect" onchange="handleDropdownInterceptor('STRATEGY', this.value);">
-                <option value="ALL" selected>ALL</option>
-                <option value="IRON_CROSS">IRON CROSS</option>
-                <option value="PRESS_LADDER">6/8 PRESS LADDER</option>
-                <option disabled>──────</option>
-                <option value="EDIT">✎ EDIT</option>
-                <option value="ADD">+ ADD</option>
-            </select>
-        </div>
-    </header>
+        <div class="version-tag">VERSION 1.5.1</div>
+    </nav>
 
-    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
-
-    <section class="input-pad-container">
-        <div class="pad-grid-alignment">
-            <div class="dice-die-column">
-                <h3>Left Die</h3>
-                <div class="digit-button-grid">
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 1, this)">1</button>
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 2, this)">2</button>
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 3, this)">3</button>
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 4, this)">4</button>
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 5, this)">5</button>
-                    <button class="pad-digit-btn left-die-btn" onclick="assignIsolatedDieSelection('LEFT', 6, this)">6</button>
-                </div>
+    <div class="main-wrapper">
+        <div class="meta-context-bar">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Identity</label>
+                <select id="ctxShooterSelect" class="select-element" onchange="handleContextShooterToggle()"></select>
             </div>
-            <div class="dice-die-column">
-                <h3>Right Die</h3>
-                <div class="digit-button-grid">
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 1, this)">1</button>
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 2, this)">2</button>
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 3, this)">3</button>
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 4, this)">4</button>
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 5, this)">5</button>
-                    <button class="pad-digit-btn right-die-btn" onclick="assignIsolatedDieSelection('RIGHT', 6, this)">6</button>
-                </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
+                <select id="ctxLocationSelect" class="select-element" onchange="handleContextLocationToggle()"></select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
+                <select id="ctxDiceSetSelect" class="select-element" onchange="handleContextDiceSetToggle()">
+                    <option value="NONE">NONE (NULL PAIR)</option>
+                    <option value="3V">3V SET (3/6 - 3/2)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Analytical Filter View</label>
+                <select id="ctxFilterScopeSelect" class="select-element" onchange="executeAnalyticalFilterEngine()">
+                    <option value="FULL">FULL SESSION MASTER TIMELINE</option>
+                    <option value="ISOLATE_SHOOTER">ISOLATE CURRENT SHOOTER</option>
+                    <option value="ISOLATE_LOCATION">ISOLATE CURRENT LOCATION</option>
+                    <option value="ISOLATE_COMBINED">ISOLATE TARGET COMBINED SIGNATURE</option>
+                </select>
             </div>
         </div>
 
-        <div class="operation-controls-strip">
-            <div class="control-row">
-                <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Confirm</button>
-                <button class="action-execution-btn btn-kinematic" onclick="executeCommitPipeline('KINEMATIC')">Kinematic</button>
-            </div>
-            <div class="control-row" style="margin-top: 4px;">
-                <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Unconfirm</button>
-                <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo Last</button>
-                <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset All</button>
-            </div>
+        <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Shooter Notes:</span>
+            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER TEXT FIELD NOTES BEFORE SUBMITTING ROLL INDEX...">
         </div>
-    </section>
 
-    <section class="diagnostics-wrapper-panel">
-        <div class="diagnostics-title">Custom Diagnostics Suite</div>
-        <div class="three-column-diagnostics-grid">
-            <div class="diag-column-stack">
-                <div class="diag-row-item"><span class="lbl">SOR</span><span id="lbl_SOR" class="val" style="color:var(--accent-green);">0.0</span></div>
-                <div class="diag-row-item"><span class="lbl">POINT</span><span id="lbl_POINT" class="val" style="color:var(--accent-yellow);">0</span></div>
-                <div class="diag-row-item"><span class="lbl">RED</span><span id="lbl_RED" class="val" style="color:var(--accent-red);">0</span></div>
-                <div class="diag-row-item"><span class="lbl">PSR</span><span id="lbl_PSR" class="val">0.0</span></div>
-            </div>
-            <div class="diag-column-stack">
-                <div class="diag-row-item"><span class="lbl">SRR</span><span id="lbl_SRR" class="val" style="color:#60a5fa;">0.0</span></div>
-                <div class="diag-row-item"><span class="lbl">CON</span><span id="lbl_CON" class="val">0</span></div>
-                <div class="diag-row-item"><span class="lbl">COC</span><span id="lbl_COC" class="val">0</span></div>
-                <div class="diag-row-item"><span class="lbl">DUR</span><span id="lbl_DUR" class="val">0.0</span></div>
-            </div>
-            <div class="diag-column-stack">
-                <div class="diag-row-item"><span class="lbl">HW</span><span id="lbl_HW" class="val">0</span></div>
-                <div class="diag-row-item"><span class="lbl">K_L</span><span id="lbl_KL" class="val" style="color:#a855f7;">-</span></div>
-                <div class="diag-row-item"><span class="lbl">K_R</span><span id="lbl_KR" class="val" style="color:#a855f7;">-</span></div>
-                <div class="diag-row-item"><span class="lbl">SKEW</span><span id="lbl_SKEW" class="val" style="color:var(--accent-orange);">0</span></div>
-            </div>
+        <div class="history-ribbon" id="historyContainer"></div>
+
+        <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
+            <span>LEFT DIE KINEMATICS: <b class="text-white" id="k-left-readout">N/A</b></span>
+            <span>RIGHT DIE KINEMATICS: <b class="text-white" id="k-right-readout">N/A</b></span>
         </div>
-    </section>
 
-    <main class="numerical-display-matrix-grid">
-        <script>
-            const activeValidTargets = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12];
-            activeValidTargets.forEach(num => {
-                document.write(`
-                    <div id="boxNum_${num}" class="number-tracker-box">
-                        <div class="number-header-title">${num}</div>
-                        
-                        <div class="decoupled-subcounter-row">
-                            <div class="subcounter-container-block">
-                                <span class="lbl">CUR</span>
-                                <span id="cntCurrent_${num}" class="val current">0</span>
-                            </div>
-                            <div class="subcounter-container-block">
-                                <span class="lbl">TOT</span>
-                                <span id="cntTotal_${num}" class="val total">0</span>
-                            </div>
-                        </div>
+        <div class="board-stack">
+            <div class="grid-row-segment">
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+            </div>
 
-                        <div class="puck-positioner-frame">
-                            <div id="puck_${num}" class="casino-puck-on-marker" style="display:none;">ON</div>
-                        </div>
-
-                        <div id="vel_${num}" class="velocity-indicator-tray"></div>
-
-                        <div id="wagerAmt_${num}" class="wager-financial-display-field">$0.00</div>
+            <div class="diagnostics-panel">
+                <div class="diag-title">ZOMBIELORD DIAGNOSTICS</div>
+                <div class="diag-metrics-grid">
+                    <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
+                    <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
+                    <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
+                    <div class="d-cell">
+                        <div class="temp-chip" id="temp-7" style="top:-2px; right:2px;"></div>
+                        <div class="d-label">SRR</div>
+                        <div class="d-val" id="stat-srr">0.0</div>
                     </div>
-                `);
-            });
-        </script>
-    </main>
-
-    <div id="crudOverlayModal" class="vault-modal-overlay">
-        <div class="vault-modal-card">
-            <h2 id="modalTargetTitle">Register New Entry</h2>
-            <div class="form-group-block">
-                <label id="modalFieldLabel">Profile Identifier / Code</label>
-                <input type="text" id="modalStringInput" placeholder="ENTER UNIQUE PROFILE KEY">
+                    <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
+                </div>
             </div>
-            <div class="modal-btn-strip">
-                <button class="modal-btn" style="background:#475569; color:#fff;" onclick="closeProfileCrudModal()">Cancel</button>
-                <button class="modal-btn" style="background:var(--accent-blue); color:#fff;" onclick="executeProfileCrudCommit()">Commit</button>
+
+            <div class="grid-row-segment">
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            </div>
+
+            <div class="master-rolls-box">
+                <div class="diag-title" style="padding:8px; font-size:11px;">SESSION COUNTER ACTIVITY MAP</div>
+                <div class="master-rolls-grid">
+                    <div class="m-cell m-cell-hand"><div class="m-label">Current Shooter Hand</div><div class="m-val" id="summary-current">0</div></div>
+                    <div class="m-cell m-cell-session"><div class="m-label">Total Session Rolls</div><div class="m-val" id="summary-total">0</div></div>
+                </div>
             </div>
         </div>
+
+        <div class="controller-panel">
+            <div class="dual-axis-wrapper">
+                <div class="axis-column">
+                    <div class="axis-label">Left Die</div>
+                    <div class="pad-matrix-grid" id="leftPadContainer"></div>
+                </div>
+                <div class="axis-column">
+                    <div class="axis-label">Right Die</div>
+                    <div class="pad-matrix-grid" id="rightPadContainer"></div>
+                </div>
+            </div>
+            
+            <div class="action-matrix-grid">
+                <button class="act-btn btn-green" onclick="submitRoll(true)">Confirm (Absolute)</button>
+                <button class="act-btn btn-orange" onclick="submitRoll(false)">Unconfirm (Ambiguous)</button>
+                <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last Roll</button>
+                <button class="act-btn btn-red" onclick="executeClearReset()">Reset All Rolls</button>
+            </div>
+        </div>
+
+        <div class="vault-panel-header">
+            <span>The Vault / Relational Dice Sessions</span>
+            <button onclick="commitArchiveSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all">
+                <i class="fa-solid fa-plus mr-1"></i>Save Current Session
+            </button>
+        </div>
+        <div id="vaultArchiveContainer" class="vault-grid"></div>
     </div>
 
     <script>
-        let state = {
-            rollHistoryLog: [],
-            activePoint: null,
-            selectedLeft: null,
-            selectedRight: null,
-            currentBankroll: 1000.00,
-            
-            // Active database lists hooks
-            profiles: {
-                SHOOTER: ["TONY", "DIESEL"],
-                LOCATION: ["BALLY_S", "BELLAGIO"],
-                DIRESET: ["3V_SET", "2V_SET"],
-                STRATEGY: ["IRON_CROSS", "PRESS_LADDER"]
-            },
-            activeCrudTarget: null,
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
+            projectId: "zombielords-playhouse",
+            storageBucket: "zombielords-playhouse.firebasestorage.app",
+            messagingSenderId: "795162260246",
+            appId: "1:795162260246:web:97f0361751ac1359b31637"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUid = null;
 
-            // Kinematic physics axis transformation reference arrays
-            kinematicTable: {
-                1: [1, 2, 6, 5, 4, 3],
-                2: [2, 6, 5, 1, 3, 4],
-                3: [3, 1, 2, 6, 4, 5],
-                4: [4, 6, 2, 1, 5, 3],
-                5: [5, 1, 3, 6, 2, 4],
-                6: [6, 5, 1, 2, 4, 3]
+        const state = {
+            totalRolls: 0, currentHandRolls: 0,
+            sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
+            totalPointsMade: 0, activePoint: null, shooterHistory: [],
+            selectedLeft: null, selectedRight: null,
+            rollHistoryLog: [], 
+            rawSequenceLog: [], 
+            matrix: {
+                2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
+                7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
             }
         };
 
-        /**
-         * Module 1/2 CRUD Interception Routing Engine
-         */
-        function handleDropdownInterceptor(type, value) {
-            if (value === "ADD" || value === "EDIT") {
-                state.activeCrudTarget = { type: type, mode: value };
-                document.getElementById('modalTargetTitle').textContent = `${value} ${type} PROFILE`;
-                document.getElementById('modalFieldLabel').textContent = `${type} Label Identity`;
-                document.getElementById('modalStringInput').value = value === "EDIT" ? document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value : "";
-                document.getElementById('crudOverlayModal').style.display = "flex";
+        const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
+
+        let userShootersList = ["ME", "TONY", "RANDOM RANDY", "SETTEM RANDY", "RANDOM SALLY", "SETTEM SALLY"];
+        let userLocationsList = ["BALLY'S", "AMERISTAR", "GRAND Z"];
+
+        auth.onAuthStateChanged(user => {
+            if (!user) { window.location.href = "index.html"; return; }
+            currentUid = user.uid;
+            syncConfigurationDropdowns();
+            initDualPads();
+            fetchCloudState();
+            fetchVaultArchiveList();
+        });
+
+        function syncConfigurationDropdowns() {
+            const sSel = document.getElementById('ctxShooterSelect');
+            const lSel = document.getElementById('ctxLocationSelect');
+            if(!sSel || !lSel) return;
+            
+            sSel.innerHTML = '';
+            userShootersList.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
+            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
+
+            lSel.innerHTML = '';
+            userLocationsList.forEach(l => lSel.innerHTML += `<option value="${l}">${l}</option>`);
+            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
+        }
+
+        function handleContextShooterToggle() {
+            const el = document.getElementById('ctxShooterSelect');
+            if(el.value === 'ADD_NEW') {
+                const name = prompt("REGISTER UNIQUE SHOOTER IDENTITY ID TAG:");
+                if(name && name.trim()) {
+                    const cleanName = name.trim().toUpperCase();
+                    if(!userShootersList.includes(cleanName)) userShootersList.push(cleanName);
+                    syncConfigurationDropdowns();
+                    el.value = cleanName;
+                } else {
+                    el.value = "ME";
+                }
+            }
+        }
+
+        function handleContextLocationToggle() {
+            const el = document.getElementById('ctxLocationSelect');
+            if(el.value === 'ADD_NEW') {
+                const loc = prompt("REGISTER NEW CASINO VENUE LOCATION KEY:");
+                if(loc && loc.trim()) {
+                    const cleanLoc = loc.trim().toUpperCase();
+                    if(!userLocationsList.includes(cleanLoc)) userLocationsList.push(cleanLoc);
+                    syncConfigurationDropdowns();
+                    el.value = cleanLoc;
+                } else {
+                    el.value = "BALLY'S";
+                }
+            }
+        }
+
+        function handleContextDiceSetToggle() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const strip = document.getElementById('kinematicReadoutPanel');
+            if(ds === 'NONE') strip.style.display = 'none';
+            else strip.style.display = 'flex';
+        }
+
+        function initDualPads() {
+            const lPad = document.getElementById('leftPadContainer');
+            const rPad = document.getElementById('rightPadContainer');
+            lPad.innerHTML = ''; rPad.innerHTML = '';
+            for(let i=1; i<=6; i++) {
+                lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
+                rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
+            }
+            handleContextDiceSetToggle();
+        }
+
+        function selectMatrixDie(axis, val) {
+            if(axis === 'left') {
+                for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active');
+                state.selectedLeft = val;
+                document.getElementById(`l-pad-${val}`).classList.add('active');
+            } else {
+                for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active');
+                state.selectedRight = val;
+                document.getElementById(`r-pad-${val}`).classList.add('active');
+            }
+            calculateLiveKinematicsPreview();
+        }
+
+        function calculateLiveKinematicsPreview() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const lRead = document.getElementById('k-left-readout');
+            const rRead = document.getElementById('k-right-readout');
+
+            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) {
+                lRead.innerText = "N/A"; rRead.innerText = "N/A";
                 return;
             }
-            executeGlobalRecalculationEngine();
+
+            let lRot = "N/A", lAx = "0";
+            if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; }
+            else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; }
+            else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; }
+            else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; }
+            else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; }
+            else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
+
+            let rRot = "N/A", rAx = "0";
+            if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; }
+            else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; }
+            else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; }
+            else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; }
+            else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; }
+            else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
+
+            lRead.innerText = `ROTATION: [${lRot}] | AXIS DELTA: [${lAx}]`;
+            rRead.innerText = `ROTATION: [${rRot}] | AXIS DELTA: [${rAx}]`;
         }
 
-        function closeProfileCrudModal() {
-            document.getElementById('crudOverlayModal').style.display = "none";
-            const targetSelect = document.getElementById(`ctx${state.activeCrudTarget.type.charAt(0) + state.activeCrudTarget.type.slice(1).toLowerCase()}Select`);
-            targetSelect.value = "ALL";
-            state.activeCrudTarget = null;
+        function submitRoll(isAbsolute) {
+            if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
+
+            const activeShooter = document.getElementById('ctxShooterSelect').value;
+            const activeLocation = document.getElementById('ctxLocationSelect').value;
+            const activeDiceSet = document.getElementById('ctxDiceSetSelect').value;
+            const notes = document.getElementById('ctxDescriptionInput').value.trim();
+
+            let lRot = "N/A", lAx = "0", rRot = "N/A", rAx = "0";
+            if(activeDiceSet === '3V') {
+                if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; } else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; } else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; } else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; } else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; } else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
+                if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; } else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; } else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; } else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; } else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; } else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
+            }
+
+            const rollRowRecord = {
+                leftDie: state.selectedLeft,
+                rightDie: state.selectedRight,
+                sum: state.selectedLeft + state.selectedRight,
+                shooterId: activeShooter,
+                locationId: activeLocation,
+                diceSetId: activeDiceSet,
+                kinematicsLeft: { rot: lRot, ax: lAx },
+                kinematicsRight: { rot: rRot, ax: rAx },
+                description: notes,
+                puckBeforeRoll: state.activePoint
+            };
+
+            state.rollHistoryLog.push(rollRowRecord);
+            state.rawSequenceLog.push(rollRowRecord.sum);
+
+            executeCalculationsLoop(rollRowRecord);
+            clearSelectionPads();
+            document.getElementById('ctxDescriptionInput').value = '';
+            pushCloudState("active_session");
         }
 
-        function executeProfileCrudCommit() {
-            const rawVal = document.getElementById('modalStringInput').value.trim().toUpperCase().replace(/\s+/g, '_');
-            if (!rawVal || rawVal === "ALL" || rawVal === "EDIT" || rawVal === "ADD") return alert("Invalid Profile String Identity Key Specified.");
+        function executeCalculationsLoop(record) {
+            const sum = record.sum;
+            state.totalRolls++;
+            state.currentHandRolls++;
 
-            const type = state.activeCrudTarget.type;
-            const mode = state.activeCrudTarget.mode;
-            const selectEl = document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`);
+            const isHardway = (record.leftDie === record.rightDie) && [4,6,8,10].includes(sum);
+            state.matrix[sum].tot++;
+            state.matrix[sum].cur++;
 
-            if (mode === "ADD") {
-                if (!state.profiles[type].includes(rawVal)) {
-                    state.profiles[type].push(rawVal);
-                    const opt = document.createElement('option');
-                    opt.value = rawVal; opt.textContent = rawVal.replace('_', ' ');
-                    selectEl.insertBefore(opt, selectEl.querySelector('option[disabled]'));
+            if(sum === 7) {
+                state.sevensTotal++;
+                if(state.activePoint === null) {
+                    state.sevensComeout++;
+                } else {
+                    state.sevensRed++;
+                    state.shooterHistory.push(state.currentHandRolls);
+                    state.currentHandRolls = 0;
+                    state.activePoint = null;
+                    for (let k in state.matrix) state.matrix[k].cur = 0;
                 }
-                selectEl.value = rawVal;
-            } else if (mode === "EDIT") {
-                const legacyVal = selectEl.value;
-                const idx = state.profiles[type].indexOf(legacyVal);
-                if (idx > -1) {
-                    state.profiles[type][idx] = rawVal;
-                    selectEl.options[selectEl.selectedIndex].value = rawVal;
-                    selectEl.options[selectEl.selectedIndex].textContent = rawVal.replace('_', ' ');
+            } else if (sum === 11 && state.activePoint === null) {
+                // Natural roll state bypass parameter
+            } else {
+                if(state.activePoint === null) {
+                    if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum;
+                } else if(sum === state.activePoint) {
+                    state.totalPointsMade++;
+                    state.activePoint = null;
+                }
+            }
+
+            executeAnalyticalFilterEngine();
+        }
+
+        function executeAnalyticalFilterEngine() {
+            const mode = document.getElementById('ctxFilterScopeSelect').value;
+            const targetShooter = document.getElementById('ctxShooterSelect').value;
+            const targetLocation = document.getElementById('ctxLocationSelect').value;
+
+            let filteredSet = [];
+            
+            if(mode === 'FULL') {
+                filteredSet = [...state.rollHistoryLog];
+            } else if(mode === 'ISOLATE_SHOOTER') {
+                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter);
+            } else if(mode === 'ISOLATE_LOCATION') {
+                filteredSet = state.rollHistoryLog.filter(r => r.locationId === targetLocation);
+            } else if(mode === 'ISOLATE_COMBINED') {
+                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter && r.locationId === targetLocation);
+            }
+
+            let localMatrix = { 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localAtsMap = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localSevensTotal = 0, localSevensRed = 0, localSevensComeout = 0, localPointsMade = 0;
+            let localShooterHistory = [], localCurrentHandRolls = 0, localActivePoint = null;
+
+            document.getElementById('historyContainer').innerHTML = '';
+
+            filteredSet.forEach((v, index) => {
+                localMatrix[v.sum]++;
+                
+                let ribbonClass = 'node-normal';
+                const isHard = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
+
+                localCurrentHandRolls++;
+                localAtsMap[v.sum] = 1;
+
+                if(v.sum === 7) {
+                    localSevensTotal++;
+                    if(localActivePoint === null) {
+                        localSevensComeout++;
+                        ribbonClass = 'node-point-made';
+                    } else {
+                        localSevensRed++;
+                        ribbonClass = 'node-seven-out';
+                        localShooterHistory.push(localCurrentHandRolls);
+                        localCurrentHandRolls = 0;
+                        localActivePoint = null;
+                        for(let k in localAtsMap) localAtsMap[k] = 0;
+                    }
+                } else if(v.sum === 11 && localActivePoint === null) {
+                    ribbonClass = 'node-point-made';
+                } else {
+                    if(localActivePoint === null) {
+                        if([4,5,6,8,9,10].includes(v.sum)) {
+                            localActivePoint = v.sum;
+                            ribbonClass = 'color-dark';
+                        } else {
+                            ribbonClass = 'color-dark';
+                        }
+                    } else if(v.sum === localActivePoint) {
+                        ribbonClass = 'node-point-made';
+                        localPointsMade++;
+                        localActivePoint = null;
+                    } else {
+                        ribbonClass = 'color-dark';
+                    }
+                }
+
+                if(isHard && ribbonClass === 'node-normal') ribbonClass = 'node-hard';
+
+                const ribbon = document.getElementById('historyContainer');
+                let label = v.sum.toString();
+                if(isHard) label += '<sup>(H)</sup>';
+                ribbon.innerHTML += `<div class="history-node ${ribbonClass}">${label}</div>`;
+            });
+
+            for(let i=2; i<=12; i++) {
+                if(i === 7) continue;
+                document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
+                
+                const leftCell = document.getElementById(`cur-${i}`);
+                leftCell.innerText = localMatrix[i];
+                document.getElementById(`tot-${i}`).innerText = localMatrix[i];
+                document.getElementById(`puck-${i}`).style.display = 'none';
+
+                if(localAtsMap[i] >= 1) leftCell.classList.add('ats-active');
+                else leftCell.classList.remove('ats-active');
+            }
+
+            if(localActivePoint !== null) {
+                document.getElementById(`puck-${localActivePoint}`).style.display = 'block';
+            }
+
+            evaluateRollingTemperatures();
+
+            document.getElementById('summary-total').innerText = state.totalRolls;
+            document.getElementById('summary-current').innerText = mode === 'FULL' ? state.currentHandRolls : localCurrentHandRolls;
+
+            const totalShooters = localShooterHistory.length + (localCurrentHandRolls > 0 ? 1 : 0);
+            const sor = totalShooters > 0 ? (filteredSet.length / totalShooters).toFixed(1) : "0.0";
+            const srr = localSevensTotal > 0 ? (filteredSet.length / localSevensTotal).toFixed(1) : (filteredSet.length > 0 ? filteredSet.length.toFixed(1) : "0.0");
+            const psr = localSevensRed > 0 ? (localPointsMade / localSevensRed).toFixed(1) : "0.0";
+
+            document.getElementById('stat-red').innerText = localSevensRed;
+            document.getElementById('stat-sor').innerText = sor;
+            document.getElementById('stat-psr').innerText = psr;
+            document.getElementById('stat-srr').innerText = srr;
+            document.getElementById('stat-co7').innerText = localSevensComeout;
+
+            const ribbonContainer = document.getElementById('historyContainer');
+            if (ribbonContainer) ribbonContainer.scrollLeft = ribbonContainer.scrollWidth;
+        }
+
+        function evaluateRollingTemperatures() {
+            for (let num in probabilityWindows) {
+                const windowSize = probabilityWindows[num];
+                const sampleSlice = state.rawSequenceLog.slice(-windowSize);
+                const hitCount = sampleSlice.filter(x => x == parseInt(num)).length;
+                const chip = document.getElementById(`temp-${num}`);
+                if (!chip) continue;
+
+                if (state.totalRolls < windowSize) chip.innerText = '';
+                else if (hitCount > 1) chip.innerText = '🔥';
+                else if (hitCount < 1) chip.innerText = '❄️';
+                else chip.innerText = '';
+            }
+        }
+
+        async function pushCloudState(docId, customName = null) {
+            if(!currentUid) return;
+            const payload = {
+                totalRolls: state.totalRolls,
+                currentHandRolls: state.currentHandRolls,
+                sevensTotal: state.sevensTotal,
+                sevensRed: state.sevensRed,
+                sevensComeout: state.sevensComeout,
+                totalPointsMade: state.totalPointsMade,
+                activePoint: state.activePoint,
+                shooterHistory: state.shooterHistory,
+                rawSequenceLog: state.rawSequenceLog,
+                rollHistoryLog: JSON.stringify(state.rollHistoryLog),
+                matrix: JSON.stringify(state.matrix),
+                userShootersList: userShootersList,
+                userLocationsList: userLocationsList,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(customName) payload.name = customName.toUpperCase();
+            await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).set(payload, { merge: true });
+        }
+
+        function fetchCloudState() {
+            db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").get().then(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
+                    rebuildUIFromStoredData(data);
+                } else {
+                    executeAnalyticalFilterEngine();
+                }
+            });
+        }
+
+        // Self-Healing Data Parser Sanitization Fallback Core Layer
+        function rebuildUIFromStoredData(data) {
+            state.totalRolls = data.totalRolls || 0;
+            state.currentHandRolls = data.currentHandRolls || 0;
+            state.sevensTotal = data.sevensTotal || 0;
+            state.sevensRed = data.sevensRed || 0;
+            state.sevensComeout = data.sevensComeout || 0;
+            state.totalPointsMade = data.totalPointsMade || 0;
+            state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
+            state.shooterHistory = data.shooterHistory || [];
+            state.rawSequenceLog = data.rawSequenceLog || [];
+            state.matrix = data.matrix ? (typeof data.matrix === 'string' ? JSON.parse(data.matrix) : data.matrix) : state.matrix;
+
+            // Self-Healing Logic Checks: Defensively catch and convert legacy data schemas
+            if (data.rollHistoryLog) {
+                try {
+                    const parsedLog = typeof data.rollHistoryLog === 'string' ? JSON.parse(data.rollHistoryLog) : data.rollHistoryLog;
                     
-                    // Cascade profile updates across matching string targets in master log memory
-                    state.rollHistoryLog.forEach(r => {
-                        if (type === "SHOOTER" && r.Shooter_ID === legacyVal) r.Shooter_ID = rawVal;
-                        if (type === "LOCATION" && r.Location_ID === legacyVal) r.Location_ID = rawVal;
+                    if (Array.isArray(parsedLog)) {
+                        state.rollHistoryLog = parsedLog.map((row, idx) => {
+                            // Detects if element is a legacy primitive counter map or version 1.4.4 transaction object
+                            if (row && typeof row === 'object' && 'sum' in row) {
+                                return row; // Aligned v1.5.0 structure
+                            } else if (row && typeof row === 'object' && 'selectedLeft' in row) {
+                                // Maps v1.4.4 layout structures cleanly to relational tracking rows
+                                return {
+                                    leftDie: row.selectedLeft,
+                                    rightDie: row.selectedRight,
+                                    sum: row.selectedLeft + row.selectedRight,
+                                    shooterId: "ME",
+                                    locationId: "BALLY'S",
+                                    diceSetId: "NONE",
+                                    kinematicsLeft: { rot: "N/A", ax: "0" },
+                                    kinematicsRight: { rot: "N/A", ax: "0" },
+                                    description: "Recovered legacy session roll profile",
+                                    puckBeforeRoll: row.activePoint !== undefined ? row.activePoint : null
+                                };
+                            } else {
+                                // Maps flat index arrays safely to physical dice structures
+                                const parsedSum = typeof row === 'number' ? row : (state.rawSequenceLog[idx] || 7);
+                                let d1 = 3, d2 = 4; // Midpoint neutral distribution map splits
+                                if (parsedSum === 2) { d1 = 1; d2 = 1; }
+                                else if (parsedSum === 12) { d1 = 6; d2 = 6; }
+                                return {
+                                    leftDie: d1, rightDie: d2, sum: parsedSum,
+                                    shooterId: "ME", locationId: "BALLY'S", diceSetId: "NONE",
+                                    kinematicsLeft: { rot: "N/A", ax: "0" }, kinematicsRight: { rot: "N/A", ax: "0" },
+                                    description: "Healed historical array record", puckBeforeRoll: null
+                                };
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("Self-Healing Parser Intercepted Error:", e);
+                    state.rollHistoryLog = state.rawSequenceLog.map(v => {
+                        return {
+                            leftDie: 3, rightDie: 4, sum: v,
+                            shooterId: "ME", locationId: "BALLY'S", diceSetId: "NONE",
+                            kinematicsLeft: { rot: "N/A", ax: "0" }, kinematicsRight: { rot: "N/A", ax: "0" },
+                            description: "Emergency reconstruction file array", puckBeforeRoll: null
+                        };
                     });
                 }
             }
 
-            document.getElementById('crudOverlayModal').style.display = "none";
-            state.activeCrudTarget = null;
-            executeGlobalRecalculationEngine();
+            executeAnalyticalFilterEngine();
         }
 
-        function assignIsolatedDieSelection(targetPad, faceValue, btnElement) {
-            if (targetPad === 'LEFT') {
-                state.selectedLeft = faceValue;
-                document.querySelectorAll('.left-die-btn').forEach(b => b.classList.remove('is-active-left'));
-                btnElement.classList.add('is-active-left');
-            } else {
-                state.selectedRight = faceValue;
-                document.querySelectorAll('.right-die-btn').forEach(b => b.classList.remove('is-active-right'));
-                btnElement.classList.add('is-active-right');
-            }
-        }
-
-        /**
-         * Core Statistical and Capital Processing Engine Loop
-         */
-        function executeGlobalRecalculationEngine() {
-            const selectedShooter = document.getElementById('ctxShooterSelect').value;
-            const selectedLocation = document.getElementById('ctxLocationSelect').value;
-            const selectedStrategy = document.getElementById('ctxStrategySelect').value;
-
-            let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
-            if (selectedShooter !== "ALL") filteredRolls = filteredRolls.filter(r => r.Shooter_ID === selectedShooter);
-            if (selectedLocation !== "ALL") filteredRolls = filteredRolls.filter(r => r.Location_ID === selectedLocation);
-
-            const targets = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12];
-            targets.forEach(i => {
-                document.getElementById(`cntTotal_${i}`).textContent = "0";
-                document.getElementById(`cntCurrent_${i}`).textContent = "0";
-                document.getElementById(`puck_${i}`).style.display = "none";
-                document.getElementById(`boxNum_${i}`).classList.remove('has-puck-anchored');
-                document.getElementById(`vel_${i}`).textContent = "";
-                document.getElementById(`wagerAmt_${i}`).textContent = "$0.00";
-            });
-
-            let totalValidRolls = 0;
-            let totalSevens = 0;
-            let totalHands = 0;
-            let totalPointsMade = 0;
-            let comeOutNaturals = 0;
-            let comeOutCraps = 0;
-            let totalHardways = 0;
-            let insideHits = 0;
-            let outsideHits = 0;
-            let totalPointDurationRolls = 0;
-
-            // Reset dynamic simulation bankroll baseline calculations
-            state.currentBankroll = 1000.00;
-            let currentActiveWagers = { 4:0, 5:0, 6:0, 8:0, 9:0, 10:0 };
-
-            filteredRolls.forEach(r => {
-                totalValidRolls++;
-                let rolledVal = r.Total_Sum;
-                if (rolledVal === 7) totalSevens++;
+        async function fetchVaultArchiveList() {
+            if(!currentUid) return;
+            try {
+                const snap = await db.collection("users").doc(currentUid).collection("dice_sessions").get();
+                const container = document.getElementById('vaultArchiveContainer');
+                if (!container) return;
+                container.innerHTML = '';
                 
-                if ([5,6,8,9].includes(rolledVal)) insideHits++;
-                if ([2,3,4,10,11,12].includes(rolledVal)) outsideHits++;
-                if (r.Left_Die === r.Right_Die && [4,6,8,10].includes(rolledVal)) totalHardways++;
-
-                // Process Strategic Capital Tracking Rules (Module 4 Financial Progression)
-                if (selectedStrategy !== "ALL") {
-                    if (r.Puck_Before_Roll === null) {
-                        // Off Point Setup Phase Bets Initializations
-                        if (selectedStrategy === "IRON_CROSS") {
-                            // Iron Cross forces generic field layouts + place marks at come-out resolution boundaries
-                            currentActiveWagers = { 4:0, 5:10, 6:12, 8:12, 9:10, 10:0 };
-                        } else if (selectedStrategy === "PRESS_LADDER") {
-                            currentActiveWagers = { 4:0, 5:0, 6:6, 8:6, 9:0, 10:0 };
-                        }
-                    } else {
-                        // Point phase active; process resolution modifiers
-                        if (rolledVal === 7) {
-                            // Seven out clears bankroll active placements completely
-                            let lossTotal = Object.values(currentActiveWagers).reduce((a, b) => a + b, 0);
-                            state.currentBankroll -= lossTotal;
-                            currentActiveWagers = { 4:0, 5:0, 6:0, 8:0, 9:0, 10:0 };
-                        } else if (currentActiveWagers[rolledVal] > 0) {
-                            // Payout calculation models mapping exact casino ratios
-                            let bet = currentActiveWagers[rolledVal];
-                            let win = 0;
-                            if (rolledVal === 6 || rolledVal === 8) win = Math.floor(bet * 7 / 6);
-                            if (rolledVal === 5 || rolledVal === 9) win = Math.floor(bet * 7 / 5);
-                            if (rolledVal === 4 || rolledVal === 10) win = Math.floor(bet * 9 / 5);
-                            
-                            state.currentBankroll += win;
-
-                            // Apply Strategic Press Mechanics
-                            if (selectedStrategy === "PRESS_LADDER" && (rolledVal === 6 || rolledVal === 8)) {
-                                currentActiveWagers[rolledVal] += 6; // Increment placement level up one standard unit ladder step
-                            }
-                        }
-                    }
-                }
-
-                if (r.Puck_Before_Roll === null) {
-                    if (rolledVal === 7 || rolledVal === 11) comeOutNaturals++;
-                    if ([2,3,12].includes(rolledVal)) comeOutCraps++;
-                } else {
-                    totalPointDurationRolls++;
-                    if (rolledVal === 7) totalHands++;
-                }
-
-                if (r.Is_Point_Hit) totalPointsMade++;
-
-                let totalBox = document.getElementById(`cntTotal_${rolledVal}`);
-                if (totalBox) totalBox.textContent = (parseInt(totalBox.textContent) + 1).toString();
-            });
-
-            // Tally Active Hand Subcounters
-            let currentHandRolls = [];
-            for (let i = state.rollHistoryLog.length - 1; i >= 0; i--) {
-                const r = state.rollHistoryLog[i];
-                if (r.Invalid_Roll) continue;
-                currentHandRolls.unshift(r);
-                if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
-                    currentHandRolls.shift();
-                    break;
-                }
-            }
-
-            currentHandRolls.forEach(r => {
-                let currentBox = document.getElementById(`cntCurrent_${r.Total_Sum}`);
-                if (currentBox) currentBox.textContent = (parseInt(currentBox.textContent) + 1).toString();
-            });
-
-            // Update DOM Elements for Active Wager Fields
-            Object.keys(currentActiveWagers).forEach(num => {
-                document.getElementById(`wagerAmt_${num}`).textContent = `$${currentActiveWagers[num].toFixed(2)}`;
-            });
-
-            if (state.activePoint) {
-                document.getElementById(`puck_${state.activePoint}`).style.display = "flex";
-                document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
-            }
-
-            // Standard Deviation Trend loop tracking boundaries (Above 36 throw sample gate thresholds)
-            if (totalValidRolls >= 36) {
-                const standardProbabilities = { 2:1/36, 3:2/36, 4:3/36, 5:4/36, 6:5/36, 8:5/36, 9:4/36, 10:3/36, 11:2/36, 12:1/36 };
-                targets.forEach(num => {
-                    let actualObserved = parseInt(document.getElementById(`cntTotal_${num}`).textContent);
-                    let expectedVolume = totalValidRolls * standardProbabilities[num];
-                    let varianceSigma = Math.sqrt(totalValidRolls * standardProbabilities[num] * (1 - standardProbabilities[num]));
-                    
-                    if (actualObserved > (expectedVolume + 1.5 * varianceSigma)) {
-                        document.getElementById(`vel_${num}`).textContent = "🔥";
-                    } else if (actualObserved < (expectedVolume - 1.5 * varianceSigma)) {
-                        document.getElementById(`vel_${num}`).textContent = "❄️";
+                let foundArchivesCount = 0;
+                snap.forEach(doc => {
+                    if(doc.id !== "active_session") {
+                        foundArchivesCount++;
+                        container.innerHTML += generateArchiveCardHtml(doc.id, doc.data());
                     }
                 });
-            }
 
-            // Update Panel Statistics Labels Elements Text content
-            document.getElementById('lbl_RED').textContent = totalHands.toString();
-            document.getElementById('lbl_SOR').textContent = totalHands > 0 ? (totalValidRolls / totalHands).toFixed(1) : totalValidRolls.toFixed(1);
-            document.getElementById('lbl_POINT').textContent = totalPointsMade.toString();
-            document.getElementById('lbl_PSR').textContent = totalHands > 0 ? (totalPointsMade / totalHands).toFixed(1) : totalPointsMade.toFixed(1);
-            
-            document.getElementById('lbl_SRR').textContent = totalSevens > 0 ? (totalValidRolls / totalSevens).toFixed(1) : totalValidRolls.toFixed(1);
-            document.getElementById('lbl_CON').textContent = comeOutNaturals.toString();
-            document.getElementById('lbl_COC').textContent = comeOutCraps.toString();
-            document.getElementById('lbl_DUR').textContent = totalHands > 0 ? (totalPointDurationRolls / totalHands).toFixed(1) : totalPointDurationRolls.toFixed(1);
-            
-            document.getElementById('lbl_HW').textContent = totalHardways.toString();
-            document.getElementById('lbl_SKEW').textContent = (insideHits - outsideHits).toString();
-
-            const lastRecord = state.rollHistoryLog.filter(r => !r.Invalid_Roll).pop();
-            if (lastRecord) {
-                document.getElementById('lbl_KL').textContent = lastRecord.Left_Kinematic ? lastRecord.Left_Kinematic.toString() : "-";
-                document.getElementById('lbl_KR').textContent = lastRecord.Right_Kinematic ? lastRecord.Right_Kinematic.toString() : "-";
-            } else {
-                document.getElementById('lbl_KL').textContent = "-";
-                document.getElementById('lbl_KR').textContent = "-";
-            }
-
-            synchronizeHistoryRibbonViewport();
+                if(foundArchivesCount === 0) {
+                    container.innerHTML = `<div class="text-xs text-slate-500 uppercase p-4 italic">No archived session files found in database path.</div>`;
+                }
+            } catch (e) { console.error(e); }
         }
 
-        function synchronizeHistoryRibbonViewport() {
-            const ribbon = document.getElementById('ctxHistoryRibbon');
-            if(!ribbon) return;
-            ribbon.innerHTML = '';
-            
-            state.rollHistoryLog.forEach(r => {
-                const node = document.createElement('div');
-                node.className = 'history-node state-standard';
-                
-                let isHardway = (!r.Invalid_Roll && r.Left_Die === r.Right_Die && [4,6,8,10].includes(r.Total_Sum));
-                node.innerHTML = isHardway ? `${r.Total_Sum}<sub>(H)</sub>` : `${r.Total_Sum}`;
+        function generateArchiveCardHtml(id, data) {
+            const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : 'ARCHIVE';
+            return `
+                <div class="vault-card">
+                    <div class="flex justify-between items-center">
+                        <span class="vault-card-title">
+                            ${data.name || 'UNNAMED DEPLOYMENT'}
+                            <button onclick="renameArchiveSession('${id}', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400 ml-1"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                        </span>
+                        <span class="text-[10px] text-slate-500 font-bold">${dateStr}</span>
+                    </div>
+                    <div class="vault-card-meta">
+                        <span>TOTAL ROLLS: <b class="text-white">${data.totalRolls || 0}</b></span>
+                        <span>SEVENS OUT: <b class="text-red-400">${data.sevensRed || 0}</b></span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resumeArchivedSession('${id}')" class="act-btn btn-green py-2 text-xs font-black flex-1">
+                            <i class="fa-solid fa-play mr-1"></i>Resume
+                        </button>
+                        <button onclick="deleteArchiveSession('${id}')" class="act-btn btn-red py-2 px-3 text-xs font-black">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
 
-                if (r.Invalid_Roll) {
-                    node.style.background = "#141b2e";
-                    node.style.color = "#334155";
-                    node.style.borderColor = "#0f172a";
-                    node.textContent = "INV";
-                } else if (r.Is_Point_Establishing || (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null)) {
-                    node.className = 'history-node state-point-anchor';
-                } else if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
-                    node.className = 'history-node state-losing-seven';
-                } else if ((r.Total_Sum === 7 || r.Total_Sum === 11) && r.Puck_Before_Roll === null) {
-                    node.className = 'history-node state-comeout-win';
+        async function resumeArchivedSession(docId) {
+            if(!confirm("Overwrite active workspace with this saved session state?")) return;
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    await db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").set(data);
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
+                    rebuildUIFromStoredData(data);
+                    alert("Vault Session state recovered.");
                 }
+            } catch (e) { alert("Session recovery aborted."); }
+        }
 
-                ribbon.appendChild(node);
-            });
+        async function renameArchiveSession(docId, oldName) {
+            const name = prompt("New designation:", oldName);
+            if(name) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).update({ name: name.toUpperCase() });
+                fetchVaultArchiveList();
+            }
+        }
 
+        async function deleteArchiveSession(docId) {
+            if(confirm("Delete this archive card permanently from database storage?")) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).delete();
+                fetchVaultArchiveList();
+            }
+        }
+
+        async function commitArchiveSession() {
+            const sessionName = prompt("DESIGNATE ARCHIVE SESSION NAME:");
+            if(!sessionName || !sessionName.trim()) return alert("Designate a valid name string prior to archive creation.");
+            
+            const newDocId = "archive_" + Date.now();
+            await pushCloudState(newDocId, sessionName.trim());
+            alert("Session archived successfully.");
+            fetchVaultArchiveList();
+        }
+
+        function executeUndo() {
+            if(state.rollHistoryLog.length === 0) return alert("History underflow.");
+            
+            state.rollHistoryLog.pop();
+            state.rawSequenceLog.pop();
+            
             if(state.rollHistoryLog.length === 0) {
-                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.65rem; text-align:center; background:#000000; border-color:#1e293b; color:#475569;">STANDBY</div>';
-            }
+                executeClearReset();
+            } else {
+                state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+                state.activePoint = null; state.shooterHistory = [];
+                for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
 
-            ribbon.scrollLeft = ribbon.scrollWidth;
+                const backupLog = [...state.rollHistoryLog];
+                state.rollHistoryLog = [];
+                state.rawSequenceLog = [];
+
+                backupLog.forEach(row => {
+                    state.rollHistoryLog.push(row);
+                    state.rawSequenceLog.push(row.sum);
+                    executeCalculationsLoop(row);
+                });
+
+                pushCloudState("active_session");
+            }
         }
 
-        function executeCommitPipeline(mode) {
-            if(state.selectedLeft === null || state.selectedRight === null) return alert("Select dice values.");
-            
-            let isInvalid = (mode === "INVALID");
-            let invalidNote = null;
-
-            if (isInvalid) {
-                invalidNote = prompt("Input Reason for Invalidating Roll Variance:");
-                if (invalidNote === null) return;
-            }
-
-            let computedLeftKin = state.kinematicTable[state.selectedLeft][0];
-            let computedRightKin = state.kinematicTable[state.selectedRight][0];
-
-            const rowPayload = {
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint,
-                Left_Die: state.selectedLeft,
-                Right_Die: state.selectedRight,
-                Total_Sum: state.selectedLeft + state.selectedRight,
-                Shooter_ID: document.getElementById('ctxShooterSelect').value,
-                Location_ID: document.getElementById('ctxLocationSelect').value,
-                Left_Set_Face: "3/6",
-                Right_Set_Face: "3/2",
-                Kinematic_Status: (mode === "KINEMATIC"),
-                Left_Kinematic: (mode === "KINEMATIC" ? computedLeftKin : null),
-                Right_Kinematic: (mode === "KINEMATIC" ? computedRightKin : null),
-                Invalid_Roll: isInvalid,
-                Notes: invalidNote,
-                Is_Point_Establishing: false,
-                Is_Point_Hit: false
-            };
-
-            if (!isInvalid) {
-                let rolledTotal = rowPayload.Total_Sum;
-                if (state.activePoint === null) {
-                    if ([4,5,6,8,9,10].includes(rolledTotal)) {
-                        state.activePoint = rolledTotal; 
-                        rowPayload.Is_Point_Establishing = true; 
-                    }
-                } else {
-                    if (rolledTotal === state.activePoint) {
-                        rowPayload.Is_Point_Hit = true;
-                        state.activePoint = null; 
-                    } else if (rolledTotal === 7) {
-                        state.activePoint = null; 
-                    }
-                }
-            }
-
-            state.rollHistoryLog.push(rowPayload);
+        function executeClearReset() {
+            if(!confirm("Clear active metrics dataset?")) return;
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            document.getElementById('historyContainer').innerHTML = '';
             clearSelectionPads();
-            executeGlobalRecalculationEngine();
-        }
-
-        function executeHistoryStepUndo() {
-            if(!state.rollHistoryLog.length) return;
-            const removed = state.rollHistoryLog.pop();
-            if (!removed.Invalid_Roll) {
-                state.activePoint = removed.Puck_Before_Roll;
-            }
-            executeGlobalRecalculationEngine();
-        }
-
-        function executeWorkspaceLayoutWipe() {
-            if(!confirm("Wipe workspace data rows completely?")) return;
-            state.rollHistoryLog = [];
-            state.activePoint = null;
-            clearSelectionPads();
-            executeGlobalRecalculationEngine();
+            executeAnalyticalFilterEngine();
+            pushCloudState("active_session");
         }
 
         function clearSelectionPads() {
-            state.selectedLeft = null;
-            state.selectedRight = null;
-            document.querySelectorAll('.pad-digit-btn').forEach(b => {
-                b.classList.remove('is-active-left');
-                b.classList.remove('is-active-right');
-            });
+            state.selectedLeft = null; state.selectedRight = null;
+            for(let i=1; i<=6; i++) {
+                document.getElementById(`l-pad-${i}`).classList.remove('active');
+                document.getElementById(`r-pad-${i}`).classList.remove('active');
+            }
+            calculateLiveKinematicsPreview();
         }
-
-        const ribbonContainer = document.getElementById('ctxHistoryRibbon');
-        let isGrabbed = false, startingX, runningScrollLeft;
-        ribbonContainer.addEventListener('mousedown', (e) => {
-            isGrabbed = true;
-            startingX = e.pageX - ribbonContainer.offsetLeft;
-            runningScrollLeft = ribbonContainer.scrollLeft;
-        });
-        ribbonContainer.addEventListener('mouseleave', () => { isGrabbed = false; });
-        ribbonContainer.addEventListener('mouseup', () => { isGrabbed = false; });
-        ribbonContainer.addEventListener('mousemove', (e) => {
-            if(!isGrabbed) return;
-            e.preventDefault();
-            const currentX = e.pageX - ribbonContainer.offsetLeft;
-            ribbonContainer.scrollLeft = runningScrollLeft - (currentX - startingX) * 1.5;
-        });
-        
-        executeGlobalRecalculationEngine();
     </script>
 </body>
 </html>
