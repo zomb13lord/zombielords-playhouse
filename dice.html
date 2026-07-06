@@ -8,24 +8,24 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
         :root {
-            --bg-main: #0f172a;
-            --bg-panel: #1e293b;
-            --bg-input: #0b0f19;
-            --border-clr: #334155;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-blue: #3b82f6;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --accent-yellow: #eab308;
+            --bg-main: #0b0f19;
+            --bg-panel: #111827;
+            --bg-input: #1f2937;
+            --border-clr: #374151;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent-blue: #2563eb;
+            --accent-green: #059669;
+            --accent-red: #dc2626;
+            --accent-yellow: #d97706;
         }
 
         body {
             background-color: var(--bg-main);
             color: var(--text-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             user-select: none;
         }
 
@@ -33,22 +33,22 @@
         .profile-header-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
+            gap: 12px;
             background: var(--bg-panel);
-            padding: 15px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: 6px;
             border: 1px solid var(--border-clr);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .dropdown-box-wrapper {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
 
         .dropdown-box-wrapper label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             text-transform: uppercase;
             font-weight: 700;
             color: var(--text-muted);
@@ -57,27 +57,27 @@
 
         .dropdown-box-wrapper select {
             width: 100%;
-            background: var(--bg-input);
+            background: var(--bg-main);
             color: #fff;
             border: 1px solid var(--border-clr);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 4px;
             font-weight: 600;
             cursor: pointer;
             outline: none;
         }
 
-        /* Dynamic History Ribbon Layout (v1.15 Style Rules) */
+        /* Dynamic History Ribbon Layout (v1.15 Premium Layout Specs) */
         .history-ribbon-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 15px;
             overflow-x: auto;
             white-space: nowrap;
             display: flex;
-            gap: 10px;
+            gap: 8px;
             cursor: grab;
             scrollbar-width: none;
         }
@@ -86,55 +86,50 @@
             display: none;
         }
 
-        .history-ribbon-container:active {
-            cursor: grabbing;
-        }
-
         .history-node {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 0 12px;
-            height: 45px;
-            min-width: 45px;
-            border-radius: 6px;
+            padding: 0 10px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 4px;
             font-weight: 800;
-            font-size: 1.25rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-size: 1.15rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
             flex-shrink: 0;
             box-sizing: border-box;
         }
 
-        /* v1.15 Exact High-Contrast Style Color Codes */
+        /* v1.15 Color Specs */
         .history-node.state-standard {
             background: #000000;
             color: #ffffff;
-            border: 2px solid var(--border-clr);
+            border: 1px solid var(--border-clr);
         }
 
         .history-node.state-point-anchor {
             background: #ffffff !important;
             color: #000000 !important;
-            border: 2px solid #ffffff !important;
-            box-shadow: 0 0 12px rgba(255,255,255,0.4);
+            border: 1px solid #ffffff !important;
         }
 
         .history-node.state-comeout-win {
             background: var(--accent-green) !important;
             color: #ffffff !important;
-            border: 2px solid var(--accent-green) !important;
+            border: 1px solid var(--accent-green) !important;
         }
 
         .history-node.state-losing-seven {
             background: var(--accent-red) !important;
             color: #ffffff !important;
-            border: 2px solid var(--accent-red) !important;
+            border: 1px solid var(--accent-red) !important;
         }
 
         .history-node sub {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
-            margin-left: 2px;
+            margin-left: 1px;
             vertical-align: sub;
         }
 
@@ -142,16 +137,16 @@
         .input-pad-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 25px;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
         .pad-grid-alignment {
             display: flex;
             justify-content: space-around;
-            gap: 40px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 15px;
         }
 
         .dice-die-column {
@@ -159,12 +154,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .dice-die-column h3 {
             margin: 0;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
@@ -173,110 +168,103 @@
         .digit-button-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
             width: 100%;
-            max-width: 240px;
+            max-width: 200px;
         }
 
         .pad-digit-btn {
-            background: var(--bg-input);
+            background: var(--bg-main);
             color: #fff;
             border: 1px solid var(--border-clr);
-            padding: 15px;
-            font-size: 1.25rem;
+            padding: 12px;
+            font-size: 1.15rem;
             font-weight: 700;
-            border-radius: 6px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.1s ease;
         }
 
         .pad-digit-btn:hover {
             border-color: var(--accent-blue);
         }
 
-        /* Standardized Isolated Blue Highlight Rules */
         .left-die-btn.is-active-left {
             background: var(--accent-blue) !important;
             color: #fff !important;
-            box-shadow: 0 0 10px var(--accent-blue);
         }
 
         .right-die-btn.is-active-right {
             background: var(--accent-blue) !important;
             color: #fff !important;
-            box-shadow: 0 0 10px var(--accent-blue);
         }
 
         .operation-controls-strip {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             justify-content: center;
             border-top: 1px solid var(--border-clr);
-            padding-top: 15px;
+            padding-top: 12px;
         }
 
         .action-execution-btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             color: #fff;
-            letter-spacing: 0.02em;
         }
 
-        .action-execution-btn.btn-standard  { background: #475569; }
+        .action-execution-btn.btn-standard  { background: #4b5563; }
         .action-execution-btn.btn-kinematic { background: var(--accent-blue); }
         .action-execution-btn.btn-invalid   { background: var(--accent-red); }
-        .action-execution-btn.btn-undo      { background: #b91c1c; margin-left: auto; }
-        .action-execution-btn.btn-reset     { background: #334155; }
-        .action-execution-btn.btn-vault     { background: var(--accent-yellow); color: #0f172a; font-weight: 800; }
+        .action-execution-btn.btn-undo      { background: #991b1b; margin-left: auto; }
+        .action-execution-btn.btn-reset     { background: #374151; }
+        .action-execution-btn.btn-vault     { background: var(--accent-yellow); color: #000; font-weight: 800; }
 
         /* Calibration Suite Banner Alert Box Element */
         .calibration-telemetry-banner {
-            background: #0b0f19;
+            background: var(--bg-panel);
             border: 1px dashed var(--border-clr);
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 4px;
+            padding: 10px;
             text-align: center;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            margin-bottom: 25px;
-            letter-spacing: 0.02em;
+            margin-bottom: 15px;
         }
 
         /* Diagnostic Hooks Display Panel */
         .diagnostics-metric-panel {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 25px;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
         }
 
         .diagnostics-metric-panel h4 {
-            margin: 0 0 12px 0;
-            font-size: 0.8rem;
+            margin: 0 0 10px 0;
+            font-size: 0.75rem;
             text-transform: uppercase;
             color: var(--text-muted);
-            letter-spacing: 0.05em;
         }
 
         .diagnostics-flex-row {
             display: flex;
-            gap: 20px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
         .diagnostic-data-tag {
             background: var(--bg-main);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 4px;
             border: 1px solid var(--border-clr);
-            font-family: monospace;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
 
         .diagnostic-data-tag span {
@@ -287,32 +275,29 @@
         /* Number Metric Box Grid Display */
         .numerical-display-matrix-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 10px;
         }
 
         .number-tracker-box {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
-            border-radius: 6px;
-            padding: 12px;
+            border-radius: 4px;
+            padding: 10px;
             text-align: center;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
 
         .number-tracker-box.has-puck-anchored {
-            border-color: var(--accent-blue);
-            box-shadow: inset 0 0 8px rgba(59,130,246,0.3);
+            border-color: #ffffff;
+            background: #1e293b;
         }
 
         .number-header-title {
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             font-weight: 800;
-            margin-bottom: 6px;
-            color: var(--text-main);
+            margin-bottom: 4px;
         }
 
         .decoupled-subcounter-row {
@@ -321,9 +306,8 @@
             background: var(--bg-main);
             padding: 4px;
             border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
+            font-size: 0.75rem;
+            margin-bottom: 6px;
         }
 
         .subcounter-container-block {
@@ -333,9 +317,8 @@
         }
 
         .subcounter-container-block .lbl {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: var(--text-muted);
-            text-transform: uppercase;
         }
 
         .subcounter-container-block .val {
@@ -348,18 +331,16 @@
         .icon-indicator-tray {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            min-height: 18px;
-            margin-bottom: 8px;
+            gap: 6px;
+            font-size: 0.8rem;
+            min-height: 16px;
+            margin-bottom: 6px;
         }
 
-        /* Financial Placement Capital Field Section */
         .wager-financial-display-field {
             border-top: 1px solid var(--border-clr);
-            padding-top: 6px;
-            font-family: monospace;
-            font-size: 0.8rem;
+            padding-top: 4px;
+            font-size: 0.75rem;
             font-weight: 700;
             color: var(--accent-yellow);
         }
@@ -410,9 +391,7 @@
         </div>
     </header>
 
-    <section id="ctxHistoryRibbon" class="history-ribbon-container">
-        <div class="history-node state-standard" style="font-size: 0.75rem; text-align:center; background:#334155;">STANDBY</div>
-    </section>
+    <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
 
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
@@ -467,7 +446,6 @@
 
     <main class="numerical-display-matrix-grid">
         <script>
-            const numberMapLabels = ["TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE", "TEN", "ELEVEN", "TWELVE"];
             for(let num = 2; num <= 12; num++) {
                 document.write(`
                     <div id="boxNum_${num}" class="number-tracker-box">
@@ -485,7 +463,7 @@
                         </div>
 
                         <div class="icon-indicator-tray">
-                            <span id="icoPuck_${num}" style="display:none; filter: grayscale(0);">🎲</span>
+                            <span id="icoPuck_${num}" style="display:none;">🎲</span>
                             <span id="icoVelocity_${num}">❄️</span>
                         </div>
 
@@ -497,34 +475,23 @@
     </main>
 
     <script>
-        // Core Internal State Management Register Dictionary Hooks
         let state = {
             rollHistoryLog: [],
             activePoint: null,
             selectedLeft: null,
             selectedRight: null,
-            
-            // Money Tracking Framework States
-            currentBankroll: 1000.00,
-            wagerMatrix: {2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0}
+            currentBankroll: 1000.00
         };
 
-        /**
-         * CRUD Dropdown Selector Action Interceptor
-         */
         function handleDropdownInterceptor(type, value) {
             if (value === "ADD" || value === "EDIT") {
-                alert(`Triggering Module 2 popup modal overlay management interface window for: ${type}_PROFILES`);
+                alert(`Triggering Module 2 popup modal overlay for: ${type}`);
                 document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value = "ALL";
                 return;
             }
-            // Strategy_ID has no filtering bearing on rolls; just executes re-calculation routines
             executeGlobalRecalculationEngine();
         }
 
-        /**
-         * Isolated Highlight Dye Pad Controller
-         */
         function assignIsolatedDieSelection(targetPad, faceValue, btnElement) {
             if (targetPad === 'LEFT') {
                 state.selectedLeft = faceValue;
@@ -537,24 +504,18 @@
             }
         }
 
-        /**
-         * Consolidated Top-Down Recalculation Loop Sorter
-         */
         function executeGlobalRecalculationEngine() {
-            // Pull selector bounds
             const selectedShooter = document.getElementById('ctxShooterSelect').value;
             const selectedLocation = document.getElementById('ctxLocationSelect').value;
             const selectedDiceSet = document.getElementById('ctxDiceSetSelect').value;
             const selectedStrategy = document.getElementById('ctxStrategySelect').value;
 
-            // 1. Process Filtering Chains (Strategy_ID excluded from filtration checks)
             let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
             
             if (selectedShooter !== "ALL") filteredRolls = filteredRolls.filter(r => r.Shooter_ID === selectedShooter);
             if (selectedLocation !== "ALL") filteredRolls = filteredRolls.filter(r => r.Location_ID === selectedLocation);
-            if (selectedDiceSet !== "ALL") filteredRolls = filteredRolls.filter(r => r.Left_Set_Face === "3/6" && r.Right_Set_Face === "3/2");
 
-            // 2. Clear out view maps before tally calculation loop
+            // Clear View Maps
             for(let i=2; i<=12; i++) {
                 document.getElementById(`cntTotal_${i}`).textContent = "0";
                 document.getElementById(`cntCurrent_${i}`).textContent = "0";
@@ -565,12 +526,9 @@
             let validCount = 0;
             let sevensCount = 0;
 
-            // 3. Populate Decoupled Metric Matrices
             filteredRolls.forEach(r => {
                 validCount++;
                 if (r.Total_Sum === 7) sevensCount++;
-                
-                // Increment filtered total session metric display values
                 let currentTotalVal = parseInt(document.getElementById(`cntTotal_${r.Total_Sum}`).textContent);
                 document.getElementById(`cntTotal_${r.Total_Sum}`).textContent = (currentTotalVal + 1).toString();
             });
@@ -582,7 +540,6 @@
                 if (r.Invalid_Roll) continue;
                 currentHandRolls.unshift(r);
                 if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
-                    // Seven out broken cut line; drop trailing parameters
                     currentHandRolls.shift();
                     break;
                 }
@@ -593,19 +550,17 @@
                 document.getElementById(`cntCurrent_${r.Total_Sum}`).textContent = (currentHandBoxVal + 1).toString();
             });
 
-            // 4. Update Puck DOM Positions
+            // Update Puck DOM Positions
             if (state.activePoint) {
                 document.getElementById(`icoPuck_${state.activePoint}`).style.display = "inline";
                 document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
             }
 
-            // 5. Update Structural Statistics Targets
             document.getElementById('diagTotalRolls').textContent = state.rollHistoryLog.length.toString();
             document.getElementById('diagValidRolls').textContent = validCount.toString();
             document.getElementById('diagSevensCount').textContent = sevensCount.toString();
             document.getElementById('diagSRR').textContent = sevensCount > 0 ? (validCount / sevensCount).toFixed(1) : validCount.toFixed(1);
 
-            // Execute Capital / Money calculations based on Strategy Selector here
             if (selectedStrategy !== "ALL") {
                 document.getElementById('diagBankroll').textContent = `$${state.currentBankroll.toFixed(2)} [${selectedStrategy.replace('_',' ')}]`;
             } else {
@@ -615,35 +570,28 @@
             synchronizeHistoryRibbonViewport();
         }
 
-        /**
-         * v1.15 Exact High-Contrast History Ribbon Layout Renderer
-         */
         function synchronizeHistoryRibbonViewport() {
             const ribbon = document.getElementById('ctxHistoryRibbon');
             if(!ribbon) return;
             ribbon.innerHTML = '';
             
-            // Build Chronologically: Oldest on Left -> Newest on Far Right
             state.rollHistoryLog.forEach(r => {
                 const node = document.createElement('div');
                 node.className = 'history-node state-standard';
                 
-                // Assign Hardways Suffix Tag Verification
                 let isHardway = (!r.Invalid_Roll && r.Left_Die === r.Right_Die && [4,6,8,10].includes(r.Total_Sum));
                 node.innerHTML = isHardway ? `${r.Total_Sum}<sub>(H)</sub>` : `${r.Total_Sum}`;
 
                 if (r.Invalid_Roll) {
-                    node.style.background = "#475569";
-                    node.style.color = "#94a3b8";
+                    node.style.background = "#374151";
+                    node.style.color = "#6b7280";
                     node.textContent = "INV";
-                } else if (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null) {
-                    // Point Anchor Hit State
+                } else if (r.Is_Point_Establishing || (r.Total_Sum === r.Puck_Before_Roll && r.Puck_Before_Roll !== null)) {
+                    // Match Point State Coloration
                     node.className = 'history-node state-point-anchor';
                 } else if (r.Total_Sum === 7 && r.Puck_Before_Roll !== null) {
-                    // Losing Seven State
                     node.className = 'history-node state-losing-seven';
                 } else if ((r.Total_Sum === 7 || r.Total_Sum === 11) && r.Puck_Before_Roll === null) {
-                    // Comeout Natural Win State
                     node.className = 'history-node state-comeout-win';
                 }
 
@@ -651,29 +599,22 @@
             });
 
             if(state.rollHistoryLog.length === 0) {
-                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.75rem; text-align:center; background:#334155;">STANDBY</div>';
+                ribbon.innerHTML = '<div class="history-node state-standard" style="font-size:0.75rem; text-align:center; background:#1f2937;">STANDBY</div>';
             }
 
-            // Snap view window scroll axis coordinates straight to the right wall boundaries instantly
             ribbon.scrollLeft = ribbon.scrollWidth;
         }
 
-        /**
-         * Roll Submission Pipeline Entry Point Interceptor
-         */
         function executeCommitPipeline(mode) {
-            if(state.selectedLeft === null || state.selectedRight === null) return alert("Select isolated dice values first.");
+            if(state.selectedLeft === null || state.selectedRight === null) return alert("Select dice values.");
             
             let isInvalid = (mode === "INVALID");
             let invalidNote = null;
 
             if (isInvalid) {
                 invalidNote = prompt("Input Reason for Invalidating Roll Variance:");
-                if (invalidNote === null) return; // User canceled out of pop-up
+                if (invalidNote === null) return;
             }
-
-            const leftFaceStr = document.getElementById('ctxDiceSetSelect').value === "ALL" ? "3/6" : "3/6";
-            const rightFaceStr = document.getElementById('ctxDiceSetSelect').value === "ALL" ? "3/2" : "3/2";
 
             const rowPayload = {
                 Time_Stamp: new Date().toISOString(),
@@ -684,25 +625,27 @@
                 Total_Sum: state.selectedLeft + state.selectedRight,
                 Shooter_ID: document.getElementById('ctxShooterSelect').value,
                 Location_ID: document.getElementById('ctxLocationSelect').value,
-                Left_Set_Face: leftFaceStr,
-                Right_Set_Face: rightFaceStr,
+                Left_Set_Face: "3/6",
+                Right_Set_Face: "3/2",
                 Kinematic_Status: (mode === "KINEMATIC"),
-                Left_Kinematic: (mode === "KINEMATIC" ? 1 : null), // Uses 1/2 physical die reference codes
+                Left_Kinematic: (mode === "KINEMATIC" ? 1 : null),
                 Right_Kinematic: (mode === "KINEMATIC" ? 1 : null),
                 Invalid_Roll: isInvalid,
-                Notes: invalidNote
+                Notes: invalidNote,
+                Is_Point_Establishing: false
             };
 
-            // Game State Machine Puck Evaluators
+            // STRICT STATE ENGINE MATCHES CASINO RULES EXACTLY
             if (!isInvalid) {
                 let rolledTotal = rowPayload.Total_Sum;
                 if (state.activePoint === null) {
                     if ([4,5,6,8,9,10].includes(rolledTotal)) {
-                        state.activePoint = rolledTotal; // Point Established
+                        state.activePoint = rolledTotal; 
+                        rowPayload.Is_Point_Establishing = true; // LOCK POINT TARGET ON THIS NODE
                     }
                 } else {
                     if (rolledTotal === 7 || rolledTotal === state.activePoint) {
-                        state.activePoint = null; // Point Cleared or Sevened Out
+                        state.activePoint = null; 
                     }
                 }
             }
@@ -715,7 +658,6 @@
         function executeHistoryStepUndo() {
             if(!state.rollHistoryLog.length) return;
             const removed = state.rollHistoryLog.pop();
-            // Revert puck state back to preceding anchor state parameter
             if (!removed.Invalid_Roll) {
                 state.activePoint = removed.Puck_Before_Roll;
             }
@@ -723,7 +665,7 @@
         }
 
         function executeWorkspaceLayoutWipe() {
-            if(!confirm("Wipe working dashboard memory back to initialization defaults?")) return;
+            if(!confirm("Wipe working default default data?")) return;
             state.rollHistoryLog = [];
             state.activePoint = null;
             clearSelectionPads();
@@ -739,11 +681,8 @@
             });
         }
 
-        function triggerVaultOverlayCall() {
-            alert("Architect Overlay Trigger: Vault interface display called. Module 5 pop-up routine loaded.");
-        }
+        function triggerVaultOverlayCall() { alert("Vault popup loaded."); }
 
-        // Ribbon Drag-to-Scroll UX Binding Engine Hooks
         const ribbonContainer = document.getElementById('ctxHistoryRibbon');
         let isGrabbed = false, startingX, runningScrollLeft;
         ribbonContainer.addEventListener('mousedown', (e) => {
