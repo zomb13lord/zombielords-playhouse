@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Craps Kinematics Vault Terminal</title>
-    <!-- Firebase SDK Core Layer Stubs -->
+    <title>Premium Craps Kinematics Vault Terminal - v1.15.Master</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -22,6 +21,7 @@
             --accent-orange: #f97316;
             --accent-yellow: #eab308;
             --high-gloss-glow: 0 0 12px rgba(37, 99, 235, 0.5);
+            --overlay-bg: rgba(4, 7, 18, 0.85);
         }
 
         * {
@@ -39,7 +39,7 @@
             overflow-x: hidden;
         }
 
-        /* [ELEMENT 1] FILTER DROP-DOWNS */
+        /* [MODULE 1] FILTER DROP-DOWNS */
         .profile-header-bar {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -78,7 +78,7 @@
             outline: none;
         }
 
-        /* [ELEMENT 2] CHRONOLOGICAL HISTORY STREAM */
+        /* [MODULE 2] CHRONOLOGICAL HISTORY STREAM */
         .history-ribbon-container {
             background: #000000;
             border: 1px solid var(--border-clr);
@@ -146,7 +146,7 @@
             vertical-align: sub;
         }
 
-        /* [ELEMENT 3] MOBILE-OPTIMIZED DICE INPUT PAD */
+        /* [MODULE 3] MOBILE-OPTIMIZED DICE INPUT PAD */
         .input-pad-container {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
@@ -239,7 +239,7 @@
         .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
         .action-execution-btn.btn-reset     { background: #334155; }
 
-        /* [ELEMENT 4] CUSTOM DIAGNOSTICS SUITE */
+        /* [MODULE 4] CUSTOM DIAGNOSTICS SUITE */
         .diagnostics-wrapper-panel {
             background: var(--bg-panel);
             border: 1px solid var(--border-clr);
@@ -291,7 +291,7 @@
             color: #fff;
         }
 
-        /* [ELEMENT 5] BOX NUMBER DATA GRID */
+        /* [MODULE 5] BOX NUMBER DATA GRID */
         .numerical-display-matrix-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
@@ -393,17 +393,87 @@
             color: var(--accent-yellow);
             font-family: monospace;
         }
+
+        /* ADVANCED CONFIGURATION MODALS INTERFACE (FULL ENGINE ADDITION) */
+        .vault-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--overlay-bg);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .vault-modal-card {
+            background: var(--bg-panel);
+            border: 1px solid #334155;
+            border-radius: 6px;
+            max-width: 450px;
+            width: 100%;
+            padding: 16px;
+            box-shadow: var(--high-gloss-glow);
+        }
+
+        .vault-modal-card h2 {
+            margin: 0 0 12px 0;
+            font-size: 0.9rem;
+            color: var(--accent-orange);
+            text-transform: uppercase;
+        }
+
+        .form-group-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .form-group-block label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .form-group-block input {
+            background: var(--bg-main);
+            border: 1px solid var(--border-clr);
+            color: #fff;
+            padding: 8px;
+            border-radius: 3px;
+            outline: none;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .modal-btn-strip {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <!-- [ELEMENT 1] FILTER DROP-DOWNS -->
     <header class="profile-header-bar">
         <div class="dropdown-box-wrapper">
             <label for="ctxShooterSelect">Shooter ID</label>
             <select id="ctxShooterSelect" onchange="handleDropdownInterceptor('SHOOTER', this.value);">
                 <option value="ALL" selected>ALL</option>
                 <option value="TONY">TONY</option>
+                <option value="DIESEL">DIESEL</option>
                 <option disabled>──────</option>
                 <option value="EDIT">✎ EDIT</option>
                 <option value="ADD">+ ADD</option>
@@ -414,6 +484,7 @@
             <select id="ctxLocationSelect" onchange="handleDropdownInterceptor('LOCATION', this.value);">
                 <option value="ALL" selected>ALL</option>
                 <option value="BALLY_S">BALLY'S</option>
+                <option value="BELLAGIO">BELLAGIO</option>
                 <option disabled>──────</option>
                 <option value="EDIT">✎ EDIT</option>
                 <option value="ADD">+ ADD</option>
@@ -424,6 +495,7 @@
             <select id="ctxDiceSetSelect" onchange="handleDropdownInterceptor('DIRESET', this.value);">
                 <option value="ALL" selected>ALL</option>
                 <option value="3V_SET">3V SET</option>
+                <option value="2V_SET">2V SET</option>
                 <option disabled>──────</option>
                 <option value="EDIT">✎ EDIT</option>
                 <option value="ADD">+ ADD</option>
@@ -434,6 +506,7 @@
             <select id="ctxStrategySelect" onchange="handleDropdownInterceptor('STRATEGY', this.value);">
                 <option value="ALL" selected>ALL</option>
                 <option value="IRON_CROSS">IRON CROSS</option>
+                <option value="PRESS_LADDER">6/8 PRESS LADDER</option>
                 <option disabled>──────</option>
                 <option value="EDIT">✎ EDIT</option>
                 <option value="ADD">+ ADD</option>
@@ -441,10 +514,8 @@
         </div>
     </header>
 
-    <!-- [ELEMENT 2] CHRONOLOGICAL HISTORY STREAM -->
     <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
 
-    <!-- [ELEMENT 3] MOBILE-OPTIMIZED DICE INPUT PAD -->
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
             <div class="dice-die-column">
@@ -484,25 +555,21 @@
         </div>
     </section>
 
-    <!-- [ELEMENT 4] CUSTOM DIAGNOSTICS SUITE -->
     <section class="diagnostics-wrapper-panel">
         <div class="diagnostics-title">Custom Diagnostics Suite</div>
         <div class="three-column-diagnostics-grid">
-            <!-- Column A -->
             <div class="diag-column-stack">
                 <div class="diag-row-item"><span class="lbl">SOR</span><span id="lbl_SOR" class="val" style="color:var(--accent-green);">0.0</span></div>
                 <div class="diag-row-item"><span class="lbl">POINT</span><span id="lbl_POINT" class="val" style="color:var(--accent-yellow);">0</span></div>
                 <div class="diag-row-item"><span class="lbl">RED</span><span id="lbl_RED" class="val" style="color:var(--accent-red);">0</span></div>
                 <div class="diag-row-item"><span class="lbl">PSR</span><span id="lbl_PSR" class="val">0.0</span></div>
             </div>
-            <!-- Column B -->
             <div class="diag-column-stack">
                 <div class="diag-row-item"><span class="lbl">SRR</span><span id="lbl_SRR" class="val" style="color:#60a5fa;">0.0</span></div>
                 <div class="diag-row-item"><span class="lbl">CON</span><span id="lbl_CON" class="val">0</span></div>
                 <div class="diag-row-item"><span class="lbl">COC</span><span id="lbl_COC" class="val">0</span></div>
                 <div class="diag-row-item"><span class="lbl">DUR</span><span id="lbl_DUR" class="val">0.0</span></div>
             </div>
-            <!-- Column C -->
             <div class="diag-column-stack">
                 <div class="diag-row-item"><span class="lbl">HW</span><span id="lbl_HW" class="val">0</span></div>
                 <div class="diag-row-item"><span class="lbl">K_L</span><span id="lbl_KL" class="val" style="color:#a855f7;">-</span></div>
@@ -512,7 +579,6 @@
         </div>
     </section>
 
-    <!-- [ELEMENT 5] BOX NUMBER DATA GRID -->
     <main class="numerical-display-matrix-grid">
         <script>
             const activeValidTargets = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12];
@@ -545,12 +611,38 @@
         </script>
     </main>
 
+    <div id="crudOverlayModal" class="vault-modal-overlay">
+        <div class="vault-modal-card">
+            <h2 id="modalTargetTitle">Register New Entry</h2>
+            <div class="form-group-block">
+                <label id="modalFieldLabel">Profile Identifier / Code</label>
+                <input type="text" id="modalStringInput" placeholder="ENTER UNIQUE PROFILE KEY">
+            </div>
+            <div class="modal-btn-strip">
+                <button class="modal-btn" style="background:#475569; color:#fff;" onclick="closeProfileCrudModal()">Cancel</button>
+                <button class="modal-btn" style="background:var(--accent-blue); color:#fff;" onclick="executeProfileCrudCommit()">Commit</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let state = {
             rollHistoryLog: [],
             activePoint: null,
             selectedLeft: null,
             selectedRight: null,
+            currentBankroll: 1000.00,
+            
+            // Active database lists hooks
+            profiles: {
+                SHOOTER: ["TONY", "DIESEL"],
+                LOCATION: ["BALLY_S", "BELLAGIO"],
+                DIRESET: ["3V_SET", "2V_SET"],
+                STRATEGY: ["IRON_CROSS", "PRESS_LADDER"]
+            },
+            activeCrudTarget: null,
+
+            // Kinematic physics axis transformation reference arrays
             kinematicTable: {
                 1: [1, 2, 6, 5, 4, 3],
                 2: [2, 6, 5, 1, 3, 4],
@@ -561,12 +653,62 @@
             }
         };
 
+        /**
+         * Module 1/2 CRUD Interception Routing Engine
+         */
         function handleDropdownInterceptor(type, value) {
             if (value === "ADD" || value === "EDIT") {
-                alert(`Overlay Profile Prompt: ${type}`);
-                document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value = "ALL";
+                state.activeCrudTarget = { type: type, mode: value };
+                document.getElementById('modalTargetTitle').textContent = `${value} ${type} PROFILE`;
+                document.getElementById('modalFieldLabel').textContent = `${type} Label Identity`;
+                document.getElementById('modalStringInput').value = value === "EDIT" ? document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`).value : "";
+                document.getElementById('crudOverlayModal').style.display = "flex";
                 return;
             }
+            executeGlobalRecalculationEngine();
+        }
+
+        function closeProfileCrudModal() {
+            document.getElementById('crudOverlayModal').style.display = "none";
+            const targetSelect = document.getElementById(`ctx${state.activeCrudTarget.type.charAt(0) + state.activeCrudTarget.type.slice(1).toLowerCase()}Select`);
+            targetSelect.value = "ALL";
+            state.activeCrudTarget = null;
+        }
+
+        function executeProfileCrudCommit() {
+            const rawVal = document.getElementById('modalStringInput').value.trim().toUpperCase().replace(/\s+/g, '_');
+            if (!rawVal || rawVal === "ALL" || rawVal === "EDIT" || rawVal === "ADD") return alert("Invalid Profile String Identity Key Specified.");
+
+            const type = state.activeCrudTarget.type;
+            const mode = state.activeCrudTarget.mode;
+            const selectEl = document.getElementById(`ctx${type.charAt(0) + type.slice(1).toLowerCase()}Select`);
+
+            if (mode === "ADD") {
+                if (!state.profiles[type].includes(rawVal)) {
+                    state.profiles[type].push(rawVal);
+                    const opt = document.createElement('option');
+                    opt.value = rawVal; opt.textContent = rawVal.replace('_', ' ');
+                    selectEl.insertBefore(opt, selectEl.querySelector('option[disabled]'));
+                }
+                selectEl.value = rawVal;
+            } else if (mode === "EDIT") {
+                const legacyVal = selectEl.value;
+                const idx = state.profiles[type].indexOf(legacyVal);
+                if (idx > -1) {
+                    state.profiles[type][idx] = rawVal;
+                    selectEl.options[selectEl.selectedIndex].value = rawVal;
+                    selectEl.options[selectEl.selectedIndex].textContent = rawVal.replace('_', ' ');
+                    
+                    // Cascade profile updates across matching string targets in master log memory
+                    state.rollHistoryLog.forEach(r => {
+                        if (type === "SHOOTER" && r.Shooter_ID === legacyVal) r.Shooter_ID = rawVal;
+                        if (type === "LOCATION" && r.Location_ID === legacyVal) r.Location_ID = rawVal;
+                    });
+                }
+            }
+
+            document.getElementById('crudOverlayModal').style.display = "none";
+            state.activeCrudTarget = null;
             executeGlobalRecalculationEngine();
         }
 
@@ -582,9 +724,13 @@
             }
         }
 
+        /**
+         * Core Statistical and Capital Processing Engine Loop
+         */
         function executeGlobalRecalculationEngine() {
             const selectedShooter = document.getElementById('ctxShooterSelect').value;
             const selectedLocation = document.getElementById('ctxLocationSelect').value;
+            const selectedStrategy = document.getElementById('ctxStrategySelect').value;
 
             let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
             if (selectedShooter !== "ALL") filteredRolls = filteredRolls.filter(r => r.Shooter_ID === selectedShooter);
@@ -597,6 +743,7 @@
                 document.getElementById(`puck_${i}`).style.display = "none";
                 document.getElementById(`boxNum_${i}`).classList.remove('has-puck-anchored');
                 document.getElementById(`vel_${i}`).textContent = "";
+                document.getElementById(`wagerAmt_${i}`).textContent = "$0.00";
             });
 
             let totalValidRolls = 0;
@@ -610,29 +757,69 @@
             let outsideHits = 0;
             let totalPointDurationRolls = 0;
 
+            // Reset dynamic simulation bankroll baseline calculations
+            state.currentBankroll = 1000.00;
+            let currentActiveWagers = { 4:0, 5:0, 6:0, 8:0, 9:0, 10:0 };
+
             filteredRolls.forEach(r => {
                 totalValidRolls++;
-                if (r.Total_Sum === 7) totalSevens++;
+                let rolledVal = r.Total_Sum;
+                if (rolledVal === 7) totalSevens++;
                 
-                if ([5,6,8,9].includes(r.Total_Sum)) insideHits++;
-                if ([2,3,4,10,11,12].includes(r.Total_Sum)) outsideHits++;
+                if ([5,6,8,9].includes(rolledVal)) insideHits++;
+                if ([2,3,4,10,11,12].includes(rolledVal)) outsideHits++;
+                if (r.Left_Die === r.Right_Die && [4,6,8,10].includes(rolledVal)) totalHardways++;
 
-                if (r.Left_Die === r.Right_Die && [4,6,8,10].includes(r.Total_Sum)) totalHardways++;
+                // Process Strategic Capital Tracking Rules (Module 4 Financial Progression)
+                if (selectedStrategy !== "ALL") {
+                    if (r.Puck_Before_Roll === null) {
+                        // Off Point Setup Phase Bets Initializations
+                        if (selectedStrategy === "IRON_CROSS") {
+                            // Iron Cross forces generic field layouts + place marks at come-out resolution boundaries
+                            currentActiveWagers = { 4:0, 5:10, 6:12, 8:12, 9:10, 10:0 };
+                        } else if (selectedStrategy === "PRESS_LADDER") {
+                            currentActiveWagers = { 4:0, 5:0, 6:6, 8:6, 9:0, 10:0 };
+                        }
+                    } else {
+                        // Point phase active; process resolution modifiers
+                        if (rolledVal === 7) {
+                            // Seven out clears bankroll active placements completely
+                            let lossTotal = Object.values(currentActiveWagers).reduce((a, b) => a + b, 0);
+                            state.currentBankroll -= lossTotal;
+                            currentActiveWagers = { 4:0, 5:0, 6:0, 8:0, 9:0, 10:0 };
+                        } else if (currentActiveWagers[rolledVal] > 0) {
+                            // Payout calculation models mapping exact casino ratios
+                            let bet = currentActiveWagers[rolledVal];
+                            let win = 0;
+                            if (rolledVal === 6 || rolledVal === 8) win = Math.floor(bet * 7 / 6);
+                            if (rolledVal === 5 || rolledVal === 9) win = Math.floor(bet * 7 / 5);
+                            if (rolledVal === 4 || rolledVal === 10) win = Math.floor(bet * 9 / 5);
+                            
+                            state.currentBankroll += win;
+
+                            // Apply Strategic Press Mechanics
+                            if (selectedStrategy === "PRESS_LADDER" && (rolledVal === 6 || rolledVal === 8)) {
+                                currentActiveWagers[rolledVal] += 6; // Increment placement level up one standard unit ladder step
+                            }
+                        }
+                    }
+                }
 
                 if (r.Puck_Before_Roll === null) {
-                    if (r.Total_Sum === 7 || r.Total_Sum === 11) comeOutNaturals++;
-                    if ([2,3,12].includes(r.Total_Sum)) comeOutCraps++;
+                    if (rolledVal === 7 || rolledVal === 11) comeOutNaturals++;
+                    if ([2,3,12].includes(rolledVal)) comeOutCraps++;
                 } else {
                     totalPointDurationRolls++;
-                    if (r.Total_Sum === 7) totalHands++;
+                    if (rolledVal === 7) totalHands++;
                 }
 
                 if (r.Is_Point_Hit) totalPointsMade++;
 
-                let totalBox = document.getElementById(`cntTotal_${r.Total_Sum}`);
+                let totalBox = document.getElementById(`cntTotal_${rolledVal}`);
                 if (totalBox) totalBox.textContent = (parseInt(totalBox.textContent) + 1).toString();
             });
 
+            // Tally Active Hand Subcounters
             let currentHandRolls = [];
             for (let i = state.rollHistoryLog.length - 1; i >= 0; i--) {
                 const r = state.rollHistoryLog[i];
@@ -649,11 +836,17 @@
                 if (currentBox) currentBox.textContent = (parseInt(currentBox.textContent) + 1).toString();
             });
 
+            // Update DOM Elements for Active Wager Fields
+            Object.keys(currentActiveWagers).forEach(num => {
+                document.getElementById(`wagerAmt_${num}`).textContent = `$${currentActiveWagers[num].toFixed(2)}`;
+            });
+
             if (state.activePoint) {
                 document.getElementById(`puck_${state.activePoint}`).style.display = "flex";
                 document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
             }
 
+            // Standard Deviation Trend loop tracking boundaries (Above 36 throw sample gate thresholds)
             if (totalValidRolls >= 36) {
                 const standardProbabilities = { 2:1/36, 3:2/36, 4:3/36, 5:4/36, 6:5/36, 8:5/36, 9:4/36, 10:3/36, 11:2/36, 12:1/36 };
                 targets.forEach(num => {
@@ -669,6 +862,7 @@
                 });
             }
 
+            // Update Panel Statistics Labels Elements Text content
             document.getElementById('lbl_RED').textContent = totalHands.toString();
             document.getElementById('lbl_SOR').textContent = totalHands > 0 ? (totalValidRolls / totalHands).toFixed(1) : totalValidRolls.toFixed(1);
             document.getElementById('lbl_POINT').textContent = totalPointsMade.toString();
