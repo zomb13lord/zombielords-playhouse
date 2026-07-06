@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium Craps Kinematics Vault Terminal</title>
-    <!-- Firebase SDK Core Layer Stubs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <style>
@@ -21,7 +20,7 @@
             --accent-red: #ef4444;
             --accent-orange: #f97316;
             --accent-yellow: #eab308;
-            --high-gloss-glow: 0 0 12px rgba(37, 99, 235, 0.4);
+            --high-gloss-glow: 0 0 12px rgba(37, 99, 235, 0.5);
         }
 
         * {
@@ -177,7 +176,7 @@
             font-weight: 700;
         }
 
-        /* 2x3 Compact Digit Matrix layout formatting specifications */
+        /* Exact 2x3 grid configuration layout */
         .digit-button-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -195,7 +194,6 @@
             border-radius: 3px;
             cursor: pointer;
             text-align: center;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
         }
 
         .left-die-btn.is-active-left {
@@ -210,7 +208,7 @@
             box-shadow: var(--high-gloss-glow);
         }
 
-        /* High-Gloss Operational Controls Stack Layout */
+        /* Optimized Controls Formats */
         .operation-controls-strip {
             display: flex;
             flex-direction: column;
@@ -234,7 +232,6 @@
             cursor: pointer;
             color: #fff;
             text-align: center;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
         }
 
         .action-execution-btn.btn-standard  { background: var(--accent-green); }
@@ -243,34 +240,56 @@
         .action-execution-btn.btn-undo      { background: #1e293b; border: 1px solid #334155; }
         .action-execution-btn.btn-reset     { background: #334155; }
 
-        /* [4] SESSION DIAGNOSTICS HOOK PANEL */
-        .top-tier-aggregate-panel {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
+        /* [4] CUSTOM DIAGNOSTICS SUITE */
+        .diagnostics-wrapper-panel {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-clr);
+            border-radius: 4px;
+            padding: 8px;
             margin-bottom: 8px;
         }
 
-        .aggregate-tag-box {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-clr);
-            padding: 6px 2px;
-            text-align: center;
-            border-radius: 3px;
-        }
-
-        .aggregate-tag-box .lbl {
-            font-size: 0.6rem;
-            color: #475569;
-            font-weight: 700;
+        .diagnostics-title {
+            font-size: 0.65rem;
             text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.05em;
         }
 
-        .aggregate-tag-box .val {
-            font-size: 1.15rem;
+        .three-column-diagnostics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .diag-column-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .diag-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-main);
+            padding: 6px 8px;
+            border-radius: 2px;
+            border: 1px solid #1e293b;
+            font-size: 0.75rem;
+        }
+
+        .diag-row-item .lbl {
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .diag-row-item .val {
             font-weight: 900;
             font-family: monospace;
-            margin-top: 1px;
+            color: #fff;
         }
 
         /* [5] BOX NUMBER DATA GRID */
@@ -289,12 +308,12 @@
             text-align: center;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .number-tracker-box.has-puck-anchored {
             border-color: #ffffff;
             background: #1e293b;
-            box-shadow: 0 0 6px rgba(255,255,255,0.15);
         }
 
         .number-header-title {
@@ -336,13 +355,35 @@
         .subcounter-container-block .val.current { color: var(--accent-green); }
         .subcounter-container-block .val.total   { color: #94a3b8; }
 
-        .icon-indicator-tray {
+        /* High-Visibility Circular "ON" Puck CSS Component Layout Override Rules */
+        .puck-positioner-frame {
             display: flex;
             justify-content: center;
-            gap: 4px;
-            font-size: 0.75rem;
-            min-height: 16px;
+            align-items: center;
+            min-height: 20px;
             margin-bottom: 4px;
+        }
+
+        .casino-puck-on-marker {
+            width: 20px;
+            height: 20px;
+            background: #ffffff;
+            color: #000000;
+            border-radius: 50%;
+            font-size: 0.6rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 6px #ffffff;
+            letter-spacing: -0.05em;
+        }
+
+        .velocity-indicator-tray {
+            font-size: 0.75rem;
+            min-height: 14px;
+            display: flex;
+            justify-content: center;
             align-items: center;
         }
 
@@ -354,14 +395,10 @@
             color: var(--accent-yellow);
             font-family: monospace;
         }
-
-        /* HIDDEN TELEMETRY FRAMEWORK NODES */
-        .activity-counter-map { display: none; }
     </style>
 </head>
 <body>
 
-    <!-- [1] FILTER DROP-DOWNS -->
     <header class="profile-header-bar">
         <div class="dropdown-box-wrapper">
             <label for="ctxShooterSelect">Shooter ID</label>
@@ -405,10 +442,8 @@
         </div>
     </header>
 
-    <!-- [2] CHRONOLOGICAL HISTORY STREAM -->
     <section id="ctxHistoryRibbon" class="history-ribbon-container"></section>
 
-    <!-- [3] MOBILE-OPTIMIZED DICE INPUT PAD (2x3 Grid Matrix Formatting Specification) -->
     <section class="input-pad-container">
         <div class="pad-grid-alignment">
             <div class="dice-die-column">
@@ -437,29 +472,45 @@
 
         <div class="operation-controls-strip">
             <div class="control-row">
-                <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Standard</button>
+                <button class="action-execution-btn btn-standard" onclick="executeCommitPipeline('STANDARD')">Confirm</button>
                 <button class="action-execution-btn btn-kinematic" onclick="executeCommitPipeline('KINEMATIC')">Kinematic</button>
             </div>
             <div class="control-row" style="margin-top: 4px;">
-                <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Invalid</button>
-                <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo</button>
-                <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset</button>
+                <button class="action-execution-btn btn-invalid" onclick="executeCommitPipeline('INVALID')">Unconfirm</button>
+                <button class="action-execution-btn btn-undo" onclick="executeHistoryStepUndo()">Undo Last</button>
+                <button class="action-execution-btn btn-reset" onclick="executeWorkspaceLayoutWipe()">Reset All</button>
             </div>
         </div>
     </section>
 
-    <!-- [4] SESSION DIAGNOSTICS HOOK PANEL -->
-    <section class="top-tier-aggregate-panel">
-        <div class="aggregate-tag-box"><div class="lbl">RED</div><div id="diagSevensCount" class="val" style="color:var(--accent-red);">0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">SOR</div><div id="diagTotalRolls" class="val" style="color:var(--accent-green);">0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">SRR</div><div id="diagSRR" class="val" style="color:var(--accent-blue);">0.0</div></div>
-        <div class="aggregate-tag-box"><div class="lbl">CO7</div><div id="diagValidRolls" class="val" style="color:var(--accent-yellow);">0</div></div>
+    <section class="diagnostics-wrapper-panel">
+        <div class="diagnostics-title">Custom Diagnostics Suite</div>
+        <div class="three-column-diagnostics-grid">
+            <div class="diag-column-stack">
+                <div class="diag-row-item"><span class="lbl">SOR</span><span id="lbl_SOR" class="val" style="color:var(--accent-green);">0.0</span></div>
+                <div class="diag-row-item"><span class="lbl">POINT</span><span id="lbl_POINT" class="val" style="color:var(--accent-yellow);">0</span></div>
+                <div class="diag-row-item"><span class="lbl">RED</span><span id="lbl_RED" class="val" style="color:var(--accent-red);">0</span></div>
+                <div class="diag-row-item"><span class="lbl">PSR</span><span id="lbl_PSR" class="val">0.0</span></div>
+            </div>
+            <div class="diag-column-stack">
+                <div class="diag-row-item"><span class="lbl">SRR</span><span id="lbl_SRR" class="val" style="color:#60a5fa;">0.0</span></div>
+                <div class="diag-row-item"><span class="lbl">CON</span><span id="lbl_CON" class="val">0</span></div>
+                <div class="diag-row-item"><span class="lbl">COC</span><span id="lbl_COC" class="val">0</span></div>
+                <div class="diag-row-item"><span class="lbl">DUR</span><span id="lbl_DUR" class="val">0.0</span></div>
+            </div>
+            <div class="diag-column-stack">
+                <div class="diag-row-item"><span class="lbl">HW</span><span id="lbl_HW" class="val">0</span></div>
+                <div class="diag-row-item"><span class="lbl">K_L</span><span id="lbl_KL" class="val" style="color:#a855f7;">-</span></div>
+                <div class="diag-row-item"><span class="lbl">K_R</span><span id="lbl_KR" class="val" style="color:#a855f7;">-</span></div>
+                <div class="diag-row-item"><span class="lbl">SKEW</span><span id="lbl_SKEW" class="val" style="color:var(--accent-orange);">0</span></div>
+            </div>
+        </div>
     </section>
 
-    <!-- [5] BOX NUMBER DATA GRID -->
     <main class="numerical-display-matrix-grid">
         <script>
-            for(let num = 2; num <= 12; num++) {
+            const activeValidTargets = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12];
+            activeValidTargets.forEach(num => {
                 document.write(`
                     <div id="boxNum_${num}" class="number-tracker-box">
                         <div class="number-header-title">${num}</div>
@@ -475,15 +526,16 @@
                             </div>
                         </div>
 
-                        <div class="icon-indicator-tray">
-                            <span id="icoPuck_${num}" style="display:none;">🎲</span>
-                            <span id="icoVelocity_${num}">❄️</span>
+                        <div class="puck-positioner-frame">
+                            <div id="puck_${num}" class="casino-puck-on-marker" style="display:none;">ON</div>
                         </div>
+
+                        <div id="vel_${num}" class="velocity-indicator-tray"></div>
 
                         <div id="wagerAmt_${num}" class="wager-financial-display-field">$0.00</div>
                     </div>
                 `);
-            }
+            });
         </script>
     </main>
 
@@ -492,7 +544,17 @@
             rollHistoryLog: [],
             activePoint: null,
             selectedLeft: null,
-            selectedRight: null
+            selectedRight: null,
+            
+            // Standard Dice Kinematic Mapping Ref Matrices
+            kinematicTable: {
+                1: [1, 2, 6, 5, 4, 3],
+                2: [2, 6, 5, 1, 3, 4],
+                3: [3, 1, 2, 6, 4, 5],
+                4: [4, 6, 2, 1, 5, 3],
+                5: [5, 1, 3, 6, 2, 4],
+                6: [6, 5, 1, 2, 4, 3]
+            }
         };
 
         function handleDropdownInterceptor(type, value) {
@@ -520,28 +582,61 @@
             const selectedShooter = document.getElementById('ctxShooterSelect').value;
             const selectedLocation = document.getElementById('ctxLocationSelect').value;
 
+            // Apply Master Filters (Strategy_ID handled natively downstream)
             let filteredRolls = state.rollHistoryLog.filter(r => !r.Invalid_Roll);
-            
             if (selectedShooter !== "ALL") filteredRolls = filteredRolls.filter(r => r.Shooter_ID === selectedShooter);
             if (selectedLocation !== "ALL") filteredRolls = filteredRolls.filter(r => r.Location_ID === selectedLocation);
 
-            for(let i=2; i<=12; i++) {
+            // Hard Reset All Layout Components 
+            const targets = [2, 3, 4, 5, 6, 8, 9, 10, 11, 12];
+            targets.forEach(i => {
                 document.getElementById(`cntTotal_${i}`).textContent = "0";
                 document.getElementById(`cntCurrent_${i}`).textContent = "0";
-                document.getElementById(`icoPuck_${i}`).style.display = "none";
+                document.getElementById(`puck_${i}`).style.display = "none";
                 document.getElementById(`boxNum_${i}`).classList.remove('has-puck-anchored');
-            }
-
-            let validCount = 0;
-            let sevensCount = 0;
-
-            filteredRolls.forEach(r => {
-                validCount++;
-                if (r.Total_Sum === 7) sevensCount++;
-                let currentTotalVal = parseInt(document.getElementById(`cntTotal_${r.Total_Sum}`).textContent);
-                document.getElementById(`cntTotal_${r.Total_Sum}`).textContent = (currentTotalVal + 1).toString();
+                document.getElementById(`vel_${i}`).textContent = ""; // Kept blank at baseline initialization
             });
 
+            // Intermediate Mathematical Counters Registers
+            let totalValidRolls = 0;
+            let totalSevens = 0;
+            let totalHands = 0;
+            let totalPointsMade = 0;
+            let comeOutNaturals = 0;
+            let comeOutCraps = 0;
+            let totalHardways = 0;
+            let insideHits = 0;
+            let outsideHits = 0;
+            let totalPointDurationRolls = 0;
+
+            filteredRolls.forEach(r => {
+                totalValidRolls++;
+                if (r.Total_Sum === 7) totalSevens++;
+                
+                // Track Inside vs Outside spatial distribution array counters
+                if ([5,6,8,9].includes(r.Total_Sum)) insideHits++;
+                if ([2,3,4,10,11,12].includes(r.Total_Sum)) outsideHits++;
+
+                // Track pure Hardways count
+                if (r.Left_Die === r.Right_Die && [4,6,8,10].includes(r.Total_Sum)) totalHardways++;
+
+                // Hand lifecycle statistics evaluations
+                if (r.Puck_Before_Roll === null) {
+                    if (r.Total_Sum === 7 || r.Total_Sum === 11) comeOutNaturals++;
+                    if ([2,3,12].includes(r.Total_Sum)) comeOutCraps++;
+                } else {
+                    totalPointDurationRolls++;
+                    if (r.Total_Sum === 7) totalHands++; // Seven-Out registered
+                }
+
+                if (r.Is_Point_Hit) totalPointsMade++;
+
+                // Build Total Session box value strings
+                let totalBox = document.getElementById(`cntTotal_${r.Total_Sum}`);
+                if (totalBox) totalBox.textContent = (parseInt(totalBox.textContent) + 1).toString();
+            });
+
+            // Tally Active Hand Subcounters
             let currentHandRolls = [];
             for (let i = state.rollHistoryLog.length - 1; i >= 0; i--) {
                 const r = state.rollHistoryLog[i];
@@ -554,19 +649,55 @@
             }
 
             currentHandRolls.forEach(r => {
-                let currentHandBoxVal = parseInt(document.getElementById(`cntCurrent_${r.Total_Sum}`).textContent);
-                document.getElementById(`cntCurrent_${r.Total_Sum}`).textContent = (currentHandBoxVal + 1).toString();
+                let currentBox = document.getElementById(`cntCurrent_${r.Total_Sum}`);
+                if (currentBox) currentBox.textContent = (parseInt(currentBox.textContent) + 1).toString();
             });
 
+            // Assign Puck DOM Coordinates
             if (state.activePoint) {
-                document.getElementById(`icoPuck_${state.activePoint}`).style.display = "inline";
+                document.getElementById(`puck_${state.activePoint}`).style.display = "flex";
                 document.getElementById(`boxNum_${state.activePoint}`).classList.add('has-puck-anchored');
             }
 
-            document.getElementById('diagTotalRolls').textContent = validCount.toString();
-            document.getElementById('diagValidRolls').textContent = state.rollHistoryLog.filter(r => !r.Invalid_Roll && r.Puck_Before_Roll === null && (r.Total_Sum === 7 || r.Total_Sum === 11)).length.toString();
-            document.getElementById('diagSevensCount').textContent = sevensCount.toString();
-            document.getElementById('diagSRR').textContent = sevensCount > 0 ? (validCount / sevensCount).toFixed(1) : validCount.toFixed(1);
+            // Standard Deviation Trend Loop Integration (Runs above 36 throw sampling baseline)
+            if (totalValidRolls >= 36) {
+                const standardProbabilities = { 2:1/36, 3:2/36, 4:3/36, 5:4/36, 6:5/36, 8:5/36, 9:4/36, 10:3/36, 11:2/36, 12:1/36 };
+                targets.forEach(num => {
+                    let actualObserved = parseInt(document.getElementById(`cntTotal_${num}`).textContent);
+                    let expectedVolume = totalValidRolls * standardProbabilities[num];
+                    let varianceSigma = Math.sqrt(totalValidRolls * standardProbabilities[num] * (1 - standardProbabilities[num]));
+                    
+                    if (actualObserved > (expectedVolume + 1.5 * varianceSigma)) {
+                        document.getElementById(`vel_${num}`).textContent = "🔥";
+                    } else if (actualObserved < (expectedVolume - 1.5 * varianceSigma)) {
+                        document.getElementById(`vel_${num}`).textContent = "❄️";
+                    }
+                });
+            }
+
+            // Render Output Fields to Organized 3-Column Diagnostics Panel Header
+            document.getElementById('lbl_RED').textContent = totalHands.toString();
+            document.getElementById('lbl_SOR').textContent = totalHands > 0 ? (totalValidRolls / totalHands).toFixed(1) : totalValidRolls.toFixed(1);
+            document.getElementById('lbl_POINT').textContent = totalPointsMade.toString();
+            document.getElementById('lbl_PSR').textContent = totalHands > 0 ? (totalPointsMade / totalHands).toFixed(1) : totalPointsMade.toFixed(1);
+            
+            document.getElementById('lbl_SRR').textContent = totalSevens > 0 ? (totalValidRolls / totalSevens).toFixed(1) : totalValidRolls.toFixed(1);
+            document.getElementById('lbl_CON').textContent = comeOutNaturals.toString();
+            document.getElementById('lbl_COC').textContent = comeOutCraps.toString();
+            document.getElementById('lbl_DUR').textContent = totalHands > 0 ? (totalPointDurationRolls / totalHands).toFixed(1) : totalPointDurationRolls.toFixed(1);
+            
+            document.getElementById('lbl_HW').textContent = totalHardways.toString();
+            document.getElementById('lbl_SKEW').textContent = (insideHits - outsideHits).toString();
+
+            // Render Immediate Kinematic Core State Output Values
+            const lastRecord = state.rollHistoryLog.filter(r => !r.Invalid_Roll).pop();
+            if (lastRecord) {
+                document.getElementById('lbl_KL').textContent = lastRecord.Left_Kinematic ? lastRecord.Left_Kinematic.toString() : "-";
+                document.getElementById('lbl_KR').textContent = lastRecord.Right_Kinematic ? lastRecord.Right_Kinematic.toString() : "-";
+            } else {
+                document.getElementById('lbl_KL').textContent = "-";
+                document.getElementById('lbl_KR').textContent = "-";
+            }
 
             synchronizeHistoryRibbonViewport();
         }
@@ -617,6 +748,10 @@
                 if (invalidNote === null) return;
             }
 
+            // Compute physics kinematic state transformations from index matrices
+            let computedLeftKin = state.kinematicTable[state.selectedLeft][0];
+            let computedRightKin = state.kinematicTable[state.selectedRight][0];
+
             const rowPayload = {
                 Time_Stamp: new Date().toISOString(),
                 Roll_Index: state.rollHistoryLog.length + 1,
@@ -629,11 +764,12 @@
                 Left_Set_Face: "3/6",
                 Right_Set_Face: "3/2",
                 Kinematic_Status: (mode === "KINEMATIC"),
-                Left_Kinematic: (mode === "KINEMATIC" ? 1 : null),
-                Right_Kinematic: (mode === "KINEMATIC" ? 1 : null),
+                Left_Kinematic: (mode === "KINEMATIC" ? computedLeftKin : null),
+                Right_Kinematic: (mode === "KINEMATIC" ? computedRightKin : null),
                 Invalid_Roll: isInvalid,
                 Notes: invalidNote,
-                Is_Point_Establishing: false
+                Is_Point_Establishing: false,
+                Is_Point_Hit: false
             };
 
             if (!isInvalid) {
@@ -644,7 +780,10 @@
                         rowPayload.Is_Point_Establishing = true; 
                     }
                 } else {
-                    if (rolledTotal === 7 || rolledTotal === state.activePoint) {
+                    if (rolledTotal === state.activePoint) {
+                        rowPayload.Is_Point_Hit = true;
+                        state.activePoint = null; 
+                    } else if (rolledTotal === 7) {
                         state.activePoint = null; 
                     }
                 }
@@ -681,6 +820,7 @@
             });
         }
 
+        // Horizontal Ribbon Mouse Grab Drag-to-Scroll Hooks
         const ribbonContainer = document.getElementById('ctxHistoryRibbon');
         let isGrabbed = false, startingX, runningScrollLeft;
         ribbonContainer.addEventListener('mousedown', (e) => {
