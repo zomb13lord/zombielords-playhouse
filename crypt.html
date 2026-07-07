@@ -65,7 +65,7 @@
                 <div class="border-b border-emerald-900/40 pb-3 mb-6 flex justify-between items-end">
                     <h2 class="cinzel text-lg text-slate-300 uppercase tracking-widest">Archived Inscriptions</h2>
                     <div class="flex gap-2">
-                        <button onclick="document.getElementById('csv-file-input').click();" class="shard-btn primary-shard"><i class="fa-solid fa-file-import"></i> Import CSV</button>
+                        <button onclick="document.getElementById('csv-file-input').click();" class="shard-btn primary-shard"><i class="fa-solid fa-file-import mr-1"></i> Import CSV</button>
                         <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="processCSVUpload(this.files[0])">
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                 snap.forEach(doc => { 
                     if(doc.id !== "active_session") html += generateCardHtml(doc.id, doc.data(), false); 
                 });
-                document.getElementById('archive-container').innerHTML = html || `<div class="col-span-full text-center text-xs text-slate-600 tracking-widest p-8">CRYPT IS VACANT</div>`;
+                document.getElementById('archive-container').innerHTML = html;
             } catch (e) { console.error("Extraction fault: ", e); }
         }
 
@@ -172,17 +172,39 @@
                 if (!doc.exists) return alert("Target resolution broken.");
                 
                 const data = doc.data();
-                let csvString = "Parent_Module_Context,Session_Designation,Payload_Data_Stream\n";
-                csvString += `"${data.module_id || 'UNASSIGNED'}","${data.name || 'UNNAMED'}","${(typeof data.payload_log === 'string' ? data.payload_log : JSON.stringify(data.payload_log || [])).replace(/"/g, '""')}"\n`;
+                let logArray = [];
+                try { logArray = data.payload_log ? (typeof data.payload_log === 'string' ? JSON.parse(data.payload_log) : data.payload_log) : []; } catch(e) { logArray = []; }
+
+                let csvString = "";
+                
+                if (data.module_id === "DICE_TRACKER") {
+                    csvString = "Parent_Module_Context,Session_Designation,Time_Stamp,Roll_Index,Puck_Before_Roll,Left_Die,Right_Die,Total_Sum,Location_ID,Table_Position,Shooter_ID,Left_Set_Face,Right_Set_Face,Kinematic_Status,Left_Kinematic,Right_Kinematic,Invalid_Roll,Notes\n";
+                    logArray.forEach(r => {
+                        csvString += `"DICE_TRACKER","${data.name || 'UNNAMED'}",`
+                                  + `"${r.Time_Stamp || ''}",${r.Roll_Index || 0},"${r.Puck_Before_Roll || 'OFF'}",`
+                                  + `${r.Left_Die || 0},${r.Right_Die || 0},${r.Total_Sum || 0},`
+                                  + `"${r.Location_ID || 'UNASSIGNED'}","${r.Table_Position || 'UNASSIGNED'}","${r.Shooter_ID || 'UNASSIGNED'}",`
+                                  + `"${r.Left_Set_Face || '3/6'}","${r.Right_Set_Face || '3/2'}",${r.Kinematic_Status || false},`
+                                  + `${r.Left_Kinematic !== null ? r.Left_Kinematic : ''},${r.Right_Kinematic !== null ? r.Right_Kinematic : ''},`
+                                  + `${r.Invalid_Roll || false},"${(r.Notes || '').replace(/"/g, '""')}"\n`;
+                    });
+                } else if (data.module_id === "ROULETTE_TRACKER") {
+                    csvString = "Parent_Module_Context,Session_Designation,Time_Stamp,Value\n";
+                    logArray.forEach(r => {
+                        csvString += `"ROULETTE_TRACKER","${data.name || 'UNNAMED'}","${r.t || ''}","${r.n || ''}"\n`;
+                    });
+                } else {
+                    return alert("Unsupported export transformation context.");
+                }
 
                 const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
                 const anchor = document.createElement("a");
                 anchor.setAttribute("href", URL.createObjectURL(blob));
-                anchor.setAttribute("download", `crypt_extract_${data.name || 'session'}_${Date.now()}.csv`);
+                anchor.setAttribute("download", `vault_flat_${data.name || 'session'}_${Date.now()}.csv`);
                 document.body.appendChild(anchor);
                 anchor.click();
                 document.body.removeChild(anchor);
-            } catch (err) { alert("CSV Compilation Interrupted."); }
+            } catch (err) { alert("CSV Tabular Layout Assembly Interrupted."); }
         }
 
         function processCSVUpload(fileObject) {
@@ -192,29 +214,72 @@
                 try {
                     const text = e.target.result;
                     const lines = text.split(/\r?\n/);
-                    lines.shift(); // Evict header row
+                    if (lines.length < 2) return alert("File underflow detected.");
                     
-                    if (!lines[0].trim()) return alert("Payload Stream Void.");
-                    const matches = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                    if (!matches || matches.length < 3) return alert("Malformatted Polymorphic CSV Core Structure.");
-
-                    const clean = (val) => val.replace(/^"|"$/g, '').trim();
-                    const modId = clean(matches[0]);
-                    const sName = clean(matches[1]).toUpperCase();
-                    const rawPayload = matches[2].replace(/^"|"$/g, '').replace(/""/g, '"');
+                    const header = lines.shift();
+                    const cleanStr = (val) => (val || '').replace(/^"|"$/g, '').trim();
+                    
+                    let firstRowCells = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!firstRowCells) return alert("Empty row parse failure.");
+                    
+                    let modId = cleanStr(firstRowCells[0]);
+                    let sessionName = cleanStr(firstRowCells[1]) || "IMPORTED_SESSION";
+                    let payloadArray = [];
+                    
+                    if (modId === "DICE_TRACKER") {
+                        lines.forEach(line => {
+                            if (!line.trim()) return;
+                            let cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                            if (!cells || cells.length < 18) return;
+                            payloadArray.push({
+                                Time_Stamp: cleanStr(cells[2]),
+                                Roll_Index: parseInt(cleanStr(cells[3])) || 0,
+                                Puck_Before_Roll: cleanStr(cells[4]) === 'OFF' ? null : parseInt(cleanStr(cells[4])),
+                                Left_Die: parseInt(cleanStr(cells[5])) || 0,
+                                Right_Die: parseInt(cleanStr(cells[6])) || 0,
+                                Total_Sum: parseInt(cleanStr(cells[7])) || 0,
+                                Location_ID: cleanStr(cells[8]),
+                                Table_Position: cleanStr(cells[9]),
+                                Shooter_ID: cleanStr(cells[10]),
+                                Left_Set_Face: cleanStr(cells[11]),
+                                Right_Set_Face: cleanStr(cells[12]),
+                                Kinematic_Status: cleanStr(cells[13]) === 'true',
+                                Left_Kinematic: cleanStr(cells[14]) !== '' ? parseInt(cleanStr(cells[14])) : null,
+                                Right_Kinematic: cleanStr(cells[15]) !== '' ? parseInt(cleanStr(cells[15])) : null,
+                                Invalid_Roll: cleanStr(cells[16]) === 'true',
+                                Notes: cleanStr(cells[17])
+                            });
+                        });
+                    } else if (modId === "ROULETTE_TRACKER") {
+                        lines.forEach(line => {
+                            if (!line.trim()) return;
+                            let cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                            if (!cells || cells.length < 4) return;
+                            payloadArray.push({
+                                t: parseInt(cleanStr(cells[2])) || Date.now(),
+                                n: cleanStr(cells[3])
+                            });
+                        });
+                    } else {
+                        return alert("Unrecognized Polymorphic Metadata Signature.");
+                    }
 
                     const payloadDocument = {
                         module_id: modId,
-                        name: sName,
+                        name: sessionName.toUpperCase(),
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                        meta_tags: { location: "IMPORTED", shooter_or_dealer: "IMPORTED", base_unit: 1 },
-                        payload_log: rawPayload
+                        meta_tags: { 
+                            location: payloadArray[0]?.Location_ID || "IMPORTED", 
+                            shooter_or_dealer: payloadArray[0]?.Shooter_ID || "IMPORTED", 
+                            base_unit: 1 
+                        },
+                        payload_log: JSON.stringify(payloadArray)
                     };
 
                     await db.collection("users").doc(currentUid).collection("crypt").doc("archive_" + Date.now()).set(payloadDocument);
-                    alert("Polymorphic Data Inscribed Successfully into Crypt.");
+                    alert(`Tabular Inscription Resolved: Extracted ${payloadArray.length} items.`);
                     fetchCryptData();
-                } catch(err) { alert("Data Core Parsing Collapse."); }
+                } catch(err) { alert("Data Layout Parsing Collapse."); }
             };
             reader.readAsText(fileObject);
         }
