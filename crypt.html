@@ -1,0 +1,237 @@
+<!-- name: crypt.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Crypt | Zombie Lord's</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;600&display=swap');
+        :root { --bg-dark: #020617; --emerald: #10b981; }
+        body { 
+            margin: 0; padding: 0; background-color: var(--bg-dark); color: #f8fafc; 
+            font-family: 'Cinzel', serif; min-height: 100vh;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), 
+            url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        .shard { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; transition: all 0.3s ease; }
+        .shard:hover { border-color: rgba(16, 185, 129, 0.6); }
+        .shard-btn { 
+            background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; 
+            transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; 
+            gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif;
+            font-weight: 700; letter-spacing: 0.1em; font-size: 10px;
+        }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); }
+        .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge { background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 3px 6px; border-radius: 4px; font-family: 'Montserrat', sans-serif; font-size: 8px; text-transform: uppercase; font-weight: 600; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="flex flex-col">
+    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-[50] h-[76px] flex-shrink-0">
+        <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
+            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
+            <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
+        </div>
+        <div class="flex items-center gap-6">
+            <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            <button onclick="document.getElementById('csv-file-input').click();" class="text-[10px] text-emerald-400 hover:text-emerald-300 transition-all uppercase font-bold tracking-[0.2em]"><i class="fa-solid fa-file-import mr-1"></i> Import CSV</button>
+            <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="processCSVUpload(this.files[0])">
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-4 md:p-8 pt-8">
+        <div class="w-full max-w-5xl mx-auto">
+            <div class="text-center mb-10">
+                <h1 class="cinzel text-3xl md:text-4xl emerald-text uppercase tracking-[0.3em] font-black">The Crypt</h1>
+                <p class="text-xs text-slate-400 tracking-widest uppercase mt-3 font-montserrat">Unified Data Vault</p>
+            </div>
+
+            <div class="mb-12">
+                <div class="flex justify-between items-end border-b border-emerald-900/40 pb-3 mb-6">
+                    <h2 class="cinzel text-lg text-white uppercase tracking-widest">Active Workspace State</h2>
+                    <button onclick="purgeActiveBuffer()" class="text-[10px] text-red-400 hover:text-red-300 font-bold tracking-widest uppercase transition-all"><i class="fa-solid fa-trash-can mr-2"></i>Wipe Active Workspace</button>
+                </div>
+                <div id="active-session-container"></div>
+            </div>
+
+            <div>
+                <div class="border-b border-emerald-900/40 pb-3 mb-6">
+                    <h2 class="cinzel text-lg text-slate-300 uppercase tracking-widest">Archived Inscriptions</h2>
+                </div>
+                <div id="archive-container" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); const db = firebase.firestore();
+        let currentUid = null;
+
+        auth.onAuthStateChanged(user => {
+            if (!user) { window.location.href = "index.html"; return; }
+            currentUid = user.uid;
+            document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
+            fetchCryptData();
+        });
+
+        async function purgeActiveBuffer() {
+            if(confirm("Permanently extinguish active buffer parameters and start fresh?")) {
+                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
+                fetchCryptData();
+            }
+        }
+
+        async function fetchCryptData() {
+            const cryptRef = db.collection("users").doc(currentUid).collection("crypt");
+            try {
+                const activeDoc = await cryptRef.doc("active_session").get();
+                const activeContainer = document.getElementById('active-session-container');
+                if (activeDoc.exists) { 
+                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, activeDoc.data(), true); 
+                } else { 
+                    activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed text-xs text-slate-500 tracking-widest uppercase">No Active Workspace Document Restored inside the Crypt.</div>`; 
+                }
+
+                const snap = await cryptRef.orderBy("timestamp", "desc").get();
+                let html = '';
+                snap.forEach(doc => { 
+                    if(doc.id !== "active_session") html += generateCardHtml(doc.id, doc.data(), false); 
+                });
+                document.getElementById('archive-container').innerHTML = html || `<div class="col-span-full text-center text-xs text-slate-600 tracking-widest p-8">CRYPT IS VACANT</div>`;
+            } catch (e) { console.error("Extraction fault: ", e); }
+        }
+
+        function generateCardHtml(id, data, isActive) {
+            let logArray = [];
+            try { logArray = data.payload_log ? (typeof data.payload_log === 'string' ? JSON.parse(data.payload_log) : data.payload_log) : []; } catch(e) { logArray = []; }
+            
+            const count = logArray.length;
+            const title = data.name || (isActive ? "ACTIVE BUFFER" : `INSCRIPTION ${id.substring(0,6)}`);
+            const moduleTag = data.module_id || "UNASSIGNED";
+            const location = (data.meta_tags && data.meta_tags.location) || "UNASSIGNED";
+            const shooter = (data.meta_tags && data.meta_tags.shooter_or_dealer) || "UNASSIGNED";
+            const unit = (data.meta_tags && data.meta_tags.base_unit) || 0;
+
+            return `
+            <div class="shard p-6 ${isActive ? 'border-l-4 border-l-emerald-500 relative' : ''}">
+                ${isActive ? '<div class="absolute top-0 right-0 bg-emerald-500/20 text-emerald-400 text-[8px] px-2 py-1 font-bold tracking-widest">BUFF_ACTIVE</div>' : ''}
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-emerald-400 font-bold text-sm tracking-widest flex items-center gap-2">
+                        ${title} 
+                        <button onclick="editInscName('${id}', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                    </h3>
+                    <span class="text-[9px] text-slate-500 font-montserrat">${data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : 'Recent'}</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mb-4">
+                    <span class="badge ${moduleTag === 'DICE_TRACKER' ? 'border-amber-500/40 text-amber-400' : 'border-emerald-500/40 text-emerald-400'}">${moduleTag.replace('_',' ')}</span>
+                    <span class="badge">Loc: ${location}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 border-t border-emerald-900/30 pt-4 mb-6 text-[9px] text-slate-400 uppercase tracking-wider">
+                    <p>Operator/Shooter: <span class="text-white font-bold">${shooter}</span></p>
+                    <p class="text-right">Base Unit: <span class="text-white font-bold">$${unit}</span></p>
+                    <p class="col-span-2">Payload Volume: <span class="text-emerald-400 font-bold">${count} Records</span></p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="resumeInsc('${id}')" class="shard-btn primary-shard flex-1"><i class="fa-solid fa-play"></i> Resume</button>
+                    <button onclick="exportInscToCSV('${id}')" class="shard-btn text-white flex-1"><i class="fa-solid fa-file-csv"></i> Export</button>
+                    ${!isActive ? `<button onclick="deleteInsc('${id}')" class="shard-btn text-red-400 px-3"><i class="fa-solid fa-trash"></i></button>` : ''}
+                </div>
+            </div>`;
+        }
+
+        async function resumeInsc(docId) {
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
+                if(!doc.exists) return alert("Resolution Target Lost.");
+                
+                const data = doc.data();
+                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(data);
+                
+                if (data.module_id === "DICE_TRACKER") window.location.assign("dice.html");
+                else if (data.module_id === "ROULETTE_TRACKER") window.location.assign("roulette.html");
+                else alert("Module Context Route Ambiguous.");
+            } catch (e) { alert("Execution routing lock failure."); }
+        }
+
+        async function exportInscToCSV(docId) {
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
+                if (!doc.exists) return alert("Target resolution broken.");
+                
+                const data = doc.data();
+                let csvString = "Parent_Module_Context,Session_Designation,Payload_Data_Stream\n";
+                csvString += `"${data.module_id || 'UNASSIGNED'}","${data.name || 'UNNAMED'}","${(typeof data.payload_log === 'string' ? data.payload_log : JSON.stringify(data.payload_log || [])).replace(/"/g, '""')}"\n`;
+
+                const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+                const anchor = document.createElement("a");
+                anchor.setAttribute("href", URL.createObjectURL(blob));
+                anchor.setAttribute("download", `crypt_extract_${data.name || 'session'}_${Date.now()}.csv`);
+                document.body.appendChild(anchor);
+                anchor.click();
+                document.body.removeChild(anchor);
+            } catch (err) { alert("CSV Compilation Interrupted."); }
+        }
+
+        function processCSVUpload(fileObject) {
+            if (!fileObject) return;
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split(/\r?\n/);
+                    lines.shift(); // Evict header row
+                    
+                    if (!lines[0].trim()) return alert("Payload Stream Void.");
+                    const matches = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                    if (!matches || matches.length < 3) return alert("Malformatted Polymorphic CSV Core Structure.");
+
+                    const clean = (val) => val.replace(/^"|"$/g, '').trim();
+                    const modId = clean(matches[0]);
+                    const sName = clean(matches[1]).toUpperCase();
+                    const rawPayload = matches[2].replace(/^"|"$/g, '').replace(/""/g, '"');
+
+                    const payloadDocument = {
+                        module_id: modId,
+                        name: sName,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        meta_tags: { location: "IMPORTED", shooter_or_dealer: "IMPORTED", base_unit: 1 },
+                        payload_log: rawPayload
+                    };
+
+                    await db.collection("users").doc(currentUid).collection("crypt").doc("archive_" + Date.now()).set(payloadDocument);
+                    alert("Polymorphic Data Inscribed Successfully into Crypt.");
+                    fetchCryptData();
+                } catch(err) { alert("Data Core Parsing Collapse."); }
+            };
+            reader.readAsText(fileObject);
+        }
+
+        async function editInscName(docId, oldName) {
+            const name = prompt("Alphanumeric Shift Designation:", oldName);
+            if(name) {
+                await db.collection("users").doc(currentUid).collection("crypt").doc(docId).update({ name: name.toUpperCase() });
+                fetchCryptData();
+            }
+        }
+
+        async function deleteInsc(id) {
+            if(confirm("Commit irreversible purge card structural wipe?")) {
+                await db.collection("users").doc(currentUid).collection("crypt").doc(id).delete();
+                fetchCryptData();
+            }
+        }
+    </script>
+</body>
+</html>
