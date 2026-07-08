@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.16.1</title>
+    <title>Dice Tracker v1.16.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -13,11 +13,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;400;600&display=swap');
         :root {
             --bg-primary: #020617;
-            --panel-bg: rgba(15, 23, 42, 0.7);
+            --panel-bg: rgba(15, 23, 42, 0.75);
             --text-main: #f8fafc;
             --emerald-accent: #10b981;
             --amber-accent: #f59e0b;
-            --border-color: rgba(16, 185, 129, 0.2);
+            --border-color: rgba(16, 185, 129, 0.25);
             --puck-on: #e11d48;
         }
         body {
@@ -26,17 +26,17 @@
             background-size: cover; background-position: center; background-attachment: fixed;
         }
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-b: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
+        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
         .main-wrapper { padding: 15px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
         
-        .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: rgba(0, 0, 0, 0.4); padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; }
+        .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: transparent; padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; -webkit-overflow-scrolling: touch; }
         .history-ribbon::-webkit-scrollbar { display: none; }
         .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; }
-        .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.15); }
+        .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.2); }
         .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
-        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; }
-        .node-seven-out { background-color: #ef4444; color: #fff; }
-        .node-natural { background-color: var(--emerald-accent); color: #fff; }
+        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
+        .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
+        .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
 
         .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
@@ -51,32 +51,48 @@
         .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
 
         .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; }
-        .pad-btn { background: #020617; color: #fff; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 18px; font-weight: bold; width: 50px; height: 50px; cursor: pointer; border-radius: 4px; }
-        .pad-btn.active { background: var(--amber-accent); color: #000; border-color: #ffffff; }
-        .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
-        .kinematic-readout-strip { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.5); padding: 10px; border-radius: 4px; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: var(--amber-accent); }
+        .pad-btn { background: #020617; color: #fff; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 18px; font-weight: bold; width: 50px; height: 50px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
+        .pad-btn.active { background: var(--amber-accent); color: #000; border-color: #ffffff; transform: scale(1.05); }
+        .action-matrix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; width: 100%; }
+        .act-btn { padding: 12px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 12px; text-transform: uppercase; text-align: center; }
+        .btn-green { background: var(--emerald-accent); color: white; }
+        .btn-purple { background: #a855f7; color: white; }
+        .btn-orange { background: #f97316; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+        .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
+        .select-element:focus { border-color: var(--emerald-accent); }
+        .kinematic-readout-strip { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.5); padding: 12px; border-radius: 4px; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: var(--amber-accent); }
         
-        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-box { background: #0f172a; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; }
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: #0f172a; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
         .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
+        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; }
+        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
+        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
+        .d-cell:last-child { border-right: none; }
+        .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
+        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <nav class="zombie-nav-header">
         <div class="flex flex-col cursor-pointer" onclick="window.location.assign('lobby.html')">
-            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
+            <h2 class="brand-title text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
             <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em]"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
-            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
+            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em] font-serif"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em] font-serif">Logout</button>
         </div>
     </nav>
 
     <div class="main-wrapper">
+        <!-- Section 1: Relational Dataset Dropdown Matrix -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
@@ -112,8 +128,10 @@
             </div>
         </div>
 
+        <!-- Section 2: High-Contrast History Ribbon -->
         <div class="history-ribbon" id="historyContainer"></div>
 
+        <!-- Section 3: Integrated Controller & State Display Counters -->
         <div class="controller-panel flex flex-col gap-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex flex-col items-center">
@@ -150,11 +168,13 @@
             </div>
         </div>
 
+        <!-- Section 4: Kinematic Recommendation Strip -->
         <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
             <span>LEFT DIE KINEMATICS: <b class="text-white font-mono" id="k-left-readout">N/A</b></span>
             <span>RIGHT DIE KINEMATICS: <b class="text-white font-mono" id="k-right-readout">N/A</b></span>
         </div>
 
+        <!-- Section 5: Contiguous Number Board Stack (2-6 directly over 8-12) -->
         <div class="board-stack">
             <div class="grid-row-segment">
                 <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
@@ -172,6 +192,7 @@
             </div>
         </div>
 
+        <!-- Section 6: Diagnostics Display & Processing Filters Base Panel -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div class="diagnostics-panel md:col-span-2">
                 <div class="diag-title">ZOMBIELORD STATISTICAL DIAGNOSTICS</div>
@@ -196,8 +217,9 @@
         </div>
     </div>
 
+    <!-- Modal Form Interface Component Frame -->
     <div id="property-modal" class="modal-mask">
-        <div class="modal-box p-6 shard">
+        <div class="modal-box">
             <h2 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h2>
             <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
             <div class="flex justify-end gap-3 mt-6 border-t border-slate-800 pt-4">
@@ -455,6 +477,7 @@
                 sevensComeout: state.sevensComeout, 
                 totalPointsMade: state.totalPointsMade, 
                 activePoint: state.activePoint, 
+                value: state.activePoint, // Sync backup identifier
                 shooterHistory: state.shooterHistory, 
                 rawSequenceLog: state.rawSequenceLog, 
                 payload_log: JSON.stringify(state.rollHistoryLog), 
@@ -474,11 +497,9 @@
             state.totalRolls = d.totalRolls || 0; state.currentHandRolls = d.currentHandRolls || 0; state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
             try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
             
-            // Unify resolution gate for both field variants
             let rawLog = d.payload_log || d.rollHistoryLog || [];
             try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
             
-            // Re-map legacy camelCase structures coming down from historical records
             state.rollHistoryLog = state.rollHistoryLog.map(r => {
                 return {
                     leftDie: r.leftDie || r.Left_Die || 3,
