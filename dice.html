@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.23.0</title>
+    <title>Dice Tracker v1.24.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -75,7 +75,6 @@
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
-        /* Pixel-Aligned Parity Dimensions with Hairline Border Wrappers */
         .dice-visual-cube { width: 52px; height: 50px; background: #020617; color: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 32px; border: 0.5px solid rgba(51, 65, 85, 0.8); box-shadow: 0 0 12px rgba(255,255,255,0.1); font-family: sans-serif; }
         .force-uppercase { text-transform: uppercase; }
         .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 38px; }
@@ -155,7 +154,6 @@
                             <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
                         </div>
                     </div>
-
                     <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
                         <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">USING ORIGINAL CONFIG</button>
                     </div>
@@ -213,7 +211,7 @@
                     </select>
                 </div>
             </div>
-            <div class="diag-metrics-grid">
+            <div class="diag-metrics-grid" id="diagGridContainer">
                 <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
                 <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
                 <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
@@ -246,8 +244,6 @@
         const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
 
         let currentSuggestedSetString = ""; let activeTargetDiceSetString = ""; let isSuggestedSetFlag = false;
-        
-        // Multi-Selection Array Target Mask Corrected to cover 2-12 including 7
         let activeKinematicFilterMask = { 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true };
 
         const state = {
@@ -269,6 +265,7 @@
 
         function initDualPads() {
             const l = document.getElementById('leftPadContainer'), r = document.getElementById('rightPadContainer');
+            if(!l || !r) return;
             l.innerHTML = ''; r.innerHTML = '';
             for(let i=1; i<=6; i++) {
                 l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
@@ -277,7 +274,7 @@
         }
 
         function initDragToScrollRibbon() {
-            const el = document.getElementById('historyContainer');
+            const el = document.getElementById('historyContainer'); if(!el) return;
             let down = false, sX, sLeft;
             el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
             el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
@@ -300,12 +297,10 @@
                     db.collection("users").doc(currentUid).collection("master_dice_sets").get(),
                     db.collection("users").doc(currentUid).collection("master_invalid_causes").get()
                 ]);
-
                 userShootersList = {}; sSnap.forEach(doc => { userShootersList[doc.id] = doc.data(); });
                 userLocationsList = {}; lSnap.forEach(doc => { userLocationsList[doc.id] = doc.data(); });
                 userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
                 userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
-
                 syncConfigurationDropdowns();
             } catch (err) { console.error(err); }
         }
@@ -315,7 +310,6 @@
             const lSel = document.getElementById('ctxLocationSelect');
             const pSel = document.getElementById('ctxTablePositionSelect');
             const dSel = document.getElementById('ctxDiceSetSelect');
-            
             if (!sSel || !lSel || !pSel || !dSel) return;
             const prevS = sSel.value, prevL = lSel.value, prevP = pSel.value, prevD = dSel.value;
 
@@ -343,7 +337,6 @@
             if(lSel.querySelector(`option[value="${prevL}"]`)) lSel.value = prevL;
             if(pSel.querySelector(`option[value="${prevP}"]`)) pSel.value = prevP;
             if(dSel.querySelector(`option[value="${prevD}"]`)) dSel.value = prevD;
-            
             onDiceSetChange();
         }
 
@@ -351,7 +344,6 @@
             activeModalContext = category; activeEditId = targetId;
             const isEditMode = targetId !== null;
             const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
-
             document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
             
@@ -381,7 +373,6 @@
             } else if (category === 'invalid_causes') {
                 htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. DICE OFF TABLE"></div>`;
             }
-
             fields.innerHTML = htmlContent;
             document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
         }
@@ -395,7 +386,7 @@
             const idVal = idField ? idField.value.trim().toUpperCase() : "";
 
             if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
-                if (!activeEditId) { if (!idVal) return alert("Unique configuration tag missing."); targetDocId = idVal; }
+                if (!activeEditId) { if (!idVal) return alert("Unique parameter tag label required."); targetDocId = idVal; }
                 if (activeModalContext === 'shooters') {
                     payload = { Handedness: document.getElementById('mField_Hand').value, Throwing_Style: document.getElementById('mField_Style').value, Preferred_Location: document.getElementById('mField_PrefLoc').value, Notes: document.getElementById('mField_Notes').value.trim().toUpperCase() };
                 } else if (activeModalContext === 'locations') {
@@ -404,7 +395,7 @@
                     payload = { name: targetDocId, Description: document.getElementById('mField_Desc').value.trim().toUpperCase() };
                 }
             } else if (activeModalContext === 'dice_sets') {
-                const sName = nameField.value.trim().toUpperCase(); if (!sName) return alert("Alpha tag identity label blank.");
+                const sName = nameField.value.trim().toUpperCase(); if (!sName) return alert("Alpha identity name tag mandatory.");
                 if (!activeEditId) targetDocId = "SET_" + Date.now();
                 payload = {
                     Set_Name: sName, Description: document.getElementById('mField_Desc').value.trim().toUpperCase(),
@@ -437,7 +428,6 @@
             document.getElementById('modal-headline').innerText = "FILTER KINEMATIC OUTCOMES";
             const fields = document.getElementById('modal-form-fields');
             
-            // Reconstructed Multi-Selection Outcome grid featuring the explicitly requested number 7
             let html = `<div class="grid grid-cols-4 gap-2 w-full">`;
             for(let i=2; i<=12; i++) {
                 let activeStyle = activeKinematicFilterMask[i] ? "bg-emerald-600 border border-emerald-400 text-white" : "bg-slate-900 border border-slate-700 text-slate-500";
@@ -468,11 +458,12 @@
 
         function launchInvalidCausePickerModal() {
             activeModalContext = 'invalid_causes'; activeEditId = null;
-            document.getElementById('modal-headline').innerText = "SELECT INVALID TIMEOUT CAUSE";
+            let causeKeys = Object.keys(userCausesList);
             const fields = document.getElementById('modal-form-fields');
+            document.getElementById('modal-headline').innerText = "SELECT INVALID TIMEOUT CAUSE";
             
             let html = `<div><label class="block mb-1 font-bold">Select Existing Reason Matrix:</label><select id="mField_CauseSelect" class="select-element py-2">`;
-            Object.keys(userCausesList).forEach(k => { html += `<option value="${k}">${k}</option>`; });
+            causeKeys.forEach(k => { html += `<option value="${k}">${k}</option>`; });
             html += `</select></div><div class="mt-4 border-t border-slate-800 pt-3"><label class="block mb-1 font-bold">[OR REGISTER NEW INVALID CAUSE STR]:</label><input type="text" id="mField_NewCauseInput" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. DICE OFF TABLE"></div>`;
             
             fields.innerHTML = html;
@@ -488,7 +479,7 @@
             let finalCause = selectVal || "UNSPECIFIED PARSE FAULT";
             if (inputVal) {
                 finalCause = inputVal;
-                await db.collection("users").doc(currentUid).collection("master_invalid_causes").doc(finalCause).set({ name: finalCause, Description: "USER DEFINED EXCEPTION EVENT" });
+                await db.collection("users").doc(currentUid).collection("master_invalid_causes").doc(finalCause).set({ name: finalCause, Description: "USER DEFINED FRAME EXCEPTION" });
                 userCausesList[finalCause] = { name: finalCause };
             }
             
@@ -505,8 +496,53 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
+        function onDiceSetChange() {
+            const el = document.getElementById('ctxDiceSetSelect');
+            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
+            const tgl = document.getElementById('toggle-set-container');
+
+            if (!el.value || el.value === 'ALL') {
+                if(visL) visL.style.display = 'none'; if(visR) visR.style.display = 'none'; if(tgl) tgl.style.display = 'none'; 
+                document.getElementById('pad-telemetry-left').style.opacity = '0';
+                document.getElementById('pad-telemetry-right').style.opacity = '0';
+                activeTargetDiceSetString = ""; return;
+            }
+
+            const d = userDiceSetsList[el.value];
+            if (d) {
+                document.getElementById('v-left-t').innerText = PIP_MAP[d.Left_Top_Face || 3];
+                document.getElementById('v-left-f').innerText = PIP_MAP[d.Left_Front_Face || 6];
+                document.getElementById('v-right-t').innerText = PIP_MAP[d.Right_Top_Face || 3];
+                document.getElementById('v-right-f').innerText = PIP_MAP[d.Right_Front_Face || 2];
+                if(visL) visL.style.display = 'flex'; if(visR) visR.style.display = 'flex';
+                
+                if (activeTargetDiceSetString === "") {
+                    activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+                }
+                if(tgl) tgl.style.display = 'flex';
+            }
+        }
+
+        function selectMatrixDie(axis, val) {
+            if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
+            else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
+        }
+
+        function renderLastRollKinematics(record) {
+            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
+            if (!lBox || !rBox) return;
+            if (record.Invalid_Roll || !record.Kinematic_Status || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
+            
+            const parseAxisString = (kObj) => {
+                if(!kObj) return "N/A"; const r = parseInt(kObj.rot);
+                if([1,2,6,5].includes(r)) return `PITCH [${r}]`; return `YAW [${r}]`;
+            };
+            lBox.innerText = parseAxisString(record.Left_Kinematic); lBox.style.opacity = '1';
+            rBox.innerText = parseAxisString(record.Right_Kinematic); rBox.style.opacity = '1';
+        }
+
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button selection metrics unselected.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button markers required.");
             const locVal = document.getElementById('ctxLocationSelect').value;
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
@@ -537,43 +573,6 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
-        function executeCalculationsLoop(record) {
-            if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
-            const sum = record.sum;
-            state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
-            if(sum === 7) {
-                state.sevensTotal++;
-                if(state.activePoint === null) state.sevensComeout++;
-                else { state.sevensRed++; state.shooterHistory.push(state.currentHandRolls); state.currentHandRolls = 0; state.activePoint = null; for(let k in state.matrix) state.matrix[k].cur = 0; }
-            } else {
-                if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
-                else if(sum === state.activePoint) { state.totalPointsMade++; state.activePoint = null; }
-            }
-            executeAnalyticalFilterEngine(); renderLastRollKinematics(record);
-        }
-
-        function calculateGeometricDiceMedian(sampleStream) {
-            const valid = sampleStream.filter(v => v !== null && v !== undefined); if (!valid.length) return 1;
-            const counts = { 1:0, 2:0, 6:0, 5:0, 4:0 }; valid.forEach(v => { if(counts[v.rot] !== undefined) counts[v.rot]++; });
-            return [1,2,6,5,4].sort((a,b) => counts[b] - counts[a])[0] || 1;
-        }
-
-        function processCalibrationSuiteSuggestionsEngine(validLogs) {
-            const tglContainer = document.getElementById('toggle-set-container');
-            if (validLogs.length < 15 || document.getElementById('ctxDiceSetSelect').value === 'ALL' || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') {
-                currentSuggestedSetString = ""; tglContainer.style.display = 'none'; return;
-            }
-            const lMed = calculateGeometricDiceMedian(validLogs.map(r => r.Left_Kinematic));
-            const rMed = calculateGeometricDiceMedian(validLogs.map(r => r.Right_Kinematic));
-            const lastRow = validLogs[validLogs.length - 1];
-            const shiftCube = (fStr, code) => {
-                const top = parseInt(fStr.split('/')[0]) || 3, fr = parseInt(fStr.split('/')[1]) || 6;
-                if (code == 1) return `${top}/${fr}`; if (code == 2) return `${fr}/${7-top}`; if (code == 6) return `${7-top}/${7-fr}`; if (code == 5) return `${7-fr}/${top}`; return `${top}/${fr}`;
-            };
-            currentSuggestedSetString = `${shiftCube(lastRow.Left_Set_Face, lMed)}x${shiftCube(lastRow.Right_Set_Face, rMed)}`;
-            tglContainer.style.display = 'flex'; resetSuggestionTrackingButtonDisplay();
-        }
-
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
             const sh = getSelectedText('Shooter'); const loc = document.getElementById('ctxLocationSelect').value;
@@ -588,10 +587,11 @@
 
             let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
             let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
-            const ribbon = document.getElementById('historyContainer'); ribbon.innerHTML = '';
+            const ribbon = document.getElementById('historyContainer'); if(!ribbon) return;
+            ribbon.innerHTML = '';
             let kLogs = [];
 
-            // Corrected, fully mapped global transition dictionary schema tracking (Covers all possible outcomes 2-12 including 7)
+            // Corrected conditional execution transition matrix array maps
             let conditionalTransitionsMatrix = {};
             for(let i=2; i<=12; i++) { conditionalTransitionsMatrix[i] = { totalCounts: {}, pairCounts: {} }; }
 
@@ -601,7 +601,6 @@
                 
                 if (idx > 0) {
                     const prevRow = filtered[idx - 1];
-                    // Bypasses randomized stick shifts (Sevens or Invalid logs) to insulate tracking matrices
                     if (prevRow && !prevRow.Invalid_Roll && prevRow.sum >= 2 && prevRow.sum <= 12 && prevRow.sum !== 7) {
                         const setupAnchorTotal = prevRow.sum;
                         const unorderedPairKey = [v.leftDie, v.rightDie].sort((a,b)=>a-b).join('-');
@@ -623,12 +622,15 @@
             });
 
             for(let i=2; i<=12; i++) {
-                if(i===7) continue; document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
-                const cell = document.getElementById(`cur-${i}`); cell.innerText = lm[i]; document.getElementById(`tot-${i}`).innerText = lm[i];
-                document.getElementById(`puck-${i}`).style.display = (lap === i) ? 'block' : 'none';
-                if(la[i]) cell.classList.add('ats-active'); else cell.classList.remove('ats-active');
+                if(i===7) continue; 
+                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = state.matrix[i].tot;
+                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = lm[i]; 
+                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i];
                 
-                // Multi-Cycle Cold Horizon Frequency Temperature Scaling Loop
+                const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (lap === i) ? 'block' : 'none';
+                if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
+                
+                // Multi-Cycle Horizon Frequency Temperature Tracker Checks
                 const horizonN = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
                 if (chip) {
                     const hit1 = state.rawSequenceLog.slice(-horizonN).filter(x => x == i).length;
@@ -646,10 +648,9 @@
                     }
                 }
                 
-                // Probability Ratio Normalization Suite outputs onto ALL 11 board boxes
+                // Normalizes next-step probabilities using the expected multiplier scale map
                 const pane = document.getElementById(`ev-pane-${i}`);
                 if(pane) {
-                    // Normalizes counts directly against exact theoretical combinations weight out of 36
                     let totalVectors = Object.keys(conditionalTransitionsMatrix[i].totalCounts).map(Number).filter(n => activeKinematicFilterMask[n]).sort((a,b) => {
                         let perfIndexA = conditionalTransitionsMatrix[i].totalCounts[a] / (probabilityWindows[a] / 36);
                         let perfIndexB = conditionalTransitionsMatrix[i].totalCounts[b] / (probabilityWindows[b] / 36);
@@ -675,7 +676,7 @@
                 }
             }
 
-            // Fixed structured display mappings protect layout containment frames
+            // Fixed structured display mappings to prevent HUD collapse
             document.getElementById('stat-red').innerText = lRed;
             document.getElementById('stat-sor').innerText = lRed > 0 ? (lValid / lRed).toFixed(1) : lValid.toFixed(1);
             document.getElementById('stat-psr').innerText = lRed > 0 ? (lPoints / lRed).toFixed(1) : "0.0";
