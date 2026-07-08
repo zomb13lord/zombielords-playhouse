@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.18.0</title>
+    <title>Dice Tracker v1.18.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -50,16 +50,20 @@
         .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
         .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
 
-        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; }
-        .pad-btn { background: #020617; color: #fff; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 18px; font-weight: bold; width: 50px; height: 50px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
-        .pad-btn.active { background: var(--amber-accent); color: #000; border-color: #ffffff; transform: scale(1.05); }
-        .action-matrix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; width: 100%; }
-        .act-btn { padding: 12px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 12px; text-transform: uppercase; text-align: center; }
-        .btn-green { background: var(--emerald-accent); color: white; }
-        .btn-purple { background: #a855f7; color: white; }
-        .btn-orange { background: #f97316; color: white; }
-        .btn-blue { background: #3b82f6; color: white; }
-        .btn-red { background: #ef4444; color: white; }
+        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        .pad-btn { background: #020617; color: #94a3b8; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 20px; font-weight: bold; width: 52px; height: 50px; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .pad-btn:hover { color: #fff; border-color: var(--emerald-accent); }
+        .pad-btn.active { background: linear-gradient(135deg, var(--emerald-accent) 0%, #047857 100%); color: #fff !important; border-color: #ffffff40; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        
+        .act-btn { padding: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 13px; text-transform: uppercase; text-align: center; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0.3); box-shadow: 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1); }
+        .act-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+        .act-btn:active { transform: translateY(1px); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-purple { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: white; }
+        .btn-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; }
+        .btn-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+        .btn-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
         
         .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
         .select-element:focus { border-color: var(--emerald-accent); }
@@ -79,15 +83,15 @@
         .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
         .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
         
-        .dice-visual-cube { width: 30px; height: 30px; background: #ef4444; color: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; border: 1px solid #ffffff30; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+        .dice-visual-cube { width: 34px; height: 34px; background: #0f172a; color: var(--emerald-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 24px; border: 1px solid var(--border-color); box-shadow: 0 0 10px rgba(16,185,129,0.15); font-family: sans-serif; }
         .force-uppercase { text-transform: uppercase; }
 
         @keyframes pulse-warn {
             0%, 100% { border-color: rgba(16, 185, 129, 0.5); box-shadow: none; }
             50% { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.7); background: rgba(245, 158, 11, 0.15); }
         }
-        .pulse-warning-btn { animation: pulse-warn 1.2s infinite; color: #f59e0b !important; }
-    </style>
+        .pulse-warning-btn { animation: pulse-warn 1.2s infinite; color: #f59e0b !important; border-color: #f59e0b !important; }
+    </svg>
 </head>
 <body>
 
@@ -97,8 +101,8 @@
             <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em] font-serif"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
-            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em] font-serif">Logout</button>
+            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em]"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
         </div>
     </nav>
 
@@ -137,65 +141,66 @@
         <div class="history-ribbon" id="historyContainer"></div>
 
         <div class="controller-panel">
-            <div class="flex flex-col md:flex-row justify-center items-center gap-8 max-w-[1000px] mx-auto">
-                <div class="flex flex-col items-center gap-2 flex-1 w-full max-w-[180px]">
-                    <div class="flex items-center gap-3 h-8">
+            <div class="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-[1000px] mx-auto w-full">
+                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
+                    <div class="flex items-center gap-3 h-10">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
                         <div id="vis-left-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
-                            <div class="dice-visual-cube" id="v-left-t">-</div>
-                            <div class="dice-visual-cube" id="v-left-f">-</div>
+                            <div class="dice-visual-cube" id="v-left-t">⚂</div>
+                            <div class="dice-visual-cube" id="v-left-f">⚅</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full" id="leftPadContainer"></div>
-                    <div id="pad-suggest-left" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">BASE: -</div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="leftPadContainer"></div>
+                    
+                    <div id="pad-telemetry-left" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0">
+                        PITCH [1]
+                    </div>
                 </div>
                 
-                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 w-full md:w-auto min-w-[280px] max-w-xs gap-3 shrink-0">
-                    <div class="flex justify-around w-full">
+                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 w-full md:w-auto min-w-[280px] max-w-xs gap-3 shrink-0 justify-between">
+                    <div class="flex justify-around w-full mt-2">
                         <div class="text-center">
                             <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Hand</div>
                             <div class="text-3xl font-black text-white font-mono mt-1" id="summary-current">0</div>
                         </div>
-                        <div class="border-r border-slate-800 h-10"></div>
+                        <div class="border-r border-slate-800 h-12"></div>
                         <div class="text-center">
                             <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Session</div>
                             <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
                         </div>
                     </div>
 
-                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-2 flex flex-col gap-1.5 items-center" style="display:none">
+                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
                         <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">
                             USING ORIGINAL CONFIG
                         </button>
                     </div>
-                    
-                    <div id="pad-kinematic-telemetry" class="w-full text-[10px] text-amber-500 font-bold bg-slate-950/40 p-2 border border-slate-800 rounded text-center hidden">
-                        <div id="lbl-telemetry-left" class="font-mono text-slate-200">L: N/A</div>
-                        <div id="lbl-telemetry-right" class="font-mono text-slate-200 mt-1">R: N/A</div>
-                    </div>
                 </div>
 
-                <div class="flex flex-col items-center gap-2 flex-1 w-full max-w-[180px]">
-                    <div class="flex items-center gap-3 h-8">
+                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
+                    <div class="flex items-center gap-3 h-10">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
                         <div id="vis-right-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
-                            <div class="dice-visual-cube" id="v-right-t">-</div>
-                            <div class="dice-visual-cube" id="v-right-f">-</div>
+                            <div class="dice-visual-cube" id="v-right-t">⚂</div>
+                            <div class="dice-visual-cube" id="v-right-f">⚁</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full" id="rightPadContainer"></div>
-                    <div id="pad-suggest-right" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">BASE: -</div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="rightPadContainer"></div>
+                    
+                    <div id="pad-telemetry-right" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0">
+                        YAW [4]
+                    </div>
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 gap-3 border-t border-slate-800 mt-4 pt-4">
-                <button class="act-btn btn-green font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('STANDARD')">Standard Roll</button>
-                <button class="act-btn btn-purple font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
+            <div class="grid grid-cols-2 gap-4 border-t border-slate-800 mt-6 pt-5">
+                <button class="act-btn btn-green font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('STANDARD')">Standard Roll</button>
+                <button class="act-btn btn-purple font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="launchInvalidCausePickerWorkflow()">Invalid Roll</button>
-                <button class="act-btn btn-blue font-bold py-2 text-xs" onclick="executeUndo()">Undo Last</button>
-                <button class="act-btn btn-red font-bold py-2 text-xs" onclick="executeClearReset()">Reset Dataset</button>
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <button class="act-btn btn-orange font-bold py-2.5 text-xs" onclick="launchInvalidCausePickerWorkflow()">Invalid Roll</button>
+                <button class="act-btn btn-blue font-bold py-2.5 text-xs" onclick="executeUndo()">Undo Last</button>
+                <button class="act-btn btn-red font-bold py-2.5 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
         </div>
 
@@ -256,6 +261,7 @@
             "SL1", "SL2", "SL3", "SL4", "HL1", "HL2", "HL3", "HL4",
             "SR1", "SR2", "SR3", "SR4", "HR1", "HR2", "HR3", "HR4"
         ];
+        const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
 
         let currentSuggestedSetString = ""; 
         let activeTargetDiceSetString = ""; 
@@ -277,23 +283,6 @@
                 fetchCloudState();
             });
         });
-
-        function initDualPads() {
-            const l = document.getElementById('leftPadContainer'), r = document.getElementById('rightPadContainer');
-            l.innerHTML = ''; r.innerHTML = '';
-            for(let i=1; i<=6; i++) {
-                l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
-                r.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
-            }
-        }
-
-        function initDragToScrollRibbon() {
-            const el = document.getElementById('historyContainer');
-            let down = false, sX, sLeft;
-            el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
-            el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
-            el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
-        }
 
         function setDefaultAllDropdowns() {
             document.getElementById('ctxLocationSelect').value = "ALL";
@@ -361,7 +350,7 @@
             document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
             
-            let htmlContent = `<div><label class="block mb-1 font-bold">Unique ID Key Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"'} placeholder="e.g. BALLY'S"></div>`;
+            let htmlContent = `<div><label class="block mb-1 font-bold">Unique ID Key Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"'} placeholder="e.g. VENUE_KEY"></div>`;
 
             if (category === 'shooters') {
                 htmlContent += `
@@ -385,7 +374,7 @@
                     <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE (1-6):</label><input type="number" id="mField_RFront" min="1" max="6" value="${record.Right_Front_Face || 2}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
                 </div>`;
             } else if (category === 'invalid_causes') {
-                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Mechanical stick error profile"></div>`;
+                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Bounced off surface line layout"></div>`;
             }
 
             fields.innerHTML = htmlContent;
@@ -405,7 +394,7 @@
 
             if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
                 if (!activeEditId) {
-                    if (!idVal) return alert("Unique Primary Key alphanumeric identifier required.");
+                    if (!idVal) return alert("Unique Primary Key string validation missing.");
                     targetDocId = idVal;
                 }
                 if (activeModalContext === 'shooters') {
@@ -417,7 +406,7 @@
                 }
             } else if (activeModalContext === 'dice_sets') {
                 const sName = nameField.value.trim().toUpperCase();
-                if (!sName) return alert("Set identity validation tag label parameter mandatory.");
+                if (!sName) return alert("Set designation alpha configuration name mandatory.");
                 if (!activeEditId) targetDocId = "SET_" + Date.now();
                 payload = {
                     Set_Name: sName,
@@ -449,14 +438,14 @@
 
         function editCurrentAsset(cat) {
             const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
-            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select registered data parameter target row asset context model.");
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select standard custom category model element profile first.");
             openMetadataModal(cat, el.value);
         }
 
         async function deleteCurrentAsset(cat) {
             const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
-            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select standard parameter option entry.");
-            if (confirm("Permanently wipe registry config asset from storage collection paths?")) {
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select active targeted profile element option choice.");
+            if (confirm("Permanently strip config map row metadata block from firestore arrays?")) {
                 await db.collection("users").doc(currentUid).collection(`master_${cat}`).doc(el.value).delete();
                 await fetchMasterMetadataCollections();
                 setDefaultAllDropdowns();
@@ -471,39 +460,40 @@
         function onDiceSetChange() {
             const el = document.getElementById('ctxDiceSetSelect');
             const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
-            const sugL = document.getElementById('pad-suggest-left'), sugR = document.getElementById('pad-suggest-right');
             const tgl = document.getElementById('toggle-set-container');
 
             if (!el.value || el.value === 'ALL') {
                 visL.style.display = 'none'; visR.style.display = 'none';
-                sugL.style.display = 'none'; sugR.style.display = 'none';
-                tgl.style.display = 'none'; document.getElementById('pad-kinematic-telemetry').classList.add('hidden');
+                tgl.style.display = 'none'; 
+                document.getElementById('pad-telemetry-left').style.opacity = '0';
+                document.getElementById('pad-telemetry-right').style.opacity = '0';
                 activeTargetDiceSetString = "";
                 return;
             }
 
             const d = userDiceSetsList[el.value];
             if (d) {
-                document.getElementById('v-left-t').innerText = d.Left_Top_Face || '3';
-                document.getElementById('v-left-f').innerText = d.Left_Front_Face || '6';
-                document.getElementById('v-right-t').innerText = d.Right_Top_Face || '3';
-                document.getElementById('v-right-f').innerText = d.Right_Front_Face || '2';
+                // High-Gloss Slate Re-skin with Unicode Pip Assignments to eliminate clashing colors
+                document.getElementById('v-left-t').innerText = PIP_MAP[d.Left_Top_Face || 3];
+                document.getElementById('v-left-f').innerText = PIP_MAP[d.Left_Front_Face || 6];
+                document.getElementById('v-right-t').innerText = PIP_MAP[d.Right_Top_Face || 3];
+                document.getElementById('v-right-f').innerText = PIP_MAP[d.Right_Front_Face || 2];
                 visL.style.display = 'flex'; visR.style.display = 'flex';
                 
                 if (activeTargetDiceSetString === "") {
                     activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
                 }
-                
-                sugL.style.display = 'block'; sugR.style.display = 'block'; tgl.style.display = 'flex';
+                tgl.style.display = 'flex';
             }
             calculateLiveKinematicsPreview();
         }
 
-        function toggleSetExecutionFlag() {
+        const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
+
+        function handleSuggestionToggleAction() {
             if (activeTargetDiceSetString !== "" && activeTargetDiceSetString !== getDropdownConfigDiceSetString()) {
-                if (confirm("Revert tracking back to your Dropdown Configured Original Dice Set parameters?")) {
+                if (confirm("Return calculation calibration anchor tracking parameters to your top Dropdown Selected Dice Set?")) {
                     activeTargetDiceSetString = getDropdownConfigDiceSetString();
-                    isSuggestedSetFlag = false;
                     resetSuggestionTrackingButtonDisplay();
                     calculateLiveKinematicsPreview();
                 }
@@ -512,9 +502,8 @@
             
             if (currentSuggestedSetString === "") return;
             
-            if (confirm(`Commit calibration swap sequence and record throws using Suggested Set [${currentSuggestedSetString}]?`)) {
+            if (confirm(`Promote Suggested Calibration alignment [${currentSuggestedSetString}] as your active physical recording set matrix layout?`)) {
                 activeTargetDiceSetString = currentSuggestedSetString;
-                isSuggestedSetFlag = true;
                 resetSuggestionTrackingButtonDisplay();
                 calculateLiveKinematicsPreview();
             }
@@ -522,8 +511,7 @@
 
         function getDropdownConfigDiceSetString() {
             const el = document.getElementById('ctxDiceSetSelect');
-            const d = userDiceSetsList[el.value];
-            if(!d) return "";
+            const d = userDiceSetsList[el.value]; if(!d) return "";
             return `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
         }
 
@@ -533,10 +521,10 @@
             
             if (activeTargetDiceSetString === getDropdownConfigDiceSetString()) {
                 btn.innerText = "USING ORIGINAL CONFIG";
-                btn.className = "w-full text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 p-2.5 rounded transition-all text-center";
+                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-800 p-2.5 rounded text-amber-400 transition-all text-center";
             } else {
                 btn.innerText = `PROMOTED: ${activeTargetDiceSetString}`;
-                btn.className = "w-full text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 p-2.5 rounded transition-all text-center";
+                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-500/40 p-2.5 rounded text-emerald-400 transition-all text-center";
                 
                 if (currentSuggestedSetString !== "" && currentSuggestedSetString !== activeTargetDiceSetString) {
                     btn.classList.add('pulse-warning-btn');
@@ -544,8 +532,6 @@
                 }
             }
         }
-
-        function handleSuggestionToggleAction() { toggleSetExecutionFlag(); }
 
         function selectMatrixDie(axis, val) {
             if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
@@ -564,28 +550,29 @@
                 lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
             }
 
-            sugL.innerText = `TARGET BASE: [ ${lParts[0]}/${lParts[1]} ]`;
-            sugR.innerText = `TARGET BASE: [ ${rParts[0]}/${rParts[1]} ]`;
+            sugL.innerText = `SUGGEST TOP: [ ${lParts[0]} ]`;
+            sugR.innerText = `SUGGEST TOP: [ ${rParts[0]} ]`;
         }
 
         function renderLastRollKinematics(record) {
-            const block = document.getElementById('pad-kinematic-telemetry');
-            if (record.Invalid_Roll || !record.Kinematic_Status) { block.classList.add('hidden'); return; }
-            document.getElementById('lbl-telemetry-left').innerText = `L: PITCH [${record.Left_Kinematic?.rot || '0'}] YAW [${record.Left_Kinematic?.ax || '0'}]`;
-            document.getElementById('lbl-telemetry-right').innerText = `R: PITCH [${record.Right_Kinematic?.rot || '0'}] YAW [${record.Right_Kinematic?.ax || '0'}]`;
-            block.classList.remove('hidden');
+            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
+            if (record.Invalid_Roll || !record.Kinematic_Status) { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
+            
+            // Clean un-bloated string formatting tokens rendered strictly inside console padding bounds
+            lBox.innerText = `L-CODE: [${record.Left_Kinematic?.rot || '1'}]`;
+            rBox.innerText = `R-CODE: [${record.Right_Kinematic?.rot || '1'}]`;
+            lBox.style.opacity = '1'; rBox.style.opacity = '1';
         }
 
         async function launchInvalidCausePickerWorkflow() {
             let causeKeys = Object.keys(userCausesList);
-            let promptStr = "SPECIFY INVALID TIMELINE TRACKING EXCLUSION BREAK EVENT:\n";
+            let promptStr = "SELECT INVALID TIMELINE TIMEOUT TRIGGER EVENT CAUSE:\n";
             causeKeys.forEach((k, idx) => { promptStr += `${idx + 1}. ${k}\n`; });
-            promptStr += `${causeKeys.length + 1}. [+ REGISTER NEW CAUSE LABEL]`;
+            promptStr += `${causeKeys.length + 1}. [+ REGISTER NEW DYNAMIC CAUSE CODE]`;
             
-            const choice = prompt(promptStr, "1");
-            if (!choice) return;
+            const choice = prompt(promptStr, "1"); if (!choice) return;
+            let selectedCause = "UNSPECIFIED MISSTHROW";
             
-            let selectedCause = "UNSPECIFIED ERR";
             if (parseInt(choice) === causeKeys.length + 1) { openMetadataModal('invalid_causes'); return; }
             else if (causeKeys[parseInt(choice) - 1]) selectedCause = causeKeys[parseInt(choice) - 1];
 
@@ -606,10 +593,11 @@
         }
 
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button matrix input markers empty.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button inputs mandatory.");
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
             
+            // Automated double/hardway verification lock override loop pass rule parameter
             let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway);
 
             let lKin = null, rKin = null;
@@ -620,16 +608,24 @@
                     lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
                 }
                 
-                // Advanced 3D Kinematics Translation Matrix Engine per structural continuity boundaries
-                lKin = { rot: (state.selectedLeft === lParts[0] ? "1" : (state.selectedLeft === (7 - lParts[1]) ? "2" : (state.selectedLeft === (7 - lParts[0]) ? "6" : "5"))), ax: (state.selectedLeft === lParts[0] ? "0" : "1") };
-                rKin = { rot: (state.selectedRight === rParts[0] ? "1" : (state.selectedRight === (7 - rParts[1]) ? "2" : (state.selectedRight === (7 - rParts[0]) ? "6" : "5"))), ax: (state.selectedRight === rParts[0] ? "0" : "1") };
+                // Closed-loop spatial reference transform trees mapped exactly to Module 3 specification
+                const computeCode = (top, bTop, bFront) => {
+                    if (top === bTop) return 1;
+                    if (top === (7 - bFront)) return 2;
+                    if (top === (7 - bTop)) return 6;
+                    if (top === bFront) return 5;
+                    return 4; // Flat side lateral transform ring fallback gate
+                };
+
+                lKin = { rot: computeCode(state.selectedLeft, lParts[0], lParts[1]), ax: (state.selectedLeft === lParts[0] ? "0" : "1") };
+                rKin = { rot: computeCode(state.selectedRight, rParts[0], rParts[1]), ax: (state.selectedRight === rParts[0] ? "0" : "1") };
             }
 
             const r = {
                 leftDie: parseInt(state.selectedLeft), rightDie: parseInt(state.selectedRight), sum: sumValue,
                 Location_ID: getSelectedText('Location'), Table_Position: document.getElementById('ctxTablePositionSelect').value || "SL1", Shooter_ID: getSelectedText('Shooter'),
-                Left_Set_Face: document.getElementById('vis-left-set').style.display !== 'none' ? (document.getElementById('v-left-t').innerText + "/" + document.getElementById('v-left-f').innerText) : "N/A",
-                Right_Set_Face: document.getElementById('vis-right-set').style.display !== 'none' ? (document.getElementById('v-right-t').innerText + "/" + document.getElementById('v-right-f').innerText) : "N/A",
+                Left_Set_Face: activeTargetDiceSetString.split('x')[0] || "3/6",
+                Right_Set_Face: activeTargetDiceSetString.split('x')[1] || "3/2",
                 Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
                 Kinematic_Status: enforceKinematics, Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL", Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false, Notes: ""
             };
@@ -654,43 +650,29 @@
         }
 
         function calculateGeometricDiceMedian(sampleStream) {
-            const valid = sampleStream.filter(v => v !== null && v !== undefined);
-            if (!valid.length) return 1;
-            const counts = { 1:0, 2:0, 6:0, 5:0 };
+            const valid = sampleStream.filter(v => v !== null && v !== undefined); if (!valid.length) return 1;
+            const counts = { 1:0, 2:0, 6:0, 5:0, 4:0 };
             valid.forEach(v => { if(counts[v.rot] !== undefined) counts[v.rot]++; });
-            const arr = [1,2,6,5].sort((a,b) => counts[b] - counts[a]);
-            return arr[0] || 1;
+            return [1,2,6,5,4].sort((a,b) => counts[b] - counts[a])[0] || 1;
         }
 
         function processCalibrationSuiteSuggestionsEngine(validLogs) {
             const tglContainer = document.getElementById('toggle-set-container');
-            
             if (validLogs.length < 15 || document.getElementById('ctxDiceSetSelect').value === 'ALL') {
-                currentSuggestedSetString = "";
-                tglContainer.style.display = 'none';
-                return;
+                currentSuggestedSetString = ""; tglContainer.style.display = 'none'; return;
             }
 
-            const lStream = validLogs.map(r => r.Left_Kinematic);
-            const rStream = validLogs.map(r => r.Right_Kinematic);
-            const lMed = calculateGeometricDiceMedian(lStream);
-            const rMed = calculateGeometricDiceMedian(rStream);
-
+            const lMed = calculateGeometricDiceMedian(validLogs.map(r => r.Left_Kinematic));
+            const rMed = calculateGeometricDiceMedian(validLogs.map(r => r.Right_Kinematic));
             const lastRow = validLogs[validLogs.length - 1];
-            const lBase = lastRow.Left_Set_Face || "3/6";
-            const rBase = lastRow.Right_Set_Face || "3/2";
-
+            
             const shiftCube = (fStr, code) => {
-                const top = parseInt(fStr.split('/')[0]) || 3;
-                const fr = parseInt(fStr.split('/')[1]) || 6;
-                if (code == 1) return `${top}/${fr}`;
-                if (code == 2) return `${fr}/${7-top}`;
-                if (code == 6) return `${7-top}/${7-fr}`;
-                if (code == 5) return `${7-fr}/${top}`;
+                const top = parseInt(fStr.split('/')[0]) || 3, fr = parseInt(fStr.split('/')[1]) || 6;
+                if (code == 1) return `${top}/${fr}`; if (code == 2) return `${fr}/${7-top}`; if (code == 6) return `${7-top}/${7-fr}`; if (code == 5) return `${7-fr}/${top}`;
                 return `${top}/${fr}`;
             };
 
-            currentSuggestedSetString = `${shiftCube(lBase, lMed)}x${shiftCube(rBase, rMed)}`;
+            currentSuggestedSetString = `${shiftCube(lastRow.Left_Set_Face, lMed)}x${shiftCube(lastRow.Right_Set_Face, rMed)}`;
             tglContainer.style.display = 'flex';
             resetSuggestionTrackingButtonDisplay();
         }
