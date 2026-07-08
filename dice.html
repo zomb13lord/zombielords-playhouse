@@ -2,92 +2,807 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Tracker v1.25.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dice Tracker v1.20.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #020617; color: #f8fafc; font-family: monospace; }
-        .controller-panel { background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.25); padding: 20px; border-radius: 8px; }
-        .pad-btn { background: #020617; color: #fff; border: 1px solid #334155; width: 50px; height: 50px; cursor: pointer; border-radius: 4px; }
-        .pad-btn.active { background: #f59e0b; color: #000; }
-        .act-btn { padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;400;600&display=swap');
+        :root {
+            --bg-primary: #020617;
+            --panel-bg: rgba(15, 23, 42, 0.75);
+            --text-main: #f8fafc;
+            --emerald-accent: #10b981;
+            --amber-accent: #f59e0b;
+            --border-color: rgba(16, 185, 129, 0.25);
+            --puck-on: #e11d48;
+        }
+        body {
+            background-color: var(--bg-primary); color: var(--text-main); font-family: monospace; margin: 0; padding: 0;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
+        .main-wrapper { padding: 15px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: transparent; padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; -webkit-overflow-scrolling: touch; }
+        .history-ribbon::-webkit-scrollbar { display: none; }
+        .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; }
+        .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.2); }
+        .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
+        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
+        .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
+        .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
+
+        .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+        .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
+        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 6px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; }
+        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; }
+        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 10px; font-weight: bold; }
+        .box-count { font-size: 22px; font-weight: bold; color: #ffffff; padding: 10px 0; }
+        .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(51, 65, 85, 0.4); font-size: 11px; }
+        .sub-left { background-color: #000000; color: #ffffff; padding: 4px 0; border-right: 1px solid rgba(51, 65, 85, 0.4); font-weight: bold; }
+        .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
+
+        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+        .pad-btn { background: #020617; color: #94a3b8; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 20px; font-weight: bold; width: 52px; height: 50px; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .pad-btn:hover { color: #fff; border-color: var(--emerald-accent); }
+        .pad-btn.active { background: linear-gradient(135deg, var(--emerald-accent) 0%, #047857 100%); color: #fff !important; border-color: #ffffff40; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        
+        .act-btn { padding: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 13px; text-transform: uppercase; text-align: center; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0.4); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .act-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
+        .act-btn:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
+        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+        .btn-purple { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: white; }
+        .btn-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; }
+        .btn-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+        .btn-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+        
+        .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
+        .select-element:focus { border-color: var(--emerald-accent); }
+        
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: #1e293b; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #f8fafc; }
+        
+        .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+        .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        
+        .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
+        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; display: flex; justify-content: space-between; align-items: center; }
+        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
+        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
+        .d-cell:last-child { border-right: none; }
+        .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
+        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
+        
+        .dice-visual-cube { width: 34px; height: 34px; background: #0f172a; color: var(--emerald-accent); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 24px; border: 1px solid var(--border-color); box-shadow: 0 0 12px rgba(16,185,129,0.15); font-family: sans-serif; }
+        .force-uppercase { text-transform: uppercase; }
+        .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 38px; }
+
+        @keyframes pulse-warn {
+            0%, 100% { border-color: rgba(16, 185, 129, 0.5); box-shadow: none; }
+            50% { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.7); background: rgba(245, 158, 11, 0.15); }
+        }
+        .pulse-warning-btn { animation: pulse-warn 1.2s infinite; color: #f59e0b !important; border-color: #f59e0b !important; }
     </style>
 </head>
 <body>
-    <div class="main-wrapper p-4 max-w-4xl mx-auto">
-        <div id="status-log" class="text-[10px] text-emerald-500 mb-2">SYSTEM READY</div>
-        
-        <div class="controller-panel">
-            <div class="flex justify-center gap-12 mb-6">
-                <div id="leftPadContainer" class="grid grid-cols-3 gap-2"></div>
-                <div id="rightPadContainer" class="grid grid-cols-3 gap-2"></div>
+
+    <nav class="zombie-nav-header">
+        <div class="flex flex-col cursor-pointer" onclick="window.location.assign('lobby.html')">
+            <h2 class="brand-title text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
+            <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em]"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
+                <div class="flex gap-1">
+                    <select id="ctxLocationSelect" class="select-element" onchange="watchLocationDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('locations')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('locations')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <button class="act-btn bg-emerald-600" onclick="submitRoll()">Standard Roll</button>
-                <button class="act-btn bg-red-600" onclick="resetState()">Reset</button>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Location</label>
+                <select id="ctxTablePositionSelect" class="select-element" onchange="executeAnalyticalFilterEngine()"></select>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter ID</label>
+                <div class="flex gap-1">
+                    <select id="ctxShooterSelect" class="select-element" onchange="watchShooterDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('shooters')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('shooters')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
+                <div class="flex gap-1">
+                    <select id="ctxDiceSetSelect" class="select-element" onchange="watchDiceSetDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('dice_sets')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('dice_sets')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="history-ribbon" id="historyContainer"></div>
+
+        <div class="controller-panel">
+            <div class="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-[1000px] mx-auto w-full">
+                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
+                    <div class="flex items-center gap-3 h-12">
+                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
+                        <div id="vis-left-set" class="flex gap-1.5 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
+                            <div class="dice-visual-cube" id="v-left-t">-</div>
+                            <div class="dice-visual-cube" id="v-left-f">-</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="leftPadContainer"></div>
+                    <div id="pad-telemetry-left" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0 transition-opacity duration-200">-</div>
+                </div>
+                
+                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 w-full md:w-auto min-w-[280px] max-w-xs gap-3 shrink-0 justify-between">
+                    <div class="flex justify-around w-full mt-2">
+                        <div class="text-center">
+                            <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Hand</div>
+                            <div class="text-3xl font-black text-white font-mono mt-1" id="summary-current">0</div>
+                        </div>
+                        <div class="border-r border-slate-800 h-12"></div>
+                        <div class="text-center">
+                            <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Session</div>
+                            <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
+                        </div>
+                    </div>
+
+                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
+                        <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">USING ORIGINAL CONFIG</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
+                    <div class="flex items-center gap-3 h-12">
+                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
+                        <div id="vis-right-set" class="flex gap-1.5 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
+                            <div class="dice-visual-cube" id="v-right-t">-</div>
+                            <div class="dice-visual-cube" id="v-right-f">-</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="rightPadContainer"></div>
+                    <div id="pad-telemetry-right" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0 transition-opacity duration-200">-</div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 border-t border-slate-800 mt-6 pt-5">
+                <button class="act-btn btn-green font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('STANDARD')">Standard Roll</button>
+                <button class="act-btn btn-purple font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
+            </div>
+            <div class="grid grid-cols-3 gap-4 mt-3">
+                <button class="act-btn btn-orange font-bold py-2.5 text-xs" onclick="launchInvalidCausePickerModal()">Invalid Roll</button>
+                <button class="act-btn btn-blue font-bold py-2.5 text-xs" onclick="executeUndo()">Undo Last</button>
+                <button class="act-btn btn-red font-bold py-2.5 text-xs" onclick="executeClearReset()">Reset Dataset</button>
+            </div>
+        </div>
+
+        <div class="board-stack">
+            <div class="grid-row-segment">
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
+            </div>
+            <div class="grid-row-segment">
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
+            </div>
+        </div>
+
+        <div class="diagnostics-panel mt-2">
+            <div class="diag-title">
+                <span>ZOMBIELORD STATISTICAL DIAGNOSTICS</span>
+                <select id="ctxFilterScopeSelect" class="bg-slate-900 border border-slate-700 text-white font-mono text-[11px] p-1 px-3 rounded outline-none cursor-pointer" onchange="executeAnalyticalFilterEngine()">
+                    <option value="ALL">ALL SESSION TIMELINE</option>
+                    <option value="CUSTOM">CUSTOM DROPDOWN FILTER</option>
+                </select>
+            </div>
+            <div class="diag-metrics-grid">
+                <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
+                <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
+                <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
+                <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
+                <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ctxMetadataModalFrame" class="modal-mask">
+        <div class="modal-box">
+            <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register Parameter</h3>
+            <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
+            <div class="flex justify-between gap-3 mt-6 border-t border-slate-800 pt-4">
+                <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">[ CANCEL ]</button>
+                <button onclick="commitMetadataModalForm()" class="shard-btn primary-shard px-4 py-2">[ ACCEPT ]</button>
             </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); 
-        const db = firebase.firestore();
+        const auth = firebase.auth(); const db = firebase.firestore();
+        let currentUid = null, activeModalContext = null, activeEditId = null;
 
-        let state = { selectedLeft: null, selectedRight: null };
+        // Structured dictionaries instantiated cleanly to prevent runtime execution loops
+        let userShootersList = {}; let userLocationsList = {}; let userDiceSetsList = {}; let userCausesList = {};
+        const FIXED_TABLE_POSITIONS = [
+            "SL1", "SL2", "SL3", "SL4", "HL1", "HL2", "HL3", "HL4",
+            "SR1", "SR2", "SR3", "SR4", "HR1", "HR2", "HR3", "HR4"
+        ];
+        const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
 
-        // 1. Force Immediate UI Render
-        function initDualPads() {
-            const l = document.getElementById('leftPadContainer');
-            const r = document.getElementById('rightPadContainer');
-            for(let i=1; i<=6; i++) {
-                l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectDie('left', ${i})">${i}</button>`;
-                r.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectDie('right', ${i})">${i}</button>`;
-            }
-        }
+        let currentSuggestedSetString = ""; let activeTargetDiceSetString = ""; let isSuggestedSetFlag = false;
 
-        function selectDie(side, val) {
-            if(side === 'left') {
-                document.querySelectorAll('[id^="l-pad-"]').forEach(el => el.classList.remove('active'));
-                state.selectedLeft = val;
-                document.getElementById(`l-pad-${val}`).classList.add('active');
-            } else {
-                document.querySelectorAll('[id^="r-pad-"]').forEach(el => el.classList.remove('active'));
-                state.selectedRight = val;
-                document.getElementById(`r-pad-${val}`).classList.add('active');
-            }
-        }
+        const state = {
+            totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
+            matrix: { 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0}, 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0} }
+        };
+        const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
-        async function submitRoll() {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Select dice!");
-            try {
-                await db.collection("test_roll").add({
-                    sum: state.selectedLeft + state.selectedRight,
-                    ts: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                document.getElementById('status-log').innerText = "ROLL SAVED TO DATABASE";
-                resetState();
-            } catch (e) {
-                document.getElementById('status-log').innerText = "DB ERROR: " + e.message;
-            }
-        }
-
-        function resetState() {
-            state.selectedLeft = null; state.selectedRight = null;
-            document.querySelectorAll('.pad-btn').forEach(el => el.classList.remove('active'));
-        }
-
-        auth.signInAnonymously().then(() => {
-            document.getElementById('status-log').innerText = "AUTHENTICATED";
+        auth.onAuthStateChanged(user => {
+            if (!user) { window.location.href = "index.html"; return; }
+            currentUid = user.uid;
             initDualPads();
-        }).catch(e => {
-            document.getElementById('status-log').innerText = "AUTH FAIL: " + e.message;
+            initDragToScrollRibbon();
+            fetchMasterMetadataCollections().then(() => {
+                setDefaultAllDropdowns();
+                fetchCloudState();
+            });
         });
+
+        function setDefaultAllDropdowns() {
+            document.getElementById('ctxLocationSelect').value = "ALL";
+            document.getElementById('ctxTablePositionSelect').value = "ALL";
+            document.getElementById('ctxShooterSelect').value = "ALL";
+            document.getElementById('ctxDiceSetSelect').value = "ALL";
+        }
+
+        async function fetchMasterMetadataCollections() {
+            if (!currentUid) return;
+            try {
+                const [sSnap, lSnap, dSnap, cSnap] = await Promise.all([
+                    db.collection("users").doc(currentUid).collection("master_shooters").get(),
+                    db.collection("users").doc(currentUid).collection("master_locations").get(),
+                    db.collection("users").doc(currentUid).collection("master_dice_sets").get(),
+                    db.collection("users").doc(currentUid).collection("master_invalid_causes").get()
+                ]);
+
+                userShootersList = {}; sSnap.forEach(doc => { userShootersList[doc.id] = doc.data(); });
+                userLocationsList = {}; lSnap.forEach(doc => { userLocationsList[doc.id] = doc.data(); });
+                userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
+                userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
+
+                syncConfigurationDropdowns();
+            } catch (err) { console.error("Sync Interception Failure: ", err); }
+        }
+
+        function syncConfigurationDropdowns() {
+            const sSel = document.getElementById('ctxShooterSelect');
+            const lSel = document.getElementById('ctxLocationSelect');
+            const pSel = document.getElementById('ctxTablePositionSelect');
+            const dSel = document.getElementById('ctxDiceSetSelect');
+            
+            if (!sSel || !lSel || !pSel || !dSel) return;
+            const prevS = sSel.value, prevL = lSel.value, prevP = pSel.value, prevD = dSel.value;
+
+            lSel.innerHTML = `<option value="ALL">ALL LOCATIONS</option>`;
+            Object.keys(userLocationsList).forEach(id => { lSel.innerHTML += `<option value="${id}">${id}</option>`; });
+            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
+
+            pSel.innerHTML = `<option value="ALL">ALL POSITIONS</option>`;
+            FIXED_TABLE_POSITIONS.forEach(p => { pSel.innerHTML += `<option value="${p}">${p}</option>`; });
+
+            // Suffix Sorting logic attaches high unicode weight to push MECHANICAL arms to bottom
+            sSel.innerHTML = `<option value="ALL">ALL SHOOTERS</option>`;
+            let shooterKeys = Object.keys(userShootersList).sort((a,b) => {
+                let handA = userShootersList[a].Handedness === 'MECHANICAL' ? 'z_' : 'a_';
+                let handB = userShootersList[b].Handedness === 'MECHANICAL' ? 'z_' : 'a_';
+                return (handA + a).localeCompare(handB + b);
+            });
+            shooterKeys.forEach(id => { sSel.innerHTML += `<option value="${id}">${id}</option>`; });
+            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
+
+            dSel.innerHTML = `<option value="ALL">NONE SELECTED</option>`;
+            Object.keys(userDiceSetsList).forEach(id => { dSel.innerHTML += `<option value="${id}">${userDiceSetsList[id].Set_Name}</option>`; });
+            dSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW DICE SET]</option>`;
+
+            if(sSel.querySelector(`option[value="${prevS}"]`)) sSel.value = prevS;
+            if(lSel.querySelector(`option[value="${prevL}"]`)) lSel.value = prevL;
+            if(pSel.querySelector(`option[value="${prevP}"]`)) pSel.value = prevP;
+            if(dSel.querySelector(`option[value="${prevD}"]`)) dSel.value = prevD;
+            
+            onDiceSetChange();
+        }
+
+        function openMetadataModal(category, targetId = null) {
+            activeModalContext = category; activeEditId = targetId;
+            const isEditMode = targetId !== null;
+            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
+
+            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
+            const fields = document.getElementById('modal-form-fields');
+            
+            let htmlContent = `<div><label class="block mb-1 font-bold">Unique Asset ID Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"'} placeholder="e.g. EVOLUTION"></div>`;
+
+            if (category === 'shooters') {
+                htmlContent += `
+                <div class="mt-2"><label class="block mb-1 font-bold">Dominant Hand:</label><select id="mField_Hand" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="RIGHT" ${record.Handedness === 'RIGHT' ? 'selected' : ''}>RIGHT-HANDED</option><option value="LEFT" ${record.Handedness === 'LEFT' ? 'selected' : ''}>LEFT-HANDED</option><option value="MECHANICAL" ${record.Handedness === 'MECHANICAL' ? 'selected' : ''}>MECHANICAL</option></select></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Throwing Style:</label><select id="mField_Style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="CONTROLLED SET" ${record.Throwing_Style === 'CONTROLLED SET' ? 'selected' : ''}>CONTROLLED SET</option><option value="RANDOM RANDY" ${record.Throwing_Style === 'RANDOM RANDY' ? 'selected' : ''}>RANDOM RANDY</option><option value="SHAKE RATTLE AND ROLL" ${record.Throwing_Style === 'SHAKE RATTLE AND ROLL' ? 'selected' : ''}>SHAKE RATTLE AND ROLL</option></select></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Preferred Rail Position:</label><select id="mField_PrefLoc" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="">NONE Selected</option>${FIXED_TABLE_POSITIONS.map(p => `<option value="${p}" ${record.Preferred_Location === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Observations / Notes:</label><textarea id="mField_Notes" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none h-16 resize-none force-uppercase text-transform: uppercase;">${record.Notes || ''}</textarea></div>`;
+            } else if (category === 'locations') {
+                htmlContent += `
+                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Address" value="${record.Address || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Online Armature Hub"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Table Length (FT):</label><input type="text" id="mField_Length" value="${record.Table_Length || '14'}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Bounce Elasticity:</label><select id="mField_Bouncy" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="LOW" ${record.Bouncy_Rating === 'LOW' ? 'selected' : ''}>LOW BOUNCE</option><option value="MEDIAN" ${record.Bouncy_Rating === 'MEDIAN' ? 'selected' : ''}>MEDIAN BOUNCE</option><option value="HIGH" ${record.Bouncy_Rating === 'HIGH' ? 'selected' : ''}>HIGH BOUNCE</option></select></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Surface Pile Layout:</label><select id="mField_Surface" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="FELT" ${record.Table_Surface === 'FELT' ? 'selected' : ''}>FELT</option><option value="MICROFIBER" ${record.Table_Surface === 'MICROFIBER' ? 'selected' : ''}>MICROFIBER</option></select></div>`;
+            } else if (category === 'dice_sets') {
+                htmlContent = `<div><label class="block mb-1 font-bold">Dice Set Designation Name:</label><input type="text" id="mField_Name" value="${record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="3V ARRANGEMENT"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="Calibration tracking profiles note alignment"></div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 bg-black/30 p-2 rounded border border-slate-800">
+                    <div><label class="block text-[11px] text-amber-500 font-bold">L-TOP (1-6):</label><input type="number" id="mField_LTop" min="1" max="6" value="${record.Left_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-TOP (1-6):</label><input type="number" id="mField_RTop" min="1" max="6" value="${record.Right_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px] text-amber-500 font-bold">L-FACE (1-6):</label><input type="number" id="mField_LFront" min="1" max="6" value="${record.Left_Front_Face || 6}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE (1-6):</label><input type="number" id="mField_RFront" min="1" max="6" value="${record.Right_Front_Face || 2}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                </div>`;
+            } else if (category === 'invalid_causes') {
+                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. DICE OFF TABLE"></div>`;
+            }
+
+            fields.innerHTML = htmlContent;
+            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
+        }
+
+        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; syncConfigurationDropdowns(); }
+
+        async function commitMetadataModalForm() {
+            if (!currentUid) return;
+            let targetDocId = activeEditId;
+            let payload = {};
+
+            const idField = document.getElementById('mField_Id');
+            const nameField = document.getElementById('mField_Name');
+            const idVal = idField ? idField.value.trim().toUpperCase() : "";
+
+            if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
+                if (!activeEditId) {
+                    if (!idVal) return alert("Unique parameter key code mandate unfulfilled.");
+                    targetDocId = idVal;
+                }
+                if (activeModalContext === 'shooters') {
+                    payload = { Handedness: document.getElementById('mField_Hand').value, Throwing_Style: document.getElementById('mField_Style').value, Preferred_Location: document.getElementById('mField_PrefLoc').value, Notes: document.getElementById('mField_Notes').value.trim().toUpperCase() };
+                } else if (activeModalContext === 'locations') {
+                    payload = { name: targetDocId, Address: document.getElementById('mField_Address').value.trim().toUpperCase(), Table_Length: document.getElementById('mField_Length').value.trim().toUpperCase(), Bouncy_Rating: document.getElementById('mField_Bouncy').value, Table_Surface: document.getElementById('mField_Surface').value };
+                } else if (activeModalContext === 'invalid_causes') {
+                    payload = { name: targetDocId, Description: document.getElementById('mField_Desc').value.trim().toUpperCase() };
+                }
+            } else if (activeModalContext === 'dice_sets') {
+                const sName = nameField.value.trim().toUpperCase();
+                if (!sName) return alert("Designation tag identity parameters missing.");
+                if (!activeEditId) targetDocId = "SET_" + Date.now();
+                payload = {
+                    Set_Name: sName,
+                    Description: document.getElementById('mField_Desc').value.trim().toUpperCase(),
+                    Left_Top_Face: parseInt(document.getElementById('mField_LTop').value) || 3,
+                    Left_Front_Face: parseInt(document.getElementById('mField_LFront').value) || 6,
+                    Right_Top_Face: parseInt(document.getElementById('mField_RTop').value) || 3,
+                    Right_Front_Face: parseInt(document.getElementById('mField_RFront').value) || 2
+                };
+            }
+
+            await db.collection("users").doc(currentUid).collection(`master_${activeModalContext}`).doc(targetDocId).set(payload);
+            
+            if (activeModalContext === 'shooters') userShootersList[targetDocId] = payload;
+            else if (activeModalContext === 'locations') userLocationsList[targetDocId] = payload;
+            else if (activeModalContext === 'dice_sets') userDiceSetsList[targetDocId] = payload;
+            else if (activeModalContext === 'invalid_causes') userCausesList[targetDocId] = payload;
+
+            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
+            await fetchMasterMetadataCollections();
+            
+            const targetDropdownId = activeModalContext === 'shooters' ? 'ctxShooterSelect' : (activeModalContext === 'locations' ? 'ctxLocationSelect' : (activeModalContext === 'dice_sets' ? 'ctxDiceSetSelect' : null));
+            if(targetDropdownId) {
+                document.getElementById(targetDropdownId).value = targetDocId;
+                if(activeModalContext === 'dice_sets') onDiceSetChange();
+            }
+            executeAnalyticalFilterEngine();
+        }
+
+        function editCurrentAsset(cat) {
+            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select registered custom parameters first.");
+            openMetadataModal(cat, el.value);
+        }
+
+        async function deleteCurrentAsset(cat) {
+            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select highlighted target configuration entry row index item.");
+            if (confirm("Permanently strip asset config map matrix profile block row?")) {
+                await db.collection("users").doc(currentUid).collection(`master_${cat}`).doc(el.value).delete();
+                await fetchMasterMetadataCollections();
+                setDefaultAllDropdowns();
+                executeAnalyticalFilterEngine();
+            }
+        }
+
+        function watchShooterDropdownChange() { if(document.getElementById('ctxShooterSelect').value === 'ADD_NEW') openMetadataModal('shooters'); else executeAnalyticalFilterEngine(); }
+        function watchLocationDropdownChange() { if(document.getElementById('ctxLocationSelect').value === 'ADD_NEW') openMetadataModal('locations'); else executeAnalyticalFilterEngine(); }
+        function watchDiceSetDropdownChange() { if(document.getElementById('ctxDiceSetSelect').value === 'ADD_NEW') openMetadataModal('dice_sets'); else onDiceSetChange(); }
+
+        function onDiceSetChange() {
+            const el = document.getElementById('ctxDiceSetSelect');
+            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
+            const tgl = document.getElementById('toggle-set-container');
+
+            if (!el.value || el.value === 'ALL') {
+                visL.style.display = 'none'; visR.style.display = 'none'; tgl.style.display = 'none'; 
+                document.getElementById('pad-telemetry-left').style.opacity = '0';
+                document.getElementById('pad-telemetry-right').style.opacity = '0';
+                activeTargetDiceSetString = ""; return;
+            }
+
+            const d = userDiceSetsList[el.value];
+            if (d) {
+                document.getElementById('v-left-t').innerText = PIP_MAP[d.Left_Top_Face || 3];
+                document.getElementById('v-left-f').innerText = PIP_MAP[d.Left_Front_Face || 6];
+                document.getElementById('v-right-t').innerText = PIP_MAP[d.Right_Top_Face || 3];
+                document.getElementById('v-right-f').innerText = PIP_MAP[d.Right_Front_Face || 2];
+                visL.style.display = 'flex'; visR.style.display = 'flex';
+                
+                if (activeTargetDiceSetString === "") {
+                    activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+                }
+                tgl.style.display = 'flex';
+            }
+            calculateLiveKinematicsPreview();
+        }
+
+        function handleSuggestionToggleAction() {
+            if (activeTargetDiceSetString !== "" && activeTargetDiceSetString !== getDropdownConfigDiceSetString()) {
+                if (confirm("Return calculation calibration anchor tracking parameters to your Dropdown Configured Original Dice Set?")) {
+                    activeTargetDiceSetString = getDropdownConfigDiceSetString();
+                    isSuggestedSetFlag = false; resetSuggestionTrackingButtonDisplay(); calculateLiveKinematicsPreview();
+                }
+                return;
+            }
+            if (currentSuggestedSetString === "") return;
+            if (confirm(`Promote calibration suggestions layer [${currentSuggestedSetString}] as active physical throw baseline set orientation?`)) {
+                activeTargetDiceSetString = currentSuggestedSetString; isSuggestedSetFlag = true;
+                resetSuggestionTrackingButtonDisplay(); calculateLiveKinematicsPreview();
+            }
+        }
+
+        function getDropdownConfigDiceSetString() {
+            const el = document.getElementById('ctxDiceSetSelect'); const d = userDiceSetsList[el.value]; if(!d) return "";
+            return `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+        }
+
+        function resetSuggestionTrackingButtonDisplay() {
+            const btn = document.getElementById('btn-set-flag'); btn.classList.remove('pulse-warning-btn');
+            if (activeTargetDiceSetString === getDropdownConfigDiceSetString()) {
+                btn.innerText = "USING ORIGINAL CONFIG";
+                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-800 p-2.5 rounded text-amber-400 transition-all text-center";
+            } else {
+                btn.innerText = `PROMOTED: ${activeTargetDiceSetString}`;
+                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-500/40 p-2.5 rounded text-emerald-400 transition-all text-center";
+                if (currentSuggestedSetString !== "" && currentSuggestedSetString !== activeTargetDiceSetString) {
+                    btn.classList.add('pulse-warning-btn'); btn.innerText = "NEW SUGGESTION READY";
+                }
+            }
+        }
+
+        function selectMatrixDie(axis, val) {
+            if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
+            else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
+            calculateLiveKinematicsPreview();
+        }
+
+        function calculateLiveKinematicsPreview() {}
+
+        function renderLastRollKinematics(record) {
+            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
+            if (record.Invalid_Roll || !record.Kinematic_Status || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
+            
+            const parseAxisString = (kObj) => {
+                if(!kObj) return "N/A"; const r = parseInt(kObj.rot);
+                if([1,2,6,5].includes(r)) return `PITCH [${r}]`; return `YAW [${r}]`;
+            };
+            lBox.innerText = parseAxisString(record.Left_Kinematic); rBox.innerText = parseAxisString(record.Right_Kinematic);
+            lBox.style.opacity = '1'; rBox.style.opacity = '1';
+        }
+
+        async function launchInvalidCausePickerModal() {
+            activeModalContext = 'invalid_causes'; activeEditId = null;
+            let causeKeys = Object.keys(userCausesList);
+            
+            // Reconstructed Dynamic Modal Form Component Shroud Frame popup selector interface
+            const fields = document.getElementById('modal-form-fields');
+            document.getElementById('modal-headline').innerText = "SELECT INVALID TIMEOUT CAUSE";
+            
+            let html = `<div><label class="block mb-1 font-bold">Select Active Code Label:</label><select id="mField_CauseSelect" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none">`;
+            causeKeys.forEach(k => { html += `<option value="${k}">${k}</option>`; });
+            html += `</select></div><div class="mt-3 border-t border-slate-800 pt-3"><label class="block mb-1 font-bold">[OR REGISTER NEW INVALID CAUSE DESC]:</label><input type="text" id="mField_NewCauseInput" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. STICKMAN INTERFERENCE"></div>`;
+            
+            fields.innerHTML = html;
+            
+            const acceptBtn = document.querySelector('#ctxMetadataModalFrame .shard-btn');
+            acceptBtn.setAttribute('onclick', 'commitInvalidCausePickerSelection()');
+            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
+        }
+
+        async function commitInvalidCausePickerSelection() {
+            if (!currentUid) return;
+            const selectVal = document.getElementById('mField_CauseSelect')?.value;
+            const inputVal = document.getElementById('mField_NewCauseInput')?.value.trim().toUpperCase();
+            
+            let finalCause = selectVal || "UNSPECIFIED ERROR";
+            if (inputVal) {
+                finalCause = inputVal;
+                await db.collection("users").doc(currentUid).collection("master_invalid_causes").doc(finalCause).set({ name: finalCause, Description: "USER DEFINED EXCEPTION EVENT" });
+                userCausesList[finalCause] = { name: finalCause };
+            }
+            
+            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
+            const acceptBtn = document.querySelector('#ctxMetadataModalFrame .shard-btn');
+            acceptBtn.setAttribute('onclick', 'commitMetadataModalForm()');
+
+            const r = {
+                leftDie: null, rightDie: null, sum: 0,
+                Location_ID: document.getElementById('ctxLocationSelect').value, Table_Position: document.getElementById('ctxTablePositionSelect').value || "SL1", Shooter_ID: getSelectedText('Shooter'),
+                Left_Set_Face: "N/A", Right_Set_Face: "N/A", Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null, Invalid_Roll: true, Notes: finalCause
+            };
+            state.rollHistoryLog.push(r); state.rawSequenceLog.push(0);
+            executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
+        }
+
+        function getSelectedText(type) {
+            const el = document.getElementById(type === 'Location' ? 'ctxLocationSelect' : 'ctxShooterSelect');
+            if (!el || el.value === 'ALL' || el.selectedIndex < 0) return "UNASSIGNED";
+            return el.options[el.selectedIndex].text;
+        }
+
+        function submitRoll(trackingMode) {
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice matrix button nodes empty.");
+            const locVal = document.getElementById('ctxLocationSelect').value;
+            const sumValue = parseInt(state.selectedLeft + state.selectedRight);
+            const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
+            
+            let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway) || (locVal === 'EVOLUTION');
+
+            let lKin = null, rKin = null;
+            if (enforceKinematics && document.getElementById('ctxDiceSetSelect').value !== 'ALL' && locVal !== 'EVOLUTION') {
+                let lParts = [3,6], rParts = [3,2];
+                if (activeTargetDiceSetString !== "") {
+                    const pairs = activeTargetDiceSetString.split('x');
+                    lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
+                }
+                const computeCode = (top, bTop, bFront) => {
+                    if (top === bTop) return 1; if (top === (7 - bFront)) return 2; if (top === (7 - bTop)) return 6; if (top === bFront) return 5; return 4; 
+                };
+                lKin = { rot: computeCode(state.selectedLeft, lParts[0], lParts[1]), ax: (state.selectedLeft === lParts[0] ? "0" : "1") };
+                rKin = { rot: computeCode(state.selectedRight, rParts[0], rParts[1]), ax: (state.selectedRight === rParts[0] ? "0" : "1") };
+            }
+
+            const r = {
+                leftDie: parseInt(state.selectedLeft), rightDie: parseInt(state.selectedRight), sum: sumValue,
+                Location_ID: locVal, Table_Position: document.getElementById('ctxTablePositionSelect').value || "SL1", Shooter_ID: getSelectedText('Shooter'),
+                Left_Set_Face: activeTargetDiceSetString.split('x')[0] || "3/6", Right_Set_Face: activeTargetDiceSetString.split('x')[1] || "3/2",
+                Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: enforceKinematics, Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL", Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false, Notes: ""
+            };
+            state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.sum);
+            executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
+        }
+
+        function executeCalculationsLoop(record) {
+            if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
+            const sum = record.sum;
+            state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
+            if(sum === 7) {
+                state.sevensTotal++;
+                if(state.activePoint === null) state.sevensComeout++;
+                else { state.sevensRed++; state.shooterHistory.push(state.currentHandRolls); state.currentHandRolls = 0; state.activePoint = null; for(let k in state.matrix) state.matrix[k].cur = 0; }
+            } else {
+                if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
+                else if(sum === state.activePoint) { state.totalPointsMade++; state.activePoint = null; }
+            }
+            executeAnalyticalFilterEngine(); renderLastRollKinematics(record);
+        }
+
+        function calculateGeometricDiceMedian(sampleStream) {
+            const valid = sampleStream.filter(v => v !== null && v !== undefined); if (!valid.length) return 1;
+            const counts = { 1:0, 2:0, 6:0, 5:0, 4:0 }; valid.forEach(v => { if(counts[v.rot] !== undefined) counts[v.rot]++; });
+            return [1,2,6,5,4].sort((a,b) => counts[b] - counts[a])[0] || 1;
+        }
+
+        function processCalibrationSuiteSuggestionsEngine(validLogs) {
+            const tglContainer = document.getElementById('toggle-set-container');
+            if (validLogs.length < 15 || document.getElementById('ctxDiceSetSelect').value === 'ALL' || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') {
+                currentSuggestedSetString = ""; tglContainer.style.display = 'none'; return;
+            }
+            const lMed = calculateGeometricDiceMedian(validLogs.map(r => r.Left_Kinematic));
+            const rMed = calculateGeometricDiceMedian(validLogs.map(r => r.Right_Kinematic));
+            const lastRow = validLogs[validLogs.length - 1];
+            const shiftCube = (fStr, code) => {
+                const top = parseInt(fStr.split('/')[0]) || 3, fr = parseInt(fStr.split('/')[1]) || 6;
+                if (code == 1) return `${top}/${fr}`; if (code == 2) return `${fr}/${7-top}`; if (code == 6) return `${7-top}/${7-fr}`; if (code == 5) return `${7-fr}/${top}`; return `${top}/${fr}`;
+            };
+            currentSuggestedSetString = `${shiftCube(lastRow.Left_Set_Face, lMed)}x${shiftCube(lastRow.Right_Set_Face, rMed)}`;
+            tglContainer.style.display = 'flex'; resetSuggestionTrackingButtonDisplay();
+        }
+
+        function executeAnalyticalFilterEngine() {
+            const mode = document.getElementById('ctxFilterScopeSelect').value;
+            const sh = getSelectedText('Shooter'); const loc = document.getElementById('ctxLocationSelect').value;
+            const pos = document.getElementById('ctxTablePositionSelect').value;
+            let filtered = [...state.rollHistoryLog];
+
+            if(mode === 'CUSTOM') {
+                if(sh !== "UNASSIGNED") filtered = filtered.filter(r => r.Shooter_ID === sh);
+                if(loc !== "ALL") filtered = filtered.filter(r => r.Location_ID === loc);
+                if(pos !== "ALL") filtered = filtered.filter(r => r.Table_Position === pos);
+            }
+
+            let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
+            let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
+            const ribbon = document.getElementById('historyContainer'); ribbon.innerHTML = '';
+            let kLogs = [];
+
+            // Global Evolution Armature Transition Data Accumulator Matrix (Tracks globally across all 11 possible outcome totals 2-12)
+            let evConditionalTracker = {}; 
+            for(let i=2; i<=12; i++) { evConditionalTracker[i] = { vectorCounts: {}, pairCounts: {} }; }
+
+            filtered.forEach((v, idx) => {
+                if(v.Invalid_Roll) { ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-amber-500 border border-amber-500/30 text-xs" title="${v.Notes}">ERR</div>`; return; }
+                lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1; if(v.Kinematic_Status) kLogs.push(v);
+                
+                // Track transition paths based on baseline setup total N-1
+                if (loc === 'EVOLUTION' && idx > 0) {
+                    const prevRow = filtered[idx - 1];
+                    // Skip randomization re-roll overrides (Sevens or Invalid frames)
+                    if (prevRow && !prevRow.Invalid_Roll && prevRow.sum !== 7 && prevRow.sum !== 0) {
+                        const baseSetupSum = prevRow.sum;
+                        const pairStr = [v.leftDie, v.rightDie].sort((a,b)=>a-b).join('-');
+                        
+                        if(!evConditionalTracker[baseSetupSum].vectorCounts[v.sum]) evConditionalTracker[baseSetupSum].vectorCounts[v.sum] = 0;
+                        evConditionalTracker[baseSetupSum].vectorCounts[v.sum]++;
+                        
+                        if(!evConditionalTracker[baseSetupSum].pairCounts[pairStr]) evConditionalTracker[baseSetupSum].pairCounts[pairStr] = 0;
+                        evConditionalTracker[baseSetupSum].pairCounts[pairStr]++;
+                    }
+                }
+
+                let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
+                if(v.sum === 7) { lTotal++; if(lap === null) { lComeout++; c = 'node-natural'; } else { lRed++; c = 'node-seven-out'; lHand = 0; lap = null; for(let k in la) la[k] = 0; } }
+                else if(v.sum === 11 && lap === null) c = 'node-natural';
+                else { if(lap === null) { if([4,5,6,8,9,10].includes(v.sum)) { lap = v.sum; c = 'node-point-made'; } } else if(v.sum === lap) { c = 'node-point-made'; lPoints++; lap = null; } else { c = isH ? 'node-hard' : 'node-normal'; } }
+                if(isH && c === 'node-normal') c = 'node-hard';
+                ribbon.innerHTML += `<div class="history-node ${c}">${v.sum}${isH && c!=='node-point-made'?'<sup>H</sup>':''}</div>`;
+            });
+
+            // Re-render display panel metrics counters alongside multi-cycle cold scaling horizons
+            for(let i=2; i<=12; i++) {
+                if(i===7) continue; document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
+                const cell = document.getElementById(`cur-${i}`); cell.innerText = lm[i]; document.getElementById(`tot-${i}`).innerText = lm[i];
+                document.getElementById(`puck-${i}`).style.display = (lap === i) ? 'block' : 'none';
+                if(la[i]) cell.classList.add('ats-active'); else cell.classList.remove('ats-active');
+                
+                // Multi-Cycle Horizon Frequency Temperature Tracker Checks
+                const w = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
+                if (chip) {
+                    const hit1 = state.rawSequenceLog.slice(-w).filter(x => x == i).length;
+                    if (hit1 > 1) {
+                        chip.innerText = '🔥';
+                    } else if (state.totalRolls >= w && hit1 === 0) {
+                        chip.innerText = '❄️';
+                        if (state.totalRolls >= (2*w) && state.rawSequenceLog.slice(-(2*w)).filter(x => x == i).length === 0) chip.innerText = '❄️❄️';
+                        if (state.totalRolls >= (3*w) && state.rawSequenceLog.slice(-(3*w)).filter(x => x == i).length === 0) chip.innerText = '❄️❄️❄️';
+                    } else {
+                        chip.innerText = '';
+                    }
+                }
+                
+                // Process and project explicit Conditional Kinematic Hot/Cold outputs globally on ALL 11 blocks
+                const pane = document.getElementById(`ev-pane-${i}`);
+                if(pane) {
+                    if (loc === 'EVOLUTION') {
+                        pane.classList.remove('hidden');
+                        let nextVectors = Object.keys(evConditionalTracker[i].vectorCounts).map(Number).sort((a,b) => evConditionalTracker[i].vectorCounts[b] - evConditionalTracker[i].vectorCounts[a]);
+                        let lowVectors = Object.keys(probabilityWindows).map(Number).filter(n => n!==7 && !evConditionalTracker[i].vectorCounts[n]);
+                        
+                        let hotStr = "NONE", coldStr = "NONE";
+                        if (nextVectors.length > 0) {
+                            let topTargetSum = nextVectors[0]; hotStr = `${topTargetSum}`;
+                            // Drill down to display un-ordered pairs strictly if the destination target is a standard table box number
+                            if ([4,5,6,8,9,10].includes(topTargetSum)) {
+                                let matchingPairs = Object.keys(evConditionalTracker[i].pairCounts).filter(p => p.split('-').map(Number).reduce((a,b)=>a+b,0) === topTargetSum).sort((a,b) => evConditionalTracker[i].pairCounts[b] - evConditionalTracker[i].pairCounts[a]);
+                                if(matchingPairs.length > 0) hotStr += ` [${matchingPairs[0]}]`;
+                            }
+                        }
+                        if (lowVectors.length > 0) coldStr = `${lowVectors[0]}`;
+                        pane.innerHTML = `<div class="text-[9px] leading-tight"><b class="text-orange-400">HOT NEXT:</b> ${hotStr}</div><div class="text-[9px] leading-tight mt-0.5"><b class="text-cyan-400">COLD NEXT:</b> ${coldStr}</div>`;
+                    } else {
+                        pane.classList.add('hidden');
+                    }
+                }
+            }
+
+            document.getElementById('summary-total').innerText = state.totalRolls;
+            document.getElementById('summary-current').innerText = lHand;
+            document.getElementById('stat-red').innerText = lRed;
+            document.getElementById('stat-sor').innerText = lRed > 0 ? (lValid / lRed).toFixed(1) : lValid.toFixed(1);
+            document.getElementById('stat-psr').innerText = lRed > 0 ? (lPoints / lRed).toFixed(1) : "0.0";
+            document.getElementById('stat-srr').innerText = lTotal > 0 ? (lValid / lTotal).toFixed(1) : lValid.toFixed(1);
+            document.getElementById('stat-co7').innerText = lComeout;
+            
+            processCalibrationSuiteSuggestionsEngine(kLogs); ribbon.scrollLeft = ribbon.scrollWidth;
+        }
+
+        async function pushCloudState(docId, name = null) {
+            if(!currentUid) return;
+            let uppercaseName = name ? name.toUpperCase() : null;
+            let p = { module_id: "DICE_TRACKER", totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls, sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout, totalPointsMade: state.totalPointsMade, activePoint: state.activePoint, value: state.activePoint, shooterHistory: state.shooterHistory, rawSequenceLog: state.rawSequenceLog, payload_log: JSON.stringify(state.rollHistoryLog), matrix: JSON.stringify(state.matrix), meta_tags: { location: document.getElementById('ctxLocationSelect').value, base_unit: 1 }, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
+            if(uppercaseName) p.name = uppercaseName;
+            await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(p, { merge: true });
+        }
+
+        function fetchCloudState() { db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => { if(doc.exists) rebuildUIFromStoredData(doc.data()); }); }
+
+        function rebuildUIFromStoredData(d) {
+            state.totalRolls = d.totalRolls || 0; state.currentHandRolls = d.currentHandRolls || 0; state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
+            try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
+            let rawLog = d.payload_log || d.rollHistoryLog || []; try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
+            executeAnalyticalFilterEngine();
+        }
+
+        async function handleCryptNavigationTrigger() {
+            if(state.rollHistoryLog.length > 0 && confirm("Archive current active workspace tracking session inside the Crypt?")) {
+                const n = prompt("ENTER ARCHIVE NAME:"); if(n && n.trim()) await pushCloudState("archive_" + Date.now(), n.trim());
+            }
+            window.location.assign('crypt.html');
+        }
+
+        function executeUndo() {
+            if(state.rollHistoryLog.length === 0) return; state.rollHistoryLog.pop(); state.rawSequenceLog.pop();
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null;
+            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            b.forEach(row => { state.rollHistoryLog.push(row); state.rawSequenceLog.push(row.sum); executeCalculationsLoop(row); }); pushCloudState("active_session");
+        }
+
+        function executeClearReset() {
+            if(!confirm("Clear session data?")) return;
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            clearSelectionPads(); executeAnalyticalFilterEngine(); pushCloudState("active_session");
+        }
+
+        function clearSelectionPads() { state.selectedLeft = null; state.selectedRight = null; for(let i=1; i<=6; i++) { document.getElementById(`l-pad-${i}`).classList.remove('active'); document.getElementById(`r-pad-${i}`).classList.remove('active'); } }
     </script>
 </body>
 </html>
