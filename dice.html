@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.16.0</title>
+    <title>Dice Tracker v1.16.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -13,100 +13,61 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;400;600&display=swap');
         :root {
             --bg-primary: #020617;
-            --panel-bg: #0f172a;
+            --panel-bg: rgba(15, 23, 42, 0.7);
             --text-main: #f8fafc;
             --emerald-accent: #10b981;
             --amber-accent: #f59e0b;
-            --border-color: #334155;
+            --border-color: rgba(16, 185, 129, 0.2);
             --puck-on: #e11d48;
         }
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            font-family: monospace;
-            margin: 0; padding: 0;
+            background-color: var(--bg-primary); color: var(--text-main); font-family: monospace; margin: 0; padding: 0;
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
             background-size: cover; background-position: center; background-attachment: fixed;
         }
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .zombie-nav-header {
-            background-color: rgba(2, 6, 23, 0.6);
-            backdrop-filter: blur(20px);
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 20px; border-b: 1px solid rgba(16, 185, 129, 0.2);
-            height: 76px; font-family: 'Cinzel', serif;
-        }
-        .main-wrapper { padding: 15px; max-width: 1000px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        .history-ribbon {
-            display: flex; flex-direction: row; overflow-x: auto; background-color: #000;
-            padding: 12px; gap: 6px; min-height: 50px; align-items: center;
-            border: 1px solid var(--border-color); cursor: grab; user-select: none;
-            -webkit-overflow-scrolling: touch;
-        }
+        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-b: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
+        .main-wrapper { padding: 15px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: rgba(0, 0, 0, 0.4); padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; }
         .history-ribbon::-webkit-scrollbar { display: none; }
-        .history-ribbon:active { cursor: grabbing; }
-        .history-node {
-            font-weight: bold; font-size: 16px; padding: 6px 10px; border-radius: 2px;
-            min-width: 32px; text-align: center; flex-shrink: 0; font-family: monospace;
-        }
-        .node-normal { background-color: #1e293b; color: #fff; border: 1px solid var(--border-color); }
-        .node-hard { background-color: #1e293b; color: #fff; border: 2px dashed var(--amber-accent); }
-        .node-point-made { background-color: #ffffff; color: #000000; border: 1px solid #fff; font-weight: 900; }
+        .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; }
+        .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.15); }
+        .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
+        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; }
         .node-seven-out { background-color: #ef4444; color: #fff; }
         .node-natural { background-color: var(--emerald-accent); color: #fff; }
-        .board-stack { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+
+        .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
-        .box-container { background-color: var(--panel-bg); border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .box-num-header { font-size: 24px; font-weight: 900; color: var(--amber-accent); padding: 8px 0; background: #090d16; border-bottom: 1px solid var(--border-color); font-family: monospace; }
-        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; display: none; }
+        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 6px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); }
+        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; }
         .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 10px; font-weight: bold; }
-        .color-dark { background-color: #020617; }
-        .color-red { background-color: #1e1b4b; }
-        .box-count { font-size: 24px; font-weight: bold; color: #ffffff; padding: 15px 0; font-family: monospace; }
-        .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--border-color); font-size: 12px; }
-        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
+        .box-count { font-size: 22px; font-weight: bold; color: #ffffff; padding: 10px 0; }
+        .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(51, 65, 85, 0.4); font-size: 11px; }
+        .sub-left { background-color: #000000; color: #ffffff; padding: 4px 0; border-right: 1px solid rgba(51, 65, 85, 0.4); font-weight: bold; }
         .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
-        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
-        .diagnostics-panel { background-color: #090d16; border: 1px solid var(--border-color); display: flex; flex-direction: column; width: 100%; }
-        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid var(--border-color); }
-        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
-        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid var(--border-color); position: relative; }
-        .d-cell:last-child { border-right: none; }
-        .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; }
-        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
-        .master-rolls-box { background-color: #020617; border: 1px solid var(--border-color); text-align: center; display: flex; flex-direction: column; justify-content: space-between; width: 100%; }
-        .master-rolls-grid { display: grid; grid-template-columns: 1fr 1fr; background-color: var(--border-color); gap: 1px; }
-        .m-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px 0; }
-        .m-cell-hand { background-color: #000000; }   
-        .m-cell-session { background-color: #1e293b; } 
-        .m-label { font-size: 11px; color: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
-        .m-val { font-size: 32px; font-weight: 900; color: #ffffff; margin-top: 4px; font-family: monospace; }
-        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; display: flex; flex-direction: column; gap: 15px; }
-        .dual-axis-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .axis-column { display: flex; flex-direction: column; align-items: center; }
-        .axis-label { font-size: 13px; font-weight: 900; color: var(--amber-accent); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.1em; }
-        .pad-matrix-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-        .pad-btn { background: #020617; color: #fff; border: 1px solid var(--border-color); font-size: 20px; font-weight: bold; width: 55px; height: 55px; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
-        .pad-btn.active { background: var(--amber-accent); color: #000; border-color: #ffffff; transform: scale(1.05); }
-        .action-matrix-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; width: 100%; }
-        .act-btn { padding: 12px; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; font-size: 12px; text-transform: uppercase; text-align: center; }
-        .btn-green { background: var(--emerald-accent); color: white; }
-        .btn-orange { background: #f97316; color: white; }
-        .btn-purple { background: #a855f7; color: white; }
-        .btn-blue { background: #3b82f6; color: white; }
-        .btn-red { background: #ef4444; color: white; }
-        .meta-context-bar { background-color: #020617; border: 1px solid var(--border-color); padding: 12px; border-radius: 4px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        @media(min-width: 1024px) { .meta-context-bar { grid-template-columns: repeat(4, 1fr); } }
-        .select-element { background-color: #0f172a; border: 1px solid var(--border-color); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
-        .select-element:focus { border-color: var(--emerald-accent); }
-        .kinematic-readout-strip { background-color: #090d16; border: 1px solid var(--border-color); padding: 12px; border-radius: 4px; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: var(--amber-accent); }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
+
+        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; }
+        .pad-btn { background: #020617; color: #fff; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 18px; font-weight: bold; width: 50px; height: 50px; cursor: pointer; border-radius: 4px; }
+        .pad-btn.active { background: var(--amber-accent); color: #000; border-color: #ffffff; }
+        .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; padding: 6px; border-radius: 4px; font-size: 12px; outline: none; width: 100%; }
+        .kinematic-readout-strip { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.5); padding: 10px; border-radius: 4px; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: var(--amber-accent); }
+        
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: #0f172a; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; }
+        .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+        .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
     </style>
 </head>
 <body>
 
     <nav class="zombie-nav-header">
         <div class="flex flex-col cursor-pointer" onclick="window.location.assign('lobby.html')">
-            <h2 class="brand-title text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
+            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
             <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         <div class="flex items-center gap-4">
@@ -116,612 +77,456 @@
     </nav>
 
     <div class="main-wrapper">
-        <div class="meta-context-bar">
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Identity</label>
-                <select id="ctxShooterSelect" class="select-element" onchange="handleContextShooterToggle()"></select>
-            </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
-                <select id="ctxLocationSelect" class="select-element" onchange="handleContextLocationToggle()"></select>
+                <div class="flex gap-1">
+                    <select id="sel-location" class="select-element" onchange="checkDropdownTrigger('location')"></select>
+                    <button onclick="editDropdownItem('location')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteDropdownItem('location')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Table Location</label>
+                <div class="flex gap-1">
+                    <select id="sel-table" class="select-element" onchange="checkDropdownTrigger('table')"></select>
+                    <button onclick="editDropdownItem('table')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteDropdownItem('table')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter ID</label>
+                <div class="flex gap-1">
+                    <select id="sel-shooter" class="select-element" onchange="checkDropdownTrigger('shooter')"></select>
+                    <button onclick="editDropdownItem('shooter')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteDropdownItem('shooter')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
-                <select id="ctxDiceSetSelect" class="select-element" onchange="handleContextDiceSetToggle()">
-                    <option value="NONE">NONE (NULL PAIR)</option>
-                    <option value="3V">3V SET (3/6 - 3/2)</option>
-                </select>
+                <div class="flex gap-1">
+                    <select id="sel-diceset" class="select-element" onchange="checkDropdownTrigger('diceset')"></select>
+                    <button onclick="editDropdownItem('diceset')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteDropdownItem('diceset')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
             </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Analytical Filter View</label>
-                <select id="ctxFilterScopeSelect" class="select-element" onchange="executeAnalyticalFilterEngine()">
-                    <option value="FULL">FULL Master Timeline</option>
-                    <option value="ISOLATE_SHOOTER">Isolate Shooter</option>
-                    <option value="ISOLATE_LOCATION">Isolate Location</option>
-                    <option value="ISOLATE_COMBINED">Isolate Combined</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
-            <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Shooter Notes:</span>
-            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER TEXT FIELD NOTES BEFORE SUBMITTING ROLL INDEX...">
         </div>
 
         <div class="history-ribbon" id="historyContainer"></div>
 
-        <div class="controller-panel">
-            <div class="dual-axis-wrapper">
-                <div class="axis-column">
-                    <div class="axis-label">Left Die</div>
-                    <div class="pad-matrix-grid" id="leftPadContainer"></div>
+        <div class="controller-panel flex flex-col gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex flex-col items-center">
+                    <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2">Left Die</span>
+                    <div class="grid grid-cols-3 gap-2" id="leftPadContainer"></div>
                 </div>
-                <div class="axis-column">
-                    <div class="axis-label">Right Die</div>
-                    <div class="pad-matrix-grid" id="rightPadContainer"></div>
+                
+                <div class="flex flex-row md:flex-col justify-around bg-black/50 border border-slate-800 rounded p-4 flex-grow w-full md:w-auto max-w-sm gap-2">
+                    <div class="text-center">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Hand</div>
+                        <div class="text-3xl font-black text-white font-mono mt-1" id="summary-current">0</div>
+                    </div>
+                    <div class="border-l md:border-l-0 md:border-t border-slate-800 w-px md:w-full h-auto md:h-px my-1"></div>
+                    <div class="text-center">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Session</div>
+                        <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center">
+                    <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2">Right Die</span>
+                    <div class="grid grid-cols-3 gap-2" id="rightPadContainer"></div>
                 </div>
             </div>
             
-            <div class="action-matrix-grid">
-                <button class="act-btn btn-green" onclick="submitRoll('STANDARD')">Standard Roll</button>
-                <button class="act-btn btn-purple" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
-                <button class="act-btn btn-orange" onclick="submitRoll('INVALID')">Invalid Roll</button>
-                <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last</button>
-                <button class="act-btn btn-red" onclick="executeClearReset()">Reset Dataset</button>
+            <div class="grid grid-cols-2 gap-3 border-t border-slate-800 pt-4">
+                <button class="act-btn btn-green font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('STANDARD')">Standard Roll</button>
+                <button class="act-btn btn-purple font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="submitRoll('INVALID')">Invalid Roll</button>
+                <button class="act-btn btn-blue font-bold py-2 text-xs" onclick="executeUndo()">Undo Last</button>
+                <button class="act-btn btn-red font-bold py-2 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
         </div>
 
         <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
-            <span>LEFT DIE KINEMATICS: <b class="text-white" id="k-left-readout">N/A</b></span>
-            <span>RIGHT DIE KINEMATICS: <b class="text-white" id="k-right-readout">N/A</b></span>
+            <span>LEFT DIE KINEMATICS: <b class="text-white font-mono" id="k-left-readout">N/A</b></span>
+            <span>RIGHT DIE KINEMATICS: <b class="text-white font-mono" id="k-right-readout">N/A</b></span>
         </div>
 
         <div class="board-stack">
             <div class="grid-row-segment">
-                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
-                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
-                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
-                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
-                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
             </div>
+            <div class="grid-row-segment">
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            </div>
+        </div>
 
-            <div class="diagnostics-panel">
-                <div class="diag-title">ZOMBIELORD DIAGNOSTICS</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
+            <div class="diagnostics-panel md:col-span-2">
+                <div class="diag-title">ZOMBIELORD STATISTICAL DIAGNOSTICS</div>
                 <div class="diag-metrics-grid">
                     <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
                     <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
                     <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
-                    <div class="d-cell">
-                        <div class="temp-chip" id="temp-7" style="top:-2px; right:2px;"></div>
-                        <div class="d-label">SRR</div>
-                        <div class="d-val" id="stat-srr">0.0</div>
-                    </div>
+                    <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
                     <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
                 </div>
             </div>
-
-            <div class="grid-row-segment">
-                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
-                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
-                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
-                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
-                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded flex flex-col justify-center">
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-2 tracking-wider">Timeline Processing Scope</label>
+                <select id="ctxFilterScopeSelect" class="select-element bg-slate-950 py-2.5" onchange="executeAnalyticalFilterEngine()">
+                    <option value="FULL">FULL SESSION MASTER TIMELINE</option>
+                    <option value="ISOLATE_SHOOTER">ISOLATE CURRENT SHOOTER</option>
+                    <option value="ISOLATE_LOCATION">ISOLATE CURRENT LOCATION</option>
+                    <option value="ISOLATE_COMBINED">ISOLATE COMBINED SIGNATURE</option>
+                </select>
             </div>
+        </div>
+    </div>
 
-            <div class="master-rolls-box">
-                <div class="diag-title" style="padding:8px; font-size:11px;">SESSION COUNTER ACTIVITY MAP</div>
-                <div class="master-rolls-grid">
-                    <div class="m-cell m-cell-hand"><div class="m-label">Current Shooter Hand</div><div class="m-val" id="summary-current">0</div></div>
-                    <div class="m-cell m-cell-session"><div class="m-label">Total Session Rolls</div><div class="m-val" id="summary-total">0</div></div>
-                </div>
+    <div id="property-modal" class="modal-mask">
+        <div class="modal-box p-6 shard">
+            <h2 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h2>
+            <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
+            <div class="flex justify-end gap-3 mt-6 border-t border-slate-800 pt-4">
+                <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">Cancel</button>
+                <button onclick="savePropertyModalForm()" class="shard-btn primary-shard px-4 py-2">Commit Asset</button>
             </div>
         </div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
-            authDomain: "zombielords-playhouse.firebaseapp.com",
-            projectId: "zombielords-playhouse",
-            storageBucket: "zombielords-playhouse.firebasestorage.app",
-            messagingSenderId: "795162260246",
-            appId: "1:795162260246:web:97f0361751ac1359b31637"
-        };
-        
+        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        let currentUid = null;
+        const auth = firebase.auth(); const db = firebase.firestore();
+        let currentUid = null, activeModalContext = null, activeEditId = null;
 
         const state = {
-            totalRolls: 0, currentHandRolls: 0,
-            sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
-            totalPointsMade: 0, activePoint: null, shooterHistory: [],
-            selectedLeft: null, selectedRight: null,
-            rollHistoryLog: [], 
-            rawSequenceLog: [], 
-            matrix: {
-                2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
-                7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
-            }
+            totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
+            matrix: { 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0}, 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0} }
         };
-
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
-
-        let userShootersList = ["ME", "TONY", "RANDOM RANDY", "SETTEM RANDY", "RANDOM SALLY", "SETTEM SALLY"];
-        let userLocationsList = ["BALLY'S", "AMERISTAR", "GRAND Z"];
 
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
-            syncConfigurationDropdowns();
             initDualPads();
             initDragToScrollRibbon();
-            fetchCloudState();
+            syncAllDatabaseDropdowns().then(() => {
+                fetchCloudState();
+            });
         });
 
-        function syncConfigurationDropdowns() {
-            const sSel = document.getElementById('ctxShooterSelect');
-            const lSel = document.getElementById('ctxLocationSelect');
-            if(!sSel || !lSel) return;
-            
-            sSel.innerHTML = '';
-            userShootersList.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
-            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
-
-            lSel.innerHTML = '';
-            userLocationsList.forEach(l => lSel.innerHTML += `<option value="${l}">${l}</option>`);
-            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
-        }
-
-        function handleContextShooterToggle() {
-            const el = document.getElementById('ctxShooterSelect');
-            if(el.value === 'ADD_NEW') {
-                const name = prompt("REGISTER UNIQUE SHOOTER IDENTITY ID TAG:");
-                if(name && name.trim()) {
-                    const cleanName = name.trim().toUpperCase();
-                    if(!userShootersList.includes(cleanName)) userShootersList.push(cleanName);
-                    syncConfigurationDropdowns();
-                    el.value = cleanName;
-                } else {
-                    el.value = "ME";
-                }
-            }
-        }
-
-        function handleContextLocationToggle() {
-            const el = document.getElementById('ctxLocationSelect');
-            if(el.value === 'ADD_NEW') {
-                const loc = prompt("REGISTER NEW CASINO VENUE LOCATION KEY:");
-                if(loc && loc.trim()) {
-                    const cleanLoc = loc.trim().toUpperCase();
-                    if(!userLocationsList.includes(cleanLoc)) userLocationsList.push(cleanLoc);
-                    syncConfigurationDropdowns();
-                    el.value = cleanLoc;
-                } else {
-                    el.value = "BALLY'S";
-                }
-            }
-        }
-
-        function handleContextDiceSetToggle() {
-            const ds = document.getElementById('ctxDiceSetSelect').value;
-            const strip = document.getElementById('kinematicReadoutPanel');
-            if(ds === 'NONE') strip.style.display = 'none';
-            else strip.style.display = 'flex';
-        }
-
         function initDualPads() {
-            const lPad = document.getElementById('leftPadContainer');
-            const rPad = document.getElementById('rightPadContainer');
-            lPad.innerHTML = ''; rPad.innerHTML = '';
+            const l = document.getElementById('leftPadContainer'), r = document.getElementById('rightPadContainer');
+            l.innerHTML = ''; r.innerHTML = '';
             for(let i=1; i<=6; i++) {
-                lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
-                rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
+                l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
+                r.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
             }
-            handleContextDiceSetToggle();
         }
 
         function initDragToScrollRibbon() {
-            const slider = document.getElementById('historyContainer');
-            let isDown = false, startX, scrollLeft;
+            const el = document.getElementById('historyContainer');
+            let down = false, sX, sLeft;
+            el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
+            el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
+            el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
+        }
 
-            slider.addEventListener('mousedown', (e) => {
-                isDown = true;
-                slider.classList.add('active');
-                startX = e.pageX - slider.offsetLeft;
-                scrollLeft = slider.scrollLeft;
-            });
-            slider.addEventListener('mouseleave', () => {
-                isDown = false;
-            });
-            slider.addEventListener('mouseup', () => {
-                isDown = false;
-            });
-            slider.addEventListener('mousemove', (e) => {
-                if(!isDown) return;
-                e.preventDefault();
-                const x = e.pageX - slider.offsetLeft;
-                const walk = (x - startX) * 2;
-                slider.scrollLeft = scrollLeft - walk;
-            });
+        async function syncAllDatabaseDropdowns() {
+            await Promise.all([loadDataset('location'), loadDataset('table'), loadDataset('shooter'), loadDataset('diceset')]);
+        }
+
+        async function loadDataset(type) {
+            const select = document.getElementById(`sel-${type}`); if(!select) return;
+            const snap = await db.collection("users").doc(currentUid).collection(`dataset_${type}`).get();
+            select.innerHTML = '';
+            snap.forEach(doc => { select.innerHTML += `<option value="${doc.id}">${doc.data().name.toUpperCase()}</option>`; });
+            select.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW ASSET]</option>`;
+        }
+
+        function checkDropdownTrigger(type) {
+            if(document.getElementById(`sel-${type}`).value === 'ADD_NEW') launchPropertyModal(type);
+        }
+
+        function launchPropertyModal(type, editId = null) {
+            activeModalContext = type; activeEditId = editId;
+            const headline = document.getElementById('modal-headline');
+            const fields = document.getElementById('modal-form-fields');
+            document.getElementById('property-modal').style.display = 'flex';
+            
+            let html = `<div><label class="block mb-1 font-bold">ASSET ID NAME:</label><input type="text" id="form-field-name" class="w-full bg-slate-900 border border-slate-700 p-2 text-white outline-none rounded"></div>`;
+            headline.innerText = (editId ? "Modify " : "Register New ") + type.toUpperCase();
+            
+            if(type === 'location') html += `<div><label class="block mb-1 font-bold">TABLE COUNT:</label><input type="number" id="form-loc-tables" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="1"></div>`;
+            else if(type === 'table') html += `<div><label class="block mb-1 font-bold">LENGTH (FT):</label><input type="text" id="form-tab-len" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="12"></div>`;
+            else if(type === 'shooter') html += `<div><label class="block mb-1 font-bold">THROW STYLE SET:</label><input type="text" id="form-shoot-style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="PSO"></div>`;
+            else if(type === 'diceset') html += `<div><label class="block mb-1 font-bold">LEFT FACES (T/F):</label><input type="text" id="form-dice-left" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/6"></div><div><label class="block mb-1 font-bold">RIGHT FACES (T/F):</label><input type="text" id="form-dice-right" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/2"></div>`;
+            
+            fields.innerHTML = html;
+            
+            if(editId) {
+                db.collection("users").doc(currentUid).collection(`dataset_${type}`).doc(editId).get().then(doc => {
+                    if(doc.exists) {
+                        const d = doc.data();
+                        document.getElementById('form-field-name').value = d.name || '';
+                        if(type === 'location') document.getElementById('form-loc-tables').value = d.tables || '1';
+                        else if(type === 'table') document.getElementById('form-tab-len').value = d.length || '12';
+                        else if(type === 'shooter') document.getElementById('form-shoot-style').value = d.style || 'PSO';
+                        else if(type === 'diceset') { document.getElementById('form-dice-left').value = d.left_face || '3/6'; document.getElementById('form-dice-right').value = d.right_face || '3/2'; }
+                    }
+                });
+            }
+        }
+
+        function closePropertyModal() { document.getElementById('property-modal').style.display = 'none'; syncAllDatabaseDropdowns(); }
+
+        async function savePropertyModalForm() {
+            const nameVal = document.getElementById('form-field-name').value.trim().toUpperCase();
+            if(!nameVal) return alert("Asset label missing.");
+            
+            let docData = { name: nameVal };
+            if(activeModalContext === 'location') docData.tables = document.getElementById('form-loc-tables').value;
+            else if(activeModalContext === 'table') docData.length = document.getElementById('form-tab-len').value;
+            else if(activeModalContext === 'shooter') docData.style = document.getElementById('form-shoot-style').value;
+            else if(activeModalContext === 'diceset') { docData.left_face = document.getElementById('form-dice-left').value; docData.right_face = document.getElementById('form-dice-right').value; }
+            
+            const docRef = db.collection("users").doc(currentUid).collection(`dataset_${activeModalContext}`);
+            if(activeEditId) await docRef.doc(activeEditId).set(docData);
+            else await docRef.doc("asset_" + Date.now()).set(docData);
+            
+            closePropertyModal();
+        }
+
+        async function editDropdownItem(type) {
+            const id = document.getElementById(`sel-${type}`).value;
+            if(!id || id === 'ADD_NEW') return alert("Select a valid asset element first.");
+            launchPropertyModal(type, id);
+        }
+
+        async function deleteDropdownItem(type) {
+            const id = document.getElementById(`sel-${type}`).value;
+            if(!id || id === 'ADD_NEW') return alert("Select target asset row element.");
+            if(confirm("Purge selected relational asset parameter?")) {
+                await db.collection("users").doc(currentUid).collection(`dataset_${type}`).doc(id).delete();
+                syncAllDatabaseDropdowns();
+            }
         }
 
         function selectMatrixDie(axis, val) {
-            if(axis === 'left') {
-                for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active');
-                state.selectedLeft = val;
-                document.getElementById(`l-pad-${val}`).classList.add('active');
-            } else {
-                for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active');
-                state.selectedRight = val;
-                document.getElementById(`r-pad-${val}`).classList.add('active');
-            }
+            if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
+            else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
             calculateLiveKinematicsPreview();
         }
 
         function calculateLiveKinematicsPreview() {
-            const ds = document.getElementById('ctxDiceSetSelect').value;
-            const lRead = document.getElementById('k-left-readout');
-            const rRead = document.getElementById('k-right-readout');
-
-            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) {
-                lRead.innerText = "N/A"; rRead.innerText = "N/A";
-                return;
-            }
-
-            let lRot = "N/A", lAx = "0";
-            if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; }
-            else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; }
-            else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; }
-            else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; }
-            else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; }
-            else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
-
-            let rRot = "N/A", rAx = "0";
-            if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; }
-            else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; }
-            else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; }
-            else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; }
-            else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; }
-            else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
-
-            lRead.innerText = `ROTATION: [${lRot}] | AXIS DELTA: [${lAx}]`;
-            rRead.innerText = `ROTATION: [${rRot}] | AXIS DELTA: [${rAx}]`;
+            const ds = document.getElementById('sel-diceset').value;
+            const l = document.getElementById('k-left-readout'), r = document.getElementById('k-right-readout');
+            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) { l.innerText = "N/A"; r.innerText = "N/A"; return; }
+            l.innerText = state.selectedLeft === 3 ? "ROTATION: [0] | DELTA: [0]" : "ROTATION: [AXIS_ROT] | DELTA: [1]";
+            r.innerText = state.selectedRight === 3 ? "ROTATION: [0] | DELTA: [0]" : "ROTATION: [AXIS_ROT] | DELTA: [1]";
         }
 
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Die selection empty.");
+            
+            const locEl = document.getElementById('sel-location');
+            const tblEl = document.getElementById('sel-table');
+            const shtEl = document.getElementById('sel-shooter');
+            const dcsEl = document.getElementById('sel-diceset');
 
-            const activeShooter = document.getElementById('ctxShooterSelect').value;
-            const activeLocation = document.getElementById('ctxLocationSelect').value;
-            const activeDiceSet = document.getElementById('ctxDiceSetSelect').value;
-            const notes = document.getElementById('ctxDescriptionInput').value.trim();
-
-            let lRot = "N/A", lAx = "0", rRot = "N/A", rAx = "0";
-            if(activeDiceSet === '3V') {
-                if(state.selectedLeft === 3) { lRot = "0"; lAx = "0"; } else if(state.selectedLeft === 1) { lRot = "+1"; lAx = "0"; } else if(state.selectedLeft === 6) { lRot = "-1"; lAx = "0"; } else if(state.selectedLeft === 4) { lRot = "±2"; lAx = "0"; } else if(state.selectedLeft === 5) { lRot = "OFF-AXIS"; lAx = "+1"; } else if(state.selectedLeft === 2) { lRot = "OFF-AXIS"; lAx = "-1"; }
-                if(state.selectedRight === 3) { rRot = "0"; rAx = "0"; } else if(state.selectedRight === 5) { rRot = "+1"; rAx = "0"; } else if(state.selectedRight === 2) { rRot = "-1"; rAx = "0"; } else if(state.selectedRight === 4) { rRot = "±2"; rAx = "0"; } else if(state.selectedRight === 6) { rRot = "OFF-AXIS"; rAx = "+1"; } else if(state.selectedRight === 1) { rRot = "OFF-AXIS"; rAx = "-1"; }
-            }
-
-            const rollRowRecord = {
-                leftDie: state.selectedLeft,
-                rightDie: state.selectedRight,
-                sum: state.selectedLeft + state.selectedRight,
-                shooterId: activeShooter,
-                locationId: activeLocation,
-                diceSetId: activeDiceSet,
-                kinematicsLeft: { rot: lRot, ax: lAx },
-                kinematicsRight: { rot: rRot, ax: rAx },
-                description: notes,
-                puckBeforeRoll: state.activePoint,
-                invalidRoll: (trackingMode === 'INVALID'),
-                trackingType: trackingMode
+            const r = {
+                leftDie: parseInt(state.selectedLeft), 
+                rightDie: parseInt(state.selectedRight), 
+                sum: parseInt(state.selectedLeft + state.selectedRight),
+                Location_ID: locEl.options[locEl.selectedIndex]?.text || "UNASSIGNED",
+                Table_Position: tblEl.options[tblEl.selectedIndex]?.text || "UNASSIGNED",
+                Shooter_ID: shtEl.options[shtEl.selectedIndex]?.text || "UNASSIGNED",
+                Left_Set_Face: dcsEl.options[dcsEl.selectedIndex]?.text.split(' ')[2]?.split('-')[0] || "3/6",
+                Right_Set_Face: dcsEl.options[dcsEl.selectedIndex]?.text.split(' ')[2]?.split('-')[1] || "3/2",
+                Time_Stamp: new Date().toISOString(),
+                Roll_Index: state.rollHistoryLog.length + 1,
+                Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: (trackingMode === 'KINEMATIC'),
+                Left_Kinematic: null, Right_Kinematic: null,
+                Invalid_Roll: (trackingMode === 'INVALID'), 
+                Notes: ""
             };
-
-            state.rollHistoryLog.push(rollRowRecord);
-            state.rawSequenceLog.push(rollRowRecord.sum);
-
-            executeCalculationsLoop(rollRowRecord);
-            clearSelectionPads();
-            document.getElementById('ctxDescriptionInput').value = '';
-            pushCloudState("active_session");
+            
+            state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.sum);
+            executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
         function executeCalculationsLoop(record) {
-            const sum = record.sum;
-            if (record.invalidRoll) {
-                executeAnalyticalFilterEngine();
-                return;
-            }
-            
-            state.totalRolls++;
-            state.currentHandRolls++;
-
-            state.matrix[sum].tot++;
-            state.matrix[sum].cur++;
-
+            const sum = record.sum; if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
+            state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
             if(sum === 7) {
                 state.sevensTotal++;
-                if(state.activePoint === null) {
-                    state.sevensComeout++;
-                } else {
-                    state.sevensRed++;
-                    state.shooterHistory.push(state.currentHandRolls);
-                    state.currentHandRolls = 0;
-                    state.activePoint = null;
-                    for (let k in state.matrix) state.matrix[k].cur = 0;
-                }
-            } else if (sum === 11 && state.activePoint === null) {
-                // Natural comeout logic bypass standard placement rules
+                if(state.activePoint === null) state.sevensComeout++;
+                else { state.sevensRed++; state.shooterHistory.push(state.currentHandRolls); state.currentHandRolls = 0; state.activePoint = null; for(let k in state.matrix) state.matrix[k].cur = 0; }
             } else {
-                if(state.activePoint === null) {
-                    if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum;
-                } else if(sum === state.activePoint) {
-                    state.totalPointsMade++;
-                    state.activePoint = null;
-                }
+                if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
+                else if(sum === state.activePoint) { state.totalPointsMade++; state.activePoint = null; }
             }
-
             executeAnalyticalFilterEngine();
         }
 
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
-            const targetShooter = document.getElementById('ctxShooterSelect').value;
-            const targetLocation = document.getElementById('ctxLocationSelect').value;
-
-            let filteredSet = [];
+            const locEl = document.getElementById('sel-location');
+            const shtEl = document.getElementById('sel-shooter');
             
-            if(mode === 'FULL') {
-                filteredSet = [...state.rollHistoryLog];
-            } else if(mode === 'ISOLATE_SHOOTER') {
-                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter);
-            } else if(mode === 'ISOLATE_LOCATION') {
-                filteredSet = state.rollHistoryLog.filter(r => r.locationId === targetLocation);
-            } else if(mode === 'ISOLATE_COMBINED') {
-                filteredSet = state.rollHistoryLog.filter(r => r.shooterId === targetShooter && r.locationId === targetLocation);
-            }
+            const sh = shtEl.options[shtEl.selectedIndex]?.text || "UNASSIGNED";
+            const loc = locEl.options[locEl.selectedIndex]?.text || "UNASSIGNED";
+            
+            let filtered = [...state.rollHistoryLog];
 
-            let localMatrix = { 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
-            let localAtsMap = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
-            let localSevensTotal = 0, localSevensRed = 0, localSevensComeout = 0, localPointsMade = 0;
-            let localShooterHistory = [], localCurrentHandRolls = 0, localActivePoint = null, localValidCount = 0;
+            if(mode === 'ISOLATE_SHOOTER') filtered = filtered.filter(r => r.Shooter_ID === sh);
+            else if(mode === 'ISOLATE_LOCATION') filtered = filtered.filter(r => r.Location_ID === loc);
+            else if(mode === 'ISOLATE_COMBINED') filtered = filtered.filter(r => r.Shooter_ID === sh && r.Location_ID === loc);
 
-            document.getElementById('historyContainer').innerHTML = '';
+            let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
+            let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
+            const ribbon = document.getElementById('historyContainer'); ribbon.innerHTML = '';
 
-            filteredSet.forEach((v) => {
-                if (v.invalidRoll) {
-                    const ribbon = document.getElementById('historyContainer');
-                    ribbon.innerHTML += `<div class="history-node bg-slate-800 text-slate-500 line-through">${v.sum}</div>`;
-                    return;
-                }
-
-                localValidCount++;
-                localMatrix[v.sum]++;
-                localCurrentHandRolls++;
-                localAtsMap[v.sum] = 1;
-                
-                let ribbonClass = 'node-normal';
-                const isHard = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
-
-                if(v.sum === 7) {
-                    localSevensTotal++;
-                    if(localActivePoint === null) {
-                        localSevensComeout++;
-                        ribbonClass = 'node-natural';
-                    } else {
-                        localSevensRed++;
-                        ribbonClass = 'node-seven-out';
-                        localShooterHistory.push(localCurrentHandRolls);
-                        localCurrentHandRolls = 0;
-                        localActivePoint = null;
-                        for(let k in localAtsMap) localAtsMap[k] = 0;
-                    }
-                } else if(v.sum === 11 && localActivePoint === null) {
-                    ribbonClass = 'node-natural';
-                } else {
-                    if(localActivePoint === null) {
-                        if([4,5,6,8,9,10].includes(v.sum)) {
-                            localActivePoint = v.sum;
-                            ribbonClass = 'node-point-made'; 
-                        }
-                    } else if(v.sum === localActivePoint) {
-                        ribbonClass = 'node-point-made';
-                        localPointsMade++;
-                        localActivePoint = null;
-                    } else {
-                        ribbonClass = isHard ? 'node-hard' : 'node-normal';
-                    }
-                }
-
-                if(isHard && ribbonClass === 'node-normal') ribbonClass = 'node-hard';
-
-                const ribbon = document.getElementById('historyContainer');
-                let label = v.sum.toString();
-                if(isHard && ribbonClass !== 'node-point-made') label += '<sup>H</sup>';
-                ribbon.innerHTML += `<div class="history-node ${ribbonClass}">${label}</div>`;
+            filtered.forEach(v => {
+                if(v.Invalid_Roll) { ribbon.innerHTML += `<div class="history-node bg-slate-800 text-slate-500 line-through">${v.sum}</div>`; return; }
+                lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1;
+                let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
+                if(v.sum === 7) { lTotal++; if(lap === null) { lComeout++; c = 'node-natural'; } else { lRed++; c = 'node-seven-out'; lHand = 0; lap = null; for(let k in la) la[k] = 0; } }
+                else if(v.sum === 11 && lap === null) c = 'node-natural';
+                else { if(lap === null) { if([4,5,6,8,9,10].includes(v.sum)) { lap = v.sum; c = 'node-point-made'; } } else if(v.sum === lap) { c = 'node-point-made'; lPoints++; lap = null; } else { c = isH ? 'node-hard' : 'node-normal'; } }
+                if(isH && c === 'node-normal') c = 'node-hard';
+                ribbon.innerHTML += `<div class="history-node ${c}">${v.sum}${isH && c!=='node-point-made'?'<sup>H</sup>':''}</div>`;
             });
 
             for(let i=2; i<=12; i++) {
-                if(i === 7) continue;
-                document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
-                
-                const leftCell = document.getElementById(`cur-${i}`);
-                leftCell.innerText = localMatrix[i];
-                document.getElementById(`tot-${i}`).innerText = localMatrix[i];
-                document.getElementById(`puck-${i}`).style.display = 'none';
-
-                if(localAtsMap[i] >= 1) leftCell.classList.add('ats-active');
-                else leftCell.classList.remove('ats-active');
+                if(i===7) continue; document.getElementById(`count-${i}`).innerText = state.matrix[i].tot;
+                const cell = document.getElementById(`cur-${i}`); cell.innerText = lm[i]; document.getElementById(`tot-${i}`).innerText = lm[i];
+                document.getElementById(`puck-${i}`).style.display = (lap === i) ? 'block' : 'none';
+                if(la[i]) cell.classList.add('ats-active'); else cell.classList.remove('ats-active');
             }
-
-            if(localActivePoint !== null) {
-                document.getElementById(`puck-${localActivePoint}`).style.display = 'block';
-            }
-
-            evaluateRollingTemperatures();
 
             document.getElementById('summary-total').innerText = state.totalRolls;
-            document.getElementById('summary-current').innerText = mode === 'FULL' ? state.currentHandRolls : localCurrentHandRolls;
-
-            const totalShooters = localShooterHistory.length + (localCurrentHandRolls > 0 ? 1 : 0);
-            const sor = totalShooters > 0 ? (localValidCount / totalShooters).toFixed(1) : "0.0";
-            const srr = localSevensTotal > 0 ? (localValidCount / localSevensTotal).toFixed(1) : (localValidCount > 0 ? localValidCount.toFixed(1) : "0.0");
-            const psr = localSevensRed > 0 ? (localPointsMade / localSevensRed).toFixed(1) : "0.0";
-
-            document.getElementById('stat-red').innerText = localSevensRed;
-            document.getElementById('stat-sor').innerText = sor;
-            document.getElementById('stat-psr').innerText = psr;
-            document.getElementById('stat-srr').innerText = srr;
-            document.getElementById('stat-co7').innerText = localSevensComeout;
-
-            const ribbonContainer = document.getElementById('historyContainer');
-            if (ribbonContainer) ribbonContainer.scrollLeft = ribbonContainer.scrollWidth;
+            document.getElementById('summary-current').innerText = lHand;
+            document.getElementById('stat-red').innerText = lRed;
+            document.getElementById('stat-sor').innerText = lRed > 0 ? (lValid / lRed).toFixed(1) : lValid.toFixed(1);
+            document.getElementById('stat-psr').innerText = lRed > 0 ? (lPoints / lRed).toFixed(1) : "0.0";
+            document.getElementById('stat-srr').innerText = lTotal > 0 ? (lValid / lTotal).toFixed(1) : lValid.toFixed(1);
+            document.getElementById('stat-co7').innerText = lComeout;
+            
+            evaluateRollingTemperatures();
+            ribbon.scrollLeft = ribbon.scrollWidth;
         }
 
         function evaluateRollingTemperatures() {
             for (let num in probabilityWindows) {
-                const windowSize = probabilityWindows[num];
-                const sampleSlice = state.rawSequenceLog.slice(-windowSize);
-                const hitCount = sampleSlice.filter(x => x == parseInt(num)).length;
-                const chip = document.getElementById(`temp-${num}`);
-                if (!chip) continue;
-
-                if (state.totalRolls < windowSize) chip.innerText = '';
-                else if (hitCount > 1) chip.innerText = '🔥';
-                else if (hitCount < 1) chip.innerText = '❄️';
-                else chip.innerText = '';
+                const w = probabilityWindows[num]; const slice = state.rawSequenceLog.slice(-w);
+                const count = slice.filter(x => x == parseInt(num)).length;
+                const chip = document.getElementById(`temp-${num}`); if(!chip) continue;
+                chip.innerText = state.totalRolls < w ? '' : (count > 1 ? '🔥' : (count < 1 ? '❄️' : ''));
             }
         }
 
-        async function pushCloudState(docId, customName = null) {
+        async function pushCloudState(docId, name = null) {
             if(!currentUid) return;
-            const payload = {
-                module_id: "DICE_TRACKER",
-                totalRolls: state.totalRolls,
-                currentHandRolls: state.currentHandRolls,
-                sevensTotal: state.sevensTotal,
-                sevensRed: state.sevensRed,
-                sevensComeout: state.sevensComeout,
-                totalPointsMade: state.totalPointsMade,
-                activePoint: state.activePoint,
-                shooterHistory: state.shooterHistory,
-                rawSequenceLog: state.rawSequenceLog,
-                rollHistoryLog: JSON.stringify(state.rollHistoryLog),
-                matrix: JSON.stringify(state.matrix),
-                userShootersList: userShootersList,
-                userLocationsList: userLocationsList,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            const locEl = document.getElementById('sel-location');
+            const locationString = locEl.options[locEl.selectedIndex]?.text || "IMPORTED";
+            
+            let p = { 
+                module_id: "DICE_TRACKER", 
+                totalRolls: state.totalRolls, 
+                currentHandRolls: state.currentHandRolls, 
+                sevensTotal: state.sevensTotal, 
+                sevensRed: state.sevensRed, 
+                sevensComeout: state.sevensComeout, 
+                totalPointsMade: state.totalPointsMade, 
+                activePoint: state.activePoint, 
+                shooterHistory: state.shooterHistory, 
+                rawSequenceLog: state.rawSequenceLog, 
+                payload_log: JSON.stringify(state.rollHistoryLog), 
+                matrix: JSON.stringify(state.matrix), 
+                meta_tags: { location: locationString, base_unit: 1 },
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
-            if(customName) payload.name = customName.toUpperCase();
-            await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(payload, { merge: true });
+            if(name) p.name = name.toUpperCase();
+            await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(p, { merge: true });
         }
 
         function fetchCloudState() {
-            db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => {
-                if(doc.exists) {
-                    const data = doc.data();
-                    if(data.userShootersList) userShootersList = data.userShootersList;
-                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
-                    syncConfigurationDropdowns();
-                    rebuildUIFromStoredData(data);
-                } else {
-                    executeAnalyticalFilterEngine();
-                }
-            });
+            db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => { if(doc.exists) rebuildUIFromStoredData(doc.data()); });
         }
 
-        function rebuildUIFromStoredData(data) {
-            state.totalRolls = data.totalRolls || 0;
-            state.currentHandRolls = data.currentHandRolls || 0;
-            state.sevensTotal = data.sevensTotal || 0;
-            state.sevensRed = data.sevensRed || 0;
-            state.sevensComeout = data.sevensComeout || 0;
-            state.totalPointsMade = data.totalPointsMade || 0;
-            state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
-            state.shooterHistory = data.shooterHistory || [];
-            state.rawSequenceLog = data.rawSequenceLog || [];
-            state.matrix = data.matrix ? (typeof data.matrix === 'string' ? JSON.parse(data.matrix) : data.matrix) : state.matrix;
+        function rebuildUIFromStoredData(d) {
+            state.totalRolls = d.totalRolls || 0; state.currentHandRolls = d.currentHandRolls || 0; state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
+            try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
+            
+            // Unify resolution gate for both field variants
+            let rawLog = d.payload_log || d.rollHistoryLog || [];
+            try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
+            
+            // Re-map legacy camelCase structures coming down from historical records
+            state.rollHistoryLog = state.rollHistoryLog.map(r => {
+                return {
+                    leftDie: r.leftDie || r.Left_Die || 3,
+                    rightDie: r.rightDie || r.Right_Die || 4,
+                    sum: r.sum || r.Total_Sum || 7,
+                    Location_ID: r.Location_ID || r.locationId || "UNASSIGNED",
+                    Table_Position: r.Table_Position || r.tablePosition || "UNASSIGNED",
+                    Shooter_ID: r.Shooter_ID || r.shooterId || "UNASSIGNED",
+                    Left_Set_Face: r.Left_Set_Face || r.leftSetFace || "3/6",
+                    Right_Set_Face: r.Right_Set_Face || r.rightSetFace || "3/2",
+                    Time_Stamp: r.Time_Stamp || r.timeStamp || new Date().toISOString(),
+                    Roll_Index: r.Roll_Index || r.rollIndex || 0,
+                    Puck_Before_Roll: r.Puck_Before_Roll !== undefined ? r.Puck_Before_Roll : (r.puckBeforeRoll || "OFF"),
+                    Kinematic_Status: r.Kinematic_Status !== undefined ? r.Kinematic_Status : (r.kinematicStatus || false),
+                    Left_Kinematic: r.Left_Kinematic || null,
+                    Right_Kinematic: r.Right_Kinematic || null,
+                    Invalid_Roll: r.Invalid_Roll !== undefined ? r.Invalid_Roll : (r.invalidRoll || false),
+                    Notes: r.Notes || r.description || ""
+                };
+            });
 
-            if (data.rollHistoryLog) {
-                try {
-                    state.rollHistoryLog = typeof data.rollHistoryLog === 'string' ? JSON.parse(data.rollHistoryLog) : data.rollHistoryLog;
-                } catch (e) {
-                    console.error("Data fallback intercept:", e);
-                }
-            }
             executeAnalyticalFilterEngine();
         }
 
         async function handleCryptNavigationTrigger() {
-            if (state.rollHistoryLog.length > 0) {
-                const choice = confirm("Press OK to capture & save your active workspace state to an Inscription card inside the Crypt, or Cancel to open without saving.");
-                if (choice) {
-                    const sessionName = prompt("DESIGNATE CRYPT SESSION ARCHIVE NAME:");
-                    if(sessionName && sessionName.trim()) {
-                        await pushCloudState("archive_" + Date.now(), sessionName.trim());
-                        alert("Session archived.");
-                    } else {
-                        alert("Save cancelled due to empty name.");
-                        return;
-                    }
-                }
+            if(state.rollHistoryLog.length > 0 && confirm("Archive current active workspace tracking session inside the Crypt?")) {
+                const n = prompt("ENTER ARCHIVE NAME:"); if(n && n.trim()) await pushCloudState("archive_" + Date.now(), n.trim());
             }
             window.location.assign('crypt.html');
         }
 
         function executeUndo() {
-            if(state.rollHistoryLog.length === 0) return alert("History underflow.");
-            
-            state.rollHistoryLog.pop();
-            state.rawSequenceLog.pop();
-            
-            if(state.rollHistoryLog.length === 0) {
-                state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
-                state.activePoint = null; state.shooterHistory = [];
-                for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-                document.getElementById('historyContainer').innerHTML = '';
-                clearSelectionPads();
-                executeAnalyticalFilterEngine();
-                pushCloudState("active_session");
-            } else {
-                state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
-                state.activePoint = null; state.shooterHistory = [];
-                for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-
-                const backupLog = [...state.rollHistoryLog];
-                state.rollHistoryLog = [];
-                state.rawSequenceLog = [];
-
-                backupLog.forEach(row => {
-                    state.rollHistoryLog.push(row);
-                    state.rawSequenceLog.push(row.sum);
-                    executeCalculationsLoop(row);
-                });
-                pushCloudState("active_session");
-            }
-        }
-
-        function executeClearReset() {
-            if(!confirm("Clear active metrics dataset?")) return;
-            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
-            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = []; state.rawSequenceLog = [];
-            for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-            document.getElementById('historyContainer').innerHTML = '';
-            clearSelectionPads();
-            executeAnalyticalFilterEngine();
+            if(state.rollHistoryLog.length === 0) return; state.rollHistoryLog.pop(); state.rawSequenceLog.pop();
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null;
+            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            b.forEach(row => { state.rollHistoryLog.push(row); state.rawSequenceLog.push(row.sum); executeCalculationsLoop(row); });
             pushCloudState("active_session");
         }
 
-        function clearSelectionPads() {
-            state.selectedLeft = null; state.selectedRight = null;
-            for(let i=1; i<=6; i++) {
-                document.getElementById(`l-pad-${i}`).classList.remove('active');
-                document.getElementById(`r-pad-${i}`).classList.remove('active');
-            }
-            calculateLiveKinematicsPreview();
+        function executeClearReset() {
+            if(!confirm("Clear session data?")) return;
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            clearSelectionPads(); executeAnalyticalFilterEngine(); pushCloudState("active_session");
         }
+
+        function clearSelectionPads() { state.selectedLeft = null; state.selectedRight = null; for(let i=1; i<=6; i++) { document.getElementById(`l-pad-${i}`).classList.remove('active'); document.getElementById(`r-pad-${i}`).classList.remove('active'); } calculateLiveKinematicsPreview(); }
     </script>
 </body>
 </html>
