@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.17.1</title>
+    <title>Dice Tracker v1.17.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -26,7 +26,7 @@
             background-size: cover; background-position: center; background-attachment: fixed;
         }
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
+        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-between: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
         .main-wrapper { padding: 15px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
         
         .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: transparent; padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; -webkit-overflow-scrolling: touch; }
@@ -64,8 +64,8 @@
         .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
         .select-element:focus { border-color: var(--emerald-accent); }
         
-        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-box { background: #0f172a; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: #1e293b; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #f8fafc; }
         
         .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
@@ -90,43 +90,41 @@
             <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em]"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
-            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
+            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em] font-serif"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em] font-serif">Logout</button>
         </div>
     </nav>
 
     <div class="main-wrapper">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
                 <div class="flex gap-1">
-                    <select id="sel-location" class="select-element" onchange="checkDropdownTrigger('location')"></select>
-                    <button onclick="editDropdownItem('location')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteDropdownItem('location')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                    <select id="ctxLocationSelect" class="select-element" onchange="watchLocationDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('locations')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('locations')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Table Location</label>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Location</label>
                 <div class="flex gap-1">
-                    <select id="sel-table" class="select-element" onchange="checkDropdownTrigger('table')"></select>
-                    <button onclick="editDropdownItem('table')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteDropdownItem('table')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                    <select id="ctxTablePositionSelect" class="select-element" onchange="executeAnalyticalFilterEngine()"></select>
                 </div>
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter ID</label>
                 <div class="flex gap-1">
-                    <select id="sel-shooter" class="select-element" onchange="checkDropdownTrigger('shooter')"></select>
-                    <button onclick="editDropdownItem('shooter')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteDropdownItem('shooter')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                    <select id="ctxShooterSelect" class="select-element" onchange="watchShooterDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('shooters')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('shooters')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
                 <div class="flex gap-1">
-                    <select id="sel-diceset" class="select-element" onchange="onDiceSetChange()"></select>
-                    <button onclick="editDropdownItem('diceset')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteDropdownItem('diceset')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                    <select id="ctxDiceSetSelect" class="select-element" onchange="watchDiceSetDropdownChange()"></select>
+                    <button onclick="editCurrentAsset('dice_sets')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
+                    <button onclick="deleteCurrentAsset('dice_sets')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
             </div>
         </div>
@@ -144,8 +142,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2" id="leftPadContainer"></div>
-                    
-                    <div id="box-suggest-left" class="text-[10px] text-slate-400 font-bold bg-slate-950/80 p-1.5 px-3 border border-slate-800 rounded w-full text-center" style="display:none">SUGGEST: N/A</div>
+                    <div id="pad-suggest-left" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">SUGGEST TOP: -</div>
                 </div>
                 
                 <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 flex-grow w-full md:w-auto max-w-sm gap-4">
@@ -165,6 +162,12 @@
                         <span class="text-[9px] uppercase font-bold text-slate-500">Track Set Target:</span>
                         <button id="btn-set-flag" onclick="toggleSetExecutionFlag()" class="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-1 rounded transition-all">ORIGINAL SET</button>
                     </div>
+                    
+                    <div id="pad-kinematic-telemetry" class="w-full text-[10px] text-amber-500 font-bold bg-slate-950/40 p-2 border border-slate-800 rounded text-center hidden">
+                        <div class="text-slate-400 text-[8px] uppercase mb-1">Last Telemetry State</div>
+                        <div id="lbl-telemetry-left">L: N/A</div>
+                        <div id="lbl-telemetry-right" class="mt-0.5">R: N/A</div>
+                    </div>
                 </div>
 
                 <div class="flex flex-col items-center gap-2">
@@ -176,8 +179,7 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2" id="rightPadContainer"></div>
-                    
-                    <div id="box-suggest-right" class="text-[10px] text-slate-400 font-bold bg-slate-950/80 p-1.5 px-3 border border-slate-800 rounded w-full text-center" style="display:none">SUGGEST: N/A</div>
+                    <div id="pad-suggest-right" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">SUGGEST TOP: -</div>
                 </div>
             </div>
             
@@ -186,15 +188,10 @@
                 <button class="act-btn btn-purple font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
             </div>
             <div class="grid grid-cols-3 gap-2">
-                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="onInvalidRollTrigger()">Invalid Roll</button>
+                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="launchInvalidCausePicker()">Invalid Roll</button>
                 <button class="act-btn btn-blue font-bold py-2 text-xs" onclick="executeUndo()">Undo Last</button>
                 <button class="act-btn btn-red font-bold py-2 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
-        </div>
-
-        <div class="kinematic-readout-strip" id="kinematicReadoutPanel" style="display:none">
-            <span>LAST ROLL LEFT TELEMETRY: <b class="text-white font-mono" id="k-left-readout">N/A</b></span>
-            <span>LAST ROLL RIGHT TELEMETRY: <b class="text-white font-mono" id="k-right-readout">N/A</b></span>
         </div>
 
         <div class="board-stack">
@@ -238,13 +235,13 @@
         </div>
     </div>
 
-    <div id="property-modal" class="modal-mask">
+    <div id="ctxMetadataModalFrame" class="modal-mask">
         <div class="modal-box">
-            <h2 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h2>
+            <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h3>
             <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
-            <div class="flex justify-end gap-3 mt-6 border-t border-slate-800 pt-4">
-                <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">Cancel</button>
-                <button onclick="savePropertyModalForm()" class="shard-btn primary-shard px-4 py-2">Commit Asset</button>
+            <div class="flex justify-between gap-3 mt-6 border-t border-slate-800 pt-4">
+                <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">[ CANCEL ]</button>
+                <button onclick="commitMetadataModalForm()" class="shard-btn primary-shard px-4 py-2">[ ACCEPT ]</button>
             </div>
         </div>
     </div>
@@ -255,6 +252,9 @@
         const auth = firebase.auth(); const db = firebase.firestore();
         let currentUid = null, activeModalContext = null, activeEditId = null;
         let isSuggestedSetFlag = false;
+
+        let userShootersList = {}, userLocationsList = {}, userDiceSetsList = {}, userCausesList = {};
+        const FIXED_TABLE_POSITIONS = ["SL1", "SL2", "SL3", "SL4", "HL1", "HL2", "HL3", "HL4"];
 
         const state = {
             totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
@@ -267,9 +267,8 @@
             currentUid = user.uid;
             initDualPads();
             initDragToScrollRibbon();
-            syncAllDatabaseDropdowns().then(() => {
-                fetchCloudState();
-            });
+            fetchMasterMetadataCollections();
+            fetchCloudState();
         });
 
         function initDualPads() {
@@ -289,141 +288,173 @@
             el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
         }
 
-        async function syncAllDatabaseDropdowns() {
-            await Promise.all([loadDataset('location'), loadDataset('table'), loadDataset('shooter'), loadDataset('diceset'), loadDataset('invalid_cause')]);
+        async function fetchMasterMetadataCollections() {
+            if (!currentUid) return;
+            try {
+                const [sSnap, lSnap, dSnap, cSnap] = await Promise.all([
+                    db.collection("users").doc(currentUid).collection("master_shooters").get(),
+                    db.collection("users").doc(currentUid).collection("master_locations").get(),
+                    db.collection("users").doc(currentUid).collection("master_dice_sets").get(),
+                    db.collection("users").doc(currentUid).collection("master_invalid_causes").get()
+                ]);
+
+                userShootersList = {}; sSnap.forEach(doc => { userShootersList[doc.id] = doc.data(); });
+                userLocationsList = {}; lSnap.forEach(doc => { userLocationsList[doc.id] = doc.data(); });
+                userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
+                userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
+
+                syncConfigurationDropdowns();
+            } catch (err) { console.error("Sync fault: ", err); }
+        }
+
+        function syncConfigurationDropdowns() {
+            const sSel = document.getElementById('ctxShooterSelect');
+            const lSel = document.getElementById('ctxLocationSelect');
+            const pSel = document.getElementById('ctxTablePositionSelect');
+            const dSel = document.getElementById('ctxDiceSetSelect');
+            
+            if (!sSel || !lSel || !pSel || !dSel) return;
+            const prevS = sSel.value, prevL = lSel.value, prevP = pSel.value, prevD = dSel.value;
+
+            lSel.innerHTML = `<option value="ALL">ALL LOCATIONS</option>`;
+            Object.keys(userLocationsList).forEach(id => { lSel.innerHTML += `<option value="${id}">${userLocationsList[id].name || id}</option>`; });
+            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
+
+            pSel.innerHTML = FIXED_TABLE_POSITIONS.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            sSel.innerHTML = `<option value="ALL">ALL SHOOTERS</option>`;
+            Object.keys(userShootersList).forEach(id => { sSel.innerHTML += `<option value="${id}">${id}</option>`; });
+            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
+
+            dSel.innerHTML = `<option value="ALL">NONE Selected</option>`;
+            Object.keys(userDiceSetsList).forEach(id => { dSel.innerHTML += `<option value="${id}">${userDiceSetsList[id].Set_Name}</option>`; });
+            dSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW DICE SET]</option>`;
+
+            if(sSel.querySelector(`option[value="${prevS}"]`)) sSel.value = prevS;
+            if(lSel.querySelector(`option[value="${prevL}"]`)) lSel.value = prevL;
+            if(pSel.querySelector(`option[value="${prevP}"]`)) pSel.value = prevP;
+            if(dSel.querySelector(`option[value="${prevD}"]`)) dSel.value = prevD;
+            
             onDiceSetChange();
         }
 
-        async function loadDataset(type) {
-            const select = document.getElementById(`sel-${type}`); if(!select) return;
-            const snap = await db.collection("users").doc(currentUid).collection(`dataset_${type}`).get();
-            select.innerHTML = `<option value="ALL">ALL ${type.toUpperCase()}</option>`;
-            snap.forEach(doc => { select.innerHTML += `<option value="${doc.id}">${doc.data().name.toUpperCase()}</option>`; });
-            select.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW ASSET]</option>`;
-        }
+        function openMetadataModal(category, targetId = null) {
+            activeModalContext = category; activeEditId = targetId;
+            const isEditMode = targetId !== null;
+            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
 
-        function checkDropdownTrigger(type) {
-            if(document.getElementById(`sel-${type}`).value === 'ADD_NEW') launchPropertyModal(type);
-            else if(type === 'diceset') onDiceSetChange();
-            else executeAnalyticalFilterEngine();
-        }
-
-        function launchPropertyModal(type, editId = null) {
-            activeModalContext = type; activeEditId = editId;
-            const headline = document.getElementById('modal-headline');
+            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
-            document.getElementById('property-modal').style.display = 'flex';
             
-            let html = `<div><label class="block mb-1 font-bold">ASSET ID NAME:</label><input type="text" id="form-field-name" class="w-full bg-slate-900 border border-slate-700 p-2 text-white outline-none rounded"></div>`;
-            headline.innerText = (editId ? "Modify " : "Register New ") + type.toUpperCase();
-            
-            if(type === 'location') html += `<div><label class="block mb-1 font-bold">TABLE COUNT:</label><input type="number" id="form-loc-tables" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="1"></div>`;
-            else if(type === 'table') html += `<div><label class="block mb-1 font-bold">LENGTH (FT):</label><input type="text" id="form-tab-len" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="12"></div>`;
-            else if(type === 'shooter') html += `<div><label class="block mb-1 font-bold">THROW STYLE SET:</label><input type="text" id="form-shoot-style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="PSO"></div>`;
-            else if(type === 'diceset') html += `<div><label class="block mb-1 font-bold">LEFT FACES (TOP/FRONT):</label><input type="text" id="form-dice-left" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/6"></div><div><label class="block mb-1 font-bold">RIGHT FACES (TOP/FRONT):</label><input type="text" id="form-dice-right" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/2"></div>`;
-            else if(type === 'invalid_cause') html += `<div><label class="block mb-1 font-bold">CAUSE CODE CATEGORY:</label><input type="text" id="form-cause-cat" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="TABLE_ERR"></div>`;
-            
-            fields.innerHTML = html;
-            
-            if(editId) {
-                db.collection("users").doc(currentUid).collection(`dataset_${type}`).doc(editId).get().then(doc => {
-                    if(doc.exists) {
-                        const d = doc.data();
-                        document.getElementById('form-field-name').value = d.name || '';
-                        if(type === 'location') document.getElementById('form-loc-tables').value = d.tables || '1';
-                        else if(type === 'table') document.getElementById('form-tab-len').value = d.length || '12';
-                        else if(type === 'shooter') document.getElementById('form-shoot-style').value = d.style || 'PSO';
-                        else if(type === 'diceset') { document.getElementById('form-dice-left').value = d.left_face || '3/6'; document.getElementById('form-dice-right').value = d.right_face || '3/2'; }
-                        else if(type === 'invalid_cause') document.getElementById('form-cause-cat').value = d.category || 'TABLE_ERR';
-                    }
-                });
+            let htmlContent = `<div><label class="block mb-1 font-bold">Unique ID Key Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"'} placeholder="e.g. LAS_VEGAS_STRIP"></div>`;
+
+            if (category === 'shooters') {
+                htmlContent += `<div><label class="block mb-1 font-bold">Throwing Style Pattern:</label><input type="text" id="mField_Style" value="${record.Throwing_Style || 'PSO'}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"></div>`;
+            } else if (category === 'locations') {
+                htmlContent += `<div><label class="block mb-1 font-bold">Chassis Length (FT):</label><input type="text" id="mField_Length" value="${record.Table_Length || '12'}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"></div>`;
+            } else if (category === 'dice_sets') {
+                htmlContent = `<div><label class="block mb-1 font-bold">Set Designation Name:</label><input type="text" id="mField_Name" value="${record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="3V ARRANGEMENT"></div>
+                <div class="grid grid-cols-2 gap-2 mt-2">
+                    <div><label class="block text-[11px]">L-TOP (1-6):</label><input type="number" id="mField_LTop" min="1" max="6" value="${record.Left_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px]">L-FRONT (1-6):</label><input type="number" id="mField_LFront" min="1" max="6" value="${record.Left_Front_Face || 6}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px]">R-TOP (1-6):</label><input type="number" id="mField_RTop" min="1" max="6" value="${record.Right_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px]">R-FRONT (1-6):</label><input type="number" id="mField_RFront" min="1" max="6" value="${record.Right_Front_Face || 2}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                </div>`;
+            } else if (category === 'invalid_causes') {
+                htmlContent = `<div><label class="block mb-1 font-bold">Custom Cause Label:</label><input type="text" id="mField_Id" value="${targetId || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. DICE OFF TABLE"></div>`;
             }
+
+            fields.innerHTML = htmlContent;
+            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
         }
 
-        function closePropertyModal() { document.getElementById('property-modal').style.display = 'none'; syncAllDatabaseDropdowns(); }
+        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; }
 
-        async function savePropertyModalForm() {
-            const nameVal = document.getElementById('form-field-name').value.trim().toUpperCase();
-            if(!nameVal) return alert("Asset name descriptor missing.");
-            
-            let docData = { name: nameVal };
-            if(activeModalContext === 'location') docData.tables = document.getElementById('form-loc-tables').value;
-            else if(activeModalContext === 'table') docData.length = document.getElementById('form-tab-len').value;
-            else if(activeModalContext === 'shooter') docData.style = document.getElementById('form-shoot-style').value;
-            else if(activeModalContext === 'diceset') { docData.left_face = document.getElementById('form-dice-left').value; docData.right_face = document.getElementById('form-dice-right').value; }
-            else if(activeModalContext === 'invalid_cause') docData.category = document.getElementById('form-cause-cat').value;
-            
-            const docRef = db.collection("users").doc(currentUid).collection(`dataset_${activeModalContext}`);
-            if(activeEditId) await docRef.doc(activeEditId).set(docData);
-            else await docRef.doc("asset_" + Date.now()).set(docData);
-            
+        async function commitMetadataModalForm() {
+            if (!currentUid) return;
+            let targetDocId = activeEditId;
+            let payload = {};
+
+            const idField = document.getElementById('mField_Id');
+            const nameField = document.getElementById('mField_Name');
+            const idVal = idField ? idField.value.trim().toUpperCase() : "";
+
+            if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
+                if (!activeEditId) {
+                    if (!idVal) return alert("Primary ID mandate broken.");
+                    targetDocId = idVal;
+                }
+                if (activeModalContext === 'shooters') payload = { Throwing_Style: document.getElementById('mField_Style').value.trim().toUpperCase() };
+                else if (activeModalContext === 'locations') payload = { name: targetDocId, Table_Length: document.getElementById('mField_Length').value.trim() };
+                else if (activeModalContext === 'invalid_causes') payload = { name: targetDocId };
+            } else if (activeModalContext === 'dice_sets') {
+                const sName = nameField.value.trim().toUpperCase();
+                if (!sName) return alert("Designation string parameter empty.");
+                if (!activeEditId) targetDocId = "set_" + Date.now();
+                payload = {
+                    Set_Name: sName,
+                    Left_Top_Face: parseInt(document.getElementById('mField_LTop').value) || 3,
+                    Left_Front_Face: parseInt(document.getElementById('mField_LFront').value) || 6,
+                    Right_Top_Face: parseInt(document.getElementById('mField_RTop').value) || 3,
+                    Right_Front_Face: parseInt(document.getElementById('mField_RFront').value) || 2
+                };
+            }
+
+            await db.collection("users").doc(currentUid).collection(`master_${activeModalContext}`).doc(targetDocId).set(payload);
             closePropertyModal();
+            await fetchMasterMetadataCollections();
         }
 
-        async function editDropdownItem(type) {
-            const id = document.getElementById(`sel-${type}`).value;
-            if(!id || id === 'ADD_NEW' || id === 'ALL') return alert("Select a registered asset parameter choice.");
-            launchPropertyModal(type, id);
+        function editCurrentAsset(cat) {
+            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
+            if (!el.value || el.value === 'ALL') return alert("Select a transaction asset element target row.");
+            openMetadataModal(cat, el.value);
         }
 
-        async function deleteDropdownItem(type) {
-            const id = document.getElementById(`sel-${type}`).value;
-            if(!id || id === 'ADD_NEW' || id === 'ALL') return alert("Select standard parameter entry.");
-            if(confirm("Permanently wipe asset profile?")) {
-                await db.collection("users").doc(currentUid).collection(`dataset_${type}`).doc(id).delete();
-                syncAllDatabaseDropdowns();
+        async function deleteCurrentAsset(cat) {
+            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
+            if (!el.value || el.value === 'ALL') return alert("Select baseline element row.");
+            if (confirm("Irreversibly delete cloud file path configuration row?")) {
+                await db.collection("users").doc(currentUid).collection(`master_${cat}`).doc(el.value).delete();
+                await fetchMasterMetadataCollections();
             }
         }
+
+        function watchShooterDropdownChange() { if(document.getElementById('ctxShooterSelect').value === 'ADD_NEW') openMetadataModal('shooters'); else executeAnalyticalFilterEngine(); }
+        function watchLocationDropdownChange() { if(document.getElementById('ctxLocationSelect').value === 'ADD_NEW') openMetadataModal('locations'); else executeAnalyticalFilterEngine(); }
+        function watchDiceSetDropdownChange() { if(document.getElementById('ctxDiceSetSelect').value === 'ADD_NEW') openMetadataModal('dice_sets'); else onDiceSetChange(); }
 
         function toggleSetExecutionFlag() {
             isSuggestedSetFlag = !isSuggestedSetFlag;
             const btn = document.getElementById('btn-set-flag');
-            if(isSuggestedSetFlag) {
-                btn.innerText = "SUGGESTED SET";
-                btn.className = "text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 px-4 py-1 rounded transition-all";
-            } else {
-                btn.innerText = "ORIGINAL SET";
-                btn.className = "text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-1 rounded transition-all";
-            }
+            btn.innerText = isSuggestedSetFlag ? "SUGGESTED SET" : "ORIGINAL SET";
+            btn.className = isSuggestedSetFlag ? "text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 px-4 py-1 rounded transition-all" : "text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-1 rounded transition-all";
             calculateLiveKinematicsPreview();
         }
 
         function onDiceSetChange() {
-            const el = document.getElementById('sel-diceset');
-            if(el.value === 'ADD_NEW') { launchPropertyModal('diceset'); return; }
-            
+            const el = document.getElementById('ctxDiceSetSelect');
             const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
-            const sugL = document.getElementById('box-suggest-left'), sugR = document.getElementById('box-suggest-right');
+            const sugL = document.getElementById('pad-suggest-left'), sugR = document.getElementById('pad-suggest-right');
             const tgl = document.getElementById('toggle-set-container');
 
-            if(!el.value || el.value === 'ALL') { 
-                visL.style.display = 'none'; visR.style.display = 'none'; 
+            if (!el.value || el.value === 'ALL') {
+                visL.style.display = 'none'; visR.style.display = 'none';
                 sugL.style.display = 'none'; sugR.style.display = 'none';
-                tgl.style.display = 'none';
-                return; 
+                tgl.style.display = 'none'; document.getElementById('kinematicReadoutPanel').style.display = 'none';
+                return;
             }
-            
-            db.collection("users").doc(currentUid).collection("dataset_diceset").doc(el.value).get().then(doc => {
-                if(doc.exists) {
-                    const d = doc.data();
-                    const lf = (d.left_face || "3/6").split('/');
-                    const rf = (d.right_face || "3/2").split('/');
-                    
-                    document.getElementById('v-left-t').innerText = lf[0] || '-';
-                    document.getElementById('v-left-f').innerText = lf[1] || '-';
-                    document.getElementById('v-right-t').innerText = rf[0] || '-';
-                    document.getElementById('v-right-f').innerText = rf[1] || '-';
-                    
-                    visL.style.display = 'flex'; visR.style.display = 'flex';
-                    sugL.style.display = 'block'; sugR.style.display = 'block';
-                    tgl.style.display = 'flex';
-                } else {
-                    visL.style.display = 'none'; visR.style.display = 'none';
-                    sugL.style.display = 'none'; sugR.style.display = 'none';
-                    tgl.style.display = 'none';
-                }
-                calculateLiveKinematicsPreview();
-            });
+
+            const d = userDiceSetsList[el.value];
+            if (d) {
+                document.getElementById('v-left-t').innerText = d.Left_Top_Face || '3';
+                document.getElementById('v-left-f').innerText = d.Left_Front_Face || '6';
+                document.getElementById('v-right-t').innerText = d.Right_Top_Face || '3';
+                document.getElementById('v-right-f').innerText = d.Right_Front_Face || '2';
+                visL.style.display = 'flex'; visR.style.display = 'flex';
+                sugL.style.display = 'block'; sugR.style.display = 'block'; tgl.style.display = 'flex';
+            }
+            calculateLiveKinematicsPreview();
         }
 
         function selectMatrixDie(axis, val) {
@@ -433,124 +464,79 @@
         }
 
         function calculateLiveKinematicsPreview() {
-            const el = document.getElementById('sel-diceset');
-            const sugL = document.getElementById('box-suggest-left'), sugR = document.getElementById('box-suggest-right');
-            
-            if(!el.value || el.value === 'ALL') {
-                sugL.style.display = 'none'; sugR.style.display = 'none';
-                return;
-            }
+            const el = document.getElementById('ctxDiceSetSelect');
+            const sugL = document.getElementById('pad-suggest-left'), sugR = document.getElementById('pad-suggest-right');
+            if (!el.value || el.value === 'ALL') return;
 
             let targetLeftTop = parseInt(document.getElementById('v-left-t').innerText) || 3;
             let targetRightTop = parseInt(document.getElementById('v-right-t').innerText) || 3;
+            if(isSuggestedSetFlag) { targetLeftTop = (targetLeftTop % 6) + 1; targetRightTop = (targetRightTop % 6) + 1; }
 
-            if(isSuggestedSetFlag) {
-                targetLeftTop = (targetLeftTop % 6) + 1; 
-                targetRightTop = (targetRightTop % 6) + 1;
-            }
-            
-            sugL.innerText = `SUGGESTED TOP: [ ${targetLeftTop} ]`;
-            sugR.innerText = `SUGGESTED TOP: [ ${targetRightTop} ]`;
+            sugL.innerText = `SUGGEST TOP: [ ${targetLeftTop} ]`;
+            sugR.innerText = `SUGGEST TOP: [ ${targetRightTop} ]`;
         }
 
         function renderLastRollKinematics(record) {
             const panel = document.getElementById('kinematicReadoutPanel');
-            if (record.Invalid_Roll || !record.Kinematic_Status) {
-                panel.style.display = 'none';
-                return;
-            }
-            
-            document.getElementById('k-left-readout').innerText = `ROTATION: [${record.Left_Kinematic?.rot || '0'}] | AXIS DELTA: [${record.Left_Kinematic?.ax || '0'}]`;
-            document.getElementById('k-right-readout').innerText = `ROTATION: [${record.Right_Kinematic?.rot || '0'}] | AXIS DELTA: [${record.Right_Kinematic?.ax || '0'}]`;
+            if (record.Invalid_Roll || !record.Kinematic_Status) { panel.style.display = 'none'; return; }
+            document.getElementById('k-left-readout').innerText = `ROT: [${record.Left_Kinematic?.rot || '0'}] | DELTA: [${record.Left_Kinematic?.ax || '0'}]`;
+            document.getElementById('k-right-readout').innerText = `ROT: [${record.Right_Kinematic?.rot || '0'}] | DELTA: [${record.Right_Kinematic?.ax || '0'}]`;
             panel.style.display = 'flex';
         }
 
-        async function onInvalidRollTrigger() {
-            // Read target reasons collection from db path
-            const snap = await db.collection("users").doc(currentUid).collection("dataset_invalid_cause").get();
-            let promptStr = "SPECIFY INVALID TIMELINE BREAKER EVENT REASON:\n";
-            let optionsMap = {};
-            let idx = 1;
-            
-            snap.forEach(doc => {
-                promptStr += `${idx}. ${doc.data().name}\n`;
-                optionsMap[idx] = doc.data().name;
-                idx++;
-            });
-            promptStr += `${idx}. [+ REGISTER NEW CAUSE PARAMETER]`;
+        async function launchInvalidCausePicker() {
+            let causeKeys = Object.keys(userCausesList);
+            let promptStr = "SPECIFY INVALID TIMELINE TRACKING EXCLUSION BREAK EVENT:\n";
+            causeKeys.forEach((k, idx) => { promptStr += `${idx + 1}. ${k}\n`; });
+            promptStr += `${causeKeys.length + 1}. [+ REGISTER NEW CAUSE LABEL]`;
             
             const choice = prompt(promptStr, "1");
             if (!choice) return;
             
-            let finalCause = "UNSPECIFIED PARSE FAULT";
-            if (parseInt(choice) === idx) {
-                launchPropertyModal('invalid_cause');
-                return;
-            } else if (optionsMap[parseInt(choice)]) {
-                finalCause = optionsMap[parseInt(choice)];
-            } else {
-                finalCause = choice.trim().toUpperCase();
-            }
-            
-            // Log explicitly to timeline without die dependencies
+            let selectedCause = "UNSPECIFIED ERR";
+            if (parseInt(choice) === causeKeys.length + 1) { openMetadataModal('invalid_causes'); return; }
+            else if (causeKeys[parseInt(choice) - 1]) selectedCause = causeKeys[parseInt(choice) - 1];
+
             const r = {
                 leftDie: null, rightDie: null, sum: 0,
-                Location_ID: getSelectedText('location'), Table_Position: getSelectedText('table'),
-                Shooter_ID: getSelectedText('shooter'), Left_Set_Face: "N/A", Right_Set_Face: "N/A",
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
-                Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null,
-                Invalid_Roll: true, Notes: finalCause
+                Location_ID: getSelectedText('Location'), Table_Position: document.getElementById('ctxTablePositionSelect').value || "SL1", Shooter_ID: getSelectedText('Shooter'),
+                Left_Set_Face: "N/A", Right_Set_Face: "N/A", Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null, Invalid_Roll: true, Notes: selectedCause
             };
-            
             state.rollHistoryLog.push(r); state.rawSequenceLog.push(0);
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
         function getSelectedText(type) {
-            const el = document.getElementById(`sel-${type}`);
+            const el = document.getElementById(type === 'Location' ? 'ctxLocationSelect' : 'ctxShooterSelect');
             if (!el || el.value === 'ALL' || el.selectedIndex < 0) return "UNASSIGNED";
             return el.options[el.selectedIndex].text;
         }
 
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Die selection indices required.");
-            
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice parameter keys empty.");
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
             
-            // Double face rule parameters check configuration logic bypass override flag trigger gate
-            let enforceKinematics = (trackingMode === 'KINEMATIC');
-            if (sumValue === 2 || sumValue === 12 || isHardway) {
-                enforceKinematics = true; 
-            }
+            let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway);
 
             let lKin = null, rKin = null;
-            if (enforceKinematics && document.getElementById('sel-diceset').value !== 'ALL') {
+            if (enforceKinematics && document.getElementById('ctxDiceSetSelect').value !== 'ALL') {
                 let targetLeftTop = parseInt(document.getElementById('v-left-t').innerText) || 3;
                 let targetRightTop = parseInt(document.getElementById('v-right-t').innerText) || 3;
-                if(isSuggestedSetFlag) {
-                    targetLeftTop = (targetLeftTop % 6) + 1; targetRightTop = (targetRightTop % 6) + 1;
-                }
+                if(isSuggestedSetFlag) { targetLeftTop = (targetLeftTop % 6) + 1; targetRightTop = (targetRightTop % 6) + 1; }
                 lKin = { rot: (state.selectedLeft === targetLeftTop ? "0" : "AX_R"), ax: (state.selectedLeft === targetLeftTop ? "0" : "1") };
                 rKin = { rot: (state.selectedRight === targetRightTop ? "0" : "AX_R"), ax: (state.selectedRight === targetRightTop ? "0" : "1") };
             }
 
             const r = {
                 leftDie: parseInt(state.selectedLeft), rightDie: parseInt(state.selectedRight), sum: sumValue,
-                Location_ID: getSelectedText('location'), Table_Position: getSelectedText('table'), Shooter_ID: getSelectedText('shooter'),
+                Location_ID: getSelectedText('Location'), Table_Position: document.getElementById('ctxTablePositionSelect').value || "SL1", Shooter_ID: getSelectedText('Shooter'),
                 Left_Set_Face: document.getElementById('vis-left-set').style.display !== 'none' ? (document.getElementById('v-left-t').innerText + "/" + document.getElementById('v-left-f').innerText) : "N/A",
                 Right_Set_Face: document.getElementById('vis-right-set').style.display !== 'none' ? (document.getElementById('v-right-t').innerText + "/" + document.getElementById('v-right-f').innerText) : "N/A",
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
-                Kinematic_Status: enforceKinematics,
-                Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL",
-                Left_Kinematic: lKin, Right_Kinematic: rKin,
-                Invalid_Roll: false, Notes: ""
+                Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: enforceKinematics, Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL", Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false, Notes: ""
             };
-            
             state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.sum);
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
@@ -573,8 +559,7 @@
 
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
-            const sh = getSelectedText('shooter');
-            const loc = getSelectedText('location');
+            const sh = getSelectedText('Shooter'); const loc = getSelectedText('Location');
             let filtered = [...state.rollHistoryLog];
 
             if(mode === 'ISOLATE_SHOOTER') filtered = filtered.filter(r => r.Shooter_ID === sh);
@@ -586,10 +571,7 @@
             const ribbon = document.getElementById('historyContainer'); ribbon.innerHTML = '';
 
             filtered.forEach(v => {
-                if(v.Invalid_Roll) { 
-                    ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-amber-500 border border-amber-500/30 text-xs" title="${v.Notes}">ERR</div>`; 
-                    return; 
-                }
+                if(v.Invalid_Roll) { ribbon.innerHTML += `<div class="history-node bg-amber-600/10 text-amber-500 border border-amber-500/30 text-xs" title="${v.Notes}">ERR</div>`; return; }
                 lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1;
                 let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
                 if(v.sum === 7) { lTotal++; if(lap === null) { lComeout++; c = 'node-natural'; } else { lRed++; c = 'node-seven-out'; lHand = 0; lap = null; for(let k in la) la[k] = 0; } }
@@ -629,31 +611,19 @@
 
         async function pushCloudState(docId, name = null) {
             if(!currentUid) return;
-            let p = { 
-                module_id: "DICE_TRACKER", totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls, sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout, totalPointsMade: state.totalPointsMade, activePoint: state.activePoint, value: state.activePoint, shooterHistory: state.shooterHistory, rawSequenceLog: state.rawSequenceLog, payload_log: JSON.stringify(state.rollHistoryLog), matrix: JSON.stringify(state.matrix), meta_tags: { location: getSelectedText('location'), base_unit: 1 }, timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-            };
+            let p = { module_id: "DICE_TRACKER", totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls, sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout, totalPointsMade: state.totalPointsMade, activePoint: state.activePoint, value: state.activePoint, shooterHistory: state.shooterHistory, rawSequenceLog: state.rawSequenceLog, payload_log: JSON.stringify(state.rollHistoryLog), matrix: JSON.stringify(state.matrix), meta_tags: { location: getSelectedText('Location'), base_unit: 1 }, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
             if(name) p.name = name.toUpperCase();
             await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(p, { merge: true });
         }
 
-        function fetchCloudState() {
-            db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => { if(doc.exists) rebuildUIFromStoredData(doc.data()); });
-        }
+        function fetchCloudState() { db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => { if(doc.exists) rebuildUIFromStoredData(doc.data()); }); }
 
         function rebuildUIFromStoredData(d) {
             state.totalRolls = d.totalRolls || 0; state.currentHandRolls = d.currentHandRolls || 0; state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
             try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
-            
             let rawLog = d.payload_log || d.rollHistoryLog || [];
             try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
-            
-            state.rollHistoryLog = state.rollHistoryLog.map(r => {
-                return {
-                    leftDie: r.leftDie || r.Left_Die || null, rightDie: r.rightDie || r.Right_Die || null, sum: r.sum !== undefined ? r.sum : (r.Total_Sum || 0), Location_ID: r.Location_ID || r.locationId || "UNASSIGNED", Table_Position: r.Table_Position || r.tablePosition || "UNASSIGNED", Shooter_ID: r.Shooter_ID || r.shooterId || "UNASSIGNED", Left_Set_Face: r.Left_Set_Face || r.leftSetFace || "N/A", Right_Set_Face: r.Right_Set_Face || r.rightSetFace || "N/A", Time_Stamp: r.Time_Stamp || r.timeStamp || new Date().toISOString(), Roll_Index: r.Roll_Index || r.rollIndex || 0, Puck_Before_Roll: r.Puck_Before_Roll !== undefined ? r.Puck_Before_Roll : (r.puckBeforeRoll || "OFF"), Kinematic_Status: r.Kinematic_Status !== undefined ? r.Kinematic_Status : (r.kinematicStatus || false), Left_Kinematic: r.Left_Kinematic || null, Right_Kinematic: r.Right_Kinematic || null, Invalid_Roll: r.Invalid_Roll !== undefined ? r.Invalid_Roll : (r.invalidRoll || false), Notes: r.Notes || r.description || ""
-                };
-            });
             executeAnalyticalFilterEngine();
-            if (state.rollHistoryLog.length > 0) renderLastRollKinematics(state.rollHistoryLog[state.rollHistoryLog.length - 1]);
         }
 
         async function handleCryptNavigationTrigger() {
@@ -662,24 +632,6 @@
             }
             window.location.assign('crypt.html');
         }
-
-        function executeUndo() {
-            if(state.rollHistoryLog.length === 0) return; state.rollHistoryLog.pop(); state.rawSequenceLog.pop();
-            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null;
-            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-            const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
-            b.forEach(row => { state.rollHistoryLog.push(row); state.rawSequenceLog.push(row.sum); executeCalculationsLoop(row); });
-            pushCloudState("active_session");
-        }
-
-        function executeClearReset() {
-            if(!confirm("Clear session data?")) return;
-            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null; state.rollHistoryLog = []; state.rawSequenceLog = [];
-            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-            clearSelectionPads(); executeAnalyticalFilterEngine(); pushCloudState("active_session");
-        }
-
-        function clearSelectionPads() { state.selectedLeft = null; state.selectedRight = null; for(let i=1; i<=6; i++) { document.getElementById(`l-pad-${i}`).classList.remove('active'); document.getElementById(`r-pad-${i}`).classList.remove('active'); } calculateLiveKinematicsPreview(); }
     </script>
 </body>
 </html>
