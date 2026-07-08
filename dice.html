@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.16.0</title>
+    <title>Dice Tracker v1.17.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -60,15 +60,17 @@
         .btn-orange { background: #f97316; color: white; }
         .btn-blue { background: #3b82f6; color: white; }
         .btn-red { background: #ef4444; color: white; }
+        
         .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
         .select-element:focus { border-color: var(--emerald-accent); }
-        .kinematic-readout-strip { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.5); padding: 12px; border-radius: 4px; display: flex; justify-content: space-around; font-size: 11px; font-weight: bold; color: var(--amber-accent); }
         
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-box { background: #0f172a; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        
         .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        
         .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
         .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; }
         .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
@@ -76,6 +78,9 @@
         .d-cell:last-child { border-right: none; }
         .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
         .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
+        
+        /* Visual Dice Render Blocks */
+        .dice-visual-cube { width: 30px; height: 30px; background: #ef4444; color: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; border: 1px solid #ffffff30; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
     </style>
 </head>
 <body>
@@ -92,7 +97,6 @@
     </nav>
 
     <div class="main-wrapper">
-        <!-- Section 1: Relational Dataset Dropdown Matrix -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
@@ -121,22 +125,32 @@
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
                 <div class="flex gap-1">
-                    <select id="sel-diceset" class="select-element" onchange="checkDropdownTrigger('diceset')"></select>
+                    <select id="sel-diceset" class="select-element" onchange="onDiceSetChange()"></select>
                     <button onclick="editDropdownItem('diceset')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
                     <button onclick="deleteDropdownItem('diceset')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
+                </div>
+                <div class="flex items-center justify-between mt-2 bg-slate-900/80 p-1 px-2 border border-slate-800 rounded">
+                    <span class="text-[9px] uppercase font-bold text-slate-400">Target Set State:</span>
+                    <button id="btn-set-flag" onclick="toggleSetExecutionFlag()" class="text-[9px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-2 py-0.5 rounded transition-all">ORIGINAL SET</button>
                 </div>
             </div>
         </div>
 
-        <!-- Section 2: High-Contrast History Ribbon -->
         <div class="history-ribbon" id="historyContainer"></div>
 
-        <!-- Section 3: Integrated Controller & State Display Counters -->
         <div class="controller-panel flex flex-col gap-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <div class="flex flex-col items-center">
-                    <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2">Left Die</span>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
+                        <div id="vis-left-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800 hidden">
+                            <span class="text-[8px] text-slate-500">SET:</span>
+                            <div class="dice-visual-cube" id="v-left-t">-</div>
+                            <div class="dice-visual-cube" id="v-left-f">-</div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-3 gap-2" id="leftPadContainer"></div>
+                    <div class="text-[10px] text-slate-400 font-bold bg-slate-950/80 p-1.5 px-3 border border-slate-800 rounded w-full text-center" id="pad-suggest-left">L-SUGGEST: N/A</div>
                 </div>
                 
                 <div class="flex flex-row md:flex-col justify-around bg-black/50 border border-slate-800 rounded p-4 flex-grow w-full md:w-auto max-w-sm gap-2">
@@ -151,9 +165,17 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col items-center">
-                    <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider mb-2">Right Die</span>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
+                        <div id="vis-right-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800 hidden">
+                            <span class="text-[8px] text-slate-500">SET:</span>
+                            <div class="dice-visual-cube" id="v-right-t">-</div>
+                            <div class="dice-visual-cube" id="v-right-f">-</div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-3 gap-2" id="rightPadContainer"></div>
+                    <div class="text-[10px] text-slate-400 font-bold bg-slate-950/80 p-1.5 px-3 border border-slate-800 rounded w-full text-center" id="pad-suggest-right">R-SUGGEST: N/A</div>
                 </div>
             </div>
             
@@ -168,13 +190,11 @@
             </div>
         </div>
 
-        <!-- Section 4: Kinematic Recommendation Strip -->
         <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
-            <span>LEFT DIE KINEMATICS: <b class="text-white font-mono" id="k-left-readout">N/A</b></span>
-            <span>RIGHT DIE KINEMATICS: <b class="text-white font-mono" id="k-right-readout">N/A</b></span>
+            <span>LEFT DIE TELEMETRY: <b class="text-white font-mono" id="k-left-readout">N/A</b></span>
+            <span>RIGHT DIE TELEMETRY: <b class="text-white font-mono" id="k-right-readout">N/A</b></span>
         </div>
 
-        <!-- Section 5: Contiguous Number Board Stack (2-6 directly over 8-12) -->
         <div class="board-stack">
             <div class="grid-row-segment">
                 <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
@@ -192,7 +212,6 @@
             </div>
         </div>
 
-        <!-- Section 6: Diagnostics Display & Processing Filters Base Panel -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
             <div class="diagnostics-panel md:col-span-2">
                 <div class="diag-title">ZOMBIELORD STATISTICAL DIAGNOSTICS</div>
@@ -217,7 +236,6 @@
         </div>
     </div>
 
-    <!-- Modal Form Interface Component Frame -->
     <div id="property-modal" class="modal-mask">
         <div class="modal-box">
             <h2 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h2>
@@ -234,6 +252,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         let currentUid = null, activeModalContext = null, activeEditId = null;
+        let isSuggestedSetFlag = false;
 
         const state = {
             totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
@@ -270,6 +289,7 @@
 
         async function syncAllDatabaseDropdowns() {
             await Promise.all([loadDataset('location'), loadDataset('table'), loadDataset('shooter'), loadDataset('diceset')]);
+            onDiceSetChange();
         }
 
         async function loadDataset(type) {
@@ -296,7 +316,7 @@
             if(type === 'location') html += `<div><label class="block mb-1 font-bold">TABLE COUNT:</label><input type="number" id="form-loc-tables" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="1"></div>`;
             else if(type === 'table') html += `<div><label class="block mb-1 font-bold">LENGTH (FT):</label><input type="text" id="form-tab-len" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="12"></div>`;
             else if(type === 'shooter') html += `<div><label class="block mb-1 font-bold">THROW STYLE SET:</label><input type="text" id="form-shoot-style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="PSO"></div>`;
-            else if(type === 'diceset') html += `<div><label class="block mb-1 font-bold">LEFT FACES (T/F):</label><input type="text" id="form-dice-left" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/6"></div><div><label class="block mb-1 font-bold">RIGHT FACES (T/F):</label><input type="text" id="form-dice-right" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/2"></div>`;
+            else if(type === 'diceset') html += `<div><label class="block mb-1 font-bold">LEFT FACES (TOP/FRONT):</label><input type="text" id="form-dice-left" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/6"></div><div><label class="block mb-1 font-bold">RIGHT FACES (TOP/FRONT):</label><input type="text" id="form-dice-right" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded" value="3/2"></div>`;
             
             fields.innerHTML = html;
             
@@ -348,6 +368,45 @@
             }
         }
 
+        function toggleSetExecutionFlag() {
+            isSuggestedSetFlag = !isSuggestedSetFlag;
+            const btn = document.getElementById('btn-set-flag');
+            if(isSuggestedSetFlag) {
+                btn.innerText = "SUGGESTED SET";
+                btn.className = "text-[9px] font-black text-emerald-400 hover:text-emerald-300 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded transition-all";
+            } else {
+                btn.innerText = "ORIGINAL SET";
+                btn.className = "text-[9px] font-black text-amber-400 hover:text-amber-300 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-2 py-0.5 rounded transition-all";
+            }
+            calculateLiveKinematicsPreview();
+        }
+
+        function onDiceSetChange() {
+            const el = document.getElementById('sel-diceset');
+            if(el.value === 'ADD_NEW') { launchPropertyModal('diceset'); return; }
+            
+            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
+            if(!el.value) { visL.style.display = 'none'; visR.style.display = 'none'; return; }
+            
+            db.collection("users").doc(currentUid).collection("dataset_diceset").doc(el.value).get().then(doc => {
+                if(doc.exists) {
+                    const d = doc.data();
+                    const lf = (d.left_face || "3/6").split('/');
+                    const rf = (d.right_face || "3/2").split('/');
+                    
+                    document.getElementById('v-left-t').innerText = lf[0] || '-';
+                    document.getElementById('v-left-f').innerText = lf[1] || '-';
+                    document.getElementById('v-right-t').innerText = rf[0] || '-';
+                    document.getElementById('v-right-f').innerText = rf[1] || '-';
+                    
+                    visL.style.display = 'flex'; visR.style.display = 'flex';
+                } else {
+                    visL.style.display = 'none'; visR.style.display = 'none';
+                }
+                calculateLiveKinematicsPreview();
+            });
+        }
+
         function selectMatrixDie(axis, val) {
             if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
             else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
@@ -355,11 +414,36 @@
         }
 
         function calculateLiveKinematicsPreview() {
-            const ds = document.getElementById('sel-diceset').value;
-            const l = document.getElementById('k-left-readout'), r = document.getElementById('k-right-readout');
-            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) { l.innerText = "N/A"; r.innerText = "N/A"; return; }
-            l.innerText = state.selectedLeft === 3 ? "ROTATION: [0] | DELTA: [0]" : "ROTATION: [AXIS_ROT] | DELTA: [1]";
-            r.innerText = state.selectedRight === 3 ? "ROTATION: [0] | DELTA: [0]" : "ROTATION: [AXIS_ROT] | DELTA: [1]";
+            const el = document.getElementById('sel-diceset');
+            const lTel = document.getElementById('k-left-readout'), rTel = document.getElementById('k-right-readout');
+            const sugL = document.getElementById('pad-suggest-left'), sugR = document.getElementById('pad-suggest-right');
+            
+            if(!el.value || !state.selectedLeft || !state.selectedRight) {
+                lTel.innerText = "N/A"; rTel.innerText = "N/A";
+                sugL.innerText = "L-SUGGEST: N/A"; sugR.innerText = "R-SUGGEST: N/A";
+                return;
+            }
+
+            // Reference base configuration
+            let targetLeftTop = parseInt(document.getElementById('v-left-t').innerText) || 3;
+            let targetRightTop = parseInt(document.getElementById('v-right-t').innerText) || 3;
+
+            // If flag is toggled to suggested mode, adjust calculation tracking offset parameters
+            if(isSuggestedSetFlag) {
+                targetLeftTop = (targetLeftTop % 6) + 1; 
+                targetRightTop = (targetRightTop % 6) + 1;
+            }
+
+            let lRot = state.selectedLeft === targetLeftTop ? "0" : "AXIS_ROT";
+            let lAx = state.selectedLeft === targetLeftTop ? "0" : "1";
+            let rRot = state.selectedRight === targetRightTop ? "0" : "AXIS_ROT";
+            let rAx = state.selectedRight === targetRightTop ? "0" : "1";
+
+            lTel.innerText = `ROTATION: [${lRot}] | DELTA: [${lAx}]`;
+            rTel.innerText = `ROTATION: [${rRot}] | DELTA: [${rAx}]`;
+            
+            sugL.innerText = `L-SUGGEST: [${targetLeftTop}]`;
+            sugR.innerText = `R-SUGGEST: [${targetRightTop}]`;
         }
 
         function submitRoll(trackingMode) {
@@ -377,12 +461,13 @@
                 Location_ID: locEl.options[locEl.selectedIndex]?.text || "UNASSIGNED",
                 Table_Position: tblEl.options[tblEl.selectedIndex]?.text || "UNASSIGNED",
                 Shooter_ID: shtEl.options[shtEl.selectedIndex]?.text || "UNASSIGNED",
-                Left_Set_Face: dcsEl.options[dcsEl.selectedIndex]?.text.split(' ')[2]?.split('-')[0] || "3/6",
-                Right_Set_Face: dcsEl.options[dcsEl.selectedIndex]?.text.split(' ')[2]?.split('-')[1] || "3/2",
+                Left_Set_Face: document.getElementById('v-left-t').innerText + "/" + document.getElementById('v-left-f').innerText,
+                Right_Set_Face: document.getElementById('v-right-t').innerText + "/" + document.getElementById('v-right-f').innerText,
                 Time_Stamp: new Date().toISOString(),
                 Roll_Index: state.rollHistoryLog.length + 1,
                 Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
                 Kinematic_Status: (trackingMode === 'KINEMATIC'),
+                Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL",
                 Left_Kinematic: null, Right_Kinematic: null,
                 Invalid_Roll: (trackingMode === 'INVALID'), 
                 Notes: ""
@@ -469,21 +554,7 @@
             const locationString = locEl.options[locEl.selectedIndex]?.text || "IMPORTED";
             
             let p = { 
-                module_id: "DICE_TRACKER", 
-                totalRolls: state.totalRolls, 
-                currentHandRolls: state.currentHandRolls, 
-                sevensTotal: state.sevensTotal, 
-                sevensRed: state.sevensRed, 
-                sevensComeout: state.sevensComeout, 
-                totalPointsMade: state.totalPointsMade, 
-                activePoint: state.activePoint, 
-                value: state.activePoint, // Sync backup identifier
-                shooterHistory: state.shooterHistory, 
-                rawSequenceLog: state.rawSequenceLog, 
-                payload_log: JSON.stringify(state.rollHistoryLog), 
-                matrix: JSON.stringify(state.matrix), 
-                meta_tags: { location: locationString, base_unit: 1 },
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                module_id: "DICE_TRACKER", totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls, sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout, totalPointsMade: state.totalPointsMade, activePoint: state.activePoint, value: state.activePoint, shooterHistory: state.shooterHistory, rawSequenceLog: state.rawSequenceLog, payload_log: JSON.stringify(state.rollHistoryLog), matrix: JSON.stringify(state.matrix), meta_tags: { location: locationString, base_unit: 1 }, timestamp: firebase.firestore.FieldValue.serverTimestamp() 
             };
             if(name) p.name = name.toUpperCase();
             await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(p, { merge: true });
@@ -502,25 +573,9 @@
             
             state.rollHistoryLog = state.rollHistoryLog.map(r => {
                 return {
-                    leftDie: r.leftDie || r.Left_Die || 3,
-                    rightDie: r.rightDie || r.Right_Die || 4,
-                    sum: r.sum || r.Total_Sum || 7,
-                    Location_ID: r.Location_ID || r.locationId || "UNASSIGNED",
-                    Table_Position: r.Table_Position || r.tablePosition || "UNASSIGNED",
-                    Shooter_ID: r.Shooter_ID || r.shooterId || "UNASSIGNED",
-                    Left_Set_Face: r.Left_Set_Face || r.leftSetFace || "3/6",
-                    Right_Set_Face: r.Right_Set_Face || r.rightSetFace || "3/2",
-                    Time_Stamp: r.Time_Stamp || r.timeStamp || new Date().toISOString(),
-                    Roll_Index: r.Roll_Index || r.rollIndex || 0,
-                    Puck_Before_Roll: r.Puck_Before_Roll !== undefined ? r.Puck_Before_Roll : (r.puckBeforeRoll || "OFF"),
-                    Kinematic_Status: r.Kinematic_Status !== undefined ? r.Kinematic_Status : (r.kinematicStatus || false),
-                    Left_Kinematic: r.Left_Kinematic || null,
-                    Right_Kinematic: r.Right_Kinematic || null,
-                    Invalid_Roll: r.Invalid_Roll !== undefined ? r.Invalid_Roll : (r.invalidRoll || false),
-                    Notes: r.Notes || r.description || ""
+                    leftDie: r.leftDie || r.Left_Die || 3, rightDie: r.rightDie || r.Right_Die || 4, sum: r.sum || r.Total_Sum || 7, Location_ID: r.Location_ID || r.locationId || "UNASSIGNED", Table_Position: r.Table_Position || r.tablePosition || "UNASSIGNED", Shooter_ID: r.Shooter_ID || r.shooterId || "UNASSIGNED", Left_Set_Face: r.Left_Set_Face || r.leftSetFace || "3/6", Right_Set_Face: r.Right_Set_Face || r.rightSetFace || "3/2", Time_Stamp: r.Time_Stamp || r.timeStamp || new Date().toISOString(), Roll_Index: r.Roll_Index || r.rollIndex || 0, Puck_Before_Roll: r.Puck_Before_Roll !== undefined ? r.Puck_Before_Roll : (r.puckBeforeRoll || "OFF"), Kinematic_Status: r.Kinematic_Status !== undefined ? r.Kinematic_Status : (r.kinematicStatus || false), Left_Kinematic: r.Left_Kinematic || null, Right_Kinematic: r.Right_Kinematic || null, Invalid_Roll: r.Invalid_Roll !== undefined ? r.Invalid_Roll : (r.invalidRoll || false), Notes: r.Notes || r.description || ""
                 };
             });
-
             executeAnalyticalFilterEngine();
         }
 
