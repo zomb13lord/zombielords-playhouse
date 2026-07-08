@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.24.1</title>
+    <title>Dice Tracker v1.25.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -75,6 +75,7 @@
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
+        /* White Pips aligned perfectly to standard input grid buttons dimensions */
         .dice-visual-cube { width: 52px; height: 50px; background: #020617; color: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 32px; border: 0.5px solid rgba(51, 65, 85, 0.8); box-shadow: 0 0 12px rgba(255,255,255,0.1); font-family: sans-serif; }
         .force-uppercase { text-transform: uppercase; }
         .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 38px; }
@@ -369,8 +370,53 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
+        function onDiceSetChange() {
+            const el = document.getElementById('ctxDiceSetSelect');
+            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
+            const tgl = document.getElementById('toggle-set-container');
+
+            if (!el.value || el.value === 'ALL') {
+                if(visL) visL.style.display = 'none'; if(visR) visR.style.display = 'none'; if(tgl) tgl.style.display = 'none'; 
+                document.getElementById('pad-telemetry-left').style.opacity = '0';
+                document.getElementById('pad-telemetry-right').style.opacity = '0';
+                activeTargetDiceSetString = ""; return;
+            }
+
+            const d = userDiceSetsList[el.value];
+            if (d) {
+                document.getElementById('v-left-t').innerText = PIP_MAP[d.Left_Top_Face || 3];
+                document.getElementById('v-left-f').innerText = PIP_MAP[d.Left_Front_Face || 6];
+                document.getElementById('v-right-t').innerText = PIP_MAP[d.Right_Top_Face || 3];
+                document.getElementById('v-right-f').innerText = PIP_MAP[d.Right_Front_Face || 2];
+                if(visL) visL.style.display = 'flex'; if(visR) visR.style.display = 'flex';
+                
+                if (activeTargetDiceSetString === "") {
+                    activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+                }
+                if(tgl) tgl.style.display = 'flex';
+            }
+        }
+
+        function selectMatrixDie(axis, val) {
+            if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
+            else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
+        }
+
+        function renderLastRollKinematics(record) {
+            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
+            if (!lBox || !rBox) return;
+            if (record.Invalid_Roll || !record.Kinematic_Status || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
+            
+            const parseAxisString = (kObj) => {
+                if(!kObj) return "N/A"; const r = parseInt(kObj.rot);
+                if([1,2,6,5].includes(r)) return `PITCH [${r}]`; return `YAW [${r}]`;
+            };
+            lBox.innerText = parseAxisString(record.Left_Kinematic); lBox.style.opacity = '1';
+            rBox.innerText = parseAxisString(record.Right_Kinematic); rBox.style.opacity = '1';
+        }
+
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button markers required.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button selection markers missing.");
             const locVal = document.getElementById('ctxLocationSelect').value;
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
@@ -472,7 +518,7 @@
                 const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (lap === i) ? 'block' : 'none';
                 if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
                 
-                // FIXED REFERENCE: Variable loop pointer 'i' enforces robust calculation bounds cleanly
+                // FIXED LOOP VARIABLE REFERENCE: Mapped to local block iterator 'i' natively
                 const horizonN = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
                 if (chip) {
                     const hit1 = state.rawSequenceLog.slice(-horizonN).filter(x => x == i).length;
@@ -490,7 +536,7 @@
                     }
                 }
                 
-                // Mapped globally across all 11 boxes regardless of active location selection profiles
+                // Mapped universally on launch across ALL 11 board boxes
                 const pane = document.getElementById(`ev-pane-${i}`);
                 if(pane) {
                     let totalVectors = Object.keys(conditionalTransitionsMatrix[i].totalCounts).map(Number).filter(n => activeKinematicFilterMask[n]).sort((a,b) => {
