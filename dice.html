@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.24.0</title>
+    <title>Dice Tracker v1.24.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -78,7 +78,6 @@
         .dice-visual-cube { width: 52px; height: 50px; background: #020617; color: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 32px; border: 0.5px solid rgba(51, 65, 85, 0.8); box-shadow: 0 0 12px rgba(255,255,255,0.1); font-family: sans-serif; }
         .force-uppercase { text-transform: uppercase; }
         .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 38px; }
-        .pulse-warning-btn { animation: pulse-warn 1.2s infinite; color: #f59e0b !important; border-color: #f59e0b !important; }
     </style>
 </head>
 <body>
@@ -252,59 +251,6 @@
         };
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
 
-        auth.onAuthStateChanged(user => {
-            if (!user) { window.location.href = "index.html"; return; }
-            currentUid = user.uid;
-            initDualPads();
-            initDragToScrollRibbon();
-            fetchMasterMetadataCollections().then(() => {
-                setDefaultAllDropdowns();
-                fetchCloudState();
-            });
-        });
-
-        function initDualPads() {
-            const l = document.getElementById('leftPadContainer'), r = document.getElementById('rightPadContainer');
-            if(!l || !r) return;
-            l.innerHTML = ''; r.innerHTML = '';
-            for(let i=1; i<=6; i++) {
-                l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
-                r.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
-            }
-        }
-
-        function initDragToScrollRibbon() {
-            const el = document.getElementById('historyContainer'); if(!el) return;
-            let down = false, sX, sLeft;
-            el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
-            el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
-            el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
-        }
-
-        function setDefaultAllDropdowns() {
-            document.getElementById('ctxLocationSelect').value = "ALL";
-            document.getElementById('ctxTablePositionSelect').value = "ALL";
-            document.getElementById('ctxShooterSelect').value = "ALL";
-            document.getElementById('ctxDiceSetSelect').value = "ALL";
-        }
-
-        async function fetchMasterMetadataCollections() {
-            if (!currentUid) return;
-            try {
-                const [sSnap, lSnap, dSnap, cSnap] = await Promise.all([
-                    db.collection("users").doc(currentUid).collection("master_shooters").get(),
-                    db.collection("users").doc(currentUid).collection("master_locations").get(),
-                    db.collection("users").doc(currentUid).collection("master_dice_sets").get(),
-                    db.collection("users").doc(currentUid).collection("master_invalid_causes").get()
-                ]);
-                userShootersList = {}; sSnap.forEach(doc => { userShootersList[doc.id] = doc.data(); });
-                userLocationsList = {}; lSnap.forEach(doc => { userLocationsList[doc.id] = doc.data(); });
-                userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
-                userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
-                syncConfigurationDropdowns();
-            } catch (err) { console.error(err); }
-        }
-
         function syncConfigurationDropdowns() {
             const sSel = document.getElementById('ctxShooterSelect');
             const lSel = document.getElementById('ctxLocationSelect');
@@ -338,79 +284,6 @@
             if(pSel.querySelector(`option[value="${prevP}"]`)) pSel.value = prevP;
             if(dSel.querySelector(`option[value="${prevD}"]`)) dSel.value = prevD;
             onDiceSetChange();
-        }
-
-        function openMetadataModal(category, targetId = null) {
-            activeModalContext = category; activeEditId = targetId;
-            const isEditMode = targetId !== null;
-            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
-            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
-            const fields = document.getElementById('modal-form-fields');
-            
-            let htmlContent = `<div><label class="block mb-1 font-bold">Unique ID Key Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"'} placeholder="e.g. EVOLUTION"></div>`;
-
-            if (category === 'shooters') {
-                htmlContent += `
-                <div class="mt-2"><label class="block mb-1 font-bold">Dominant Hand:</label><select id="mField_Hand" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="RIGHT" ${record.Handedness === 'RIGHT' ? 'selected' : ''}>RIGHT-HANDED</option><option value="LEFT" ${record.Handedness === 'LEFT' ? 'selected' : ''}>LEFT-HANDED</option><option value="MECHANICAL" ${record.Handedness === 'MECHANICAL' ? 'selected' : ''}>MECHANICAL</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Throwing Style:</label><select id="mField_Style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="CONTROLLED SET" ${record.Throwing_Style === 'CONTROLLED SET' ? 'selected' : ''}>CONTROLLED SET</option><option value="RANDOM RANDY" ${record.Throwing_Style === 'RANDOM RANDY' ? 'selected' : ''}>RANDOM RANDY</option><option value="SHAKE RATTLE AND ROLL" ${record.Throwing_Style === 'SHAKE RATTLE AND ROLL' ? 'selected' : ''}>SHAKE RATTLE AND ROLL</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Preferred Rail Position:</label><select id="mField_PrefLoc" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="">NONE Selected</option>${FIXED_TABLE_POSITIONS.map(p => `<option value="${p}" ${record.Preferred_Location === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Observations / Notes:</label><textarea id="mField_Notes" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none h-16 resize-none force-uppercase">${record.Notes || ''}</textarea></div>`;
-            } else if (category === 'locations') {
-                htmlContent += `
-                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Address" value="${record.Address || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Online Live Table"></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Table Length (FT):</label><input type="text" id="mField_Length" value="${record.Table_Length || '14'}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase"></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Bounce Elasticity:</label><select id="mField_Bouncy" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="LOW" ${record.Bouncy_Rating === 'LOW' ? 'selected' : ''}>LOW BOUNCE</option><option value="MEDIAN" ${record.Bouncy_Rating === 'MEDIAN' ? 'selected' : ''}>MEDIAN BOUNCE</option><option value="HIGH" ${record.Bouncy_Rating === 'HIGH' ? 'selected' : ''}>HIGH BOUNCE</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Surface Pile Texture:</label><select id="mField_Surface" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="FELT" ${record.Table_Surface === 'FELT' ? 'selected' : ''}>FELT</option><option value="MICROFIBER" ${record.Table_Surface === 'MICROFIBER' ? 'selected' : ''}>MICROFIBER</option></select></div>`;
-            } else if (category === 'dice_sets') {
-                htmlContent = `<div><label class="block mb-1 font-bold">Dice Set Designation Name:</label><input type="text" id="mField_Name" value="${record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="3V ARRANGEMENT"></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="Primary tracking profile setup notes"></div>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 bg-black/30 p-2 rounded border border-slate-800">
-                    <div><label class="block text-[11px] text-amber-500 font-bold">L-TOP (1-6):</label><input type="number" id="mField_LTop" min="1" max="6" value="${record.Left_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
-                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-TOP (1-6):</label><input type="number" id="mField_RTop" min="1" max="6" value="${record.Right_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
-                    <div><label class="block text-[11px] text-amber-500 font-bold">L-FACE (1-6):</label><input type="number" id="mField_LFront" min="1" max="6" value="${record.Left_Front_Face || 6}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
-                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE (1-6):</label><input type="number" id="mField_RFront" min="1" max="6" value="${record.Right_Front_Face || 2}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
-                </div>`;
-            } else if (category === 'invalid_causes') {
-                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. DICE OFF TABLE"></div>`;
-            }
-            fields.innerHTML = htmlContent;
-            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
-        }
-
-        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitMetadataModalForm()'); syncConfigurationDropdowns(); }
-
-        async function commitMetadataModalForm() {
-            if (!currentUid) return;
-            let targetDocId = activeEditId; let payload = {};
-            const idField = document.getElementById('mField_Id'); const nameField = document.getElementById('mField_Name');
-            const idVal = idField ? idField.value.trim().toUpperCase() : "";
-
-            if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
-                if (!activeEditId) { if (!idVal) return alert("Unique parameter tag label required."); targetDocId = idVal; }
-                if (activeModalContext === 'shooters') {
-                    payload = { Handedness: document.getElementById('mField_Hand').value, Throwing_Style: document.getElementById('mField_Style').value, Preferred_Location: document.getElementById('mField_PrefLoc').value, Notes: document.getElementById('mField_Notes').value.trim().toUpperCase() };
-                } else if (activeModalContext === 'locations') {
-                    payload = { name: targetDocId, Address: document.getElementById('mField_Address').value.trim().toUpperCase(), Table_Length: document.getElementById('mField_Length').value.trim().toUpperCase(), Bouncy_Rating: document.getElementById('mField_Bouncy').value, Table_Surface: document.getElementById('mField_Surface').value };
-                } else if (activeModalContext === 'invalid_causes') {
-                    payload = { name: targetDocId, Description: document.getElementById('mField_Desc').value.trim().toUpperCase() };
-                }
-            } else if (activeModalContext === 'dice_sets') {
-                const sName = nameField.value.trim().toUpperCase(); if (!sName) return alert("Alpha identity name tag mandatory.");
-                if (!activeEditId) targetDocId = "SET_" + Date.now();
-                payload = {
-                    Set_Name: sName, Description: document.getElementById('mField_Desc').value.trim().toUpperCase(),
-                    Left_Top_Face: parseInt(document.getElementById('mField_LTop').value) || 3, Left_Front_Face: parseInt(document.getElementById('mField_LFront').value) || 6,
-                    Right_Top_Face: parseInt(document.getElementById('mField_RTop').value) || 3, Right_Front_Face: parseInt(document.getElementById('mField_RFront').value) || 2
-                };
-            }
-
-            await db.collection("users").doc(currentUid).collection(`master_${activeModalContext}`).doc(targetDocId).set(payload);
-            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
-            await fetchMasterMetadataCollections();
-            
-            const targetDropdownId = activeModalContext === 'shooters' ? 'ctxShooterSelect' : (activeModalContext === 'locations' ? 'ctxLocationSelect' : (activeModalContext === 'dice_sets' ? 'ctxDiceSetSelect' : null));
-            if(targetDropdownId) { document.getElementById(targetDropdownId).value = targetDocId; if(activeModalContext === 'dice_sets') onDiceSetChange(); }
-            executeAnalyticalFilterEngine();
         }
 
         function toggleKinematicMaskValue(num) {
@@ -496,51 +369,6 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
-        function onDiceSetChange() {
-            const el = document.getElementById('ctxDiceSetSelect');
-            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
-            const tgl = document.getElementById('toggle-set-container');
-
-            if (!el.value || el.value === 'ALL') {
-                if(visL) visL.style.display = 'none'; if(visR) visR.style.display = 'none'; if(tgl) tgl.style.display = 'none'; 
-                document.getElementById('pad-telemetry-left').style.opacity = '0';
-                document.getElementById('pad-telemetry-right').style.opacity = '0';
-                activeTargetDiceSetString = ""; return;
-            }
-
-            const d = userDiceSetsList[el.value];
-            if (d) {
-                document.getElementById('v-left-t').innerText = PIP_MAP[d.Left_Top_Face || 3];
-                document.getElementById('v-left-f').innerText = PIP_MAP[d.Left_Front_Face || 6];
-                document.getElementById('v-right-t').innerText = PIP_MAP[d.Right_Top_Face || 3];
-                document.getElementById('v-right-f').innerText = PIP_MAP[d.Right_Front_Face || 2];
-                if(visL) visL.style.display = 'flex'; if(visR) visR.style.display = 'flex';
-                
-                if (activeTargetDiceSetString === "") {
-                    activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
-                }
-                if(tgl) tgl.style.display = 'flex';
-            }
-        }
-
-        function selectMatrixDie(axis, val) {
-            if(axis === 'left') { for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active'); state.selectedLeft = val; document.getElementById(`l-pad-${val}`).classList.add('active'); }
-            else { for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active'); state.selectedRight = val; document.getElementById(`r-pad-${val}`).classList.add('active'); }
-        }
-
-        function renderLastRollKinematics(record) {
-            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
-            if (!lBox || !rBox) return;
-            if (record.Invalid_Roll || !record.Kinematic_Status || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
-            
-            const parseAxisString = (kObj) => {
-                if(!kObj) return "N/A"; const r = parseInt(kObj.rot);
-                if([1,2,6,5].includes(r)) return `PITCH [${r}]`; return `YAW [${r}]`;
-            };
-            lBox.innerText = parseAxisString(record.Left_Kinematic); lBox.style.opacity = '1';
-            rBox.innerText = parseAxisString(record.Right_Kinematic); rBox.style.opacity = '1';
-        }
-
         function submitRoll(trackingMode) {
             if(!state.selectedLeft || !state.selectedRight) return alert("Dice button markers required.");
             const locVal = document.getElementById('ctxLocationSelect').value;
@@ -573,6 +401,21 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
+        function executeCalculationsLoop(record) {
+            if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
+            const sum = record.sum;
+            state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
+            if(sum === 7) {
+                state.sevensTotal++;
+                if(state.activePoint === null) state.sevensComeout++;
+                else { state.sevensRed++; state.shooterHistory.push(state.currentHandRolls); state.currentHandRolls = 0; state.activePoint = null; for(let k in state.matrix) state.matrix[k].cur = 0; }
+            } else {
+                if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
+                else if(sum === state.activePoint) { state.totalPointsMade++; state.activePoint = null; }
+            }
+            executeAnalyticalFilterEngine(); renderLastRollKinematics(record);
+        }
+
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
             const sh = getSelectedText('Shooter'); const loc = document.getElementById('ctxLocationSelect').value;
@@ -591,7 +434,6 @@
             ribbon.innerHTML = '';
             let kLogs = [];
 
-            // Corrected conditional execution transition matrix array maps
             let conditionalTransitionsMatrix = {};
             for(let i=2; i<=12; i++) { conditionalTransitionsMatrix[i] = { totalCounts: {}, pairCounts: {} }; }
 
@@ -630,7 +472,7 @@
                 const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (lap === i) ? 'block' : 'none';
                 if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
                 
-                // Multi-Cycle Horizon Frequency Temperature Tracker Checks
+                // FIXED REFERENCE: Variable loop pointer 'i' enforces robust calculation bounds cleanly
                 const horizonN = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
                 if (chip) {
                     const hit1 = state.rawSequenceLog.slice(-horizonN).filter(x => x == i).length;
@@ -648,7 +490,7 @@
                     }
                 }
                 
-                // Normalizes next-step probabilities using the expected multiplier scale map
+                // Mapped globally across all 11 boxes regardless of active location selection profiles
                 const pane = document.getElementById(`ev-pane-${i}`);
                 if(pane) {
                     let totalVectors = Object.keys(conditionalTransitionsMatrix[i].totalCounts).map(Number).filter(n => activeKinematicFilterMask[n]).sort((a,b) => {
@@ -676,7 +518,6 @@
                 }
             }
 
-            // Fixed structured display mappings to prevent HUD collapse
             document.getElementById('stat-red').innerText = lRed;
             document.getElementById('stat-sor').innerText = lRed > 0 ? (lValid / lRed).toFixed(1) : lValid.toFixed(1);
             document.getElementById('stat-psr').innerText = lRed > 0 ? (lPoints / lRed).toFixed(1) : "0.0";
