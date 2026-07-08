@@ -72,7 +72,7 @@
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
         .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
-        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; }
+        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; display: flex; justify-content: space-between; align-items: center; }
         .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
         .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
         .d-cell:last-child { border-right: none; }
@@ -80,6 +80,12 @@
         .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
         
         .dice-visual-cube { width: 30px; height: 30px; background: #ef4444; color: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; border: 1px solid #ffffff30; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+
+        @keyframes pulse-warn {
+            0%, 100% { border-color: rgba(16, 185, 129, 0.5); box-shadow: none; }
+            50% { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.6); }
+        }
+        .pulse-warning-btn { animation: pulse-warn 1.5s infinite; }
     </style>
 </head>
 <body>
@@ -90,14 +96,13 @@
             <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em] font-serif"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
-            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em] font-serif">Logout</button>
+            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em]"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
+            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
         </div>
     </nav>
 
     <div class="main-wrapper">
-        <!-- Section 1: Relational Dataset Dropdown Matrix -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
                 <div class="flex gap-1">
@@ -108,9 +113,7 @@
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Location</label>
-                <div class="flex gap-1">
-                    <select id="ctxTablePositionSelect" class="select-element" onchange="executeAnalyticalFilterEngine()"></select>
-                </div>
+                <select id="ctxTablePositionSelect" class="select-element" onchange="executeAnalyticalFilterEngine()"></select>
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter ID</label>
@@ -128,24 +131,13 @@
                     <button onclick="deleteCurrentAsset('dice_sets')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
                 </div>
             </div>
-            <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Invalid Causes</label>
-                <div class="flex gap-1">
-                    <select id="ctxInvalidCauseSelect" class="select-element" onchange="watchCauseDropdownChange()"></select>
-                    <button onclick="editCurrentAsset('invalid_causes')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteCurrentAsset('invalid_causes')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
-            </div>
         </div>
 
-        <!-- Section 2: High-Contrast History Ribbon -->
         <div class="history-ribbon" id="historyContainer"></div>
 
-        <!-- Section 3: Integrated Controller & State Display Counters -->
-        <div class="controller-panel flex flex-col gap-4">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-                <!-- Left Die Pad Stack with Embedded Suggestions and Telemetry -->
-                <div class="flex flex-col items-center gap-2">
+        <div class="controller-panel">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+                <div class="flex flex-col items-center gap-2 flex-1 w-full max-w-[200px]">
                     <div class="flex items-center gap-3">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
                         <div id="vis-left-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
@@ -153,12 +145,10 @@
                             <div class="dice-visual-cube" id="v-left-f">-</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2" id="leftPadContainer"></div>
-                    <div id="pad-suggest-left" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">SUGGEST TOP: -</div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full" id="leftPadContainer"></div>
                 </div>
                 
-                <!-- Center Block State Display Counters + Suggested/Original Set Toggle -->
-                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 flex-grow w-full md:w-auto max-w-sm gap-4">
+                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 w-full md:w-auto min-w-[280px] max-w-xs gap-3 shrink-0">
                     <div class="flex justify-around w-full">
                         <div class="text-center">
                             <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Hand</div>
@@ -171,22 +161,19 @@
                         </div>
                     </div>
 
-                    <!-- Integrated Pivot Binary Execution Selector Toggle -->
-                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1 items-center" style="display:none">
-                        <span class="text-[9px] uppercase font-bold text-slate-500">Track Set Target:</span>
-                        <button id="btn-set-flag" onclick="toggleSetExecutionFlag()" class="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-1 rounded transition-all">ORIGINAL SET</button>
+                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-2 flex flex-col gap-1.5 items-center" style="display:none">
+                        <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border p-2 rounded transition-all text-center">
+                            NO SUGGESTION
+                        </button>
                     </div>
                     
-                    <!-- Nested Last Roll Kinematic String Reference Panel -->
                     <div id="pad-kinematic-telemetry" class="w-full text-[10px] text-amber-500 font-bold bg-slate-950/40 p-2 border border-slate-800 rounded text-center hidden">
-                        <div class="text-slate-400 text-[8px] uppercase mb-1">Last Telemetry State</div>
-                        <div id="lbl-telemetry-left">L: N/A</div>
-                        <div id="lbl-telemetry-right" class="mt-0.5">R: N/A</div>
+                        <div id="lbl-telemetry-left" class="font-mono text-slate-200">L: N/A</div>
+                        <div id="lbl-telemetry-right" class="font-mono text-slate-200 mt-1">R: N/A</div>
                     </div>
                 </div>
 
-                <!-- Right Die Pad Stack with Embedded Suggestions and Telemetry -->
-                <div class="flex flex-col items-center gap-2">
+                <div class="flex flex-col items-center gap-2 flex-1 w-full max-w-[200px]">
                     <div class="flex items-center gap-3">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
                         <div id="vis-right-set" class="flex gap-1 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
@@ -194,25 +181,21 @@
                             <div class="dice-visual-cube" id="v-right-f">-</div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-3 gap-2" id="rightPadContainer"></div>
-                    <div id="pad-suggest-right" class="text-[10px] text-emerald-400 font-bold bg-slate-950/90 p-1.5 px-3 border border-emerald-900/30 rounded w-full text-center" style="display:none">SUGGEST TOP: -</div>
+                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full" id="rightPadContainer"></div>
                 </div>
             </div>
             
-            <!-- Primary Execution Buttons -->
-            <div class="grid grid-cols-2 gap-3 border-t border-slate-800 pt-4">
+            <div class="grid grid-cols-2 gap-3 border-t border-slate-800 mt-4 pt-4">
                 <button class="act-btn btn-green font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('STANDARD')">Standard Roll</button>
                 <button class="act-btn btn-purple font-black py-3 text-sm tracking-wider shadow-lg" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
             </div>
-            <!-- Secondary Control Buttons -->
             <div class="grid grid-cols-3 gap-2">
-                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="onInvalidRollTrigger()">Invalid Roll</button>
+                <button class="act-btn btn-orange font-bold py-2 text-xs" onclick="launchInvalidCausePickerWorkflow()">Invalid Roll</button>
                 <button class="act-btn btn-blue font-bold py-2 text-xs" onclick="executeUndo()">Undo Last</button>
                 <button class="act-btn btn-red font-bold py-2 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
         </div>
 
-        <!-- Section 5: Contiguous Number Board Stack -->
         <div class="board-stack">
             <div class="grid-row-segment">
                 <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
@@ -230,35 +213,27 @@
             </div>
         </div>
 
-        <!-- Section 6: Wide Diagnostics & Post-Processing Filters -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2">
-            <div class="diagnostics-panel md:col-span-2">
-                <div class="diag-title">ZOMBIELORD STATISTICAL DIAGNOSTICS</div>
-                <div class="diag-metrics-grid">
-                    <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
-                    <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
-                    <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
-                    <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
-                    <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
-                </div>
-            </div>
-            
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded flex flex-col justify-center">
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-2 tracking-wider">Timeline Processing Scope</label>
-                <select id="ctxFilterScopeSelect" class="select-element bg-slate-950 py-2.5" onchange="executeAnalyticalFilterEngine()">
-                    <option value="ALL">ALL TIMELINE RECORDS</option>
-                    <option value="ISOLATE_SHOOTER">ISOLATE SELECTED SHOOTER</option>
-                    <option value="ISOLATE_LOCATION">ISOLATE SELECTED LOCATION</option>
-                    <option value="ISOLATE_COMBINED">ISOLATE COMBINED STATE</option>
+        <div class="diagnostics-panel mt-2">
+            <div class="diag-title">
+                <span>ZOMBIELORD STATISTICAL DIAGNOSTICS</span>
+                <select id="ctxFilterScopeSelect" class="bg-slate-900 border border-slate-700 text-white font-mono text-[11px] p-1 px-3 rounded outline-none cursor-pointer" onchange="executeAnalyticalFilterEngine()">
+                    <option value="ALL">SCOPE: ALL RECORDS</option>
+                    <option value="CUSTOM">SCOPE: CUSTOM CONFIG FILTER</option>
                 </select>
+            </div>
+            <div class="diag-metrics-grid">
+                <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
+                <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
+                <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
+                <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
+                <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
             </div>
         </div>
     </div>
 
-    <!-- Universal Property Configuration Form Modal Backdrop Shroud -->
     <div id="ctxMetadataModalFrame" class="modal-mask">
         <div class="modal-box">
-            <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register New Parameter</h3>
+            <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register Parameter</h3>
             <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
             <div class="flex justify-between gap-3 mt-6 border-t border-slate-800 pt-4">
                 <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">[ CANCEL ]</button>
@@ -272,13 +247,16 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         let currentUid = null, activeModalContext = null, activeEditId = null;
-        let isSuggestedSetFlag = false;
 
         let userShootersList = {}, userLocationsList = {}, userDiceSetsList = {}, userCausesList = {};
         const FIXED_TABLE_POSITIONS = [
             "SL1", "SL2", "SL3", "SL4", "HL1", "HL2", "HL3", "HL4",
             "SR1", "SR2", "SR3", "SR4", "HR1", "HR2", "HR3", "HR4"
         ];
+
+        // Advanced Telemetry State Tracking Structure
+        let currentSuggestedSetString = ""; 
+        let activeTargetDiceSetString = ""; 
 
         const state = {
             totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
@@ -291,8 +269,10 @@
             currentUid = user.uid;
             initDualPads();
             initDragToScrollRibbon();
-            fetchMasterMetadataCollections();
-            fetchCloudState();
+            fetchMasterMetadataCollections().then(() => {
+                setDefaultAllValues();
+                fetchCloudState();
+            });
         });
 
         function initDualPads() {
@@ -310,6 +290,14 @@
             el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
             el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
             el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
+        }
+
+        function setDefaultAllValues() {
+            document.getElementById('ctxLocationSelect').value = "ALL";
+            document.getElementById('ctxTablePositionSelect').value = "ALL";
+            document.getElementById('ctxShooterSelect').value = "ALL";
+            document.getElementById('ctxDiceSetSelect').value = "ALL";
+            document.getElementById('ctxInvalidCauseSelect').value = "ALL";
         }
 
         async function fetchMasterMetadataCollections() {
@@ -377,38 +365,38 @@
             document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
             
-            let htmlContent = `<div><label class="block mb-1 font-bold">Unique Asset ID Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"'} placeholder="e.g. VENUE / NAME KEY"></div>`;
+            let htmlContent = `<div><label class="block mb-1 font-bold">Unique ID Key Name:</label><input type="text" id="mField_Id" value="${targetId || ''}" ${isEditMode ? 'disabled class="w-full bg-slate-700 p-2 text-slate-400 rounded outline-none"' : 'style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"'} placeholder="e.g. VENUE_KEY_ID"></div>`;
 
             if (category === 'shooters') {
                 htmlContent += `
                 <div class="mt-2"><label class="block mb-1 font-bold">Dominant Hand:</label><select id="mField_Hand" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="RIGHT" ${record.Handedness === 'RIGHT' ? 'selected' : ''}>RIGHT-HANDED</option><option value="LEFT" ${record.Handedness === 'LEFT' ? 'selected' : ''}>LEFT-HANDED</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Throwing Style Pattern:</label><input type="text" id="mField_Style" value="${record.Throwing_Style || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. CONTROLLED_SET"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Throwing Style Pattern:</label><input type="text" id="mField_Style" value="${record.Throwing_Style || ''}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. CONTROLLED_SET"></div>
                 <div class="mt-2"><label class="block mb-1 font-bold">Preferred Rail Position:</label><select id="mField_PrefLoc" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="">NONE Selected</option>${FIXED_TABLE_POSITIONS.map(p => `<option value="${p}" ${record.Preferred_Location === p ? 'selected' : ''}>${p}</option>`).join('')}</select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Observations / Notes:</label><textarea id="mField_Notes" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none h-16 resize-none">${record.Notes || ''}</textarea></div>`;
+                <div class="mt-2"><label class="block mb-1 font-bold">Observations / Notes:</label><textarea id="mField_Notes" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none h-16 resize-none">${record.Notes || ''}</textarea></div>`;
             } else if (category === 'locations') {
                 htmlContent += `
-                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Address" value="${record.Address || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. Las Vegas Strip"></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Table Length (FT):</label><input type="text" id="mField_Length" value="${record.Table_Length || '14'}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Address" value="${record.Address || ''}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. Las Vegas Strip"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Table Length (FT):</label><input type="text" id="mField_Length" value="${record.Table_Length || '14'}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"></div>
                 <div class="mt-2"><label class="block mb-1 font-bold">Bounce Elasticity:</label><select id="mField_Bouncy" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="LOW" ${record.Bouncy_Rating === 'LOW' ? 'selected' : ''}>LOW BOUNCE</option><option value="MEDIAN" ${record.Bouncy_Rating === 'MEDIAN' ? 'selected' : ''}>MEDIAN BOUNCE</option><option value="HIGH" ${record.Bouncy_Rating === 'HIGH' ? 'selected' : ''}>HIGH BOUNCE</option></select></div>
                 <div class="mt-2"><label class="block mb-1 font-bold">Surface Pile Texture:</label><select id="mField_Surface" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="FELT" ${record.Table_Surface === 'FELT' ? 'selected' : ''}>FELT</option><option value="MICROFIBER" ${record.Table_Surface === 'MICROFIBER' ? 'selected' : ''}>MICROFIBER</option></select></div>`;
             } else if (category === 'dice_sets') {
-                htmlContent = `<div><label class="block mb-1 font-bold">Dice Set Designation Name:</label><input type="text" id="mField_Name" value="${record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="3V ARRANGEMENT"></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="Primary tracking profile setup notes"></div>
+                htmlContent = `<div><label class="block mb-1 font-bold">Dice Set Designation Name:</label><input type="text" id="mField_Name" value="${record.Set_Name || ''}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="3V ARRANGEMENT"></div>
+                <div class="mt-2"><label class="block mb-1 font-bold">Description Context:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="Primary tracking profile setup notes"></div>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 bg-black/30 p-2 rounded border border-slate-800">
-                    <div><label class="block text-[11px] text-amber-500 font-bold">NL-TOP (1-6):</label><input type="number" id="mField_LTop" min="1" max="6" value="${record.Left_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
+                    <div><label class="block text-[11px] text-amber-500 font-bold">L-TOP (1-6):</label><input type="number" id="mField_LTop" min="1" max="6" value="${record.Left_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
                     <div><label class="block text-[11px] text-emerald-400 font-bold">R-TOP (1-6):</label><input type="number" id="mField_RTop" min="1" max="6" value="${record.Right_Top_Face || 3}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
                     <div><label class="block text-[11px] text-amber-500 font-bold">L-FACE (1-6):</label><input type="number" id="mField_LFront" min="1" max="6" value="${record.Left_Front_Face || 6}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
                     <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE (1-6):</label><input type="number" id="mField_RFront" min="1" max="6" value="${record.Right_Front_Face || 2}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded"></div>
                 </div>`;
             } else if (category === 'invalid_causes') {
-                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. Mechanical stick error profile"></div>`;
+                htmlContent += `<div class="mt-2"><label class="block mb-1 font-bold">Cause Context Description:</label><input type="text" id="mField_Desc" value="${record.Description || ''}" style="text-transform: uppercase;" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none" placeholder="e.g. Mechanical stick error profile"></div>`;
             }
 
             fields.innerHTML = htmlContent;
             document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
         }
 
-        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; }
+        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; syncConfigurationDropdowns(); }
 
         async function commitMetadataModalForm() {
             if (!currentUid) return;
@@ -421,23 +409,23 @@
 
             if (activeModalContext === 'shooters' || activeModalContext === 'locations' || activeModalContext === 'invalid_causes') {
                 if (!activeEditId) {
-                    if (!idVal) return alert("Unique Primary Key string identifier required.");
+                    if (!idVal) return alert("Unique identifier code key required.");
                     targetDocId = idVal;
                 }
                 if (activeModalContext === 'shooters') {
-                    payload = { Handedness: document.getElementById('mField_Hand').value, Throwing_Style: document.getElementById('mField_Style').value.trim().toUpperCase(), Preferred_Location: document.getElementById('mField_PrefLoc').value, Notes: document.getElementById('mField_Notes').value.trim() };
+                    payload = { Handedness: document.getElementById('mField_Hand').value, Throwing_Style: document.getElementById('mField_Style').value.trim().toUpperCase(), Preferred_Location: document.getElementById('mField_PrefLoc').value, Notes: document.getElementById('mField_Notes').value.trim().toUpperCase() };
                 } else if (activeModalContext === 'locations') {
-                    payload = { name: targetDocId, Address: document.getElementById('mField_Address').value.trim(), Table_Length: document.getElementById('mField_Length').value.trim(), Bouncy_Rating: document.getElementById('mField_Bouncy').value, Table_Surface: document.getElementById('mField_Surface').value };
+                    payload = { name: targetDocId, Address: document.getElementById('mField_Address').value.trim().toUpperCase(), Table_Length: document.getElementById('mField_Length').value.trim().toUpperCase(), Bouncy_Rating: document.getElementById('mField_Bouncy').value, Table_Surface: document.getElementById('mField_Surface').value };
                 } else if (activeModalContext === 'invalid_causes') {
-                    payload = { name: targetDocId, Description: document.getElementById('mField_Desc').value.trim() };
+                    payload = { name: targetDocId, Description: document.getElementById('mField_Desc').value.trim().toUpperCase() };
                 }
             } else if (activeModalContext === 'dice_sets') {
                 const sName = nameField.value.trim().toUpperCase();
-                if (!sName) return alert("Set designation validation alpha string parameter required.");
-                if (!activeEditId) targetDocId = "set_" + Date.now();
+                if (!sName) return alert("Set identity validation tag label parameter mandatory.");
+                if (!activeEditId) targetDocId = "SET_" + Date.now();
                 payload = {
                     Set_Name: sName,
-                    Description: document.getElementById('mField_Desc').value.trim(),
+                    Description: document.getElementById('mField_Desc').value.trim().toUpperCase(),
                     Left_Top_Face: parseInt(document.getElementById('mField_LTop').value) || 3,
                     Left_Front_Face: parseInt(document.getElementById('mField_LFront').value) || 6,
                     Right_Top_Face: parseInt(document.getElementById('mField_RTop').value) || 3,
@@ -446,22 +434,38 @@
             }
 
             await db.collection("users").doc(currentUid).collection(`master_${activeModalContext}`).doc(targetDocId).set(payload);
-            closePropertyModal();
-            await fetchMasterMetadataCollections();
+            
+            // Re-sync local cache array pool layers dynamically
+            if (activeModalContext === 'shooters') userShootersList[targetDocId] = payload;
+            else if (activeModalContext === 'locations') userLocationsList[targetDocId] = payload;
+            else if (activeModalContext === 'dice_sets') userDiceSetsList[targetDocId] = payload;
+            else if (activeModalContext === 'invalid_causes') userCausesList[targetDocId] = payload;
+
+            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
+            syncConfigurationDropdowns();
+            
+            // Explicit focus retention loop logic to lock down the select field value to the committed asset ID
+            const targetDropdownId = activeModalContext === 'shooters' ? 'ctxShooterSelect' : (activeModalContext === 'locations' ? 'ctxLocationSelect' : (activeModalContext === 'dice_sets' ? 'ctxDiceSetSelect' : 'ctxInvalidCauseSelect'));
+            document.getElementById(targetDropdownId).value = targetDocId;
+            
+            if(activeModalContext === 'dice_sets') onDiceSetChange();
+            executeAnalyticalFilterEngine();
         }
 
         function editCurrentAsset(cat) {
             const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : (cat === 'dice_sets' ? 'ctxDiceSetSelect' : 'ctxInvalidCauseSelect')));
-            if (!el.value || el.value === 'ALL') return alert("Select registered baseline data parameter row element asset profile context target first.");
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select valid configuration element.");
             openMetadataModal(cat, el.value);
         }
 
         async function deleteCurrentAsset(cat) {
             const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : (cat === 'dice_sets' ? 'ctxDiceSetSelect' : 'ctxInvalidCauseSelect')));
-            if (!el.value || el.value === 'ALL') return alert("Select standard parameter option element reference target.");
-            if (confirm("Irreversibly delete cloud file track system data map asset signature?")) {
+            if (!el.value || el.value === 'ALL' || el.value === 'ADD_NEW') return alert("Select target configuration asset element parameter.");
+            if (confirm("Irreversibly wipe file path registry asset row?")) {
                 await db.collection("users").doc(currentUid).collection(`master_${cat}`).doc(el.value).delete();
                 await fetchMasterMetadataCollections();
+                setDefaultAllValues();
+                executeAnalyticalFilterEngine();
             }
         }
 
@@ -469,14 +473,6 @@
         function watchLocationDropdownChange() { if(document.getElementById('ctxLocationSelect').value === 'ADD_NEW') openMetadataModal('locations'); else executeAnalyticalFilterEngine(); }
         function watchDiceSetDropdownChange() { if(document.getElementById('ctxDiceSetSelect').value === 'ADD_NEW') openMetadataModal('dice_sets'); else onDiceSetChange(); }
         function watchCauseDropdownChange() { if(document.getElementById('ctxInvalidCauseSelect').value === 'ADD_NEW') openMetadataModal('invalid_causes'); }
-
-        function toggleSetExecutionFlag() {
-            isSuggestedSetFlag = !isSuggestedSetFlag;
-            const btn = document.getElementById('btn-set-flag');
-            btn.innerText = isSuggestedSetFlag ? "SUGGESTED SET" : "ORIGINAL SET";
-            btn.className = isSuggestedSetFlag ? "text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 px-4 py-1 rounded transition-all" : "text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-1 rounded transition-all";
-            calculateLiveKinematicsPreview();
-        }
 
         function onDiceSetChange() {
             const el = document.getElementById('ctxDiceSetSelect');
@@ -488,6 +484,7 @@
                 visL.style.display = 'none'; visR.style.display = 'none';
                 sugL.style.display = 'none'; sugR.style.display = 'none';
                 tgl.style.display = 'none'; document.getElementById('pad-kinematic-telemetry').classList.add('hidden');
+                activeTargetDiceSetString = "";
                 return;
             }
 
@@ -498,9 +495,66 @@
                 document.getElementById('v-right-t').innerText = d.Right_Top_Face || '3';
                 document.getElementById('v-right-f').innerText = d.Right_Front_Face || '2';
                 visL.style.display = 'flex'; visR.style.display = 'flex';
+                
+                if (activeTargetDiceSetString === "") {
+                    activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+                }
+                
                 sugL.style.display = 'block'; sugR.style.display = 'block'; tgl.style.display = 'flex';
             }
             calculateLiveKinematicsPreview();
+        }
+
+        function toggleSetExecutionFlag() {
+            if (activeTargetDiceSetString !== "" && activeTargetDiceSetString !== getDropdownConfigDiceSetString()) {
+                // User is inside an explicit suggestion path tracker state loop row
+                if (confirm("Revert tracking alignment state back to your Dropdown Configured Dice Set layout parameters?")) {
+                    activeTargetDiceSetString = getDropdownConfigDiceSetString();
+                    isSuggestedSetFlag = false;
+                    resetSuggestionTrackingButtonDisplay();
+                    calculateLiveKinematicsPreview();
+                }
+                return;
+            }
+            
+            if (currentSuggestedSetString === "") return;
+            
+            if (confirm(`Commit spatial calibration layout switch and record throws using the Suggested Set layout [${currentSuggestedSetString}]?`)) {
+                activeTargetDiceSetString = currentSuggestedSetString;
+                isSuggestedSetFlag = true;
+                resetSuggestionTrackingButtonDisplay();
+                calculateLiveKinematicsPreview();
+            }
+        }
+
+        function getDropdownConfigDiceSetString() {
+            const el = document.getElementById('ctxDiceSetSelect');
+            const d = userDiceSetsList[el.value];
+            if(!d) return "";
+            return `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
+        }
+
+        function resetSuggestionTrackingButtonDisplay() {
+            const btn = document.getElementById('btn-set-flag');
+            btn.classList.remove('pulse-warning-btn');
+            
+            if (activeTargetDiceSetString === getDropdownConfigDiceSetString()) {
+                btn.innerText = "USING ORIGINAL CONFIG";
+                btn.className = "text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/40 border border-amber-900/50 px-4 py-2 rounded transition-all";
+            } else {
+                btn.innerText = `PROMOTED: ${activeTargetDiceSetString}`;
+                btn.className = "text-[10px] font-black text-emerald-400 uppercase tracking-widest bg-emerald-950/40 border border-emerald-900/50 px-4 py-2 rounded transition-all";
+                
+                // If a brand new newer calibration suggestion layer mismatch triggers, alert the user visually via flashing
+                if (currentSuggestedSetString !== "" && currentSuggestedSetString !== activeTargetDiceSetString) {
+                    btn.classList.add('pulse-warning-btn');
+                    btn.innerText = "NEW SUGGESTION READY";
+                }
+            }
+        }
+
+        function handleSuggestionToggleAction() {
+            toggleSetExecutionFlag();
         }
 
         function selectMatrixDie(axis, val) {
@@ -514,26 +568,28 @@
             const sugL = document.getElementById('pad-suggest-left'), sugR = document.getElementById('pad-suggest-right');
             if (!el.value || el.value === 'ALL') return;
 
-            let targetLeftTop = parseInt(document.getElementById('v-left-t').innerText) || 3;
-            let targetRightTop = parseInt(document.getElementById('v-right-t').innerText) || 3;
-            if(isSuggestedSetFlag) { targetLeftTop = (targetLeftTop % 6) + 1; targetRightTop = (targetRightTop % 6) + 1; }
+            let lParts = [3,6], rParts = [3,2];
+            if (activeTargetDiceSetString !== "") {
+                const pairs = activeTargetDiceSetString.split('x');
+                lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
+            }
 
-            sugL.innerText = `SUGGEST TOP: [ ${targetLeftTop} ]`;
-            sugR.innerText = `SUGGEST TOP: [ ${targetRightTop} ]`;
+            sugL.innerText = `TARGET BASE: [ ${lParts[0]}/${lParts[1]} ]`;
+            sugR.innerText = `TARGET BASE: [ ${rParts[0]}/${rParts[1]} ]`;
         }
 
         function renderLastRollKinematics(record) {
             const block = document.getElementById('pad-kinematic-telemetry');
             if (record.Invalid_Roll || !record.Kinematic_Status) { block.classList.add('hidden'); return; }
-            document.getElementById('lbl-telemetry-left').innerText = `L: ROT [${record.Left_Kinematic?.rot || '0'}] Δ [${record.Left_Kinematic?.ax || '0'}]`;
-            document.getElementById('lbl-telemetry-right').innerText = `R: ROT [${record.Right_Kinematic?.rot || '0'}] Δ [${record.Right_Kinematic?.ax || '0'}]`;
+            document.getElementById('lbl-telemetry-left').innerText = `L: PITCH [${record.Left_Kinematic?.rot || '0'}] YAW [${record.Left_Kinematic?.ax || '0'}]`;
+            document.getElementById('lbl-telemetry-right').innerText = `R: PITCH [${record.Right_Kinematic?.rot || '0'}] YAW [${record.Right_Kinematic?.ax || '0'}]`;
             block.classList.remove('hidden');
         }
 
-        function onInvalidRollTrigger() {
+        function launchInvalidCausePickerWorkflow() {
             const cSel = document.getElementById('ctxInvalidCauseSelect');
             if (!cSel.value || cSel.value === 'ALL' || cSel.value === 'ADD_NEW') {
-                alert("Please select a valid custom configuration Cause Code item from the upper dropdown row list prior to invalid submission recording.");
+                alert("Please select a target Cause Code from the rightmost dropdown selector list component prior to committing an invalid event track.");
                 return;
             }
             
@@ -547,14 +603,8 @@
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
-        function getSelectedText(type) {
-            const el = document.getElementById(type === 'Location' ? 'ctxLocationSelect' : 'ctxShooterSelect');
-            if (!el || el.value === 'ALL' || el.selectedIndex < 0) return "UNASSIGNED";
-            return el.options[el.selectedIndex].text;
-        }
-
         function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Dice input indices pad selection missing parameters.");
+            if(!state.selectedLeft || !state.selectedRight) return alert("Dice matrix select required.");
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
             
@@ -562,11 +612,15 @@
 
             let lKin = null, rKin = null;
             if (enforceKinematics && document.getElementById('ctxDiceSetSelect').value !== 'ALL') {
-                let targetLeftTop = parseInt(document.getElementById('v-left-t').innerText) || 3;
-                let targetRightTop = parseInt(document.getElementById('v-right-t').innerText) || 3;
-                if(isSuggestedSetFlag) { targetLeftTop = (targetLeftTop % 6) + 1; targetRightTop = (targetRightTop % 6) + 1; }
-                lKin = { rot: (state.selectedLeft === targetLeftTop ? "0" : "AX_R"), ax: (state.selectedLeft === targetLeftTop ? "0" : "1") };
-                rKin = { rot: (state.selectedRight === targetRightTop ? "0" : "AX_R"), ax: (state.selectedRight === targetRightTop ? "0" : "1") };
+                let lParts = [3,6], rParts = [3,2];
+                if (activeTargetDiceSetString !== "") {
+                    const pairs = activeTargetDiceSetString.split('x');
+                    lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
+                }
+                
+                // Physical rigid body spatial mapping matching Module 3 mathematical reference ring bounds
+                lKin = { rot: (state.selectedLeft === lParts[0] ? "1" : (state.selectedLeft === (7 - lParts[1]) ? "2" : (state.selectedLeft === (7 - lParts[0]) ? "6" : "5"))), ax: (state.selectedLeft === lParts[0] ? "0" : "1") };
+                rKin = { rot: (state.selectedRight === rParts[0] ? "1" : (state.selectedRight === (7 - rParts[1]) ? "2" : (state.selectedRight === (7 - rParts[0]) ? "6" : "5"))), ax: (state.selectedRight === rParts[0] ? "0" : "1") };
             }
 
             const r = {
@@ -597,23 +651,71 @@
             renderLastRollKinematics(record);
         }
 
+        function calculateGeometricDiceMedian(sampleStream) {
+            const valid = sampleStream.filter(v => v !== null && v !== undefined);
+            if (!valid.length) return 1;
+            const counts = { 1:0, 2:0, 6:0, 5:0 };
+            valid.forEach(v => { if(counts[v.rot] !== undefined) counts[v.rot]++; });
+            const arr = [1,2,6,5].sort((a,b) => counts[b] - counts[a]);
+            return arr[0] || 1;
+        }
+
+        function processCalibrationSuiteSuggestionsEngine(validLogs) {
+            const tglContainer = document.getElementById('toggle-set-container');
+            const btn = document.getElementById('btn-set-flag');
+            
+            if (validLogs.length < 15 || document.getElementById('ctxDiceSetSelect').value === 'ALL') {
+                currentSuggestedSetString = "";
+                tglContainer.style.display = 'none';
+                return;
+            }
+
+            const lStream = validLogs.map(r => r.Left_Kinematic);
+            const rStream = validLogs.map(r => r.Right_Kinematic);
+            const lMed = calculateGeometricDiceMedian(lStream);
+            const rMed = calculateGeometricDiceMedian(rStream);
+
+            const lastRow = validLogs[validLogs.length - 1];
+            const lBase = lastRow.Left_Set_Face || "3/6";
+            const rBase = lastRow.Right_Set_Face || "3/2";
+
+            const shiftCube = (fStr, code) => {
+                const top = parseInt(fStr.split('/')[0]) || 3;
+                const fr = parseInt(fStr.split('/')[1]) || 6;
+                if (code == 1) return `${top}/${fr}`;
+                if (code == 2) return `${fr}/${7-top}`;
+                if (code == 6) return `${7-top}/${7-fr}`;
+                if (code == 5) return `${7-fr}/${top}`;
+                return `${top}/${fr}`;
+            };
+
+            currentSuggestedSetString = `${shiftCube(lBase, lMed)}x${shiftCube(rBase, rMed)}`;
+            tglContainer.style.display = 'flex';
+            resetSuggestionTrackingButtonDisplay();
+        }
+
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
             const sh = getSelectedText('Shooter'); const loc = getSelectedText('Location');
             const pos = document.getElementById('ctxTablePositionSelect').value;
             let filtered = [...state.rollHistoryLog];
 
-            if(mode === 'ISOLATE_SHOOTER') filtered = filtered.filter(r => r.Shooter_ID === sh);
-            else if(mode === 'ISOLATE_LOCATION') filtered = filtered.filter(r => r.Location_ID === loc);
-            else if(mode === 'ISOLATE_COMBINED') filtered = filtered.filter(r => r.Shooter_ID === sh && r.Location_ID === loc && r.Table_Position === pos);
+            if(mode === 'CUSTOM') {
+                if(sh !== "UNASSIGNED") filtered = filtered.filter(r => r.Shooter_ID === sh);
+                if(loc !== "UNASSIGNED") filtered = filtered.filter(r => r.Location_ID === loc);
+                if(pos !== "ALL") filtered = filtered.filter(r => r.Table_Position === pos);
+            }
 
             let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
             let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
             const ribbon = document.getElementById('historyContainer'); ribbon.innerHTML = '';
+            let kLogs = [];
 
             filtered.forEach(v => {
                 if(v.Invalid_Roll) { ribbon.innerHTML += `<div class="history-node bg-amber-600/10 text-amber-500 border border-amber-500/30 text-xs" title="${v.Notes}">ERR</div>`; return; }
                 lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1;
+                if(v.Kinematic_Status) kLogs.push(v);
+                
                 let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
                 if(v.sum === 7) { lTotal++; if(lap === null) { lComeout++; c = 'node-natural'; } else { lRed++; c = 'node-seven-out'; lHand = 0; lap = null; for(let k in la) la[k] = 0; } }
                 else if(v.sum === 11 && lap === null) c = 'node-natural';
@@ -638,6 +740,7 @@
             document.getElementById('stat-co7').innerText = lComeout;
             
             evaluateRollingTemperatures();
+            processCalibrationSuiteSuggestionsEngine(kLogs);
             ribbon.scrollLeft = ribbon.scrollWidth;
         }
 
