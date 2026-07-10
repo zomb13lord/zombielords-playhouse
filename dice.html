@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.26.0</title>
+    <title>Dice Tracker v1.26.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -37,7 +37,7 @@
         .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
         .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
         .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
-        .node-summary { background-color: #1e293b; color: #38bdf8; border: 1px solid #0284c7; font-size: 12px; padding: 6px 12px; font-family: 'Montserrat', sans-serif; font-weight: bold; border-radius: 4px; }
+        .node-summary { background-color: #020617; color: #ef4444; border: 1px solid #ef4444; font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 2px; }
 
         .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
@@ -77,7 +77,7 @@
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
-        .dice-visual-cube { width: 52px; height: 50px; background: #020617; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 42px; font-family: sans-serif; cursor: pointer; user-select: none; transition: background-color 0.2s ease; }
+        .dice-visual-cube { width: 52px; height: 50px; background-color: transparent; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none; box-shadow: none; }
         .force-uppercase { text-transform: uppercase; }
         .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 54px; }
         
@@ -95,9 +95,8 @@
             50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); opacity: 0.8; }
         }
 
-        /* Stacked point chips cosmetics */
         .chip-stack-wrapper { position: relative; width: 44px; height: 50px; display: flex; align-items: flex-end; justify-content: center; margin: 0 4px; }
-        .stacked-point-chip { position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; font-family: 'Montserrat', sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 0 4px rgba(255,255,255,0.3); color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: transform 0.2s ease; }
+        .stacked-point-chip { position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; font-family: 'Montserrat', sans-serif; box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 0 4px rgba(255,255,255,0.3); color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); transition: all 0.2s ease; }
     </style>
 </head>
 <body>
@@ -155,9 +154,9 @@
                 <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
-                        <div id="vis-left-set" class="flex gap-0.5 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
-                            <div class="dice-visual-cube" id="v-left-t" onclick="toggleDiceSetColor('left')">-</div>
-                            <div class="dice-visual-cube" id="v-left-f" onclick="toggleDiceSetColor('left')">-</div>
+                        <div id="vis-left-set" class="flex gap-0.5 items-center bg-transparent p-1" style="display:none">
+                            <div class="dice-visual-cube rounded" id="v-left-t" onclick="toggleDiceSetColor('left')">-</div>
+                            <div class="dice-visual-cube rounded" id="v-left-f" onclick="toggleDiceSetColor('left')">-</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="leftPadContainer"></div>
@@ -186,9 +185,9 @@
                 <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
-                        <div id="vis-right-set" class="flex gap-0.5 items-center bg-black/40 p-1 rounded border border-slate-800" style="display:none">
-                            <div class="dice-visual-cube" id="v-right-t" onclick="toggleDiceSetColor('right')">-</div>
-                            <div class="dice-visual-cube" id="v-right-f" onclick="toggleDiceSetColor('right')">-</div>
+                        <div id="vis-right-set" class="flex gap-0.5 items-center bg-transparent p-1" style="display:none">
+                            <div class="dice-visual-cube rounded" id="v-right-t" onclick="toggleDiceSetColor('right')">-</div>
+                            <div class="dice-visual-cube rounded" id="v-right-f" onclick="toggleDiceSetColor('right')">-</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="rightPadContainer"></div>
@@ -380,6 +379,10 @@
                 userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
                 userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
 
+                // Inject required default core entities dynamically if missing
+                if(!userShootersList["RANDOM_RANDY"]) userShootersList["RANDOM_RANDY"] = { name: "Random Randy", Type: "Favorite", Handedness: "Neither", Style: "Random", Notes: "SYSTEM PROFILE" };
+                if(!userShootersList["SHAKE_UM_UP_SALLY"]) userShootersList["SHAKE_UM_UP_SALLY"] = { name: "Shake um up Sally", Type: "Favorite", Handedness: "Neither", Style: "Shake", Notes: "SYSTEM PROFILE" };
+
                 syncConfigurationDropdowns();
             } catch (err) { console.error("Sync Fault: ", err); }
         }
@@ -403,14 +406,11 @@
             
             let shooterKeys = Object.keys(userShootersList).sort((a,b) => {
                 let recA = userShootersList[a], recB = userShootersList[b];
-                let rankA = recA.Type === 'Master' ? 1 : (recA.Type === 'Favorite' ? 2 : (recA.Type === 'Online' ? 3 : 4));
-                let rankB = recB.Type === 'Master' ? 1 : (recB.Type === 'Favorite' ? 2 : (recB.Type === 'Online' ? 3 : 4));
+                let rankA = recA.Type === 'Master' ? 1 : (recA.Type === 'Favorite' ? 2 : (recA.Type === 'Standard' ? 3 : 4));
+                let rankB = recB.Type === 'Master' ? 1 : (recB.Type === 'Favorite' ? 2 : (recB.Type === 'Standard' ? 3 : 4));
                 if(rankA !== rankB) return rankA - rankB;
                 return (recA.name || a).localeCompare(recB.name || b);
             });
-
-            sSel.innerHTML += `<option value="RANDOM_RANDY">Random Randy</option>`;
-            sSel.innerHTML += `<option value="SHAKE_UM_UP_SALLY">Shake um up Sally</option>`;
 
             shooterKeys.forEach(id => { 
                 const name = userShootersList[id].name || id;
@@ -534,7 +534,7 @@
 
         function editCurrentAsset(cat) {
             const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
-            if (!el || !el.value || ["ALL", "ADD_NEW", "RANDOM_RANDY", "SHAKE_UM_UP_SALLY"].includes(el.value)) return alert("Select registered mutable target row asset configuration context profile element.");
+            if (!el || !el.value || ["ALL", "ADD_NEW"].includes(el.value)) return alert("Select registered mutable target row asset configuration context profile element.");
             openMetadataModal(cat, el.value);
         }
 
@@ -583,15 +583,13 @@
         }
 
         function toggleDiceSetColor(axis) {
-            if(axis === 'left') {
-                leftDiceColorIdx = (leftDiceColorIdx + 1) % COLOR_SWATCHES.length;
-                document.getElementById('v-left-t').style.backgroundColor = COLOR_SWATCHES[leftDiceColorIdx];
-                document.getElementById('v-left-f').style.backgroundColor = COLOR_SWATCHES[leftDiceColorIdx];
-            } else {
-                rightDiceColorIdx = (rightDiceColorIdx + 1) % COLOR_SWATCHES.length;
-                document.getElementById('v-right-t').style.backgroundColor = COLOR_SWATCHES[rightDiceColorIdx];
-                document.getElementById('v-right-f').style.backgroundColor = COLOR_SWATCHES[rightDiceColorIdx];
-            }
+            leftDiceColorIdx = (leftDiceColorIdx + 1) % COLOR_SWATCHES.length;
+            rightDiceColorIdx = leftDiceColorIdx; 
+            
+            ['v-left-t', 'v-left-f', 'v-right-t', 'v-right-f'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.style.backgroundColor = COLOR_SWATCHES[leftDiceColorIdx];
+            });
         }
 
         function toggleSetExecutionFlag() {
@@ -709,11 +707,28 @@
                 if (activeTargetDiceSetString !== "") {
                     const pairs = activeTargetDiceSetString.split('x'); lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
                 }
-                const computeCode = (top, bTop, bFront) => {
-                    if (top === bTop) return 1; if (top === (7 - bFront)) return 2; if (top === (7 - bTop)) return 6; if (top === bFront) return 5; return 4; 
+                
+                // Advanced 3D Spatial Vector Transpose Matrix Engine
+                const computeLeftCode = (top) => {
+                    if (top === lParts[0]) return 1;       // Natural 
+                    if (top === (7 - lParts[1])) return 2; // Front face moves to top
+                    if (top === (7 - lParts[0])) return 6; // Bottom moves to top
+                    if (top === lParts[1]) return 5;       // Back face moves to top
+                    if (top === 4) return 4;               
+                    return 3;                              
                 };
-                lKin = { rot: computeCode(state.selectedLeft, lParts[0], lParts[1]), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
-                rKin = { rot: computeCode(state.selectedRight, rParts[0], rParts[1]), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
+                
+                const computeRightCode = (top) => {
+                    if (top === rParts[0]) return 1;
+                    if (top === (7 - rParts[1])) return 2;
+                    if (top === (7 - rParts[0])) return 6;
+                    if (top === rParts[1]) return 5;
+                    if (top === 4) return 4;
+                    return 3;
+                };
+
+                lKin = { rot: computeLeftCode(state.selectedLeft), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
+                rKin = { rot: computeRightCode(state.selectedRight), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
             }
 
             const r = {
@@ -767,8 +782,10 @@
                 const skewOffset = (i % 2 === 0) ? '2px' : '-2px';
                 const color = CHIP_COLORS[i] || CHIP_COLORS[11];
                 let label = '';
-                if (i === 11 && pts >= 11) {
-                    label = pts;
+                if (i === 11 || (i === limit && pts >= 11)) {
+                    label = `<span class="absolute font-black text-xs text-center text-white font-montserrat z-[100]">${pts}</span>`;
+                } else {
+                    label = `<span class="absolute font-black text-[9px] text-center text-white/40 font-montserrat z-[100]">${i}</span>`;
                 }
 
                 container.innerHTML += `
@@ -808,8 +825,9 @@
             resetSuggestionTrackingButtonDisplay();
         }
 
+        // Error log extraction wrapper layer
         function showErrNotesModal(notes) {
-            alert("INVALID TIMELINE ERROR CAUSE DIAGNOSTIC:\n\n" + (notes || "UNSPECIFIED EXCEPTION TRACE"));
+            alert("SYSTEM ERROR TIMELINE LOG CAPTURED:\n\n" + (notes || "UNSPECIFIED ARCHIVE EXCEPTION"));
         }
 
         function executeAnalyticalFilterEngine() {
@@ -837,6 +855,8 @@
             let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
             let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
             const ribbon = document.getElementById('historyContainer'); if(!ribbon) return;
+            
+            // Clean view refresh wrapper
             ribbon.innerHTML = '';
             let kLogs = [];
 
@@ -879,10 +899,9 @@
                         lRed++; c = 'node-seven-out'; 
                         lHand = 0; lap = null; for(let k in la) la[k] = 0; 
                         
-                        // Append actual Seven-Out Node
                         ribbon.innerHTML += `<div class="history-node ${c}">${v.sum}</div>`;
-                        // Insert big red summary execution token block immediately after
-                        ribbon.innerHTML += `<div class="history-node node-summary">${rollsInCurrentHandTracking} Rolls / ${pointsInCurrentHandTracking} Pts</div>`;
+                        // Strict format implementation loop parameter
+                        ribbon.innerHTML += `<div class="history-node node-summary">${rollsInCurrentHandTracking}<sup>R</sup> ${pointsInCurrentHandTracking}<sup>P</sup></div>`;
                         
                         rollsInCurrentHandTracking = 0;
                         pointsInCurrentHandTracking = 0;
@@ -902,9 +921,7 @@
                 if(isH && !currentIsPointNode) c = 'node-hard';
                 
                 let innerTextLabel = v.sum;
-                if(isH && lap === v.sum && currentIsPointNode) {
-                    innerTextLabel = `${v.sum}<sup>H</sup>`;
-                } else if(isH && c === 'node-hard') {
+                if(isH) {
                     innerTextLabel = `${v.sum}<sup>H</sup>`;
                 }
 
@@ -914,15 +931,16 @@
             for(let i=2; i<=12; i++) {
                 if(i===7) continue; 
                 const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = state.matrix[i].tot;
-                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = state.matrix[i].cur; // Hand view
-                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i]; // Filtered view
+                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = state.matrix[i].cur; 
+                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i]; 
                 
                 const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (state.activePoint === i) ? 'block' : 'none';
                 if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
                 
                 const horizonN = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
                 if (chip) {
-                    const hit1 = state.rawSequenceLog.slice(-horizonN).filter(x => x == i).length;
+                    const sampleLogSlice = state.rawSequenceLog.slice(-horizonN);
+                    const hit1 = sampleLogSlice.filter(x => x == i).length;
                     const hit2 = state.rawSequenceLog.slice(-(2*horizonN)).filter(x => x == i).length;
                     const hit3 = state.rawSequenceLog.slice(-(3*horizonN)).filter(x => x == i).length;
                     
@@ -971,7 +989,7 @@
             document.getElementById('stat-co7').innerText = lComeout;
 
             document.getElementById('summary-total').innerText = state.totalRolls;
-            document.getElementById('summary-current').innerText = state.currentHandRolls; // From last Big Red
+            document.getElementById('summary-current').innerText = rollsInCurrentHandTracking; 
             
             renderPointsChipStack();
             processCalibrationSuiteSuggestionsEngine(kLogs);
@@ -995,7 +1013,7 @@
                     ${[2,3,11,12].map(i => getTileHtml(i)).join('')}
                 </div>
                 <div class="grid grid-cols-2 gap-2 w-full mt-2">
-                    <button onclick="setGlobalMaskPreset('ALL')" class="p-2 bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded uppercase font-black tracking-wider">ALL</button>
+                    <button onclick="setGlobalMaskPreset('ALL')" class="p-2 bg-purple-600 border border-purple-400 text-white text-xs rounded uppercase font-black tracking-wider">ALL</button>
                     <button onclick="setGlobalMaskPreset('NONE')" class="p-2 bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded uppercase font-black tracking-wider">UNSELECT ALL</button>
                 </div>
             </div>`;
@@ -1107,8 +1125,14 @@
         function executeUndo() {
             if(state.rollHistoryLog.length === 0) return; 
             state.rollHistoryLog.pop(); state.rawSequenceLog.pop();
+            
+            // Defensively scrub view elements down to absolute zero index states
+            const ribbon = document.getElementById('historyContainer');
+            if(ribbon) ribbon.innerHTML = '';
+
             state.totalRolls = 0; state.currentHandRolls = 0; state.currentHandPoints = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null;
             for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            
             const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
             b.forEach(row => { 
                 state.rollHistoryLog.push(row); 
@@ -1122,10 +1146,13 @@
             if(!confirm("Clear session data?")) return;
             state.totalRolls = 0; state.currentHandRolls = 0; state.currentHandPoints = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null; state.rollHistoryLog = []; state.rawSequenceLog = [];
             for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            const ribbon = document.getElementById('historyContainer');
+            if(ribbon) ribbon.innerHTML = '';
             clearSelectionPads(); executeAnalyticalFilterEngine(); pushCloudState("active_session");
         }
 
         function clearSelectionPads() { state.selectedLeft = null; state.selectedRight = null; for(let i=1; i<=6; i++) { const lBtn = document.getElementById(`l-pad-${i}`); if(lBtn) lBtn.classList.remove('active', 'active-kinematic'); const rBtn = document.getElementById(`r-pad-${i}`); if(rBtn) rBtn.classList.remove('active', 'active-kinematic'); } }
+        function getSelectedText(type) { const el = document.getElementById(type === 'Location' ? 'ctxLocationSelect' : 'ctxShooterSelect'); if (!el || el.value === 'ALL' || el.selectedIndex < 0) return "UNASSIGNED"; return el.options[el.selectedIndex].text; }
     </script>
 </body>
 </html>
