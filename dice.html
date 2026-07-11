@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.28.0</title>
+    <title>Dice Tracker v1.27.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -34,23 +34,22 @@
         .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; cursor: pointer; }
         .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.2); }
         .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
-        .node-point-made { background-color: #ffffff !important; color: #000000 !important; font-weight: 900; border: 1px solid #ffffff !important; }
+        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
         .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
         .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
         .node-summary { background-color: rgba(15, 23, 42, 0.9); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
 
         .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
-        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; min-height: 140px; }
-        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 4px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; text-align: center; }
-        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; z-index: 20; }
-        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: bold; letter-spacing: -1px; z-index: 20; }
-        .box-count { font-size: 26px; font-weight: bold; color: #ffffff; padding: 12px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 6px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; }
+        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; }
+        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: bold; letter-spacing: -1px; }
+        .box-count { font-size: 22px; font-weight: bold; color: #ffffff; padding: 10px 0; }
         .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(51, 65, 85, 0.4); font-size: 11px; }
         .sub-left { background-color: #000000; color: #ffffff; padding: 4px 0; border-right: 1px solid rgba(51, 65, 85, 0.4); font-weight: bold; }
         .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
-        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; font-weight: bold; }
-        .evolution-metrics-pane { position: absolute; top: 34px; left: 6px; text-align: left; pointer-events: none; z-index: 10; width: calc(100% - 12px); }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
 
         .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
         .pad-btn { background: #020617; color: #94a3b8; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 20px; font-weight: bold; width: 52px; height: 50px; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
@@ -78,20 +77,22 @@
         .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
-        .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none !important; border-radius: 0px !important; box-shadow: none; }
+        .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none; box-shadow: none; }
         .force-uppercase { text-transform: uppercase; }
+        .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 54px; }
         
         .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
+        .zombie-dashboard-telemetry-strip { font-size: 11px; padding: 6px 12px; background-color: #020617; border-top: 1px solid rgba(51,65,85,0.4); display: flex; justify-content: space-around; font-family: monospace; font-weight: bold; color: var(--amber-accent); }
         .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; display: flex; justify-content: space-between; align-items: center; }
-        .diag-metrics-grid { display: grid; grid-template-columns: repeat(6, 1fr); padding: 15px 0; }
-        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; min-height: 60px; }
+        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
+        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
         .d-cell:last-child { border-right: none; }
         .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
-        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; text-align: center; line-height: 1.2; }
+        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
         
         .pulse-warning-btn { animation: alarm-pulse 0.8s infinite !important; border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
         @keyframes alarm-pulse {
-            0%, 100+ % { box-shadow: none; opacity: 1; }
+            0%, 100% { box-shadow: none; opacity: 1; }
             50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); opacity: 0.8; }
         }
 
@@ -159,7 +160,7 @@
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
                         <div id="vis-left-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube" id="v-left-t" onclick="toggleDiceSetColor('left')"></div>
+                            <div class="dice-visual-cube rounded" id="v-left-t" onclick="toggleDiceSetColor('left')"></div>
                             <div class="dice-visual-cube" id="v-left-f" onclick="toggleDiceSetColor('left')"></div>
                         </div>
                     </div>
@@ -181,8 +182,7 @@
                             <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
                         </div>
                     </div>
-                    <div id="pad-interval-readout" class="text-[11px] font-mono font-bold text-amber-500 text-center w-full border-t border-slate-800/60 pt-2">AVG INTERVAL: 0.0 | MEDIAN: 0</div>
-                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-2 flex flex-col gap-1.5 items-center" style="display:none">
+                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
                         <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">USING ORIGINAL CONFIG</button>
                     </div>
                 </div>
@@ -191,7 +191,7 @@
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
                         <div id="vis-right-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube" id="v-right-t" onclick="toggleDiceSetColor('right')"></div>
+                            <div class="dice-visual-cube rounded" id="v-right-t" onclick="toggleDiceSetColor('right')"></div>
                             <div class="dice-visual-cube" id="v-right-f" onclick="toggleDiceSetColor('right')"></div>
                         </div>
                     </div>
@@ -213,18 +213,18 @@
 
         <div class="board-stack">
             <div class="grid-row-segment">
-                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">ROLL: 0</div><div class="sub-right" id="tot-2">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
-                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">ROLL: 0</div><div class="sub-right" id="tot-3">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
-                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">ROLL: 0</div><div class="sub-right" id="tot-4">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
-                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">ROLL: 0</div><div class="sub-right" id="tot-5">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
-                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">ROLL: 0</div><div class="sub-right" id="tot-6">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
             </div>
             <div class="grid-row-segment">
-                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">ROLL: 0</div><div class="sub-right" id="tot-8">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
-                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">ROLL: 0</div><div class="sub-right" id="tot-9">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
-                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">ROLL: 0</div><div class="sub-right" id="tot-10">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
-                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">ROLL: 0</div><div class="sub-right" id="tot-11">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
-                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">ROLL: 0</div><div class="sub-right" id="tot-12">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
             </div>
         </div>
 
@@ -245,7 +245,9 @@
                 <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
                 <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
                 <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
-                <div class="d-cell"><div class="d-label">BR-DATA</div><div class="d-val" id="stat-br-data">A: 0.0<br>M: 0</div></div>
+            </div>
+            <div class="zombie-dashboard-telemetry-strip" id="bigRedMetricsStrip">
+                <span>BIG RED INTERVAL DELTAS $\rightarrow$ RUNNING MEAN: <span class="text-white" id="br-mean-val">0.0</span> | GEOMETRIC MEDIAN: <span class="text-white" id="br-median-val">0</span></span>
             </div>
         </div>
     </div>
@@ -328,18 +330,6 @@
                 fetchCloudState();
             });
         });
-
-        function getRelativeLateralFaces(T, F) {
-            const lookup = {
-                "1-2": { R: 3, L: 4 }, "1-3": { R: 5, L: 2 }, "1-5": { R: 4, L: 3 }, "1-4": { R: 2, L: 5 },
-                "2-1": { R: 4, L: 3 }, "2-4": { R: 6, L: 1 }, "2-6": { R: 3, L: 4 }, "2-3": { R: 1, L: 6 },
-                "3-1": { R: 2, L: 5 }, "3-2": { R: 6, L: 1 }, "3-6": { R: 5, L: 2 }, "3-5": { R: 1, L: 6 },
-                "4-1": { R: 5, L: 2 }, "4-5": { R: 6, L: 1 }, "4-6": { R: 2, L: 5 }, "4-2": { R: 1, L: 6 },
-                "5-1": { R: 3, L: 4 }, "5-3": { R: 6, L: 1 }, "5-6": { R: 4, L: 3 }, "5-4": { R: 1, L: 6 },
-                "6-2": { R: 4, L: 3 }, "6-4": { R: 5, L: 2 }, "6-5": { R: 3, L: 4 }, "6-3": { R: 2, L: 5 }
-            };
-            return lookup[`${T}-${F}`] || { R: 3, L: 4 };
-        }
 
         function makeVectorDotGridHTML(faceValue) {
             let html = `<div class="zombie-dot-pip-grid">`;
@@ -676,16 +666,6 @@
                 btn.classList.add('pulse-warning-btn');
                 btn.innerText = "NEW SUGGESTION READY";
             }
-            
-            if(isSuggestedSetFlag && activeTargetDiceSetString !== "") {
-                const pairs = activeTargetDiceSetString.split('x'); 
-                const lParts = pairs[0].split('/').map(Number); 
-                const rParts = pairs[1].split('/').map(Number);
-                document.getElementById('v-left-t').innerHTML = makeVectorDotGridHTML(lParts[0]);
-                document.getElementById('v-left-f').innerHTML = makeVectorDotGridHTML(lParts[1]);
-                document.getElementById('v-right-t').innerHTML = makeVectorDotGridHTML(rParts[0]);
-                document.getElementById('v-right-f').innerHTML = makeVectorDotGridHTML(rParts[1]);
-            }
         }
 
         function handleSuggestionToggleAction() { toggleSetExecutionFlag(); }
@@ -764,23 +744,19 @@
                 
                 const computeLeftCode = (top) => {
                     if (top === lParts[0]) return 1;       
-                    if (top === lParts[1]) return 2; 
-                    if (top === (7 - lParts[1])) return 5; 
-                    if (top === (7 - lParts[0])) return 6;       
-                    
-                    const lat = getRelativeLateralFaces(lParts[0], lParts[1]);
-                    if (top === lat.L) return 4;               
+                    if (top === (7 - lParts[1])) return 2; 
+                    if (top === (7 - lParts[0])) return 6; 
+                    if (top === lParts[1]) return 5;       
+                    if (top === 4) return 4;               
                     return 3;                              
                 };
                 
                 const computeRightCode = (top) => {
                     if (top === rParts[0]) return 1;
-                    if (top === rParts[1]) return 2;
-                    if (top === (7 - rParts[1])) return 5;
+                    if (top === (7 - rParts[1])) return 2;
                     if (top === (7 - rParts[0])) return 6;
-                    
-                    const lat = getRelativeLateralFaces(rParts[0], rParts[1]);
-                    if (top === lat.L) return 4;
+                    if (top === rParts[1]) return 5;
+                    if (top === 4) return 4;
                     return 3;
                 };
 
@@ -840,13 +816,13 @@
                 const color = CHIP_COLORS[i] || CHIP_COLORS[11];
                 let label = '';
                 if (i === 11 || (i === limit && pts >= 11)) {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important; font-size:24px!important; font-weight:900!important; color:#ffffff!important;">${pts}</span>`;
+                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${pts}</span>`;
                 } else {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important; font-size:24px!important; font-weight:900!important; color:#ffffff!important;">${i}</span>`;
+                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${i}</span>`;
                 }
 
                 container.innerHTML += `
-                    <div class="stacked-point-chip" style="background-color: ${color}; bottom: ${bottomOffset}px; transform: translateX(${skewOffset}); z-index: ${i}; width:32px; height:32px;">
+                    <div class="stacked-point-chip" style="background-color: ${color}; bottom: ${bottomOffset}px; transform: translateX(${skewOffset}); z-index: ${i};">
                         ${label}
                     </div>
                 `;
@@ -897,8 +873,6 @@
             if (SevenOutIndexes.length < 2) {
                 document.getElementById('br-mean-val').innerText = "0.0";
                 document.getElementById('br-median-val').innerText = "0";
-                document.getElementById('stat-br-data').innerHTML = "A: 0.0<br>M: 0";
-                document.getElementById('pad-interval-readout').innerText = "AVG INTERVAL: 0.0 | MEDIAN: 0";
                 return;
             }
 
@@ -926,8 +900,6 @@
 
             document.getElementById('br-mean-val').innerText = mean;
             document.getElementById('br-median-val').innerText = medianStr;
-            document.getElementById('stat-br-data').innerHTML = `A: ${mean}<br>M: ${medianStr}`;
-            document.getElementById('pad-interval-readout').innerText = `AVG INTERVAL: ${mean} | MEDIAN: ${medianStr}`;
         }
 
         function executeAnalyticalFilterEngine() {
@@ -1029,12 +1001,9 @@
 
             for(let i=2; i<=12; i++) {
                 if(i===7) continue; 
-                
-                const masterSessionTotal = state.rollHistoryLog.filter(r => r.sum === i && !r.Invalid_Roll).length;
-                
-                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = masterSessionTotal;
-                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = `ROLL: ${state.matrix[i].cur}`; 
-                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = `FILT: ${lm[i]}`; 
+                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = state.matrix[i].tot;
+                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = state.matrix[i].cur; 
+                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i]; 
                 
                 const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (state.activePoint === i) ? 'block' : 'none';
                 if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
