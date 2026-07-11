@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.6.2</title>
+    <title>Dice Tracker v1.28.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -34,23 +34,23 @@
         .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; cursor: pointer; }
         .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.2); }
         .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
-        .node-hardway-point { background-color: #ffffff !important; color: #000000 !important; border: 3px dashed #f59e0b !important; font-weight: 900; }
-        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
-        .node-seven-out-summary { background-color: #2563eb !important; color: #ffffff !important; font-weight: 900; border: 1px solid #2563eb; }
+        .node-point-made { background-color: #ffffff !important; color: #000000 !important; font-weight: 900; border: 1px solid #ffffff !important; }
+        .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
         .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
-        .node-summary { background-color: #2563eb; color: #ffffff; border: 1px solid rgba(37, 99, 235, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.15); }
+        .node-summary { background-color: rgba(15, 23, 42, 0.9); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
 
         .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
-        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 6px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; }
-        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; }
-        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: bold; letter-spacing: -1px; }
-        .box-count { font-size: 22px; font-weight: bold; color: #ffffff; padding: 10px 0; }
+        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; min-height: 140px; }
+        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 4px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; text-align: center; }
+        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; z-index: 20; }
+        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: bold; letter-spacing: -1px; z-index: 20; }
+        .box-count { font-size: 26px; font-weight: bold; color: #ffffff; padding: 12px 0; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
         .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(51, 65, 85, 0.4); font-size: 11px; }
         .sub-left { background-color: #000000; color: #ffffff; padding: 4px 0; border-right: 1px solid rgba(51, 65, 85, 0.4); font-weight: bold; }
         .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
-        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; font-weight: bold; }
+        .evolution-metrics-pane { position: absolute; top: 34px; left: 6px; text-align: left; pointer-events: none; z-index: 10; width: calc(100% - 12px); }
 
         .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
         .pad-btn { background: #020617; color: #94a3b8; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 20px; font-weight: bold; width: 52px; height: 50px; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
@@ -71,29 +71,27 @@
         .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
         .select-element:focus { border-color: var(--emerald-accent); }
         
-        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
         .modal-box { background: #1e293b; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #f8fafc; max-height: 90vh; overflow-y: auto; }
         
         .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
-        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
-        .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none; box-shadow: none; }
+        .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none !important; border-radius: 0px !important; box-shadow: none; }
         .force-uppercase { text-transform: uppercase; }
-        .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 54px; }
         
         .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
-        .zombie-dashboard-telemetry-strip { font-size: 11px; padding: 6px 12px; background-color: #020617; border-top: 1px solid rgba(51,65,85,0.4); display: flex; justify-content: space-around; font-family: monospace; font-weight: bold; color: var(--amber-accent); }
         .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; display: flex; justify-content: space-between; align-items: center; }
-        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
-        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
+        .diag-metrics-grid { display: grid; grid-template-columns: repeat(6, 1fr); padding: 15px 0; }
+        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; min-height: 60px; }
         .d-cell:last-child { border-right: none; }
         .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
-        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
+        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; text-align: center; line-height: 1.2; }
         
         .pulse-warning-btn { animation: alarm-pulse 0.8s infinite !important; border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
         @keyframes alarm-pulse {
-            0%, 100% { box-shadow: none; opacity: 1; }
+            0%, 100+ % { box-shadow: none; opacity: 1; }
             50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); opacity: 0.8; }
         }
 
@@ -118,19 +116,8 @@
         </div>
     </nav>
 
-    <div id="resolutionModalShroud" class="modal-mask" style="display: none; z-index: 99999;">
-        <div class="modal-box text-center">
-            <h3 class="text-red-500 font-black text-lg tracking-wider mb-2">SEVEN OUT. RESOLVE ACTIVE HAND.</h3>
-            <p class="text-slate-400 text-xs mb-6 font-mono">DETERMINE TRACKING METRIC ROUTING AND STATE ASSIGNMENTS BEFORE CONTINUING FIELD DATA COLLECTION LOOPS.</p>
-            <div class="flex gap-4">
-                <button onclick="handleResolutionSelection('SAME')" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white p-3 font-bold text-xs uppercase rounded transition-all">Same Shooter</button>
-                <button onclick="handleResolutionSelection('NEW')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white p-3 font-bold text-xs uppercase rounded transition-all">New Shooter</button>
-            </div>
-        </div>
-    </div>
-
     <div class="main-wrapper">
-        <div id="configurationBar" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
                 <div class="flex gap-1">
@@ -148,7 +135,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Position Axis</label>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Position</label>
                 <div class="flex gap-1 w-full">
                     <select id="ctxTablePositionParentSelect" class="select-element w-1/2" onchange="watchPositionParentChange()"></select>
                     <select id="ctxTablePositionChildSelect" class="select-element w-1/2" onchange="executeAnalyticalFilterEngine()"></select>
@@ -164,12 +151,6 @@
             </div>
         </div>
 
-        <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
-            <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Notes:</span>
-            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER NOTES BEFORE SUBMITTING...">
-            <button id="acceptBarBtn" onclick="toggleConfigBarVisibility(false)" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] px-3 py-1.5 uppercase rounded transition-all">Accept</button>
-        </div>
-
         <div class="history-ribbon" id="historyContainer"></div>
 
         <div class="controller-panel">
@@ -178,7 +159,7 @@
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
                         <div id="vis-left-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube rounded" id="v-left-t" onclick="toggleDiceSetColor('left')"></div>
+                            <div class="dice-visual-cube" id="v-left-t" onclick="toggleDiceSetColor('left')"></div>
                             <div class="dice-visual-cube" id="v-left-f" onclick="toggleDiceSetColor('left')"></div>
                         </div>
                     </div>
@@ -200,7 +181,8 @@
                             <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
                         </div>
                     </div>
-                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
+                    <div id="pad-interval-readout" class="text-[11px] font-mono font-bold text-amber-500 text-center w-full border-t border-slate-800/60 pt-2">AVG INTERVAL: 0.0 | MEDIAN: 0</div>
+                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-2 flex flex-col gap-1.5 items-center" style="display:none">
                         <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">USING ORIGINAL CONFIG</button>
                     </div>
                 </div>
@@ -209,7 +191,7 @@
                     <div class="flex flex-col items-center gap-1">
                         <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
                         <div id="vis-right-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube rounded" id="v-right-t" onclick="toggleDiceSetColor('right')"></div>
+                            <div class="dice-visual-cube" id="v-right-t" onclick="toggleDiceSetColor('right')"></div>
                             <div class="dice-visual-cube" id="v-right-f" onclick="toggleDiceSetColor('right')"></div>
                         </div>
                     </div>
@@ -227,23 +209,22 @@
                 <button class="act-btn btn-blue font-bold py-2.5 text-xs" onclick="executeUndo()">Undo Last</button>
                 <button class="act-btn btn-red font-bold py-2.5 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
-            <button onclick="toggleConfigBarVisibility(true)" class="act-btn bg-slate-700 hover:bg-slate-600 text-white py-3 font-bold text-xs uppercase rounded transition-all mt-3">New Shooter Manual Override</button>
         </div>
 
         <div class="board-stack">
             <div class="grid-row-segment">
-                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
-                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
-                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
-                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
-                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">ROLL: 0</div><div class="sub-right" id="tot-2">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">ROLL: 0</div><div class="sub-right" id="tot-3">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">ROLL: 0</div><div class="sub-right" id="tot-4">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">ROLL: 0</div><div class="sub-right" id="tot-5">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">ROLL: 0</div><div class="sub-right" id="tot-6">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
             </div>
             <div class="grid-row-segment">
-                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
-                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
-                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
-                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
-                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">ROLL: 0</div><div class="sub-right" id="tot-8">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">ROLL: 0</div><div class="sub-right" id="tot-9">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">ROLL: 0</div><div class="sub-right" id="tot-10">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">ROLL: 0</div><div class="sub-right" id="tot-11">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">ROLL: 0</div><div class="sub-right" id="tot-12">FILT: 0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
             </div>
         </div>
 
@@ -264,14 +245,12 @@
                 <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
                 <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
                 <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
-            </div>
-            <div class="zombie-dashboard-telemetry-strip" id="bigRedMetricsStrip">
-                <span>BIG RED INTERVAL DELTAS $\rightarrow$ RUNNING MEAN: <span class="text-white" id="br-mean-val">0.0</span> | GEOMETRIC MEDIAN: <span class="text-white" id="br-median-val">0</span></span>
+                <div class="d-cell"><div class="d-label">BR-DATA</div><div class="d-val" id="stat-br-data">A: 0.0<br>M: 0</div></div>
             </div>
         </div>
     </div>
 
-    <div id="ctxMetadataModalFrame" class="modal-mask" style="display: none;">
+    <div id="ctxMetadataModalFrame" class="modal-mask">
         <div class="modal-box">
             <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register Parameter</h3>
             <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
@@ -297,22 +276,34 @@
             1: "#10b981", 2: "#ef4444", 3: "#3b82f6", 4: "#f97316", 5: "#a855f7",
             6: "#ffffff", 7: "#000000", 8: "#ec4899", 9: "#84cc16", 10: "#06b6d4", 11: "#eab308"
         };
-        const pointChipColors = { 4: "#6366f1", 5: "#ec4899", 6: "#14b8a6", 8: "#a855f7", 9: "#f43f5e", 10: "#3b82f6" };
 
         const PARENT_POSITIONS = {
-            "ALL": "ALL POSITION CHANNELS",
-            "ALL_LEFT": "ALL LEFT REGION",
-            "ALL_RIGHT": "ALL RIGHT REGION"
+            "ALL": "ALL POSITIONS",
+            "ALL_LEFT": "ALL LEFT",
+            "ALL_RIGHT": "ALL RIGHT",
+            "LEFT_SIDE": "LEFT SIDE",
+            "HOOK_LEFT": "HOOK LEFT",
+            "RIGHT_SIDE": "RIGHT SIDE",
+            "HOOK_RIGHT": "HOOK RIGHT"
         };
 
         const CHILD_POSITIONS = {
-            "ALL": ["All", "Stick", "Hook"],
-            "ALL_LEFT": ["Left", "Stick Left", "Hook Left", "SL-1", "SL-2", "SL-3", "SL-4", "SL-5", "HL-1", "HL-2", "HL-3", "HL-4", "HL-5"],
-            "ALL_RIGHT": ["Right", "Stick Right", "Hook Right", "SR-1", "SR-2", "SR-3", "SR-4", "SR-5", "HR-1", "HR-2", "HR-3", "HR-4", "HR-5"]
+            "ALL": ["ALL"],
+            "ALL_LEFT": ["SL1", "SL2", "SL3", "SL4", "SL5", "HL1", "HL2", "HL3", "HL4", "HL5"],
+            "ALL_RIGHT": ["SR1", "SR2", "SR3", "SR4", "SR5", "HR1", "HR2", "HR3", "HR4", "HR5"],
+            "LEFT_SIDE": ["SL1", "SL2", "SL3", "SL4", "SL5"],
+            "HOOK_LEFT": ["HL1", "HL2", "HL3", "HL4", "HL5"],
+            "RIGHT_SIDE": ["SR1", "SR2", "SR3", "SR4", "SR5"],
+            "HOOK_RIGHT": ["HR1", "HR2", "HR3", "HR4", "HR5"]
         };
 
         const DOT_POSITIONS_MAP = {
-            1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8]
+            1: [4],
+            2: [0, 8],
+            3: [0, 4, 8],
+            4: [0, 2, 6, 8],
+            5: [0, 2, 4, 6, 8],
+            6: [0, 2, 3, 5, 6, 8]
         };
 
         const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
@@ -338,30 +329,16 @@
             });
         });
 
-        function toggleConfigBarVisibility(makeVisible) {
-            const bar = document.getElementById('configurationBar');
-            const acceptBtn = document.getElementById('acceptBarBtn');
-            if(!bar) return;
-            if(makeVisible) {
-                bar.classList.remove('hidden');
-                if(acceptBtn) acceptBtn.classList.remove('hidden');
-            } else {
-                bar.classList.add('hidden');
-                if(acceptBtn) acceptBtn.classList.add('hidden');
-            }
-        }
-
-        function handleResolutionSelection(choice) {
-            document.getElementById('resolutionModalShroud').style.display = 'none';
-            if(choice === 'SAME') {
-                state.activePoint = null;
-                for(let k in state.matrix) state.matrix[k].cur = 0;
-                executeAnalyticalFilterEngine();
-            } else if(choice === 'NEW') {
-                toggleConfigBarVisibility(true);
-                const sSel = document.getElementById('ctxShooterSelect');
-                if(sSel) sSel.focus();
-            }
+        function getRelativeLateralFaces(T, F) {
+            const lookup = {
+                "1-2": { R: 3, L: 4 }, "1-3": { R: 5, L: 2 }, "1-5": { R: 4, L: 3 }, "1-4": { R: 2, L: 5 },
+                "2-1": { R: 4, L: 3 }, "2-4": { R: 6, L: 1 }, "2-6": { R: 3, L: 4 }, "2-3": { R: 1, L: 6 },
+                "3-1": { R: 2, L: 5 }, "3-2": { R: 6, L: 1 }, "3-6": { R: 5, L: 2 }, "3-5": { R: 1, L: 6 },
+                "4-1": { R: 5, L: 2 }, "4-5": { R: 6, L: 1 }, "4-6": { R: 2, L: 5 }, "4-2": { R: 1, L: 6 },
+                "5-1": { R: 3, L: 4 }, "5-3": { R: 6, L: 1 }, "5-6": { R: 4, L: 3 }, "5-4": { R: 1, L: 6 },
+                "6-2": { R: 4, L: 3 }, "6-4": { R: 5, L: 2 }, "6-5": { R: 3, L: 4 }, "6-3": { R: 2, L: 5 }
+            };
+            return lookup[`${T}-${F}`] || { R: 3, L: 4 };
         }
 
         function makeVectorDotGridHTML(faceValue) {
@@ -480,21 +457,8 @@
             sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
 
             dSel.innerHTML = `<option value="ALL">NONE SELECTED</option>`;
-            
-            let sortedDiceKeys = Object.keys(userDiceSetsList).sort((a, b) => {
-                let recA = userDiceSetsList[a], recB = userDiceSetsList[b];
-                let favA = recA.isFavorite ? 1 : 0;
-                let favB = recB.isFavorite ? 1 : 0;
-                if (favA !== fontB) return favB - favA;
-                if (recA.Left_Top_Face !== recB.Left_Top_Face) return (recA.Left_Top_Face || 3) - (recB.Left_Top_Face || 3);
-                if (recA.Left_Front_Face !== recB.Left_Front_Face) return (recA.Left_Front_Face || 6) - (recB.Left_Front_Face || 6);
-                if (recA.Right_Top_Face !== recB.Right_Top_Face) return (recA.Right_Top_Face || 3) - (recB.Right_Top_Face || 3);
-                return (recA.Right_Front_Face || 2) - (recB.Right_Front_Face || 2);
-            });
-
-            sortedDiceKeys.forEach(id => { 
-                const favPrefix = userDiceSetsList[id].isFavorite ? "★ " : "";
-                dSel.innerHTML += `<option value="${id}">${favPrefix}${userDiceSetsList[id].Set_Name}</option>`; 
+            Object.keys(userDiceSetsList).forEach(id => { 
+                dSel.innerHTML += `<option value="${id}">${userDiceSetsList[id].Set_Name}</option>`; 
             });
             dSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW DICE SET]</option>`;
 
@@ -508,9 +472,9 @@
         function openMetadataModal(category, targetId = null) {
             activeModalContext = category; activeEditId = targetId;
             const isEditMode = targetId !== null;
-            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : userDiceSetsList[targetId])) : {};
+            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
 
-            document.getElementById('modal-headline').innerText = (isEditMode ? 'Edit ' : 'Register New ') + category.slice(0,-1).toUpperCase();
+            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
             
             let htmlContent = `<div class="mt-1"><label class="block mb-1 font-bold">Name / Descriptor:</label><input type="text" id="mField_Name" value="${record.name || record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Caesars Palace / 3V"></div>`;
@@ -532,12 +496,8 @@
                 <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 bg-black/30 p-2 rounded border border-slate-800">
                     <div><label class="block text-[11px] text-amber-500 font-bold">L-TOP:</label><select id="mField_LTop" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
                     <div><label class="block text-[11px] text-emerald-400 font-bold">R-TOP:</label><select id="mField_RTop" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                    <div><label class="block text-[11px] text-amber-500 font-bold">L-BACK:</label><select id="mField_LFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-BACK:</label><select id="mField_RFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                </div>
-                <div class="mt-2 flex items-center gap-2">
-                    <input type="checkbox" id="mField_IsFavorite" ${record.isFavorite ? 'checked' : ''} class="bg-slate-900 border border-slate-700 rounded text-emerald-500 focus:ring-0">
-                    <label class="font-bold text-slate-300 select-none cursor-pointer" for="mField_IsFavorite">Mark Dice Set as Favorite</label>
+                    <div><label class="block text-[11px] text-amber-500 font-bold">L-FACE:</label><select id="mField_LFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
+                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE:</label><select id="mField_RFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
                 </div>`;
             }
 
@@ -585,13 +545,11 @@
                 const lFront = parseInt(document.getElementById('mField_LFront').value);
                 const rTop = parseInt(document.getElementById('mField_RTop').value);
                 const rFront = parseInt(document.getElementById('mField_RFront').value);
-                const isFav = document.getElementById('mField_IsFavorite').checked;
                 const compiledName = `${nameVal} [${lTop}-${lFront}] [${rTop}-${rFront}]`;
                 payload = {
                     Set_Name: compiledName,
                     Left_Top_Face: lTop, Left_Front_Face: lFront,
-                    Right_Top_Face: rTop, Right_Front_Face: rFront,
-                    isFavorite: isFav
+                    Right_Top_Face: rTop, Right_Front_Face: rFront
                 };
             }
 
@@ -718,6 +676,16 @@
                 btn.classList.add('pulse-warning-btn');
                 btn.innerText = "NEW SUGGESTION READY";
             }
+            
+            if(isSuggestedSetFlag && activeTargetDiceSetString !== "") {
+                const pairs = activeTargetDiceSetString.split('x'); 
+                const lParts = pairs[0].split('/').map(Number); 
+                const rParts = pairs[1].split('/').map(Number);
+                document.getElementById('v-left-t').innerHTML = makeVectorDotGridHTML(lParts[0]);
+                document.getElementById('v-left-f').innerHTML = makeVectorDotGridHTML(lParts[1]);
+                document.getElementById('v-right-t').innerHTML = makeVectorDotGridHTML(rParts[0]);
+                document.getElementById('v-right-f').innerHTML = makeVectorDotGridHTML(rParts[1]);
+            }
         }
 
         function handleSuggestionToggleAction() { toggleSetExecutionFlag(); }
@@ -781,77 +749,61 @@
 
         function submitRoll(trackingMode) {
             if(!state.selectedLeft || !state.selectedRight) return alert("Dice button selection markers missing.");
-            const locVal = document.getElementById('ctxLocationSelect').value || "UNASSIGNED";
+            const locVal = document.getElementById('ctxLocationSelect').value;
             const sumValue = parseInt(state.selectedLeft + state.selectedRight);
             const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
             
             let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway) || (locVal === 'EVOLUTION');
 
             let lKin = null, rKin = null;
-            let lTop = 3, lBack = 6, rTop = 3, rBack = 2; // Defaults
-
-            if (document.getElementById('ctxDiceSetSelect').value !== 'ALL') {
+            if (enforceKinematics && document.getElementById('ctxDiceSetSelect').value !== 'ALL' && locVal !== 'EVOLUTION') {
                 let lParts = [3,6], rParts = [3,2];
                 if (activeTargetDiceSetString !== "") {
                     const pairs = activeTargetDiceSetString.split('x'); lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
                 }
-                lTop = lParts[0]; lBack = lParts[1];
-                rTop = rParts[0]; rBack = rParts[1];
                 
-                if (enforceKinematics && locVal !== 'EVOLUTION') {
-                    const computeLeftCode = (top) => {
-                        if (top === lParts[0]) return 1;       
-                        if (top === (7 - lParts[1])) return 2; 
-                        if (top === (7 - lParts[0])) return 6; 
-                        if (top === lParts[1]) return 5;       
-                        if (top === 4) return 4;                
-                        return 3;                              
-                    };
+                const computeLeftCode = (top) => {
+                    if (top === lParts[0]) return 1;       
+                    if (top === lParts[1]) return 2; 
+                    if (top === (7 - lParts[1])) return 5; 
+                    if (top === (7 - lParts[0])) return 6;       
                     
-                    const computeRightCode = (top) => {
-                        if (top === rParts[0]) return 1;
-                        if (top === (7 - rParts[1])) return 2;
-                        if (top === (7 - rParts[0])) return 6;
-                        if (top === rParts[1]) return 5;
-                        if (top === 4) return 4;
-                        return 3;
-                    };
+                    const lat = getRelativeLateralFaces(lParts[0], lParts[1]);
+                    if (top === lat.L) return 4;               
+                    return 3;                              
+                };
+                
+                const computeRightCode = (top) => {
+                    if (top === rParts[0]) return 1;
+                    if (top === rParts[1]) return 2;
+                    if (top === (7 - rParts[1])) return 5;
+                    if (top === (7 - rParts[0])) return 6;
+                    
+                    const lat = getRelativeLateralFaces(rParts[0], rParts[1]);
+                    if (top === lat.L) return 4;
+                    return 3;
+                };
 
-                    // Fix [object Object] leak by mapping output to explicit flattened key schemas
-                    lKin = { rot: computeLeftCode(state.selectedLeft), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
-                    rKin = { rot: computeRightCode(state.selectedRight), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
-                }
+                lKin = { rot: computeLeftCode(state.selectedLeft), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
+                rKin = { rot: computeRightCode(state.selectedRight), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
             }
 
             const r = {
-                Parent_Module_Context: "DICE_TRACKER",
-                Session_Designation: "ACTIVE_LOG_INSTANCE",
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint ? state.activePoint.toString() : "OFF",
-                Left_Die: parseInt(state.selectedLeft),
-                Right_Die: parseInt(state.selectedRight),
-                Total_Sum: sumValue,
+                leftDie: parseInt(state.selectedLeft), rightDie: parseInt(state.selectedRight), sum: sumValue,
                 Location_ID: locVal, 
                 Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
-                Shooter_ID: document.getElementById('ctxShooterSelect').value || "UNASSIGNED",
-                Left_Top: lTop, Left_Back: lBack, Right_Top: rTop, Right_Back: rBack,
-                Kinematic_Status: enforceKinematics, Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false,
-                Is_Point_Established: (state.activePoint === null && [4,5,6,8,9,10].includes(sumValue)),
-                Is_Point_Hit: (state.activePoint !== null && sumValue === state.activePoint),
-                Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL",
-                Notes: ""
+                Shooter_ID: document.getElementById('ctxShooterSelect').value,
+                Left_Set_Face: activeTargetDiceSetString.split('x')[0] || "3/6", Right_Set_Face: activeTargetDiceSetString.split('x')[1] || "3/2",
+                Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
+                Kinematic_Status: enforceKinematics, Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL", Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false, Notes: ""
             };
-
-            r.sum = r.Total_Sum; r.leftDie = r.Left_Die; r.rightDie = r.Right_Die; r.puckBeforeRoll = state.activePoint;
-
-            state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.Total_Sum);
+            state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.sum);
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
 
         function executeCalculationsLoop(record) {
             if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
-            const sum = record.Total_Sum;
+            const sum = record.sum;
             state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
             if(sum === 7) {
                 state.sevensTotal++;
@@ -861,8 +813,6 @@
                     state.shooterHistory.push({ rolls: state.currentHandRolls, points: state.currentHandPoints }); 
                     state.currentHandRolls = 0; state.currentHandPoints = 0; state.activePoint = null; 
                     for(let k in state.matrix) state.matrix[k].cur = 0; 
-                    
-                    document.getElementById('resolutionModalShroud').style.display = 'flex';
                 }
             } else {
                 if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
@@ -890,13 +840,13 @@
                 const color = CHIP_COLORS[i] || CHIP_COLORS[11];
                 let label = '';
                 if (i === 11 || (i === limit && pts >= 11)) {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${pts}</span>`;
+                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important; font-size:24px!important; font-weight:900!important; color:#ffffff!important;">${pts}</span>`;
                 } else {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${i}</span>`;
+                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important; font-size:24px!important; font-weight:900!important; color:#ffffff!important;">${i}</span>`;
                 }
 
                 container.innerHTML += `
-                    <div class="stacked-point-chip" style="background-color: ${color}; bottom: ${bottomOffset}px; transform: translateX(${skewOffset}); z-index: ${i};">
+                    <div class="stacked-point-chip" style="background-color: ${color}; bottom: ${bottomOffset}px; transform: translateX(${skewOffset}); z-index: ${i}; width:32px; height:32px;">
                         ${label}
                     </div>
                 `;
@@ -939,7 +889,7 @@
         function calculateMeanAndMedianBigRedDeltas() {
             let SevenOutIndexes = [];
             state.rollHistoryLog.forEach((r, idx) => {
-                if(!r.Invalid_Roll && r.Total_Sum === 7 && r.Puck_Before_Roll !== "OFF" && r.Puck_Before_Roll !== null) {
+                if(!r.Invalid_Roll && r.sum === 7 && r.Puck_Before_Roll !== "OFF" && r.Puck_Before_Roll !== null) {
                     SevenOutIndexes.push(idx);
                 }
             });
@@ -947,6 +897,8 @@
             if (SevenOutIndexes.length < 2) {
                 document.getElementById('br-mean-val').innerText = "0.0";
                 document.getElementById('br-median-val').innerText = "0";
+                document.getElementById('stat-br-data').innerHTML = "A: 0.0<br>M: 0";
+                document.getElementById('pad-interval-readout').innerText = "AVG INTERVAL: 0.0 | MEDIAN: 0";
                 return;
             }
 
@@ -974,6 +926,8 @@
 
             document.getElementById('br-mean-val').innerText = mean;
             document.getElementById('br-median-val').innerText = medianStr;
+            document.getElementById('stat-br-data').innerHTML = `A: ${mean}<br>M: ${medianStr}`;
+            document.getElementById('pad-interval-readout').innerText = `AVG INTERVAL: ${mean} | MEDIAN: ${medianStr}`;
         }
 
         function executeAnalyticalFilterEngine() {
@@ -989,34 +943,13 @@
                 if(sh !== "ALL") filtered = filtered.filter(r => r.Shooter_ID === sh);
                 if(loc !== "ALL") filtered = filtered.filter(r => r.Location_ID === loc);
                 if(pParent !== "ALL") {
-                    if(pChild === "Left" || pChild === "Right") {
-                        const allowedSubset = CHILD_POSITIONS[pParent].filter(x => x !== "Left" && x !== "Right" && !x.includes("Stick") && !x.includes("Hook"));
+                    const allowedSubset = CHILD_POSITIONS[pParent];
+                    if(pChild === "ALL" || !pChild) {
                         filtered = filtered.filter(r => allowedSubset.includes(r.Table_Position));
-                    } else if(pChild === "Stick Left") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("SL-"));
-                    } else if(pChild === "Hook Left") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("HL-"));
-                    } else if(pChild === "Stick Right") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("SR-"));
-                    } else if(pChild === "Hook Right") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("HR-"));
                     } else {
                         filtered = filtered.filter(r => r.Table_Position === pChild);
                     }
-                } else {
-                    if(pChild === "Stick") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("SL-") || r.Table_Position.startsWith("SR-"));
-                    } else if(pChild === "Hook") {
-                        filtered = filtered.filter(r => r.Table_Position.startsWith("HL-") || r.Table_Position.startsWith("HR-"));
-                    }
                 }
-            }
-
-            // Enforce visibility of Configuration panel block wrapper layout
-            if(state.rollHistoryLog.length < 1) {
-                toggleConfigBarVisibility(true);
-            } else if(document.getElementById('resolutionModalShroud').style.display !== 'flex') {
-                toggleConfigBarVisibility(false);
             }
 
             let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
@@ -1037,42 +970,35 @@
                     ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-amber-500 border border-amber-500/30 text-xs" onclick="showErrNotesModal('${v.Notes}')">ERR</div>`; 
                     return; 
                 }
-                lValid++; lm[v.Total_Sum]++; lHand++; la[v.Total_Sum] = 1; if(v.Kinematic_Status) kLogs.push(v);
+                lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1; if(v.Kinematic_Status) kLogs.push(v);
                 rollsInCurrentHandTracking++;
                 
                 if (idx > 0) {
                     const prevRow = filtered[idx - 1];
-                    if (prevRow && !prevRow.Invalid_Roll && prevRow.Total_Sum >= 2 && prevRow.Total_Sum <= 12 && prevRow.Total_Sum !== 7) {
-                        const setupAnchorTotal = prevRow.Total_Sum;
-                        const unorderedPairKey = [v.Left_Die, v.Right_Die].sort((a,b)=>a-b).join('-');
+                    if (prevRow && !prevRow.Invalid_Roll && prevRow.sum >= 2 && prevRow.sum <= 12 && prevRow.sum !== 7) {
+                        const setupAnchorTotal = prevRow.sum;
+                        const unorderedPairKey = [v.leftDie, v.rightDie].sort((a,b)=>a-b).join('-');
                         
-                        if(!conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.Total_Sum]) conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.Total_Sum] = 0;
-                        conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.Total_Sum]++;
+                        if(!conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum]) conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum] = 0;
+                        conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum]++;
                         
                         if(!conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey]) conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey] = 0;
                         conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey]++;
                     }
                 }
 
-                let c = 'node-normal'; const isH = (v.Left_Die === v.Right_Die) && [4,6,8,10].includes(v.Total_Sum);
+                let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
                 let currentIsPointNode = false;
 
-                if(v.Total_Sum === 7) { 
+                if(v.sum === 7) { 
                     lTotal++; 
                     if(lap === null) { 
                         lComeout++; c = 'node-natural'; 
-                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
                     } else { 
-                        lRed++; c = 'node-seven-out-summary'; 
+                        lRed++; c = 'node-seven-out'; 
                         lHand = 0; lap = null; for(let k in la) la[k] = 0; 
                         
-                        // Restores high-contrast background styling rules for Seven-Out markers
-                        let rColor = '#ef4444';
-                        let pColor = pointChipColors[lap] || '#ffffff';
-                        let summarySuperscript = `<sup style="color:${rColor}; font-weight:bold;">R</sup>`;
-                        if(pointsInCurrentHandTracking > 0) summarySuperscript += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
-
-                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}${summarySuperscript}</div>`;
+                        ribbon.innerHTML += `<div class="history-node ${c}">${v.sum}</div>`;
                         ribbon.innerHTML += `<div class="history-node node-summary">${rollsInCurrentHandTracking}<sup>R</sup> / ${pointsInCurrentHandTracking}<sup>P</sup></div>`;
                         
                         rollsInCurrentHandTracking = 0;
@@ -1080,37 +1006,35 @@
                         return; 
                     } 
                 }
-                else if(v.Total_Sum === 11 && lap === null) {
-                    c = 'node-natural';
-                    ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
-                }
+                else if(v.sum === 11 && lap === null) c = 'node-natural';
                 else { 
                     if(lap === null) { 
-                        if([4,5,6,8,9,10].includes(v.Total_Sum)) { lap = v.Total_Sum; c = 'node-point-made'; currentIsPointNode = true; } 
-                    } else if(v.Total_Sum === lap) { 
-                        c = 'node-point-made'; lPoints++; pointsInCurrentHandTracking++; currentIsPointNode = true; lap = null;
+                        if([4,5,6,8,9,10].includes(v.sum)) { lap = v.sum; c = 'node-point-made'; currentIsPointNode = true; } 
+                    } else if(v.sum === lap) { 
+                        c = 'node-point-made'; lPoints++; pointsInCurrentHandTracking++; lap = null; currentIsPointNode = true;
                     } else { 
                         c = isH ? 'node-hard' : 'node-normal'; 
                     } 
-                    
-                    // Preserves pristine 1.27.1 format without leaking superscripts onto clean timeline nodes
-                    if(isH && !currentIsPointNode) {
-                        ribbon.innerHTML += `<div class="history-node node-hard">${v.Total_Sum}<sup>(H)</sup></div>`;
-                    } else if(isH && lap !== null && v.Total_Sum === lap) {
-                        ribbon.innerHTML += `<div class="history-node node-hardway-point">${v.Total_Sum}<sup>(H)</sup></div>`;
-                    } else {
-                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
-                    }
                 }
+                if(isH && !currentIsPointNode) c = 'node-hard';
+                if(currentIsPointNode) c = 'node-point-made';
+                
+                let innerTextLabel = v.sum;
+                if(isH) innerTextLabel = `${v.sum}<sup>H</sup>`;
+
+                ribbon.innerHTML += `<div class="history-node ${c}">${innerTextLabel}</div>`;
             });
 
             const universalSequenceLog = state.rawSequenceLog;
 
             for(let i=2; i<=12; i++) {
                 if(i===7) continue; 
-                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = state.matrix[i].tot;
-                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = state.matrix[i].cur; 
-                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i]; 
+                
+                const masterSessionTotal = state.rollHistoryLog.filter(r => r.sum === i && !r.Invalid_Roll).length;
+                
+                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = masterSessionTotal;
+                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = `ROLL: ${state.matrix[i].cur}`; 
+                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = `FILT: ${lm[i]}`; 
                 
                 const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (state.activePoint === i) ? 'block' : 'none';
                 if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
@@ -1270,21 +1194,13 @@
             document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitMetadataModalForm()');
 
             const r = {
-                Parent_Module_Context: "DICE_TRACKER",
-                Session_Designation: "ACTIVE_LOG_INSTANCE",
-                Time_Stamp: new Date().toISOString(),
-                Roll_Index: state.rollHistoryLog.length + 1,
-                Puck_Before_Roll: state.activePoint ? state.activePoint.toString() : "OFF",
-                Left_Die: 0, Right_Die: 0, Total_Sum: 0,
-                Location_ID: document.getElementById('ctxLocationSelect').value || "UNASSIGNED", 
+                leftDie: null, rightDie: null, sum: 0,
+                Location_ID: document.getElementById('ctxLocationSelect').value, 
                 Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
-                Shooter_ID: document.getElementById('ctxShooterSelect').value || "UNASSIGNED",
-                Left_Top: 3, Left_Back: 6, Right_Top: 3, Right_Back: 2,
+                Shooter_ID: document.getElementById('ctxShooterSelect').value,
+                Left_Set_Face: "N/A", Right_Set_Face: "N/A", Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
                 Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null, Invalid_Roll: true, Notes: finalCause
             };
-            
-            r.sum = r.Total_Sum; r.leftDie = r.Left_Die; r.rightDie = r.Right_Die; r.puckBeforeRoll = state.activePoint;
-
             state.rollHistoryLog.push(r); state.rawSequenceLog.push(0);
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
         }
@@ -1303,39 +1219,7 @@
             state.currentHandPoints = d.currentHandPoints || 0;
             state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
             try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
-            let rawLog = d.payload_log || d.rollHistoryLog || []; 
-            try { 
-                const logParsed = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; 
-                if (Array.isArray(logParsed)) {
-                    state.rollHistoryLog = logParsed.map((row, idx) => {
-                        if (row && typeof row === 'object' && 'Total_Sum' in row) {
-                            return row;
-                        } else {
-                            return {
-                                Parent_Module_Context: "DICE_TRACKER",
-                                Session_Designation: "HEALED_BATCH",
-                                Time_Stamp: row.Time_Stamp || new Date().toISOString(),
-                                Roll_Index: row.Roll_Index || (idx + 1),
-                                Puck_Before_Roll: row.Puck_Before_Roll || "OFF",
-                                Left_Die: row.leftDie || row.Left_Die || 0,
-                                Right_Die: row.rightDie || row.Right_Die || 0,
-                                Total_Sum: row.sum || row.Total_Sum || 0,
-                                Location_ID: row.Location_ID || "ALL",
-                                Table_Position: row.Table_Position || "ALL",
-                                Shooter_ID: row.Shooter_ID || "ALL",
-                                Left_Top: row.Left_Top || 3, Left_Back: row.Left_Back || 6,
-                                Right_Top: row.Right_Top || 3, Right_Back: row.Right_Back || 2,
-                                Kinematic_Status: row.Kinematic_Status || false,
-                                Left_Kinematic: row.Left_Kinematic || null, Right_Kinematic: row.Right_Kinematic || null,
-                                Invalid_Roll: row.Invalid_Roll || false,
-                                Is_Point_Established: row.Is_Point_Established || false,
-                                Is_Point_Hit: row.Is_Point_Hit || false,
-                                Notes: row.Notes || ""
-                            };
-                        }
-                    });
-                }
-            } catch(e){}
+            let rawLog = d.payload_log || d.rollHistoryLog || []; try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
             executeAnalyticalFilterEngine();
         }
 
@@ -1359,7 +1243,7 @@
             const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
             b.forEach(row => { 
                 state.rollHistoryLog.push(row); 
-                if(!row.Invalid_Roll) state.rawSequenceLog.push(row.Total_Sum); 
+                if(!row.Invalid_Roll) state.rawSequenceLog.push(row.sum); 
                 executeCalculationsLoop(row); 
             }); 
             pushCloudState("active_session");
