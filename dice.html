@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.6.1</title>
+    <title>Dice Tracker v1.6.2</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -36,9 +36,9 @@
         .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
         .node-hardway-point { background-color: #ffffff !important; color: #000000 !important; border: 3px dashed #f59e0b !important; font-weight: 900; }
         .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
-        .node-seven-out-summary { background-color: #2563eb !important; background-opacity: 0.85; color: #ffffff !important; font-weight: 900; border: 1px solid #2563eb; }
+        .node-seven-out-summary { background-color: #2563eb !important; color: #ffffff !important; font-weight: 900; border: 1px solid #2563eb; }
         .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
-        .node-summary { background-color: #2563eb; opacity: 0.85; color: #ffffff; border: 1px solid rgba(37, 99, 235, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.15); }
+        .node-summary { background-color: #2563eb; color: #ffffff; border: 1px solid rgba(37, 99, 235, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(37, 99, 235, 0.15); }
 
         .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
@@ -75,7 +75,7 @@
         .modal-box { background: #1e293b; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #f8fafc; max-height: 90vh; overflow-y: auto; }
         
         .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
-        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
+        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); }
         .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
         
         .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none; box-shadow: none; }
@@ -121,7 +121,7 @@
     <div id="resolutionModalShroud" class="modal-mask" style="display: none; z-index: 99999;">
         <div class="modal-box text-center">
             <h3 class="text-red-500 font-black text-lg tracking-wider mb-2">SEVEN OUT. RESOLVE ACTIVE HAND.</h3>
-            <p class="text-slate-400 text-xs mb-6 font-mono">CHOOSE THE DATA INGESTION ROUTING PRESET CORRESPONDING TO ACTIVE CASINO CONDITIONS FOR DOWNSTREAM SOR / PSR METRICS MAPS.</p>
+            <p class="text-slate-400 text-xs mb-6 font-mono">DETERMINE TRACKING METRIC ROUTING AND STATE ASSIGNMENTS BEFORE CONTINUING FIELD DATA COLLECTION LOOPS.</p>
             <div class="flex gap-4">
                 <button onclick="handleResolutionSelection('SAME')" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white p-3 font-bold text-xs uppercase rounded transition-all">Same Shooter</button>
                 <button onclick="handleResolutionSelection('NEW')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white p-3 font-bold text-xs uppercase rounded transition-all">New Shooter</button>
@@ -148,7 +148,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Position</label>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Position Axis</label>
                 <div class="flex gap-1 w-full">
                     <select id="ctxTablePositionParentSelect" class="select-element w-1/2" onchange="watchPositionParentChange()"></select>
                     <select id="ctxTablePositionChildSelect" class="select-element w-1/2" onchange="executeAnalyticalFilterEngine()"></select>
@@ -166,7 +166,7 @@
 
         <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
             <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Notes:</span>
-            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE FIELD NOTES BEFORE SUBMITTING...">
+            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER NOTES BEFORE SUBMITTING...">
             <button id="acceptBarBtn" onclick="toggleConfigBarVisibility(false)" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] px-3 py-1.5 uppercase rounded transition-all">Accept</button>
         </div>
 
@@ -227,6 +227,7 @@
                 <button class="act-btn btn-blue font-bold py-2.5 text-xs" onclick="executeUndo()">Undo Last</button>
                 <button class="act-btn btn-red font-bold py-2.5 text-xs" onclick="executeClearReset()">Reset Dataset</button>
             </div>
+            <button onclick="toggleConfigBarVisibility(true)" class="act-btn bg-slate-700 hover:bg-slate-600 text-white py-3 font-bold text-xs uppercase rounded transition-all mt-3">New Shooter Manual Override</button>
         </div>
 
         <div class="board-stack">
@@ -293,8 +294,8 @@
         let leftDiceColorIdx = 0, rightDiceColorIdx = 0;
 
         const CHIP_COLORS = {
-            1: "#6366f1", 2: "#ec4899", 3: "#14b8a6", 4: "#6366f1", 5: "#ec4899",
-            6: "#14b8a6", 7: "#000000", 8: "#a855f7", 9: "#f43f5e", 10: "#3b82f6", 11: "#eab308"
+            1: "#10b981", 2: "#ef4444", 3: "#3b82f6", 4: "#f97316", 5: "#a855f7",
+            6: "#ffffff", 7: "#000000", 8: "#ec4899", 9: "#84cc16", 10: "#06b6d4", 11: "#eab308"
         };
         const pointChipColors = { 4: "#6366f1", 5: "#ec4899", 6: "#14b8a6", 8: "#a855f7", 9: "#f43f5e", 10: "#3b82f6" };
 
@@ -480,12 +481,11 @@
 
             dSel.innerHTML = `<option value="ALL">NONE SELECTED</option>`;
             
-            // Priority Sort Protocol: isFavorite DESC -> Spatial Coordinates Matrix ASC
             let sortedDiceKeys = Object.keys(userDiceSetsList).sort((a, b) => {
                 let recA = userDiceSetsList[a], recB = userDiceSetsList[b];
                 let favA = recA.isFavorite ? 1 : 0;
                 let favB = recB.isFavorite ? 1 : 0;
-                if (favA !== favB) return favB - favA;
+                if (favA !== fontB) return favB - favA;
                 if (recA.Left_Top_Face !== recB.Left_Top_Face) return (recA.Left_Top_Face || 3) - (recB.Left_Top_Face || 3);
                 if (recA.Left_Front_Face !== recB.Left_Front_Face) return (recA.Left_Front_Face || 6) - (recB.Left_Front_Face || 6);
                 if (recA.Right_Top_Face !== recB.Right_Top_Face) return (recA.Right_Top_Face || 3) - (recB.Right_Top_Face || 3);
@@ -508,9 +508,9 @@
         function openMetadataModal(category, targetId = null) {
             activeModalContext = category; activeEditId = targetId;
             const isEditMode = targetId !== null;
-            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
+            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : userDiceSetsList[targetId])) : {};
 
-            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
+            document.getElementById('modal-headline').innerText = (isEditMode ? 'Edit ' : 'Register New ') + category.slice(0,-1).toUpperCase();
             const fields = document.getElementById('modal-form-fields');
             
             let htmlContent = `<div class="mt-1"><label class="block mb-1 font-bold">Name / Descriptor:</label><input type="text" id="mField_Name" value="${record.name || record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Caesars Palace / 3V"></div>`;
@@ -788,7 +788,7 @@
             let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway) || (locVal === 'EVOLUTION');
 
             let lKin = null, rKin = null;
-            let lTop = 3, lBack = 6, rTop = 3, rBack = 2; // System defaults
+            let lTop = 3, lBack = 6, rTop = 3, rBack = 2; // Defaults
 
             if (document.getElementById('ctxDiceSetSelect').value !== 'ALL') {
                 let lParts = [3,6], rParts = [3,2];
@@ -817,12 +817,12 @@
                         return 3;
                     };
 
+                    // Fix [object Object] leak by mapping output to explicit flattened key schemas
                     lKin = { rot: computeLeftCode(state.selectedLeft), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
                     rKin = { rot: computeRightCode(state.selectedRight), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
                 }
             }
 
-            // Complete Symmetrical 22-Column Master Document Schema Contract Composition
             const r = {
                 Parent_Module_Context: "DICE_TRACKER",
                 Session_Designation: "ACTIVE_LOG_INSTANCE",
@@ -835,27 +835,15 @@
                 Location_ID: locVal, 
                 Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
                 Shooter_ID: document.getElementById('ctxShooterSelect').value || "UNASSIGNED",
-                Left_Top: lTop,
-                Left_Back: lBack,
-                Right_Top: rTop,
-                Right_Back: rBack,
-                Kinematic_Status: enforceKinematics,
-                Left_Kinematic: lKin,
-                Right_Kinematic: rKin,
-                Invalid_Roll: false,
+                Left_Top: lTop, Left_Back: lBack, Right_Top: rTop, Right_Back: rBack,
+                Kinematic_Status: enforceKinematics, Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false,
                 Is_Point_Established: (state.activePoint === null && [4,5,6,8,9,10].includes(sumValue)),
                 Is_Point_Hit: (state.activePoint !== null && sumValue === state.activePoint),
                 Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL",
                 Notes: ""
             };
 
-            // Maintain legacy tracking compatibility map pointers
-            r.sum = r.Total_Sum;
-            r.leftDie = r.Left_Die;
-            r.rightDie = r.Right_Die;
-            r.Shooter_ID = r.Shooter_ID;
-            r.Location_ID = r.Location_ID;
-            r.puckBeforeRoll = state.activePoint;
+            r.sum = r.Total_Sum; r.leftDie = r.Left_Die; r.rightDie = r.Right_Die; r.puckBeforeRoll = state.activePoint;
 
             state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.Total_Sum);
             executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
@@ -872,8 +860,8 @@
                     state.sevensRed++; 
                     state.shooterHistory.push({ rolls: state.currentHandRolls, points: state.currentHandPoints }); 
                     state.currentHandRolls = 0; state.currentHandPoints = 0; state.activePoint = null; 
+                    for(let k in state.matrix) state.matrix[k].cur = 0; 
                     
-                    // Intercept and halt workspace UI, pop resolution dialogue shroud overlay
                     document.getElementById('resolutionModalShroud').style.display = 'flex';
                 }
             } else {
@@ -1024,6 +1012,13 @@
                 }
             }
 
+            // Enforce visibility of Configuration panel block wrapper layout
+            if(state.rollHistoryLog.length < 1) {
+                toggleConfigBarVisibility(true);
+            } else if(document.getElementById('resolutionModalShroud').style.display !== 'flex') {
+                toggleConfigBarVisibility(false);
+            }
+
             let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
             let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
             const ribbon = document.getElementById('historyContainer'); if(!ribbon) return;
@@ -1039,7 +1034,7 @@
 
             filtered.forEach((v, idx) => {
                 if(v.Invalid_Roll) { 
-                    ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-[10px] text-red-500 font-bold border border-amber-500/30 text-xs" onclick="showErrNotesModal('${v.Notes}')"><sup>0</sup>ERR</div>`; 
+                    ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-amber-500 border border-amber-500/30 text-xs" onclick="showErrNotesModal('${v.Notes}')">ERR</div>`; 
                     return; 
                 }
                 lValid++; lm[v.Total_Sum]++; lHand++; la[v.Total_Sum] = 1; if(v.Kinematic_Status) kLogs.push(v);
@@ -1062,19 +1057,22 @@
                 let c = 'node-normal'; const isH = (v.Left_Die === v.Right_Die) && [4,6,8,10].includes(v.Total_Sum);
                 let currentIsPointNode = false;
 
-                let rColor = v.Total_Sum <= 7 ? '#ef4444' : '#10b981';
-                let pColor = pointChipColors[lap] || '#ffffff';
-                let superscriptStr = `<sup style="color:${rColor}; font-weight:bold;">R</sup>`;
-
                 if(v.Total_Sum === 7) { 
                     lTotal++; 
                     if(lap === null) { 
                         lComeout++; c = 'node-natural'; 
+                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
                     } else { 
                         lRed++; c = 'node-seven-out-summary'; 
                         lHand = 0; lap = null; for(let k in la) la[k] = 0; 
                         
-                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}${superscriptStr}</div>`;
+                        // Restores high-contrast background styling rules for Seven-Out markers
+                        let rColor = '#ef4444';
+                        let pColor = pointChipColors[lap] || '#ffffff';
+                        let summarySuperscript = `<sup style="color:${rColor}; font-weight:bold;">R</sup>`;
+                        if(pointsInCurrentHandTracking > 0) summarySuperscript += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
+
+                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}${summarySuperscript}</div>`;
                         ribbon.innerHTML += `<div class="history-node node-summary">${rollsInCurrentHandTracking}<sup>R</sup> / ${pointsInCurrentHandTracking}<sup>P</sup></div>`;
                         
                         rollsInCurrentHandTracking = 0;
@@ -1082,35 +1080,28 @@
                         return; 
                     } 
                 }
-                else if(v.Total_Sum === 11 && lap === null) c = 'node-natural';
+                else if(v.Total_Sum === 11 && lap === null) {
+                    c = 'node-natural';
+                    ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
+                }
                 else { 
                     if(lap === null) { 
-                        if([4,5,6,8,9,10].includes(v.Total_Sum)) { 
-                            lap = v.Total_Sum; c = 'node-point-made'; currentIsPointNode = true; 
-                            pColor = pointChipColors[lap] || '#ffffff';
-                            superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
-                        } 
+                        if([4,5,6,8,9,10].includes(v.Total_Sum)) { lap = v.Total_Sum; c = 'node-point-made'; currentIsPointNode = true; } 
                     } else if(v.Total_Sum === lap) { 
-                        c = 'node-point-made'; lPoints++; pointsInCurrentHandTracking++; currentIsPointNode = true;
-                        superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
-                        lap = null;
+                        c = 'node-point-made'; lPoints++; pointsInCurrentHandTracking++; currentIsPointNode = true; lap = null;
                     } else { 
                         c = isH ? 'node-hard' : 'node-normal'; 
-                        if([4,5,6,8,9,10].includes(lap)) {
-                            pColor = pointChipColors[lap] || '#ffffff';
-                            superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
-                        }
                     } 
+                    
+                    // Preserves pristine 1.27.1 format without leaking superscripts onto clean timeline nodes
+                    if(isH && !currentIsPointNode) {
+                        ribbon.innerHTML += `<div class="history-node node-hard">${v.Total_Sum}<sup>(H)</sup></div>`;
+                    } else if(isH && lap !== null && v.Total_Sum === lap) {
+                        ribbon.innerHTML += `<div class="history-node node-hardway-point">${v.Total_Sum}<sup>(H)</sup></div>`;
+                    } else {
+                        ribbon.innerHTML += `<div class="history-node ${c}">${v.Total_Sum}</div>`;
+                    }
                 }
-
-                if(isH && !currentIsPointNode) c = 'node-hard';
-                if(isH && lap !== null && v.Total_Sum === lap) c = 'node-hardway-point';
-                if(currentIsPointNode && c !== 'node-hardway-point') c = 'node-point-made';
-                
-                let innerTextLabel = v.Total_Sum + superscriptStr;
-                if(isH && c !== 'node-hardway-point') innerTextLabel = `${v.Total_Sum}<sup>H</sup>${superscriptStr}`;
-
-                ribbon.innerHTML += `<div class="history-node ${c}">${innerTextLabel}</div>`;
             });
 
             const universalSequenceLog = state.rawSequenceLog;
@@ -1284,23 +1275,14 @@
                 Time_Stamp: new Date().toISOString(),
                 Roll_Index: state.rollHistoryLog.length + 1,
                 Puck_Before_Roll: state.activePoint ? state.activePoint.toString() : "OFF",
-                Left_Die: 0,
-                Right_Die: 0,
-                Total_Sum: 0,
+                Left_Die: 0, Right_Die: 0, Total_Sum: 0,
                 Location_ID: document.getElementById('ctxLocationSelect').value || "UNASSIGNED", 
                 Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
                 Shooter_ID: document.getElementById('ctxShooterSelect').value || "UNASSIGNED",
                 Left_Top: 3, Left_Back: 6, Right_Top: 3, Right_Back: 2,
-                Kinematic_Status: false,
-                Left_Kinematic: null,
-                Right_Kinematic: null,
-                Invalid_Roll: true,
-                Is_Point_Established: false,
-                Is_Point_Hit: false,
-                Notes: finalCause
+                Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null, Invalid_Roll: true, Notes: finalCause
             };
             
-            // Pointers alignment mapping fallback keys
             r.sum = r.Total_Sum; r.leftDie = r.Left_Die; r.rightDie = r.Right_Die; r.puckBeforeRoll = state.activePoint;
 
             state.rollHistoryLog.push(r); state.rawSequenceLog.push(0);
