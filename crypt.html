@@ -100,7 +100,7 @@
         });
 
         async function purgeActiveBuffer() {
-            if(confirm("Permanently extinguish active buffer parameters and start fresh?")) {
+            if(confirm("Are you sure you want to clear the active workspace?")) {
                 await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
                 fetchCryptData();
             }
@@ -255,21 +255,21 @@
         async function resumeInsc(docId) {
             try {
                 const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
-                if(!doc.exists) return alert("Resolution Target Lost.");
+                if(!doc.exists) return alert("Could not find the selected session.");
                 
                 const data = doc.data();
                 await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(data);
                 
                 if (data.module_id === "DICE_TRACKER") window.location.assign("dice.html");
                 else if (data.module_id === "ROULETTE_TRACKER") window.location.assign("roulette.html");
-                else alert("Module Context Route Ambiguous.");
-            } catch (e) { alert("Execution routing lock failure."); }
+                else alert("Could not determine which tracker to open.");
+            } catch (e) { alert("Failed to resume session."); }
         }
 
         async function exportInscToCSV(docId) {
             try {
                 const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
-                if (!doc.exists) return alert("Target resolution broken.");
+                if (!doc.exists) return alert("Could not find the selected session.");
                 
                 const data = doc.data();
                 let logArray = [];
@@ -309,11 +309,11 @@
                 const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
                 const anchor = document.createElement("a");
                 anchor.setAttribute("href", URL.createObjectURL(blob));
-                anchor.setAttribute("download", `${(data.name || 'session').toLowerCase()}_export.csv`);
+                anchor.setAttribute("download", `${(data.name || 'session').toLowerCase()}.csv`);
                 document.body.appendChild(anchor);
                 anchor.click();
                 document.body.removeChild(anchor);
-            } catch (err) { alert("CSV Tabular Layout Assembly Interrupted."); }
+            } catch (err) { alert("Failed to export the session to CSV."); }
         }
 
         function processCSVUpload(fileObject) {
@@ -323,13 +323,13 @@
                 try {
                     const text = e.target.result;
                     const lines = text.split(/\r?\n/);
-                    if (lines.length < 2) return alert("File underflow detected.");
+                    if (lines.length < 2) return alert("The selected file is empty or invalid.");
                     
                     const cleanStr = (val) => (val || '').replace(/^"|"$/g, '').trim();
                     
                     // Dynamic Header Parsing
                     const headers = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(cleanStr);
-                    if (!headers || headers.length === 0) return alert("Empty header parse failure.");
+                    if (!headers || headers.length === 0) return alert("Could not read the column headers in the file.");
                     
                     lines.shift(); // Remove header row
                     
@@ -338,12 +338,30 @@
                     if (headers.includes("Puck_Before_Roll")) modId = "DICE_TRACKER";
                     else if (headers.includes("Value") || headers.includes("n")) modId = "ROULETTE_TRACKER";
                     
-                    if (modId === "UNKNOWN") return alert("Unrecognized Polymorphic Metadata Signature. Could not detect module type.");
+                    if (modId === "UNKNOWN") return alert("Could not detect if this is a Dice or Roulette file.");
 
-                    // Prompt for Session Designation
-                    let sessionName = prompt("Enter a designation for this imported session:", "IMPORTED_SESSION");
+                    // Extract default name from filename (remove .csv)
+                    let defaultName = fileObject.name.replace(/\.[^/.]+$/, "").toUpperCase();
+                    
+                    // Prompt for Session Designation with duplicate checking
+                    let sessionName = prompt("Enter a name for this imported session:", defaultName);
+                    
+                    while (sessionName !== null) {
+                        sessionName = sessionName.trim().toUpperCase();
+                        if (sessionName === "") {
+                            sessionName = prompt("Name cannot be empty. Enter a name for this imported session:", defaultName);
+                            continue;
+                        }
+                        
+                        let exists = cachedRecords.some(r => r.name === sessionName);
+                        if (exists) {
+                            sessionName = prompt(`A session named "${sessionName}" already exists. Please enter a unique name:`, defaultName);
+                        } else {
+                            break;
+                        }
+                    }
+                    
                     if (!sessionName) return; // User cancelled
-                    sessionName = sessionName.trim().toUpperCase();
                     
                     let payloadArray = [];
                     
@@ -401,26 +419,45 @@
                     };
 
                     await db.collection("users").doc(currentUid).collection("crypt").doc("archive_" + Date.now()).set(payloadDocument);
-                    alert(`Tabular Inscription Resolved: Extracted ${payloadArray.length} items.`);
+                    alert(`Successfully imported ${payloadArray.length} rolls.`);
                     fetchCryptData();
                 } catch(err) { 
                     console.error(err);
-                    alert("Data Layout Parsing Collapse."); 
+                    alert("An error occurred while reading the file."); 
                 }
             };
             reader.readAsText(fileObject);
+            // Reset the input so the same file can be selected again if needed
+            document.getElementById('csv-file-input').value = "";
         }
 
         async function editInscName(docId, oldName) {
-            const name = prompt("Alphanumeric Shift Designation:", oldName);
-            if(name) {
-                await db.collection("users").doc(currentUid).collection("crypt").doc(docId).update({ name: name.toUpperCase() });
+            let newName = prompt("Enter a new name for this session:", oldName);
+            
+            while (newName !== null) {
+                newName = newName.trim().toUpperCase();
+                if (newName === "") {
+                    newName = prompt("Name cannot be empty. Enter a new name for this session:", oldName);
+                    continue;
+                }
+                if (newName === oldName) return; // No change made
+                
+                let exists = cachedRecords.some(r => r.name === newName && r.id !== docId);
+                if (exists) {
+                    newName = prompt(`A session named "${newName}" already exists. Please enter a unique name:`, oldName);
+                } else {
+                    break;
+                }
+            }
+
+            if(newName) {
+                await db.collection("users").doc(currentUid).collection("crypt").doc(docId).update({ name: newName });
                 fetchCryptData();
             }
         }
 
         async function deleteInsc(id) {
-            if(confirm("Commit irreversible purge card structural wipe?")) {
+            if(confirm("Are you sure you want to delete this session?")) {
                 await db.collection("users").doc(currentUid).collection("crypt").doc(id).delete();
                 fetchCryptData();
             }
