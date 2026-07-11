@@ -2,1233 +2,1352 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker v1.27.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Tracker v1.6.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@300;400;600;900&display=swap');
         :root {
             --bg-primary: #020617;
-            --panel-bg: rgba(15, 23, 42, 0.75);
+            --panel-bg: #0f172a;
             --text-main: #f8fafc;
             --emerald-accent: #10b981;
             --amber-accent: #f59e0b;
-            --border-color: rgba(16, 185, 129, 0.25);
+            --border-color: #334155;
             --puck-on: #e11d48;
         }
+
         body {
-            background-color: var(--bg-primary); color: var(--text-main); font-family: monospace; margin: 0; padding: 0;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
-            background-size: cover; background-position: center; background-attachment: fixed;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: monospace;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
-        .zombie-nav-header { background-color: rgba(2, 6, 23, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border-color); height: 76px; font-family: 'Cinzel', serif; }
-        .main-wrapper { padding: 15px; max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
-        
-        .history-ribbon { display: flex; flex-direction: row; overflow-x: auto; background-color: transparent; padding: 12px; gap: 8px; min-height: 52px; align-items: center; border: 1px solid rgba(51, 65, 85, 0.5); cursor: grab; user-select: none; -webkit-overflow-scrolling: touch; }
-        .history-ribbon::-webkit-scrollbar { display: none; }
-        .history-node { font-weight: bold; font-size: 16px; padding: 4px 10px; border-radius: 2px; min-width: 32px; text-align: center; flex-shrink: 0; cursor: pointer; }
-        .node-normal { background-color: transparent; color: #f8fafc; border: 1px solid rgba(255,255,255,0.2); }
-        .node-hard { background-color: transparent; color: var(--amber-accent); border: 2px dashed var(--amber-accent); }
-        .node-point-made { background-color: #ffffff; color: #000000; font-weight: 900; border: 1px solid #ffffff; }
-        .node-seven-out { background-color: #ef4444; color: #fff; border: 1px solid #ef4444; }
-        .node-natural { background-color: var(--emerald-accent); color: #fff; border: 1px solid var(--emerald-accent); }
-        .node-summary { background-color: rgba(15, 23, 42, 0.9); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); font-size: 14px; padding: 4px 10px; font-family: 'Montserrat', sans-serif; font-weight: 900; border-radius: 4px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.15); }
 
-        .board-stack { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-        .grid-row-segment { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: 100%; }
-        .box-container { background-color: rgba(15, 23, 42, 0.6); border: 1px solid rgba(51, 65, 85, 0.4); text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
-        .box-num-header { font-size: 22px; font-weight: 900; color: var(--amber-accent); padding: 6px 0; background: #090d16; border-bottom: 1px solid rgba(51, 65, 85, 0.4); position: relative; }
-        .puck-chip { position: absolute; top: 4px; left: 6px; background-color: var(--puck-on); color: #fff; font-size: 9px; font-weight: 900; padding: 1px 4px; border-radius: 3px; border: 1px solid #fff; }
-        .temp-chip { position: absolute; top: 4px; right: 6px; font-size: 11px; font-weight: bold; letter-spacing: -1px; }
-        .box-count { font-size: 22px; font-weight: bold; color: #ffffff; padding: 10px 0; }
-        .box-sub-metrics { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid rgba(51, 65, 85, 0.4); font-size: 11px; }
-        .sub-left { background-color: #000000; color: #ffffff; padding: 4px 0; border-right: 1px solid rgba(51, 65, 85, 0.4); font-weight: bold; }
+        .zombie-nav-header {
+            background-color: #020617;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-box {
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .brand-title {
+            color: var(--emerald-accent);
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            margin: 0;
+        }
+
+        .brand-subtitle {
+            color: #f8fafc;
+            font-size: 9px;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+
+        .version-tag {
+            background-color: #1e293b;
+            color: #94a3b8;
+            border: 1px solid var(--border-color);
+            font-size: 11px;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 3px;
+        }
+
+        .main-wrapper {
+            padding: 15px;
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-ribbon {
+            display: flex;
+            flex-direction: row;
+            overflow-x: auto;
+            background-color: #000;
+            padding: 12px;
+            gap: 6px;
+            min-height: 35px;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .history-node {
+            font-weight: bold;
+            font-size: 16px;
+            padding: 4px 8px;
+            border-radius: 2px;
+            min-width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .node-normal { background-color: #fff; color: #000; }
+        .node-hardway-point { background-color: #ffffff !important; color: #000000 !important; border: 3px dashed #f59e0b !important; }
+        .node-point-made { background-color: var(--emerald-accent); color: #fff; }
+        .node-seven-out-summary { background-color: #2563eb !important; background-opacity: 0.85; color: #ffffff !important; font-weight: 900; }
+
+        .board-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .grid-row-segment {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 100%;
+        }
+
+        .box-container {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .box-num-header {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--amber-accent);
+            padding: 8px 0;
+            background: #090d16;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .puck-chip {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            background-color: var(--puck-on);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 1px 4px;
+            border-radius: 3px;
+            border: 1px solid #fff;
+            display: none;
+        }
+
+        .temp-chip {
+            position: absolute;
+            top: 4px;
+            right: 6px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .color-dark { background-color: #000000; }
+        .color-red { background-color: #450a0a; }
+
+        .box-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            padding: 15px 0;
+        }
+
+        .box-sub-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            border-top: 1px solid var(--border-color);
+            font-size: 12px;
+        }
+
+        .sub-left { background-color: #000000; color: #ffffff; padding: 6px 0; border-right: 1px solid var(--border-color); font-weight: bold; }
         .sub-left.ats-active { background-color: #047857 !important; color: #fff; }
-        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 4px 0; }
+        .sub-right { background-color: #1e293b; color: #94a3b8; padding: 6px 0; }
 
-        .controller-panel { background: var(--panel-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
-        .pad-btn { background: #020617; color: #94a3b8; border: 1px solid rgba(51, 65, 85, 0.6); font-size: 20px; font-weight: bold; width: 52px; height: 50px; cursor: pointer; border-radius: 6px; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-        .pad-btn:hover { color: #fff; border-color: var(--emerald-accent); }
-        .pad-btn.active { background: linear-gradient(135deg, var(--emerald-accent) 0%, #047857 100%); color: #fff !important; border-color: #ffffff40; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .pad-btn.active-kinematic { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%) !important; color: #fff !important; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4) !important; border-color: rgba(255,255,255,0.3) !important; }
-        
-        .act-btn { padding: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; font-size: 13px; text-transform: uppercase; text-align: center; transition: all 0.2s ease; border: 1px solid rgba(0,0,0,0.4); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .act-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 12px rgba(0,0,0,0.4); }
-        .act-btn:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        
-        .btn-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-        .btn-purple { background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%); color: white; }
-        .btn-orange { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); color: white; }
-        .btn-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
-        .btn-red { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
-        
-        .select-element { background-color: #0f172a; border: 1px solid rgba(51, 65, 85, 0.6); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; }
-        .select-element:focus { border-color: var(--emerald-accent); }
-        
-        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-box { background: #1e293b; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 450px; display: flex; flex-direction: column; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); color: #f8fafc; max-height: 90vh; overflow-y: auto; }
-        
-        .shard-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(16, 185, 129, 0.3); padding: 10px 15px; transition: 0.3s ease; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 4px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.1em; font-size: 10px; color: #f8fafc; }
-        .shard-btn:hover { border-color: #10b981; background: rgba(16, 185, 129, 0.15); }
-        .primary-shard { border-color: rgba(16, 185, 129, 0.8); background: rgba(16, 185, 129, 0.1); color: #10b981; }
-        
-        .dice-visual-cube { width: 52px; height: 50px; background-color: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; font-weight: normal; font-size: 48px; font-family: sans-serif; cursor: pointer; user-select: none; border: none; box-shadow: none; }
-        .force-uppercase { text-transform: uppercase; }
-        .evolution-metrics-pane { font-size: 10px; color: #94a3b8; text-align: left; padding: 6px 8px; font-family: monospace; line-height: 1.3; border-top: 1px solid rgba(51, 65, 85, 0.3); background: #060911; min-height: 54px; }
-        
-        .diagnostics-panel { background-color: #090d16; border: 1px solid rgba(51, 65, 85, 0.4); display: flex; flex-direction: column; width: 100%; border-radius: 4px; overflow: hidden; }
-        .zombie-dashboard-telemetry-strip { font-size: 11px; padding: 6px 12px; background-color: #020617; border-top: 1px solid rgba(51,65,85,0.4); display: flex; justify-content: space-around; font-family: monospace; font-weight: bold; color: var(--amber-accent); }
-        .diag-title { font-size: 12px; color: #94a3b8; padding: 12px; background: #020617; text-align: center; font-weight: bold; letter-spacing: 0.1em; border-bottom: 1px solid rgba(51, 65, 85, 0.4); font-family: 'Cinzel', serif; display: flex; justify-content: space-between; align-items: center; }
-        .diag-metrics-grid { display: grid; grid-template-columns: repeat(5, 1fr); padding: 15px 0; }
-        .d-cell { display: flex; flex-direction: column; justify-content: center; align-items: center; border-right: 1px solid rgba(51, 65, 85, 0.3); position: relative; }
-        .d-cell:last-child { border-right: none; }
-        .d-label { font-size: 12px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; font-family: 'Montserrat', sans-serif; }
-        .d-val { font-size: 24px; font-weight: bold; color: #ffffff; margin-top: 6px; font-family: monospace; }
-        
-        .pulse-warning-btn { animation: alarm-pulse 0.8s infinite !important; border-color: #ef4444 !important; background-color: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; }
-        @keyframes alarm-pulse {
-            0%, 100% { box-shadow: none; opacity: 1; }
-            50% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.7); opacity: 0.8; }
+        .diagnostics-panel {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            width: 100%;
         }
 
-        .chip-stack-wrapper { position: relative; width: 44px; height: 50px; display: flex; align-items: flex-end; justify-content: center; margin: 0 4px; }
-        .stacked-point-chip { position: absolute; width: 32px; height: 32px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.6), inset 0 0 4px rgba(255,255,255,0.3); transition: all 0.2s ease; }
-        
-        .zombie-dot-pip-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3px; width: 34px; height: 34px; pointer-events: none; }
-        .zombie-pip-dot { background-color: #000000; border-radius: 50%; width: 8px; height: 8px; opacity: 0; }
-        .zombie-pip-dot.active-dot { opacity: 1; }
+        .diag-title {
+            font-size: 13px;
+            color: #94a3b8;
+            padding: 12px;
+            background: #020617;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .diag-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            padding: 15px 0;
+        }
+
+        .d-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid var(--border-color);
+            position: relative;
+        }
+        .d-cell:last-child { border-right: none; }
+        .d-label { font-size: 14px; color: #64748b; font-weight: 900; letter-spacing: 0.05em; }
+        .d-val { font-size: 26px; font-weight: bold; color: #ffffff; margin-top: 6px; }
+
+        .master-rolls-box {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .master-rolls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: var(--border-color);
+            gap: 1px;
+        }
+
+        .m-cell {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .m-cell-hand { background-color: #000000; }   
+        .m-cell-session { background-color: #1e293b; } 
+        .m-label { font-size: 12px; color: #94a3b8; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; }
+        .m-val { font-size: 36px; font-weight: 900; color: #ffffff; margin-top: 6px; }
+
+        .controller-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dual-axis-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .axis-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .axis-label {
+            font-size: 13px;
+            font-weight: 900;
+            color: var(--amber-accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        .pad-matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .pad-btn {
+            background: #020617;
+            color: #fff;
+            border: 1px solid var(--border-color);
+            font-size: 20px;
+            font-weight: bold;
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .pad-btn.active {
+            background: var(--amber-accent);
+            color: #000;
+            border-color: #ffffff;
+        }
+
+        .action-matrix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .act-btn { 
+            padding: 12px; 
+            font-weight: bold; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            text-align: center;
+        }
+        .btn-green { background: var(--emerald-accent); color: white; }
+        .btn-orange { background: #f97316; color: white; }
+        .btn-blue { background: #3b82f6; color: white; }
+        .btn-red { background: #ef4444; color: white; }
+
+        .meta-context-bar {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 4px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        @media(min-width: 1024px) {
+            .meta-context-bar { grid-template-columns: repeat(5, 1fr); }
+        }
+
+        .select-element {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            font-family: monospace;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 12px;
+        }
+
+        .vault-panel-header {
+            border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #fff;
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .vault-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+
+        @media(min-width: 768px) {
+            .vault-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .vault-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 6px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .vault-card-title {
+            color: var(--emerald-accent);
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .vault-card-meta {
+            font-size: 11px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid rgba(16, 185, 129, 0.15);
+            padding-top: 8px;
+        }
+
+        .kinematic-readout-strip {
+            background-color: #090d16;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--amber-accent);
+        }
+
+        /* Modal Layout Structures */
+        .zombie-modal-shroud {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(2, 6, 23, 0.85);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 50000;
+        }
+        .zombie-modal-container {
+            background: #0f172a;
+            border: 2px solid #334155;
+            padding: 25px;
+            border-radius: 6px;
+            width: 450px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        @media (min-width: 1024px) {
+            .board-stack { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
+            .grid-row-segment:nth-child(1) { grid-column: span 5; }
+            .diagnostics-panel { grid-column: span 2; height: 100%; }
+            .grid-row-segment:nth-child(3) { grid-column: span 5; }
+            .master-rolls-box { grid-column: span 12; }
+        }
     </style>
 </head>
 <body>
 
     <nav class="zombie-nav-header">
-        <div class="flex flex-col cursor-pointer" onclick="window.location.assign('lobby.html')">
-            <h2 class="brand-title text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
-            <span class="brand-subtitle text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
+        <div class="brand-box" onclick="window.location.assign('lobby.html')">
+            <h2 class="brand-title">Zombie Lord's</h2>
+            <span class="brand-subtitle">Playhouse</span>
         </div>
-        <div class="flex items-center gap-4">
-            <button onclick="handleCryptNavigationTrigger()" class="text-[10px] border border-emerald-500/40 px-4 py-1.5 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.15em] force-uppercase"><i class="fa-solid fa-vault mr-1.5"></i>Crypt</button>
-            <button onclick="auth.signOut().then(() => window.location.href='index.html')" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 transition-all uppercase font-black tracking-[0.15em]">Logout</button>
-        </div>
+        <div class="version-tag">VERSION 1.6.0</div>
     </nav>
 
+    <div id="resolutionModalShroud" class="zombie-modal-shroud hidden">
+        <div class="zombie-modal-container">
+            <h3 class="text-red-500 font-black text-lg tracking-wider mb-2">SEVEN OUT. RESOLVE ACTIVE HAND.</h3>
+            <p class="text-slate-400 text-xs mb-6 font-mono">DETERMINE TRACKING METRIC ROUTING AND STATE ASSIGNMENTS BEFORE CONTINUING FIELD DATA COLLECTION Loops.</p>
+            <div class="flex gap-4">
+                <button onclick="handleResolutionSelection('SAME')" class="flex-1 bg-blue-600 text-white p-3 font-bold text-xs uppercase rounded hover:bg-blue-500 transition-all">Same Shooter</button>
+                <button onclick="handleResolutionSelection('NEW')" class="flex-1 bg-emerald-600 text-white p-3 font-bold text-xs uppercase rounded hover:bg-emerald-500 transition-all">New Shooter</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main-wrapper">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/60 p-4 border border-slate-800 rounded-lg">
+        <div class="meta-context-bar id="configurationBar"">
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Location</label>
-                <div class="flex gap-1">
-                    <select id="ctxLocationSelect" class="select-element" onchange="watchLocationDropdownChange()"></select>
-                    <button onclick="editCurrentAsset('locations')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteCurrentAsset('locations')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter Identity</label>
+                <select id="ctxShooterSelect" class="select-element" onchange="handleContextShooterToggle()"></select>
             </div>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Shooter</label>
-                <div class="flex gap-1">
-                    <select id="ctxShooterSelect" class="select-element" onchange="watchShooterDropdownChange()"></select>
-                    <button onclick="editCurrentAsset('shooters')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteCurrentAsset('shooters')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Casino Location</label>
+                <select id="ctxLocationSelect" class="select-element" onchange="handleContextLocationToggle()"></select>
             </div>
             <div>
-                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Position</label>
-                <div class="flex gap-1 w-full">
-                    <select id="ctxTablePositionParentSelect" class="select-element w-1/2" onchange="watchPositionParentChange()"></select>
-                    <select id="ctxTablePositionChildSelect" class="select-element w-1/2" onchange="executeAnalyticalFilterEngine()"></select>
-                </div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Table Rail Position</label>
+                <select id="ctxTablePositionSelect" class="select-element" onchange="executeAnalyticalFilterEngine()"></select>
             </div>
             <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Dice Set Matrix</label>
-                <div class="flex gap-1">
-                    <select id="ctxDiceSetSelect" class="select-element" onchange="watchDiceSetDropdownChange()"></select>
-                    <button onclick="editCurrentAsset('dice_sets')" class="text-slate-400 hover:text-white px-1.5"><i class="fa-solid fa-edit text-xs"></i></button>
-                    <button onclick="deleteCurrentAsset('dice_sets')" class="text-red-500/70 hover:text-red-400 px-1.5"><i class="fa-solid fa-trash text-xs"></i></button>
-                </div>
+                <select id="ctxDiceSetSelect" class="select-element" onchange="handleContextDiceSetToggle()"></select>
             </div>
+            <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Analytical Filter View</label>
+                <select id="ctxFilterScopeSelect" class="select-element" onchange="executeAnalyticalFilterEngine()">
+                    <option value="FULL">FULL SESSION MASTER TIMELINE</option>
+                    <option value="ISOLATE_SHOOTER">ISOLATE CURRENT SHOOTER</option>
+                    <option value="ISOLATE_LOCATION">ISOLATE CURRENT LOCATION</option>
+                    <option value="ISOLATE_COMBINED">ISOLATE TARGET COMBINED SIGNATURE</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="bg-slate-950 p-2 border border-slate-700 rounded flex gap-2 items-center">
+            <span class="text-[10px] uppercase font-bold text-slate-400 whitespace-nowrap">Shooter Notes:</span>
+            <input type="text" id="ctxDescriptionInput" class="bg-slate-900 border border-slate-700 rounded p-1 text-xs flex-grow text-white" placeholder="ENTER DESCRIPTIVE CHARACTER TEXT FIELD NOTES BEFORE SUBMITTING ROLL INDEX...">
+            <button id="acceptBarBtn" onclick="toggleConfigBarVisibility(false)" class="hidden bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] px-3 py-1.5 uppercase rounded transition-all">Accept</button>
         </div>
 
         <div class="history-ribbon" id="historyContainer"></div>
 
-        <div class="controller-panel">
-            <div class="flex flex-col md:flex-row justify-center items-stretch gap-8 max-w-[1000px] mx-auto w-full">
-                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Left Die</span>
-                        <div id="vis-left-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube rounded" id="v-left-t" onclick="toggleDiceSetColor('left')"></div>
-                            <div class="dice-visual-cube" id="v-left-f" onclick="toggleDiceSetColor('left')"></div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="leftPadContainer"></div>
-                    <div id="pad-telemetry-left" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0 transition-opacity duration-200">-</div>
-                </div>
-                
-                <div class="flex flex-col items-center bg-black/50 border border-slate-800 rounded p-4 w-full md:w-auto min-w-[300px] max-w-sm gap-3 shrink-0 justify-between">
-                    <div class="flex justify-around items-center w-full mt-1">
-                        <div class="text-center">
-                            <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Current Hand</div>
-                            <div class="text-3xl font-black text-white font-mono mt-1" id="summary-current">0</div>
-                        </div>
-                        
-                        <div class="chip-stack-wrapper" id="pointsChipStack"></div>
-                        
-                        <div class="text-center">
-                            <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Session</div>
-                            <div class="text-3xl font-black text-emerald-400 font-mono mt-1" id="summary-total">0</div>
-                        </div>
-                    </div>
-                    <div id="toggle-set-container" class="w-full border-t border-slate-800/60 pt-3 flex flex-col gap-1.5 items-center" style="display:none">
-                        <button id="btn-set-flag" onclick="handleSuggestionToggleAction()" class="w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-700 p-2.5 rounded transition-all text-center text-amber-400">USING ORIGINAL CONFIG</button>
-                    </div>
-                </div>
-
-                <div class="flex flex-col items-center justify-between gap-3 flex-1 min-w-[180px]">
-                    <div class="flex flex-col items-center gap-1">
-                        <span class="text-[11px] font-bold text-amber-500 uppercase tracking-wider">Right Die</span>
-                        <div id="vis-right-set" class="flex gap-4 items-center bg-transparent p-1" style="display:none">
-                            <div class="dice-visual-cube rounded" id="v-right-t" onclick="toggleDiceSetColor('right')"></div>
-                            <div class="dice-visual-cube" id="v-right-f" onclick="toggleDiceSetColor('right')"></div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-2 justify-items-center w-full mt-1" id="rightPadContainer"></div>
-                    <div id="pad-telemetry-right" class="text-[11px] font-mono font-bold text-slate-300 bg-slate-950/60 p-2 border border-slate-800 rounded w-full text-center h-9 flex items-center justify-center opacity-0 transition-opacity duration-200">-</div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 border-t border-slate-800 mt-6 pt-5">
-                <button class="act-btn btn-green font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('STANDARD')">Standard Roll</button>
-                <button class="act-btn btn-purple font-black py-3.5 text-sm tracking-wider" onclick="submitRoll('KINEMATIC')">Kinematic Track</button>
-            </div>
-            <div class="grid grid-cols-3 gap-4 mt-3">
-                <button class="act-btn btn-orange font-bold py-2.5 text-xs" onclick="launchInvalidCausePickerModal()">Invalid Roll</button>
-                <button class="act-btn btn-blue font-bold py-2.5 text-xs" onclick="executeUndo()">Undo Last</button>
-                <button class="act-btn btn-red font-bold py-2.5 text-xs" onclick="executeClearReset()">Reset Dataset</button>
-            </div>
+        <div class="kinematic-readout-strip" id="kinematicReadoutPanel">
+            <span>LEFT DIE KINEMATICS: <b class="text-white" id="k-left-readout">N/A</b></span>
+            <span>RIGHT DIE KINEMATICS: <b class="text-white" id="k-right-readout">N/A</b></span>
         </div>
 
         <div class="board-stack">
             <div class="grid-row-segment">
-                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2" style="display:none">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div><div class="evolution-metrics-pane" id="ev-pane-2"></div></div>
-                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3" style="display:none">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div><div class="evolution-metrics-pane" id="ev-pane-3"></div></div>
-                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4" style="display:none">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div><div class="evolution-metrics-pane" id="ev-pane-4"></div></div>
-                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5" style="display:none">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div><div class="evolution-metrics-pane" id="ev-pane-5"></div></div>
-                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6" style="display:none">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div><div class="evolution-metrics-pane" id="ev-pane-6"></div></div>
+                <div class="box-container color-dark" id="box-2"><div class="puck-chip" id="puck-2">ON</div><div class="temp-chip" id="temp-2"></div><div class="box-num-header">2</div><div class="box-count" id="count-2">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-2">0</div><div class="sub-right" id="tot-2">0</div></div></div>
+                <div class="box-container color-dark" id="box-3"><div class="puck-chip" id="puck-3">ON</div><div class="temp-chip" id="temp-3"></div><div class="box-num-header">3</div><div class="box-count" id="count-3">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-3">0</div><div class="sub-right" id="tot-3">0</div></div></div>
+                <div class="box-container color-red" id="box-4"><div class="puck-chip" id="puck-4">ON</div><div class="temp-chip" id="temp-4"></div><div class="box-num-header">4</div><div class="box-count" id="count-4">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-4">0</div><div class="sub-right" id="tot-4">0</div></div></div>
+                <div class="box-container color-red" id="box-5"><div class="puck-chip" id="puck-5">ON</div><div class="temp-chip" id="temp-5"></div><div class="box-num-header">5</div><div class="box-count" id="count-5">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-5">0</div><div class="sub-right" id="tot-5">0</div></div></div>
+                <div class="box-container color-red" id="box-6"><div class="puck-chip" id="puck-6">ON</div><div class="temp-chip" id="temp-6"></div><div class="box-num-header">6</div><div class="box-count" id="count-6">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-6">0</div><div class="sub-right" id="tot-6">0</div></div></div>
             </div>
-            <div class="grid-row-segment">
-                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8" style="display:none">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div><div class="evolution-metrics-pane" id="ev-pane-8"></div></div>
-                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9" style="display:none">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div><div class="evolution-metrics-pane" id="ev-pane-9"></div></div>
-                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10" style="display:none">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div><div class="evolution-metrics-pane" id="ev-pane-10"></div></div>
-                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11" style="display:none">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div><div class="evolution-metrics-pane" id="ev-pane-11"></div></div>
-                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12" style="display:none">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div><div class="evolution-metrics-pane" id="ev-pane-12"></div></div>
-            </div>
-        </div>
 
-        <div class="diagnostics-panel mt-2">
-            <div class="diag-title">
-                <span>ZOMBIELORD STATISTICAL DIAGNOSTICS</span>
-                <div class="flex items-center gap-3">
-                    <button onclick="launchKinematicFilterModal()" class="bg-slate-900 border border-slate-700 text-[11px] font-mono text-purple-400 p-1 px-3 rounded uppercase font-bold"><i class="fa-solid fa-filter mr-1.5"></i>Kinematic Numbers</button>
-                    <select id="ctxFilterScopeSelect" class="bg-slate-900 border border-slate-700 text-white font-mono text-[11px] p-1 px-3 rounded outline-none cursor-pointer" onchange="executeAnalyticalFilterEngine()">
-                        <option value="ALL">ALL SESSION TIMELINE</option>
-                        <option value="CUSTOM">CUSTOM DROPDOWN FILTER</option>
-                    </select>
+            <div class="diagnostics-panel">
+                <div class="diag-title">ZOMBIELORD DIAGNOSTICS</div>
+                <div class="diag-metrics-grid">
+                    <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
+                    <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
+                    <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
+                    <div class="d-cell">
+                        <div class="temp-chip" id="temp-7" style="top:-2px; right:2px;"></div>
+                        <div class="d-label">SRR</div>
+                        <div class="d-val" id="stat-srr">0.0</div>
+                    </div>
+                    <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
                 </div>
             </div>
-            <div class="diag-metrics-grid" id="diagGridContainer">
-                <div class="d-cell"><div class="d-label">RED</div><div class="d-val" id="stat-red">0</div></div>
-                <div class="d-cell"><div class="d-label">SOR</div><div class="d-val" id="stat-sor">0.0</div></div>
-                <div class="d-cell"><div class="d-label">PSR</div><div class="d-val" id="stat-psr">0.0</div></div>
-                <div class="d-cell"><div class="d-label">SRR</div><div class="d-val" id="stat-srr">0.0</div></div>
-                <div class="d-cell"><div class="d-label">CO7</div><div class="d-val" id="stat-co7">0</div></div>
-            </div>
-            <div class="zombie-dashboard-telemetry-strip" id="bigRedMetricsStrip">
-                <span>BIG RED INTERVAL DELTAS $\rightarrow$ RUNNING MEAN: <span class="text-white" id="br-mean-val">0.0</span> | GEOMETRIC MEDIAN: <span class="text-white" id="br-median-val">0</span></span>
-            </div>
-        </div>
-    </div>
 
-    <div id="ctxMetadataModalFrame" class="modal-mask">
-        <div class="modal-box">
-            <h3 id="modal-headline" class="text-emerald-400 font-bold tracking-widest uppercase text-sm border-b border-slate-800 pb-2 mb-4">Register Parameter</h3>
-            <div id="modal-form-fields" class="flex flex-col gap-3 font-mono text-xs text-slate-300"></div>
-            <div class="flex justify-between gap-3 mt-6 border-t border-slate-800 pt-4">
-                <button onclick="closePropertyModal()" class="text-xs text-slate-400 uppercase font-bold tracking-wider px-2">[ CANCEL ]</button>
-                <button id="modal-accept-btn" onclick="commitMetadataModalForm()" class="shard-btn primary-shard px-4 py-2">[ ACCEPT ]</button>
+            <div class="grid-row-segment">
+                <div class="box-container color-red" id="box-8"><div class="puck-chip" id="puck-8">ON</div><div class="temp-chip" id="temp-8"></div><div class="box-num-header">8</div><div class="box-count" id="count-8">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-8">0</div><div class="sub-right" id="tot-8">0</div></div></div>
+                <div class="box-container color-red" id="box-9"><div class="puck-chip" id="puck-9">ON</div><div class="temp-chip" id="temp-9"></div><div class="box-num-header">9</div><div class="box-count" id="count-9">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-9">0</div><div class="sub-right" id="tot-9">0</div></div></div>
+                <div class="box-container color-red" id="box-10"><div class="puck-chip" id="puck-10">ON</div><div class="temp-chip" id="temp-10"></div><div class="box-num-header">10</div><div class="box-count" id="count-10">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-10">0</div><div class="sub-right" id="tot-10">0</div></div></div>
+                <div class="box-container color-dark" id="box-11"><div class="puck-chip" id="puck-11">ON</div><div class="temp-chip" id="temp-11"></div><div class="box-num-header">11</div><div class="box-count" id="count-11">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-11">0</div><div class="sub-right" id="tot-11">0</div></div></div>
+                <div class="box-container color-dark" id="box-12"><div class="puck-chip" id="puck-12">ON</div><div class="temp-chip" id="temp-12"></div><div class="box-num-header">12</div><div class="box-count" id="count-12">0</div><div class="box-sub-metrics"><div class="sub-left" id="cur-12">0</div><div class="sub-right" id="tot-12">0</div></div></div>
+            </div>
+
+            <div class="master-rolls-box">
+                <div class="diag-title" style="padding:8px; font-size:11px;">SESSION COUNTER ACTIVITY MAP</div>
+                <div class="master-rolls-grid">
+                    <div class="m-cell m-cell-hand"><div class="m-label">Current Shooter Hand</div><div class="m-val" id="summary-current">0</div></div>
+                    <div class="m-cell m-cell-session"><div class="m-label">Total Session Rolls</div><div class="m-val" id="summary-total">0</div></div>
+                </div>
             </div>
         </div>
+
+        <div class="controller-panel">
+            <div class="dual-axis-wrapper">
+                <div class="axis-column">
+                    <div class="axis-label">Left Die</div>
+                    <div class="pad-matrix-grid" id="leftPadContainer"></div>
+                </div>
+                <div class="axis-column">
+                    <div class="axis-label">Right Die</div>
+                    <div class="pad-matrix-grid" id="rightPadContainer"></div>
+                </div>
+            </div>
+            
+            <div class="action-matrix-grid">
+                <button class="act-btn btn-green" onclick="submitRoll(true)">Confirm (Absolute)</button>
+                <button class="act-btn btn-orange" onclick="submitRoll(false)">Unconfirm (Ambiguous)</button>
+                <button class="act-btn btn-blue" onclick="executeUndo()">Undo Last Roll</button>
+                <button class="act-btn btn-red" onclick="executeClearReset()">Reset All Rolls</button>
+            </div>
+            <button onclick="toggleConfigBarVisibility(true)" class="act-btn bg-slate-700 hover:bg-slate-600 text-white py-3 font-bold text-xs uppercase rounded transition-all mt-1">New Shooter Manual Override</button>
+        </div>
+
+        <div class="vault-panel-header">
+            <span>The Vault / Relational Dice Sessions</span>
+            <button onclick="commitArchiveSession()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold tracking-widest uppercase transition-all">
+                <i class="fa-solid fa-plus mr-1"></i>Save Current Session
+            </button>
+        </div>
+        <div id="vaultArchiveContainer" class="vault-grid"></div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth(); const db = firebase.firestore();
-        let currentUid = null, activeModalContext = null, activeEditId = null;
-
-        let userShootersList = {}; let userLocationsList = {}; let userDiceSetsList = {}; let userCausesList = {};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
+            authDomain: "zombielords-playhouse.firebaseapp.com",
+            projectId: "zombielords-playhouse",
+            storageBucket: "zombielords-playhouse.firebasestorage.app",
+            messagingSenderId: "795162260246",
+            appId: "1:795162260246:web:97f0361751ac1359b31637"
+        };
         
-        const COLOR_SWATCHES = ["#ffffff", "#ef4444", "#10b981", "#3b82f6", "#f59e0b", "#a855f7"];
-        let leftDiceColorIdx = 0, rightDiceColorIdx = 0;
-
-        const CHIP_COLORS = {
-            1: "#10b981", 2: "#ef4444", 3: "#3b82f6", 4: "#f97316", 5: "#a855f7",
-            6: "#ffffff", 7: "#000000", 8: "#ec4899", 9: "#84cc16", 10: "#06b6d4", 11: "#eab308"
-        };
-
-        const PARENT_POSITIONS = {
-            "ALL": "ALL POSITIONS",
-            "ALL_LEFT": "ALL LEFT",
-            "ALL_RIGHT": "ALL RIGHT",
-            "LEFT_SIDE": "LEFT SIDE",
-            "HOOK_LEFT": "HOOK LEFT",
-            "RIGHT_SIDE": "RIGHT SIDE",
-            "HOOK_RIGHT": "HOOK RIGHT"
-        };
-
-        const CHILD_POSITIONS = {
-            "ALL": ["ALL"],
-            "ALL_LEFT": ["SL1", "SL2", "SL3", "SL4", "SL5", "HL1", "HL2", "HL3", "HL4", "HL5"],
-            "ALL_RIGHT": ["SR1", "SR2", "SR3", "SR4", "SR5", "HR1", "HR2", "HR3", "HR4", "HR5"],
-            "LEFT_SIDE": ["SL1", "SL2", "SL3", "SL4", "SL5"],
-            "HOOK_LEFT": ["HL1", "HL2", "HL3", "HL4", "HL5"],
-            "RIGHT_SIDE": ["SR1", "SR2", "SR3", "SR4", "SR5"],
-            "HOOK_RIGHT": ["HR1", "HR2", "HR3", "HR4", "HR5"]
-        };
-
-        const DOT_POSITIONS_MAP = {
-            1: [4],
-            2: [0, 8],
-            3: [0, 4, 8],
-            4: [0, 2, 6, 8],
-            5: [0, 2, 4, 6, 8],
-            6: [0, 2, 3, 5, 6, 8]
-        };
-
-        const PIP_MAP = { 1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅" };
-
-        let currentSuggestedSetString = ""; let activeTargetDiceSetString = ""; let isSuggestedSetFlag = false;
-        let activeKinematicFilterMask = { 2: true, 3: true, 4: true, 5: true, 6: true, 7: true, 8: true, 9: true, 10: true, 11: true, 12: true };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        let currentUid = null;
 
         const state = {
-            totalRolls: 0, currentHandRolls: 0, sevensTotal: 0, sevensRed: 0, sevensComeout: 0, totalPointsMade: 0, currentHandPoints: 0, activePoint: null, shooterHistory: [], selectedLeft: null, selectedRight: null, rollHistoryLog: [], rawSequenceLog: [],
-            matrix: { 2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0}, 7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0} }
+            totalRolls: 0, currentHandRolls: 0,
+            sevensTotal: 0, sevensRed: 0, sevensComeout: 0,
+            totalPointsMade: 0, activePoint: null, shooterHistory: [],
+            selectedLeft: null, selectedRight: null,
+            rollHistoryLog: [], 
+            rawSequenceLog: [], 
+            matrix: {
+                2: {cur:0, tot:0}, 3: {cur:0, tot:0}, 4: {cur:0, tot:0}, 5: {cur:0, tot:0}, 6: {cur:0, tot:0},
+                7: {cur:0, tot:0}, 8: {cur:0, tot:0}, 9: {cur:0, tot:0}, 10: {cur:0, tot:0}, 11: {cur:0, tot:0}, 12: {cur:0, tot:0}
+            }
         };
+
         const probabilityWindows = { 2: 36, 12: 36, 3: 18, 11: 18, 4: 12, 10: 12, 5: 9, 9: 9, 6: 7, 8: 7, 7: 6 };
+
+        let userShootersList = ["ME", "TONY", "RANDOM RANDY", "SETTEM RANDY", "RANDOM SALLY", "SETTEM SALLY"];
+        let userLocationsList = ["BALLY'S", "AMERISTAR", "GRAND Z"];
+        
+        // Final Structured Dice Sets with Is_Favorite and Plain Coordinates Parameters
+        let userDiceSetsList = [
+            { id: "3V", name: "3V SET", lTop: 3, lBack: 6, rTop: 3, rBack: 2, isFavorite: true },
+            { id: "2V", name: "2V SET", lTop: 2, lBack: 4, rTop: 2, rBack: 4, isFavorite: false },
+            { id: "HW", name: "HARDWAY SET", lTop: 1, lBack: 2, rTop: 1, rBack: 2, isFavorite: false },
+            { id: "CROSS", name: "CROSS SET", lTop: 1, lBack: 3, rTop: 1, rBack: 2, isFavorite: false },
+            { id: "SO", name: "SEVEN OUT SET", lTop: 2, lBack: 4, rTop: 2, rBack: 1, isFavorite: false }
+        ];
+
+        // Chip Point Color Coding Schemes Map Values
+        const pointChipColors = { 4: "#6366f1", 5: "#ec4899", 6: "#14b8a6", 8: "#a855f7", 9: "#f43f5e", 10: "#3b82f6" };
 
         auth.onAuthStateChanged(user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
+            syncConfigurationDropdowns();
             initDualPads();
-            initDragToScrollRibbon();
-            initPositionDropdowns();
-            fetchMasterMetadataCollections().then(() => {
-                setDefaultAllDropdowns();
-                fetchCloudState();
-            });
+            fetchCloudState();
+            fetchVaultArchiveList();
         });
-
-        function makeVectorDotGridHTML(faceValue) {
-            let html = `<div class="zombie-dot-pip-grid">`;
-            const activeDots = DOT_POSITIONS_MAP[faceValue] || [];
-            const dotColor = (COLOR_SWATCHES[leftDiceColorIdx] === '#ffffff') ? '#000000' : '#ffffff';
-            for(let i=0; i<9; i++) {
-                let activeClass = activeDots.includes(i) ? 'active-dot' : '';
-                html += `<div class="zombie-pip-dot ${activeClass}" style="background-color: ${dotColor};"></div>`;
-            }
-            html += `</div>`;
-            return html;
-        }
-
-        function initDualPads() {
-            const l = document.getElementById('leftPadContainer'), r = document.getElementById('rightPadContainer');
-            if(!l || !r) return;
-            l.innerHTML = ''; r.innerHTML = '';
-            for(let i=1; i<=6; i++) {
-                l.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
-                r.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
-            }
-        }
-
-        function initDragToScrollRibbon() {
-            const el = document.getElementById('historyContainer');
-            if(!el) return;
-            let down = false, sX, sLeft;
-            el.addEventListener('mousedown', (e) => { down = true; sX = e.pageX - el.offsetLeft; sLeft = el.scrollLeft; });
-            el.addEventListener('mouseleave', () => down = false); el.addEventListener('mouseup', () => down = false);
-            el.addEventListener('mousemove', (e) => { if(!down) return; e.preventDefault(); const walk = ((e.pageX - el.offsetLeft) - sX) * 2; el.scrollLeft = sLeft - walk; });
-        }
-
-        function initPositionDropdowns() {
-            const pSel = document.getElementById('ctxTablePositionParentSelect');
-            if(!pSel) return;
-            pSel.innerHTML = '';
-            for (let k in PARENT_POSITIONS) {
-                pSel.innerHTML += `<option value="${k}">${PARENT_POSITIONS[k]}</option>`;
-            }
-            watchPositionParentChange();
-        }
-
-        function watchPositionParentChange() {
-            const pSel = document.getElementById('ctxTablePositionParentSelect');
-            const cSel = document.getElementById('ctxTablePositionChildSelect');
-            if(!pSel || !cSel) return;
-            const pVal = pSel.value;
-            cSel.innerHTML = '';
-            CHILD_POSITIONS[pVal].forEach(pos => {
-                cSel.innerHTML += `<option value="${pos}">${pos}</option>`;
-            });
-            cSel.selectedIndex = 0;
-            executeAnalyticalFilterEngine();
-        }
-
-        function setDefaultAllDropdowns() {
-            document.getElementById('ctxLocationSelect').value = "ALL";
-            document.getElementById('ctxTablePositionParentSelect').value = "ALL";
-            watchPositionParentChange();
-            document.getElementById('ctxShooterSelect').value = "ALL";
-            document.getElementById('ctxDiceSetSelect').value = "ALL";
-        }
-
-        async function fetchMasterMetadataCollections() {
-            if (!currentUid) return;
-            try {
-                const [sSnap, lSnap, dSnap, cSnap] = await Promise.all([
-                    db.collection("users").doc(currentUid).collection("master_shooters").get(),
-                    db.collection("users").doc(currentUid).collection("master_locations").get(),
-                    db.collection("users").doc(currentUid).collection("master_dice_sets").get(),
-                    db.collection("users").doc(currentUid).collection("master_invalid_causes").get()
-                ]);
-
-                userShootersList = {}; sSnap.forEach(doc => { userShootersList[doc.id] = doc.data(); });
-                userLocationsList = {}; lSnap.forEach(doc => { userLocationsList[doc.id] = doc.data(); });
-                userDiceSetsList = {}; dSnap.forEach(doc => { userDiceSetsList[doc.id] = doc.data(); });
-                userCausesList = {}; cSnap.forEach(doc => { userCausesList[doc.id] = doc.data(); });
-
-                if(!userShootersList["RANDOM_RANDY"]) userShootersList["RANDOM_RANDY"] = { name: "Random Randy", Type: "Standard", Handedness: "Neither", Style: "Random", Notes: "SYSTEM PROFILE" };
-                if(!userShootersList["SHAKE_UM_UP_SALLY"]) userShootersList["SHAKE_UM_UP_SALLY"] = { name: "Shake um up Sally", Type: "Standard", Handedness: "Neither", Style: "Shake", Notes: "SYSTEM PROFILE" };
-
-                syncConfigurationDropdowns();
-            } catch (err) { console.error("Sync Fault: ", err); }
-        }
 
         function syncConfigurationDropdowns() {
             const sSel = document.getElementById('ctxShooterSelect');
             const lSel = document.getElementById('ctxLocationSelect');
+            const pSel = document.getElementById('ctxTablePositionSelect');
             const dSel = document.getElementById('ctxDiceSetSelect');
             
-            if (!sSel || !lSel || !dSel) return;
-            const prevS = sSel.value, prevL = lSel.value, prevD = dSel.value;
-
-            lSel.innerHTML = `<option value="ALL">ALL LOCATIONS</option>`;
-            Object.keys(userLocationsList).forEach(id => { 
-                const name = userLocationsList[id].name || id;
-                lSel.innerHTML += `<option value="${id}">${name}</option>`; 
-            });
-            lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
-
-            sSel.innerHTML = `<option value="ALL">ALL SHOOTERS</option>`;
-            
-            let shooterKeys = Object.keys(userShootersList).sort((a,b) => {
-                let recA = userShootersList[a], recB = userShootersList[b];
-                let rankA = recA.Type === 'Master' ? 1 : (recA.Type === 'Favorite' ? 2 : (recA.Type === 'Standard' ? 3 : 4));
-                let rankB = recB.Type === 'Master' ? 1 : (recB.Type === 'Favorite' ? 2 : (recB.Type === 'Standard' ? 3 : 4));
-                if(rankA !== rankB) return rankA - rankB;
-                return (recA.name || a).localeCompare(recB.name || b);
-            });
-
-            shooterKeys.forEach(id => { 
-                const name = userShootersList[id].name || id;
-                sSel.innerHTML += `<option value="${id}">${name}</option>`; 
-            });
-            sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
-
-            dSel.innerHTML = `<option value="ALL">NONE SELECTED</option>`;
-            Object.keys(userDiceSetsList).forEach(id => { 
-                dSel.innerHTML += `<option value="${id}">${userDiceSetsList[id].Set_Name}</option>`; 
-            });
-            dSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW DICE SET]</option>`;
-
-            if(sSel.querySelector(`option[value="${prevS}"]`)) sSel.value = prevS;
-            if(lSel.querySelector(`option[value="${prevL}"]`)) lSel.value = prevL;
-            if(dSel.querySelector(`option[value="${prevD}"]`)) dSel.value = prevD;
-            
-            onDiceSetChange();
-        }
-
-        function openMetadataModal(category, targetId = null) {
-            activeModalContext = category; activeEditId = targetId;
-            const isEditMode = targetId !== null;
-            const record = isEditMode ? (category === 'shooters' ? userShootersList[targetId] : (category === 'locations' ? userLocationsList[targetId] : (category === 'dice_sets' ? userDiceSetsList[targetId] : userCausesList[targetId]))) : {};
-
-            document.getElementById('modal-headline').innerText = (isEditMode ? 'Modify ' : 'Register New ') + category.slice(0,-1).toUpperCase();
-            const fields = document.getElementById('modal-form-fields');
-            
-            let htmlContent = `<div class="mt-1"><label class="block mb-1 font-bold">Name / Descriptor:</label><input type="text" id="mField_Name" value="${record.name || record.Set_Name || ''}" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. Caesars Palace / 3V"></div>`;
-
-            if (category === 'shooters') {
-                htmlContent += `
-                <div class="mt-2"><label class="block mb-1 font-bold">Type Classification:</label><select id="mField_Type" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Standard" ${record.Type === 'Standard' ? 'selected' : ''}>Standard</option><option value="Master" ${record.Type === 'Master' ? 'selected' : ''}>Master</option><option value="Favorite" ${record.Type === 'Favorite' ? 'selected' : ''}>Favorite</option><option value="Online" ${record.Type === 'Online' ? 'selected' : ''}>Online</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Dominant Hand:</label><select id="mField_Hand" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Right" ${record.Handedness === 'Right' ? 'selected' : ''}>Right</option><option value="Left" ${record.Handedness === 'Left' ? 'selected' : ''}>Left</option><option value="Neither" ${record.Handedness === 'Neither' ? 'selected' : ''}>Neither</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Throwing Style Pattern:</label><select id="mField_Style" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Controlled Set" ${record.Style === 'Controlled Set' ? 'selected' : ''}>Controlled Set</option><option value="Random" ${record.Style === 'Random' ? 'selected' : ''}>Random</option><option value="Shake" ${record.Style === 'Shake' ? 'selected' : ''}>Shake</option><option value="Mechanical" ${record.Style === 'Mechanical' ? 'selected' : ''}>Mechanical</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Notes:</label><textarea id="mField_Notes" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none h-16 resize-none force-uppercase">${record.Notes || ''}</textarea></div>`;
-            } else if (category === 'locations') {
-                htmlContent += `
-                <div class="mt-2"><label class="block mb-1 font-bold">Table Length:</label><select id="mField_Length" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="14 FT" ${record.Table_Length === '14 FT' ? 'selected' : ''}>14 FT</option><option value="16 FT" ${record.Table_Length === '16 FT' ? 'selected' : ''}>16 FT</option><option value="20 FT" ${record.Table_Length === '20 FT' ? 'selected' : ''}>20 FT</option><option value="8 FT Stadium" ${record.Table_Length === '8 FT Stadium' ? 'selected' : ''}>8 FT Stadium</option><option value="Dome (Bubble)" ${record.Table_Length === 'Dome (Bubble)' ? 'selected' : ''}>Dome (Bubble)</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Bounce Elasticity:</label><select id="mField_Bouncy" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Low" ${record.Bouncy_Rating === 'Low' ? 'selected' : ''}>Low</option><option value="Medium" ${record.Bouncy_Rating === 'Medium' ? 'selected' : ''}>Medium</option><option value="High" ${record.Bouncy_Rating === 'High' ? 'selected' : ''}>High</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Surface Texture:</label><select id="mField_Surface" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Felt" ${record.Table_Surface === 'Felt' ? 'selected' : ''}>Felt</option><option value="Microfiber" ${record.Table_Surface === 'Microfiber' ? 'selected' : ''}>Microfiber</option></select></div>
-                <div class="mt-2"><label class="block mb-1 font-bold">Type:</label><select id="mField_LocType" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none"><option value="Standard" ${record.LocType === 'Standard' ? 'selected' : ''}>Standard</option><option value="Stadium" ${record.LocType === 'Stadium' ? 'selected' : ''}>Stadium</option><option value="Bubble" ${record.LocType === 'Bubble' ? 'selected' : ''}>Bubble</option><option value="Mechanical Thrower" ${record.LocType === 'Mechanical Thrower' ? 'selected' : ''}>Mechanical Thrower</option></select></div>`;
-            } else if (category === 'dice_sets') {
-                htmlContent += `
-                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3 bg-black/30 p-2 rounded border border-slate-800">
-                    <div><label class="block text-[11px] text-amber-500 font-bold">L-TOP:</label><select id="mField_LTop" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-TOP:</label><select id="mField_RTop" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                    <div><label class="block text-[11px] text-amber-500 font-bold">L-FACE:</label><select id="mField_LFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                    <div><label class="block text-[11px] text-emerald-400 font-bold">R-FACE:</label><select id="mField_RFront" class="w-full bg-slate-900 p-2 text-white rounded"></select></div>
-                </div>`;
+            if(sSel) {
+                sSel.innerHTML = '';
+                userShootersList.forEach(s => sSel.innerHTML += `<option value="${s}">${s}</option>`);
+                sSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW SHOOTER]</option>`;
             }
 
-            fields.innerHTML = htmlContent;
+            if(lSel) {
+                lSel.innerHTML = '';
+                userLocationsList.forEach(l => lSel.innerHTML += `<option value="${l}">${l}</option>`);
+                lSel.innerHTML += `<option value="ADD_NEW">[+ REGISTER NEW LOCATION]</option>`;
+            }
 
-            if (category === 'dice_sets') {
-                ['mField_LTop', 'mField_RTop', 'mField_LFront', 'mField_RFront'].forEach(fieldId => {
-                    const selectEl = document.getElementById(fieldId);
-                    for(let i=1; i<=6; i++) {
-                        selectEl.innerHTML += `<option value="${i}">${PIP_MAP[i]} (${i})</option>`;
-                    }
+            if(pSel) {
+                pSel.innerHTML = `
+                    <optgroup label="─── GLOBAL VIEWPORTS ───">
+                        <option value="All">All (Global)</option>
+                        <option value="Stick">All Stick Matrix</option>
+                        <option value="Hook">All Hook Matrix</option>
+                    </optgroup>
+                    <optgroup label="─── LEFT SIDE DOMAIN ───">
+                        <option value="Left">Left (All Left)</option>
+                        <option value="Stick Left">All Stick Left</option>
+                        <option value="Hook Left">All Hook Left</option>
+                        <option value="SL-1">SL-1</option>
+                        <option value="SL-2">SL-2</option>
+                        <option value="SL-3">SL-3</option>
+                        <option value="SL-4">SL-4</option>
+                        <option value="SL-5">SL-5</option>
+                        <option value="HL-1">HL-1</option>
+                        <option value="HL-2">HL-2</option>
+                        <option value="HL-3">HL-3</option>
+                        <option value="HL-4">HL-4</option>
+                        <option value="HL-5">HL-5</option>
+                    </optgroup>
+                    <optgroup label="─── RIGHT SIDE DOMAIN ───">
+                        <option value="Right">Right (All Right)</option>
+                        <option value="Stick Right">All Stick Right</option>
+                        <option value="Hook Right">All Hook Right</option>
+                        <option value="SR-1">SR-1</option>
+                        <option value="SR-2">SR-2</option>
+                        <option value="SR-3">SR-3</option>
+                        <option value="SR-4">SR-4</option>
+                        <option value="SR-5">SR-5</option>
+                        <option value="HR-1">HR-1</option>
+                        <option value="HR-2">HR-2</option>
+                        <option value="HR-3">HR-3</option>
+                        <option value="HR-4">HR-4</option>
+                        <option value="HR-5">HR-5</option>
+                    </optgroup>
+                `;
+            }
+
+            if(dSel) {
+                // Priority Sorter Protocol: Is_Favorite DESC -> Spatial Coordinates Matrix ASC
+                let sortedDice = [...userDiceSetsList].sort((a, b) => {
+                    if (a.isFavorite !== b.isFavorite) return b.isFavorite - a.isFavorite;
+                    if (a.lTop !== b.lTop) return a.lTop - b.lTop;
+                    if (a.lBack !== b.lBack) return a.lBack - b.lBack;
+                    if (a.rTop !== b.rTop) return a.rTop - b.rTop;
+                    return a.rBack - b.rBack;
                 });
-                if (isEditMode) {
-                    document.getElementById('mField_LTop').value = record.Left_Top_Face || 3;
-                    document.getElementById('mField_LFront').value = record.Left_Front_Face || 6;
-                    document.getElementById('mField_RTop').value = record.Right_Top_Face || 3;
-                    document.getElementById('mField_RFront').value = record.Right_Front_Face || 2;
-                }
-            }
 
-            document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitMetadataModalForm()');
-            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
-        }
-
-        function closePropertyModal() { document.getElementById('ctxMetadataModalFrame').style.display = 'none'; syncConfigurationDropdowns(); }
-
-        async function commitMetadataModalForm() {
-            if (!currentUid) return;
-            let targetDocId = activeEditId;
-            let payload = {};
-
-            const nameVal = document.getElementById('mField_Name').value.trim().toUpperCase();
-            if(!nameVal) return alert("Validation requirement failed: Description Name mandatory.");
-
-            if (!activeEditId) {
-                targetDocId = (activeModalContext === 'dice_sets' ? "SET_" : "REF_") + Date.now();
-            }
-
-            if (activeModalContext === 'shooters') {
-                payload = { name: nameVal, Type: document.getElementById('mField_Type').value, Handedness: document.getElementById('mField_Hand').value, Style: document.getElementById('mField_Style').value, Notes: document.getElementById('mField_Notes').value.trim().toUpperCase() };
-            } else if (activeModalContext === 'locations') {
-                payload = { name: nameVal, Table_Length: document.getElementById('mField_Length').value, Bouncy_Rating: document.getElementById('mField_Bouncy').value, Table_Surface: document.getElementById('mField_Surface').value, LocType: document.getElementById('mField_LocType').value };
-            } else if (activeModalContext === 'dice_sets') {
-                const lTop = parseInt(document.getElementById('mField_LTop').value);
-                const lFront = parseInt(document.getElementById('mField_LFront').value);
-                const rTop = parseInt(document.getElementById('mField_RTop').value);
-                const rFront = parseInt(document.getElementById('mField_RFront').value);
-                const compiledName = `${nameVal} [${lTop}-${lFront}] [${rTop}-${rFront}]`;
-                payload = {
-                    Set_Name: compiledName,
-                    Left_Top_Face: lTop, Left_Front_Face: lFront,
-                    Right_Top_Face: rTop, Right_Front_Face: rFront
-                };
-            }
-
-            await db.collection("users").doc(currentUid).collection(`master_${activeModalContext}`).doc(targetDocId).set(payload);
-            
-            if (activeModalContext === 'shooters') userShootersList[targetDocId] = payload;
-            else if (activeModalContext === 'locations') userLocationsList[targetDocId] = payload;
-            else if (activeModalContext === 'dice_sets') userDiceSetsList[targetDocId] = payload;
-
-            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
-            await fetchMasterMetadataCollections();
-
-            const targetDropdownId = activeModalContext === 'shooters' ? 'ctxShooterSelect' : (activeModalContext === 'locations' ? 'ctxLocationSelect' : (activeModalContext === 'dice_sets' ? 'ctxDiceSetSelect' : null));
-            if(targetDropdownId && document.getElementById(targetDropdownId)) {
-                document.getElementById(targetDropdownId).value = targetDocId;
-                if(activeModalContext === 'dice_sets') onDiceSetChange();
-            }
-            executeAnalyticalFilterEngine();
-        }
-
-        function editCurrentAsset(cat) {
-            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
-            if (!el || !el.value || ["ALL", "ADD_NEW"].includes(el.value)) return alert("Select registered mutable target row asset configuration context profile element.");
-            openMetadataModal(cat, el.value);
-        }
-
-        async function deleteCurrentAsset(cat) {
-            const el = document.getElementById(cat === 'shooters' ? 'ctxShooterSelect' : (cat === 'locations' ? 'ctxLocationSelect' : 'ctxDiceSetSelect'));
-            if (!el || !el.value || ["ALL", "ADD_NEW", "RANDOM_RANDY", "SHAKE_UM_UP_SALLY"].includes(el.value)) return alert("Target profile context item choice locked or unselected.");
-            if (confirm("Permanently drop config row database document asset metadata tracking fields?")) {
-                await db.collection("users").doc(currentUid).collection(`master_${cat}`).doc(el.value).delete();
-                await fetchMasterMetadataCollections();
-                setDefaultAllDropdowns();
-                executeAnalyticalFilterEngine();
+                dSel.innerHTML = `<option value="NONE">NONE (NULL PAIR)</option>`;
+                sortedDice.forEach(d => {
+                    const favMarker = d.isFavorite ? "★ " : "";
+                    dSel.innerHTML += `<option value="${d.id}">${favMarker}${d.name} (${d.lTop}/${d.lBack} - ${d.rTop}/${d.rBack})</option>`;
+                });
             }
         }
 
-        function watchShooterDropdownChange() { if(document.getElementById('ctxShooterSelect').value === 'ADD_NEW') openMetadataModal('shooters'); else executeAnalyticalFilterEngine(); }
-        function watchLocationDropdownChange() { if(document.getElementById('ctxLocationSelect').value === 'ADD_NEW') openMetadataModal('locations'); else executeAnalyticalFilterEngine(); }
-        function watchDiceSetDropdownChange() { if(document.getElementById('ctxDiceSetSelect').value === 'ADD_NEW') openMetadataModal('dice_sets'); else onDiceSetChange(); }
+        function toggleConfigBarVisibility(makeVisible) {
+            const bar = document.getElementById('meta-context-bar') || document.querySelector('.meta-context-bar');
+            const acceptBtn = document.getElementById('acceptBarBtn');
+            if(!bar) return;
 
-        function onDiceSetChange() {
-            const el = document.getElementById('ctxDiceSetSelect');
-            const visL = document.getElementById('vis-left-set'), visR = document.getElementById('vis-right-set');
-            const tgl = document.getElementById('toggle-set-container');
-
-            if (!el || !el.value || el.value === 'ALL') {
-                if(visL) visL.style.display = 'none'; if(visR) visR.style.display = 'none'; if(tgl) tgl.style.display = 'none'; 
-                if(document.getElementById('pad-telemetry-left')) document.getElementById('pad-telemetry-left').style.opacity = '0';
-                if(document.getElementById('pad-telemetry-right')) document.getElementById('pad-telemetry-right').style.opacity = '0';
-                activeTargetDiceSetString = "";
-                syncPadColors();
-                return;
-            }
-
-            const d = userDiceSetsList[el.value];
-            if (d) {
-                document.getElementById('v-left-t').innerHTML = makeVectorDotGridHTML(d.Left_Top_Face || 3);
-                document.getElementById('v-left-f').innerHTML = makeVectorDotGridHTML(d.Left_Front_Face || 6);
-                document.getElementById('v-right-t').innerHTML = makeVectorDotGridHTML(d.Right_Top_Face || 3);
-                document.getElementById('v-right-f').innerHTML = makeVectorDotGridHTML(d.Right_Front_Face || 2);
-                if(visL) visL.style.display = 'flex'; if(visR) visR.style.display = 'flex';
-                
-                activeTargetDiceSetString = `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
-                if(tgl) tgl.style.display = 'flex';
-            }
-            resetSuggestionTrackingButtonDisplay();
-            syncPadColors();
-        }
-
-        function toggleDiceSetColor(axis) {
-            leftDiceColorIdx = (leftDiceColorIdx + 1) % COLOR_SWATCHES.length;
-            rightDiceColorIdx = leftDiceColorIdx; 
-            
-            ['v-left-t', 'v-left-f', 'v-right-t', 'v-right-f'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    el.style.backgroundColor = COLOR_SWATCHES[leftDiceColorIdx];
-                    const dotsList = el.querySelectorAll('.zombie-pip-dot');
-                    dotsList.forEach(d => {
-                        d.style.backgroundColor = (COLOR_SWATCHES[leftDiceColorIdx] === '#ffffff') ? '#000000' : '#ffffff';
-                    });
-                }
-            });
-        }
-
-        function toggleSetExecutionFlag() {
-            if (activeTargetDiceSetString !== "" && activeTargetDiceSetString !== getDropdownConfigDiceSetString()) {
-                if (confirm("Return calculation calibration anchor tracking parameters to your top Dropdown Selected Dice Set?")) {
-                    activeTargetDiceSetString = getDropdownConfigDiceSetString();
-                    isSuggestedSetFlag = false;
-                    resetSuggestionTrackingButtonDisplay();
-                }
-                return;
-            }
-            if (currentSuggestedSetString === "") return;
-            if (confirm(`Promote Suggested Calibration alignment [${currentSuggestedSetString}] as your active physical recording set matrix layout?`)) {
-                activeTargetDiceSetString = currentSuggestedSetString;
-                isSuggestedSetFlag = true;
-                resetSuggestionTrackingButtonDisplay();
-            }
-        }
-
-        function getDropdownConfigDiceSetString() {
-            const el = document.getElementById('ctxDiceSetSelect');
-            if(!el) return "";
-            const d = userDiceSetsList[el.value]; if(!d) return "";
-            return `${d.Left_Top_Face || 3}/${d.Left_Front_Face || 6}x${d.Right_Top_Face || 3}/${d.Right_Front_Face || 2}`;
-        }
-
-        function resetSuggestionTrackingButtonDisplay() {
-            const btn = document.getElementById('btn-set-flag');
-            if(!btn) return;
-            btn.classList.remove('pulse-warning-btn');
-            
-            if (activeTargetDiceSetString === getDropdownConfigDiceSetString()) {
-                btn.innerText = "USING ORIGINAL CONFIG";
-                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-slate-950 border border-slate-800 p-2.5 rounded text-amber-400 transition-all text-center";
+            if(makeVisible) {
+                bar.classList.remove('hidden');
+                if(acceptBtn) acceptBtn.classList.remove('hidden');
             } else {
-                btn.innerText = `PROMOTED: ${activeTargetDiceSetString}`;
-                btn.className = "w-full text-[10px] font-black uppercase tracking-widest bg-emerald-950/30 border border-emerald-500/40 p-2.5 rounded text-emerald-400 transition-all text-center";
-            }
-            if (currentSuggestedSetString !== "" && currentSuggestedSetString !== activeTargetDiceSetString) {
-                btn.classList.add('pulse-warning-btn');
-                btn.innerText = "NEW SUGGESTION READY";
+                bar.classList.add('hidden');
+                if(acceptBtn) acceptBtn.classList.add('hidden');
             }
         }
 
-        function handleSuggestionToggleAction() { toggleSetExecutionFlag(); }
+        function handleResolutionSelection(choice) {
+            document.getElementById('resolutionModalShroud').classList.add('hidden');
+            if(choice === 'SAME') {
+                state.activePoint = null;
+                for (let k in state.matrix) state.matrix[k].cur = 0;
+                executeAnalyticalFilterEngine();
+            } else if(choice === 'NEW') {
+                toggleConfigBarVisibility(true);
+                const sSel = document.getElementById('ctxShooterSelect');
+                if(sSel) sSel.focus();
+            }
+        }
+
+        function handleContextShooterToggle() {
+            const el = document.getElementById('ctxShooterSelect');
+            if(el.value === 'ADD_NEW') {
+                const name = prompt("REGISTER UNIQUE SHOOTER IDENTITY ID TAG:");
+                if(name && name.trim()) {
+                    const cleanName = name.trim().toUpperCase();
+                    if(!userShootersList.includes(cleanName)) userShootersList.push(cleanName);
+                    syncConfigurationDropdowns();
+                    el.value = cleanName;
+                } else {
+                    el.value = "ME";
+                }
+            }
+        }
+
+        function handleContextLocationToggle() {
+            const el = document.getElementById('ctxLocationSelect');
+            if(el.value === 'ADD_NEW') {
+                const loc = prompt("REGISTER NEW CASINO VENUE LOCATION KEY:");
+                if(loc && loc.trim()) {
+                    const cleanLoc = loc.trim().toUpperCase();
+                    if(!userLocationsList.includes(cleanLoc)) userLocationsList.push(cleanLoc);
+                    syncConfigurationDropdowns();
+                    el.value = cleanLoc;
+                } else {
+                    el.value = "BALLY'S";
+                }
+            }
+        }
+
+        function handleContextDiceSetToggle() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const strip = document.getElementById('kinematicReadoutPanel');
+            if(ds === 'NONE') {
+                if(strip) strip.style.display = 'none';
+            } else {
+                if(strip) strip.style.display = 'flex';
+            }
+            calculateLiveKinematicsPreview();
+        }
+
+        function initDualPads() {
+            const lPad = document.getElementById('leftPadContainer');
+            const rPad = document.getElementById('rightPadContainer');
+            if(!lPad || !rPad) return;
+            lPad.innerHTML = ''; rPad.innerHTML = '';
+            for(let i=1; i<=6; i++) {
+                lPad.innerHTML += `<button class="pad-btn" id="l-pad-${i}" onclick="selectMatrixDie('left', ${i})">${i}</button>`;
+                rPad.innerHTML += `<button class="pad-btn" id="r-pad-${i}" onclick="selectMatrixDie('right', ${i})">${i}</button>`;
+            }
+            handleContextDiceSetToggle();
+        }
 
         function selectMatrixDie(axis, val) {
-            if(axis === 'left') { 
-                for(let i=1; i<=6; i++) { const btn = document.getElementById(`l-pad-${i}`); if(btn) btn.classList.remove('active', 'active-kinematic'); } 
-                state.selectedLeft = val; 
-                const act = document.getElementById(`l-pad-${val}`); 
-                if(act) act.classList.add('active'); 
-            } else { 
-                for(let i=1; i<=6; i++) { const btn = document.getElementById(`r-pad-${i}`); if(btn) btn.classList.remove('active', 'active-kinematic'); } 
-                state.selectedRight = val; 
-                const act = document.getElementById(`r-pad-${val}`); 
-                if(act) act.classList.add('active'); 
+            if(axis === 'left') {
+                for(let i=1; i<=6; i++) document.getElementById(`l-pad-${i}`).classList.remove('active');
+                state.selectedLeft = val;
+                document.getElementById(`l-pad-${val}`).classList.add('active');
+            } else {
+                for(let i=1; i<=6; i++) document.getElementById(`r-pad-${i}`).classList.remove('active');
+                state.selectedRight = val;
+                document.getElementById(`r-pad-${val}`).classList.add('active');
             }
-            syncPadColors();
+            calculateLiveKinematicsPreview();
         }
 
-        function syncPadColors() {
-            const isSetSelected = document.getElementById('ctxDiceSetSelect').value !== 'ALL';
-            ['left', 'right'].forEach(axis => {
-                const selectedVal = axis === 'left' ? state.selectedLeft : state.selectedRight;
-                if(selectedVal) {
-                    const prefix = axis === 'left' ? 'l' : 'r';
-                    const btn = document.getElementById(`${prefix}-pad-${selectedVal}`);
-                    if(btn) {
-                        if(isSetSelected) {
-                            btn.classList.remove('active');
-                            btn.classList.add('active-kinematic');
-                        } else {
-                            btn.classList.remove('active-kinematic');
-                            btn.classList.add('active');
-                        }
-                    }
-                }
-            });
-        }
+        function calculateLiveKinematicsPreview() {
+            const ds = document.getElementById('ctxDiceSetSelect').value;
+            const lRead = document.getElementById('k-left-readout');
+            const rRead = document.getElementById('k-right-readout');
+            if(!lRead || !rRead) return;
 
-        function renderLastRollKinematics(record) {
-            const lBox = document.getElementById('pad-telemetry-left'), rBox = document.getElementById('pad-telemetry-right');
-            if (!lBox || !rBox) return;
-            if (record.Invalid_Roll || !record.Kinematic_Status || document.getElementById('ctxLocationSelect').value === 'EVOLUTION') { lBox.style.opacity = '0'; rBox.style.opacity = '0'; return; }
-            
-            const parseAxisString = (kObj) => {
-                if(!kObj) return "N/A"; const r = parseInt(kObj.rot);
-                if (kObj.ax === "0") {
-                    if(r === 1) return `PITCH [GREAT SHOT]`;
-                    if(r === 2) return `PITCH [ROLLED FORWARD]`;
-                    if(r === 6) return `PITCH [FLIPPED OVER]`;
-                    if(r === 5) return `PITCH [ROLLED BACK]`;
-                } else {
-                    if(r === 4) return `YAW [ROLLED RIGHT]`;
-                    if(r === 3) return `YAW [ROLLED LEFT]`;
-                }
-                return `ROT [${r}]`;
-            };
-            lBox.innerText = parseAxisString(record.Left_Kinematic); lBox.style.opacity = '1';
-            rBox.innerText = parseAxisString(record.Right_Kinematic); rBox.style.opacity = '1';
-        }
-
-        function submitRoll(trackingMode) {
-            if(!state.selectedLeft || !state.selectedRight) return alert("Dice button selection markers missing.");
-            const locVal = document.getElementById('ctxLocationSelect').value;
-            const sumValue = parseInt(state.selectedLeft + state.selectedRight);
-            const isHardway = (state.selectedLeft === state.selectedRight) && [4,6,8,10].includes(sumValue);
-            
-            let enforceKinematics = (trackingMode === 'KINEMATIC') || (sumValue === 2 || sumValue === 12 || isHardway) || (locVal === 'EVOLUTION');
-
-            let lKin = null, rKin = null;
-            if (enforceKinematics && document.getElementById('ctxDiceSetSelect').value !== 'ALL' && locVal !== 'EVOLUTION') {
-                let lParts = [3,6], rParts = [3,2];
-                if (activeTargetDiceSetString !== "") {
-                    const pairs = activeTargetDiceSetString.split('x'); lParts = pairs[0].split('/').map(Number); rParts = pairs[1].split('/').map(Number);
-                }
-                
-                const computeLeftCode = (top) => {
-                    if (top === lParts[0]) return 1;       
-                    if (top === (7 - lParts[1])) return 2; 
-                    if (top === (7 - lParts[0])) return 6; 
-                    if (top === lParts[1]) return 5;       
-                    if (top === 4) return 4;               
-                    return 3;                              
-                };
-                
-                const computeRightCode = (top) => {
-                    if (top === rParts[0]) return 1;
-                    if (top === (7 - rParts[1])) return 2;
-                    if (top === (7 - rParts[0])) return 6;
-                    if (top === rParts[1]) return 5;
-                    if (top === 4) return 4;
-                    return 3;
-                };
-
-                lKin = { rot: computeLeftCode(state.selectedLeft), ax: (state.selectedLeft === lParts[0] || state.selectedLeft === (7 - lParts[0]) ? "0" : "1") };
-                rKin = { rot: computeRightCode(state.selectedRight), ax: (state.selectedRight === rParts[0] || state.selectedRight === (7 - rParts[0]) ? "0" : "1") };
+            if(ds === 'NONE' || !state.selectedLeft || !state.selectedRight) {
+                lRead.innerText = "N/A"; rRead.innerText = "N/A";
+                return;
             }
 
-            const r = {
-                leftDie: parseInt(state.selectedLeft), rightDie: parseInt(state.selectedRight), sum: sumValue,
-                Location_ID: locVal, 
-                Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
-                Shooter_ID: document.getElementById('ctxShooterSelect').value,
-                Left_Set_Face: activeTargetDiceSetString.split('x')[0] || "3/6", Right_Set_Face: activeTargetDiceSetString.split('x')[1] || "3/2",
-                Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
-                Kinematic_Status: enforceKinematics, Set_Execution_State: isSuggestedSetFlag ? "SUGGESTED" : "ORIGINAL", Left_Kinematic: lKin, Right_Kinematic: rKin, Invalid_Roll: false, Notes: ""
+            // High Fidelity Real-time Matrix Math Resolution Logic
+            let lKin = "N/A", rKin = "N/A";
+            if(ds === '3V') {
+                if(state.selectedLeft === 3) lKin = "1";
+                else if(state.selectedLeft === 1) lKin = "2";
+                else if(state.selectedLeft === 6) lKin = "5";
+                else if(state.selectedLeft === 4) lKin = "6";
+                else if(state.selectedLeft === 5) lKin = "4";
+                else if(state.selectedLeft === 2) lKin = "3";
+
+                if(state.selectedRight === 3) rKin = "1";
+                else if(state.selectedRight === 5) rKin = "2";
+                else if(state.selectedRight === 2) rKin = "5";
+                else if(state.selectedRight === 4) rKin = "6";
+                else if(state.selectedRight === 6) rKin = "4";
+                else if(state.selectedRight === 1) rKin = "3";
+            } else {
+                lKin = "CALCULATED"; rKin = "CALCULATED";
+            }
+
+            lRead.innerText = `STATE CODE: [${lKin}]`;
+            rRead.innerText = `STATE CODE: [${rKin}]`;
+        }
+
+        function submitRoll(isAbsolute) {
+            if(!state.selectedLeft || !state.selectedRight) return alert("Selection parameters missing.");
+
+            const activeShooter = document.getElementById('ctxShooterSelect').value || "ME";
+            const activeLocation = document.getElementById('ctxLocationSelect').value || "BALLY'S";
+            const activeTablePos = document.getElementById('ctxTablePositionSelect').value || "SL-1";
+            const activeDiceSet = document.getElementById('ctxDiceSetSelect').value || "NONE";
+            const notes = document.getElementById('ctxDescriptionInput').value.trim();
+
+            let lKin = "", rKin = "", kStatus = false;
+            let targetSet = userDiceSetsList.find(d => d.id === activeDiceSet);
+            let lTop = targetSet ? targetSet.lTop : 3;
+            let lBack = targetSet ? targetSet.lBack : 6;
+            let rTop = targetSet ? targetSet.rTop : 3;
+            let rBack = targetSet ? targetSet.rBack : 2;
+
+            if(activeDiceSet === '3V') {
+                kStatus = true;
+                if(state.selectedLeft === 3) lKin = 1; else if(state.selectedLeft === 1) lKin = 2; else if(state.selectedLeft === 6) lKin = 5; else if(state.selectedLeft === 4) lKin = 6; else if(state.selectedLeft === 5) lKin = 4; else if(state.selectedLeft === 2) lKin = 3;
+                if(state.selectedRight === 3) rKin = 1; else if(state.selectedRight === 5) rKin = 2; else if(state.selectedRight === 2) rKin = 5; else if(state.selectedRight === 4) rKin = 6; else if(state.selectedRight === 6) rKin = 4; else if(state.selectedRight === 1) rKin = 3;
+            }
+
+            // Complete, Normalized 22-Column Schema Record Composition Block
+            const rollRowRecord = {
+                Parent_Module_Context: "DICE_TRACKER",
+                Session_Designation: "ACTIVE_LOG_INSTANCE",
+                Time_Stamp: new Date().toISOString(),
+                Roll_Index: state.rollHistoryLog.length + 1,
+                Puck_Before_Roll: state.activePoint === null ? "OFF" : state.activePoint.toString(),
+                Left_Die: state.selectedLeft,
+                Right_Die: state.selectedRight,
+                Total_Sum: state.selectedLeft + state.selectedRight,
+                Location_ID: activeLocation,
+                Table_Position: activeTablePos,
+                Shooter_ID: activeShooter,
+                Left_Top: lTop,
+                Left_Back: lBack,
+                Right_Top: rTop,
+                Right_Back: rBack,
+                Kinematic_Status: kStatus,
+                Left_Kinematic: lKin,
+                Right_Kinematic: rKin,
+                Invalid_Roll: !isAbsolute,
+                Is_Point_Established: (state.activePoint === null && [4,5,6,8,9,10].includes(state.selectedLeft + state.selectedRight)),
+                Is_Point_Hit: (state.activePoint !== null && (state.selectedLeft + state.selectedRight) === state.activePoint),
+                Notes: notes
             };
-            state.rollHistoryLog.push(r); state.rawSequenceLog.push(r.sum);
-            executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
+
+            // Legacy backward-compatibility mapping keys to keep calculation loop synchronized
+            rollRowRecord.sum = rollRowRecord.Total_Sum;
+            rollRowRecord.leftDie = rollRowRecord.Left_Die;
+            rollRowRecord.rightDie = rollRowRecord.Right_Die;
+            rollRowRecord.shooterId = rollRowRecord.Shooter_ID;
+            rollRowRecord.locationId = rollRowRecord.Location_ID;
+            rollRowRecord.puckBeforeRoll = state.activePoint;
+
+            state.rollHistoryLog.push(rollRowRecord);
+            state.rawSequenceLog.push(rollRowRecord.Total_Sum);
+
+            executeCalculationsLoop(rollRowRecord);
+            clearSelectionPads();
+            document.getElementById('ctxDescriptionInput').value = '';
+            pushCloudState("active_session");
         }
 
         function executeCalculationsLoop(record) {
-            if(record.Invalid_Roll) { executeAnalyticalFilterEngine(); return; }
-            const sum = record.sum;
-            state.totalRolls++; state.currentHandRolls++; state.matrix[sum].tot++; state.matrix[sum].cur++;
+            const sum = record.Total_Sum;
+            state.totalRolls++;
+            state.currentHandRolls++;
+
+            state.matrix[sum].tot++;
+            state.matrix[sum].cur++;
+
             if(sum === 7) {
                 state.sevensTotal++;
-                if(state.activePoint === null) state.sevensComeout++;
-                else { 
-                    state.sevensRed++; 
-                    state.shooterHistory.push({ rolls: state.currentHandRolls, points: state.currentHandPoints }); 
-                    state.currentHandRolls = 0; state.currentHandPoints = 0; state.activePoint = null; 
-                    for(let k in state.matrix) state.matrix[k].cur = 0; 
-                }
-            } else {
-                if(state.activePoint === null) { if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum; }
-                else if(sum === state.activePoint) { 
-                    state.totalPointsMade++; 
-                    state.currentHandPoints++;
-                    state.activePoint = null; 
-                }
-            }
-            executeAnalyticalFilterEngine(); renderLastRollKinematics(record);
-        }
-
-        function renderPointsChipStack() {
-            const container = document.getElementById('pointsChipStack');
-            if(!container) return;
-            container.innerHTML = '';
-            
-            const pts = state.currentHandPoints || 0;
-            if(pts === 0) return;
-
-            const limit = Math.min(pts, 11);
-            for(let i = 1; i <= limit; i++) {
-                const bottomOffset = (i - 1) * 3;
-                const skewOffset = (i % 2 === 0) ? '2px' : '-2px';
-                const color = CHIP_COLORS[i] || CHIP_COLORS[11];
-                let label = '';
-                if (i === 11 || (i === limit && pts >= 11)) {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${pts}</span>`;
+                if(state.activePoint === null) {
+                    state.sevensComeout++;
                 } else {
-                    label = `<span class="absolute font-black text-[24px] text-center text-white font-montserrat z-[100] drop-shadow-[0_2px_4px_rgba(0,0,0,1)]" style="line-height:1!important;">${i}</span>`;
+                    state.sevensRed++;
+                    state.shooterHistory.push(state.currentHandRolls);
+                    state.currentHandRolls = 0;
+                    
+                    // Trigger Intercept Shroud Modal instead of auto-wiping active positions
+                    document.getElementById('resolutionModalShroud').classList.remove('hidden');
                 }
-
-                container.innerHTML += `
-                    <div class="stacked-point-chip" style="background-color: ${color}; bottom: ${bottomOffset}px; transform: translateX(${skewOffset}); z-index: ${i};">
-                        ${label}
-                    </div>
-                `;
-            }
-        }
-
-        function calculateGeometricDiceMedian(sampleStream) {
-            const valid = sampleStream.filter(v => v !== null && v !== undefined); if (!valid.length) return 1;
-            const counts = { 1:0, 2:0, 6:0, 5:0, 4:0 };
-            valid.forEach(v => { if(counts[v.rot] !== undefined) counts[v.rot]++; });
-            return [1,2,6,5,4].sort((a,b) => counts[b] - counts[a])[0] || 1;
-        }
-
-        function processCalibrationSuiteSuggestionsEngine(validLogs) {
-            const tglContainer = document.getElementById('toggle-set-container');
-            if(!tglContainer) return;
-            if (validLogs.length < 15 || document.getElementById('ctxDiceSetSelect').value === 'ALL') {
-                currentSuggestedSetString = ""; tglContainer.style.display = 'none'; return;
-            }
-
-            const lMed = calculateGeometricDiceMedian(validLogs.map(r => r.Left_Kinematic));
-            const rMed = calculateGeometricDiceMedian(validLogs.map(r => r.Right_Kinematic));
-            const lastRow = validLogs[validLogs.length - 1];
-            
-            const shiftCube = (fStr, code) => {
-                const top = parseInt(fStr.split('/')[0]) || 3, fr = parseInt(fStr.split('/')[1]) || 6;
-                if (code == 1) return `${top}/${fr}`; if (code == 2) return `${fr}/${7-top}`; if (code == 6) return `${7-top}/${7-fr}`; if (code == 5) return `${7-fr}/${top}`;
-                return `${top}/${fr}`;
-            };
-
-            currentSuggestedSetString = `${shiftCube(lastRow.Left_Set_Face, lMed)}x${shiftCube(lastRow.Right_Set_Face, rMed)}`;
-            tglContainer.style.display = 'flex';
-            resetSuggestionTrackingButtonDisplay();
-        }
-
-        function showErrNotesModal(notes) {
-            alert("SYSTEM ERROR TIMELINE LOG CAPTURED:\n\n" + (notes || "UNSPECIFIED ARCHIVE EXCEPTION"));
-        }
-
-        function calculateMeanAndMedianBigRedDeltas() {
-            let SevenOutIndexes = [];
-            state.rollHistoryLog.forEach((r, idx) => {
-                if(!r.Invalid_Roll && r.sum === 7 && r.Puck_Before_Roll !== "OFF" && r.Puck_Before_Roll !== null) {
-                    SevenOutIndexes.push(idx);
-                }
-            });
-
-            if (SevenOutIndexes.length < 2) {
-                document.getElementById('br-mean-val').innerText = "0.0";
-                document.getElementById('br-median-val').innerText = "0";
-                return;
-            }
-
-            let deltas = [];
-            for (let i = 1; i < SevenOutIndexes.length; i++) {
-                deltas.push(SevenOutIndexes[i] - SevenOutIndexes[i - 1]);
-            }
-
-            const sum = deltas.reduce((a, b) => a + b, 0);
-            const mean = (sum / deltas.length).toFixed(1);
-
-            deltas.sort((a, b) => a - b);
-            const mid = Math.floor(deltas.length / 2);
-            let medianStr = "";
-
-            if (deltas.length % 2 !== 0) {
-                medianStr = deltas[mid].toString();
+            } else if (sum === 11 && state.activePoint === null) {
+                // Natural Come-out Condition Block
             } else {
-                if (deltas[mid - 1] === deltas[mid]) {
-                    medianStr = deltas[mid].toString();
-                } else {
-                    medianStr = `${deltas[mid - 1]}, ${deltas[mid]}`;
+                if(state.activePoint === null) {
+                    if([4,5,6,8,9,10].includes(sum)) state.activePoint = sum;
+                } else if(sum === state.activePoint) {
+                    state.totalPointsMade++;
+                    state.activePoint = null;
                 }
             }
 
-            document.getElementById('br-mean-val').innerText = mean;
-            document.getElementById('br-median-val').innerText = medianStr;
+            executeAnalyticalFilterEngine();
         }
 
         function executeAnalyticalFilterEngine() {
             const mode = document.getElementById('ctxFilterScopeSelect').value;
-            const sh = document.getElementById('ctxShooterSelect').value; 
-            const loc = document.getElementById('ctxLocationSelect').value;
-            const pParent = document.getElementById('ctxTablePositionParentSelect').value;
-            const pChild = document.getElementById('ctxTablePositionChildSelect').value;
+            const targetShooter = document.getElementById('ctxShooterSelect').value;
+            const targetLocation = document.getElementById('ctxLocationSelect').value;
+            const targetTablePos = document.getElementById('ctxTablePositionSelect').value;
 
-            let filtered = [...state.rollHistoryLog];
-
-            if(mode === 'CUSTOM') {
-                if(sh !== "ALL") filtered = filtered.filter(r => r.Shooter_ID === sh);
-                if(loc !== "ALL") filtered = filtered.filter(r => r.Location_ID === loc);
-                if(pParent !== "ALL") {
-                    const allowedSubset = CHILD_POSITIONS[pParent];
-                    if(pChild === "ALL" || !pChild) {
-                        filtered = filtered.filter(r => allowedSubset.includes(r.Table_Position));
-                    } else {
-                        filtered = filtered.filter(r => r.Table_Position === pChild);
-                    }
-                }
-            }
-
-            let lm = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}, la = {2:0,3:0,4:0,5:0,6:0,8:0,9:0,10:0,11:0,12:0};
-            let lTotal = 0, lRed = 0, lComeout = 0, lPoints = 0, lHand = 0, lap = null, lValid = 0;
-            const ribbon = document.getElementById('historyContainer'); if(!ribbon) return;
+            let filteredSet = [];
             
-            ribbon.innerHTML = '';
-            let kLogs = [];
+            // Complex Diagnostic Matrix Subsetting Routing Logic
+            state.rollHistoryLog.forEach(r => {
+                let matchMode = false;
+                if(mode === 'FULL') matchMode = true;
+                else if(mode === 'ISOLATE_SHOOTER' && r.Shooter_ID === targetShooter) matchMode = true;
+                else if(mode === 'ISOLATE_LOCATION' && r.Location_ID === targetLocation) matchMode = true;
+                else if(mode === 'ISOLATE_COMBINED' && r.Shooter_ID === targetShooter && r.Location_ID === targetLocation) matchMode = true;
 
-            let conditionalTransitionsMatrix = {};
-            for(let i=2; i<=12; i++) { conditionalTransitionsMatrix[i] = { totalCounts: {}, pairCounts: {} }; }
-
-            let rollsInCurrentHandTracking = 0;
-            let pointsInCurrentHandTracking = 0;
-
-            filtered.forEach((v, idx) => {
-                if(v.Invalid_Roll) { 
-                    ribbon.innerHTML += `<div class="history-node bg-amber-600/20 text-amber-500 border border-amber-500/30 text-xs" onclick="showErrNotesModal('${v.Notes}')">ERR</div>`; 
-                    return; 
+                if(matchMode) {
+                    if(targetTablePos === 'All') filteredSet.push(r);
+                    else if(targetTablePos === 'Stick' && (r.Table_Position.startsWith('SL-') || r.Table_Position.startsWith('SR-'))) filteredSet.push(r);
+                    else if(targetTablePos === 'Hook' && (r.Table_Position.startsWith('HL-') || r.Table_Position.startsWith('HR-'))) filteredSet.push(r);
+                    else if(targetTablePos === 'Left' && (r.Table_Position.startsWith('SL-') || r.Table_Position.startsWith('HL-'))) filteredSet.push(r);
+                    else if(targetTablePos === 'Stick Left' && r.Table_Position.startsWith('SL-')) filteredSet.push(r);
+                    else if(targetTablePos === 'Hook Left' && r.Table_Position.startsWith('HL-')) filteredSet.push(r);
+                    else if(targetTablePos === 'Right' && (r.Table_Position.startsWith('SR-') || r.Table_Position.startsWith('HR-'))) filteredSet.push(r);
+                    else if(targetTablePos === 'Stick Right' && r.Table_Position.startsWith('SR-')) filteredSet.push(r);
+                    else if(targetTablePos === 'Hook Right' && r.Table_Position.startsWith('HR-')) filteredSet.push(r);
+                    else if(r.Table_Position === targetTablePos) filteredSet.push(r);
                 }
-                lValid++; lm[v.sum]++; lHand++; la[v.sum] = 1; if(v.Kinematic_Status) kLogs.push(v);
-                rollsInCurrentHandTracking++;
-                
-                if (idx > 0) {
-                    const prevRow = filtered[idx - 1];
-                    if (prevRow && !prevRow.Invalid_Roll && prevRow.sum >= 2 && prevRow.sum <= 12 && prevRow.sum !== 7) {
-                        const setupAnchorTotal = prevRow.sum;
-                        const unorderedPairKey = [v.leftDie, v.rightDie].sort((a,b)=>a-b).join('-');
-                        
-                        if(!conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum]) conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum] = 0;
-                        conditionalTransitionsMatrix[setupAnchorTotal].totalCounts[v.sum]++;
-                        
-                        if(!conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey]) conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey] = 0;
-                        conditionalTransitionsMatrix[setupAnchorTotal].pairCounts[unorderedPairKey]++;
-                    }
-                }
-
-                let c = 'node-normal'; const isH = (v.leftDie === v.rightDie) && [4,6,8,10].includes(v.sum);
-                let currentIsPointNode = false;
-
-                if(v.sum === 7) { 
-                    lTotal++; 
-                    if(lap === null) { 
-                        lComeout++; c = 'node-natural'; 
-                    } else { 
-                        lRed++; c = 'node-seven-out'; 
-                        lHand = 0; lap = null; for(let k in la) la[k] = 0; 
-                        
-                        ribbon.innerHTML += `<div class="history-node ${c}">${v.sum}</div>`;
-                        ribbon.innerHTML += `<div class="history-node node-summary">${rollsInCurrentHandTracking}<sup>R</sup> / ${pointsInCurrentHandTracking}<sup>P</sup></div>`;
-                        
-                        rollsInCurrentHandTracking = 0;
-                        pointsInCurrentHandTracking = 0;
-                        return; 
-                    } 
-                }
-                else if(v.sum === 11 && lap === null) c = 'node-natural';
-                else { 
-                    if(lap === null) { 
-                        if([4,5,6,8,9,10].includes(v.sum)) { lap = v.sum; c = 'node-point-made'; currentIsPointNode = true; } 
-                    } else if(v.sum === lap) { 
-                        c = 'node-point-made'; lPoints++; pointsInCurrentHandTracking++; lap = null; currentIsPointNode = true;
-                    } else { 
-                        c = isH ? 'node-hard' : 'node-normal'; 
-                    } 
-                }
-                if(isH && !currentIsPointNode) c = 'node-hard';
-                if(currentIsPointNode) c = 'node-point-made';
-                
-                let innerTextLabel = v.sum;
-                if(isH) innerTextLabel = `${v.sum}<sup>H</sup>`;
-
-                ribbon.innerHTML += `<div class="history-node ${c}">${innerTextLabel}</div>`;
             });
 
-            const universalSequenceLog = state.rawSequenceLog;
+            let localMatrix = { 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localAtsMap = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let localSevensTotal = 0, localSevensRed = 0, localSevensComeout = 0, localPointsMade = 0;
+            let localCurrentHandRolls = 0, localActivePoint = null, localShooterHistory = [];
 
-            for(let i=2; i<=12; i++) {
-                if(i===7) continue; 
-                const countBox = document.getElementById(`count-${i}`); if(countBox) countBox.innerText = state.matrix[i].tot;
-                const cell = document.getElementById(`cur-${i}`); if(cell) cell.innerText = state.matrix[i].cur; 
-                const totBox = document.getElementById(`tot-${i}`); if(totBox) totBox.innerText = lm[i]; 
-                
-                const puck = document.getElementById(`puck-${i}`); if(puck) puck.style.display = (state.activePoint === i) ? 'block' : 'none';
-                if(la[i] && cell) cell.classList.add('ats-active'); else if(cell) cell.classList.remove('ats-active');
-                
-                const horizonN = probabilityWindows[i]; const chip = document.getElementById(`temp-${i}`);
-                if (chip) {
-                    const sampleLogSlice = universalSequenceLog.slice(-horizonN);
-                    const hit1 = sampleLogSlice.filter(x => x == i).length;
-                    const hit2 = universalSequenceLog.slice(-(2*horizonN)).filter(x => x == i).length;
-                    const hit3 = universalSequenceLog.slice(-(3*horizonN)).filter(x => x == i).length;
-                    
-                    const isLastRepeat = (universalSequenceLog.length > 1 && universalSequenceLog[universalSequenceLog.length - 1] === i && universalSequenceLog[universalSequenceLog.length - 2] === i);
+            const ribbon = document.getElementById('historyContainer');
+            if(ribbon) ribbon.innerHTML = '';
 
-                    if (isLastRepeat) {
-                        chip.innerText = '🔥🔥';
-                    } else if (hit1 > 1) {
-                        chip.innerText = '🔥';
-                    } else if (state.totalRolls >= horizonN && hit1 === 0) {
-                        chip.innerText = '❄️';
-                        if (state.totalRolls >= (2*horizonN) && hit2 === 0) chip.innerText = '❄️❄️';
-                        if (state.totalRolls >= (3*horizonN) && hit3 === 0) chip.innerText = '❄️❄️❄️';
+            filteredSet.forEach((v, index) => {
+                localMatrix[v.Total_Sum]++;
+                let ribbonClass = 'node-normal';
+                const isHard = (v.Left_Die === v.Right_Die) && [4,6,8,10].includes(v.Total_Sum);
+
+                localCurrentHandRolls++;
+                localAtsMap[v.Total_Sum] = 1;
+
+                // High Contrast Superscript Evaluation Processing Blocks
+                let rColor = v.Total_Sum <= 7 ? '#ef4444' : '#10b981';
+                let pColor = pointChipColors[localActivePoint] || '#ffffff';
+                
+                let superscriptStr = `<sup style="color:${rColor}; font-weight:bold;">R</sup>`;
+
+                if(v.Total_Sum === 7) {
+                    localSevensTotal++;
+                    if(localActivePoint === null) {
+                        localSevensComeout++;
+                        ribbonClass = 'node-point-made';
                     } else {
-                        chip.innerText = '';
+                        localSevensRed++;
+                        ribbonClass = 'node-seven-out-summary';
+                        localShooterHistory.push(localCurrentHandRolls);
+                        localCurrentHandRolls = 0;
+                        localActivePoint = null;
+                        for(let k in localAtsMap) localAtsMap[k] = 0;
                     }
-                }
-                
-                const pane = document.getElementById(`ev-pane-${i}`);
-                if(pane) {
-                    let totalVectors = Object.keys(conditionalTransitionsMatrix[i].totalCounts).map(Number).filter(n => activeKinematicFilterMask[n]).sort((a,b) => {
-                        let perfIndexA = conditionalTransitionsMatrix[i].totalCounts[a] / (probabilityWindows[a] / 36);
-                        let perfIndexB = conditionalTransitionsMatrix[i].totalCounts[b] / (probabilityWindows[b] / 36);
-                        return perfIndexB - perfIndexA;
-                    });
-                    
-                    let unhitVectors = Object.keys(probabilityWindows).map(Number).filter(n => activeKinematicFilterMask[n] && !conditionalTransitionsMatrix[i].totalCounts[n]).sort((a,b) => probabilityWindows[b] - probabilityWindows[a]);
-                    
-                    let hotVectorStr = "NONE", coldVectorStr = "NONE";
-                    if (totalVectors.length > 0) {
-                        let topHotSum = totalVectors[0]; hotVectorStr = `${topHotSum}`;
-                        if ([4,5,6,8,9,10].includes(topHotSum)) {
-                            let topPairs = Object.keys(conditionalTransitionsMatrix[i].pairCounts).filter(p => p.split('-').map(Number).reduce((a,b)=>a+b,0) === topHotSum).sort((a,b) => conditionalTransitionsMatrix[i].pairCounts[b] - conditionalTransitionsMatrix[i].pairCounts[a]);
-                            if (topPairs.length > 0) hotVectorStr += ` [${topPairs[0]}]`;
+                } else if(v.Total_Sum === 11 && localActivePoint === null) {
+                    ribbonClass = 'node-point-made';
+                } else {
+                    if(localActivePoint === null) {
+                        if([4,5,6,8,9,10].includes(v.Total_Sum)) {
+                            localActivePoint = v.Total_Sum;
+                            ribbonClass = 'color-dark';
+                            pColor = pointChipColors[localActivePoint] || '#ffffff';
+                            superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
+                        } else {
+                            ribbonClass = 'color-dark';
+                        }
+                    } else if(v.Total_Sum === localActivePoint) {
+                        ribbonClass = 'node-point-made';
+                        superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
+                        localPointsMade++;
+                        localActivePoint = null;
+                    } else {
+                        ribbonClass = 'color-dark';
+                        if([4,5,6,8,9,10].includes(localActivePoint)) {
+                            superscriptStr += `<sup style="color:${pColor}; font-weight:bold;">P</sup>`;
                         }
                     }
-                    if (unhitVectors.length > 0) {
-                        coldVectorStr = `${unhitVectors[0]}`;
-                    } else if (totalVectors.length > 1) {
-                        coldVectorStr = `${totalVectors[totalVectors.length - 1]}`;
-                    }
-                    
-                    pane.innerHTML = `<div class="text-[9px] font-bold text-left leading-tight"><b class="text-orange-400">H:</b> ${hotVectorStr}</div><div class="text-[9px] font-bold text-left leading-tight mt-0.5"><b class="text-cyan-400">C:</b> ${coldVectorStr}</div>`;
                 }
-            }
 
-            document.getElementById('stat-red').innerText = lRed;
-            document.getElementById('stat-sor').innerText = lRed > 0 ? (lValid / lRed).toFixed(1) : lValid.toFixed(1);
-            document.getElementById('stat-psr').innerText = lRed > 0 ? (lPoints / lRed).toFixed(1) : "0.0";
-            document.getElementById('stat-srr').innerText = lTotal > 0 ? (lValid / lTotal).toFixed(1) : lValid.toFixed(1);
-            document.getElementById('stat-co7').innerText = lComeout;
+                if(v.Invalid_Roll) {
+                    superscriptStr = `<sup style="color:#ef4444; font-weight:bold;">0</sup>`;
+                }
 
-            document.getElementById('summary-total').innerText = state.totalRolls;
-            document.getElementById('summary-current').innerText = rollsInCurrentHandTracking; 
-            
-            renderPointsChipStack();
-            calculateMeanAndMedianBigRedDeltas();
-            processCalibrationSuiteSuggestionsEngine(kLogs);
-            setTimeout(() => { ribbon.scrollLeft = ribbon.scrollWidth; }, 1);
-        }
+                // Symmetrical Hardway Point Intersection Graphics Layer
+                if(isHard && (ribbonClass === 'color-dark' || ribbonClass === 'node-normal') && localActivePoint !== null && v.Total_Sum === localActivePoint) {
+                    ribbonClass = 'node-hardway-point';
+                } else if(isHard && ribbonClass === 'color-dark') {
+                    ribbonClass = 'node-normal'; // Standard presentation fallback logic
+                }
 
-        function launchKinematicFilterModal() {
-            activeModalContext = 'filter_mask'; activeEditId = null;
-            document.getElementById('modal-headline').innerText = "FILTER KINEMATIC OUTCOMES";
-            const fields = document.getElementById('modal-form-fields');
-            
-            let html = `
-            <div class="flex flex-col items-center gap-3 w-full font-mono">
-                <div class="flex gap-2 justify-center w-full">
-                    ${[6,7,8].map(i => getTileHtml(i)).join('')}
-                </div>
-                <div class="flex gap-2 justify-center w-full">
-                    ${[4,5,9,10].map(i => getTileHtml(i)).join('')}
-                </div>
-                <div class="flex gap-2 justify-center w-full">
-                    ${[2,3,11,12].map(i => getTileHtml(i)).join('')}
-                </div>
-                <div class="grid grid-cols-2 gap-2 w-full mt-2">
-                    <button onclick="setGlobalMaskPreset('ALL')" class="p-2 bg-purple-600 border border-purple-400 text-white text-xs rounded uppercase font-black tracking-wider">ALL</button>
-                    <button onclick="setGlobalMaskPreset('NONE')" class="p-2 bg-slate-800 border border-slate-600 text-slate-200 text-xs rounded uppercase font-black tracking-wider">UNSELECT ALL</button>
-                </div>
-            </div>`;
-            
-            fields.innerHTML = html;
-            document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitKinematicMaskModal()');
-            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
-        }
+                if(ribbon) {
+                    let label = v.Total_Sum.toString() + superscriptStr;
+                    ribbon.innerHTML += `<div class="history-node ${ribbonClass}">${label}</div>`;
+                }
+            });
 
-        function getTileHtml(i) {
-            let activeStyle = activeKinematicFilterMask[i] ? "bg-purple-600 border-purple-400 text-white" : "bg-slate-900 border-slate-700 text-slate-500";
-            return `<div id="mask-tile-${i}" onclick="toggleKinematicMaskValue(${i})" class="w-12 h-12 flex items-center justify-center border rounded text-center font-black cursor-pointer transition-all ${activeStyle}">${i}</div>`;
-        }
-
-        function toggleKinematicMaskValue(num) {
-            activeKinematicFilterMask[num] = !activeKinematicFilterMask[num];
-            const btn = document.getElementById(`mask-tile-${num}`);
-            if(!btn) return;
-            if (activeKinematicFilterMask[num]) {
-                btn.className = "w-12 h-12 flex items-center justify-center border rounded text-center font-black cursor-pointer transition-all bg-purple-600 border-purple-400 text-white";
-            } else {
-                btn.className = "w-12 h-12 flex items-center justify-center border rounded text-center font-black cursor-pointer transition-all bg-slate-900 border-slate-700 text-slate-500";
-            }
-        }
-
-        function setGlobalMaskPreset(type) {
+            // Update DOM Counter Arrays Sync Blocks
             for(let i=2; i<=12; i++) {
-                activeKinematicFilterMask[i] = (type === 'ALL');
-                const btn = document.getElementById(`mask-tile-${i}`);
-                if (btn) {
-                    btn.className = activeKinematicFilterMask[i] ? "w-12 h-12 flex items-center justify-center border rounded text-center font-black cursor-pointer transition-all bg-purple-600 border-purple-400 text-white" : "w-12 h-12 flex items-center justify-center border rounded text-center font-black cursor-pointer transition-all bg-slate-900 border-slate-700 text-slate-500";
+                if(i === 7) continue;
+                const counterNode = document.getElementById(`count-${i}`);
+                if(counterNode) counterNode.innerText = state.matrix[i].tot;
+                
+                const leftCell = document.getElementById(`cur-${i}`);
+                if(leftCell) leftCell.innerText = localMatrix[i];
+                
+                const rightCell = document.getElementById(`tot-${i}`);
+                if(rightCell) rightCell.innerText = localMatrix[i];
+                
+                const puck = document.getElementById(`puck-${i}`);
+                if(puck) puck.style.display = 'none';
+
+                if(leftCell) {
+                    if(localAtsMap[i] >= 1) leftCell.classList.add('ats-active');
+                    else leftCell.classList.remove('ats-active');
                 }
             }
-        }
 
-        function commitKinematicMaskModal() {
-            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
-            document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitMetadataModalForm()');
-            executeAnalyticalFilterEngine();
-        }
-
-        function launchInvalidCausePickerModal() {
-            activeModalContext = 'invalid_causes'; activeEditId = null;
-            let causeKeys = Object.keys(userCausesList);
-            const fields = document.getElementById('modal-form-fields');
-            document.getElementById('modal-headline').innerText = "SELECT INVALID TIMEOUT CAUSE";
-            
-            let html = `<div><label class="block mb-1 font-bold">Select Existing Reason Matrix:</label><select id="mField_CauseSelect" class="select-element py-2">`;
-            causeKeys.forEach(k => { html += `<option value="${k}">${k}</option>`; });
-            html += `</select></div><div class="mt-4 border-t border-slate-800 pt-3"><label class="block mb-1 font-bold">[OR REGISTER NEW INVALID CAUSE STR]:</label><input type="text" id="mField_NewCauseInput" class="w-full bg-slate-900 border border-slate-700 p-2 text-white rounded outline-none force-uppercase" placeholder="e.g. DICE OFF TABLE"></div>`;
-            
-            fields.innerHTML = html;
-            document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitInvalidCausePickerSelection()');
-            document.getElementById('ctxMetadataModalFrame').style.display = 'flex';
-        }
-
-        async function commitInvalidCausePickerSelection() {
-            if (!currentUid) return;
-            const selectVal = document.getElementById('mField_CauseSelect')?.value;
-            const inputVal = document.getElementById('mField_NewCauseInput')?.value.trim().toUpperCase();
-            
-            let finalCause = selectVal || "UNSPECIFIED PARSE FAULT";
-            if (inputVal) {
-                finalCause = inputVal;
-                await db.collection("users").doc(currentUid).collection("master_invalid_causes").doc(finalCause).set({ name: finalCause, Description: "USER DEFINED FRAME EXCEPTION" });
-                userCausesList[finalCause] = { name: finalCause };
+            if(localActivePoint !== null) {
+                const activePuck = document.getElementById(`puck-${localActivePoint}`);
+                if(activePuck) activePuck.style.display = 'block';
             }
-            
-            document.getElementById('ctxMetadataModalFrame').style.display = 'none';
-            document.getElementById('modal-accept-btn').setAttribute('onclick', 'commitMetadataModalForm()');
 
-            const r = {
-                leftDie: null, rightDie: null, sum: 0,
-                Location_ID: document.getElementById('ctxLocationSelect').value, 
-                Table_Position: document.getElementById('ctxTablePositionChildSelect').value || "ALL", 
-                Shooter_ID: document.getElementById('ctxShooterSelect').value,
-                Left_Set_Face: "N/A", Right_Set_Face: "N/A", Time_Stamp: new Date().toISOString(), Roll_Index: state.rollHistoryLog.length + 1, Puck_Before_Roll: state.activePoint ? state.activePoint : "OFF",
-                Kinematic_Status: false, Left_Kinematic: null, Right_Kinematic: null, Invalid_Roll: true, Notes: finalCause
+            evaluateRollingTemperatures();
+
+            const sTotal = document.getElementById('summary-total');
+            const sCurrent = document.getElementById('summary-current');
+            if(sTotal) sTotal.innerText = state.totalRolls;
+            if(sCurrent) sCurrent.innerText = mode === 'FULL' ? state.currentHandRolls : localCurrentHandRolls;
+
+            const totalShooters = localShooterHistory.length + (localCurrentHandRolls > 0 ? 1 : 0);
+            const sor = totalShooters > 0 ? (filteredSet.length / totalShooters).toFixed(1) : "0.0";
+            const srr = localSevensTotal > 0 ? (filteredSet.length / localSevensTotal).toFixed(1) : (filteredSet.length > 0 ? filteredSet.length.toFixed(1) : "0.0");
+            const psr = localSevensRed > 0 ? (localPointsMade / localSevensRed).toFixed(1) : "0.0";
+
+            const sRed = document.getElementById('stat-red');
+            const sSor = document.getElementById('stat-sor');
+            const sPsr = document.getElementById('stat-psr');
+            const sSrr = document.getElementById('stat-srr');
+            const sCo7 = document.getElementById('stat-co7');
+
+            if(sRed) sRed.innerText = localSevensRed;
+            if(sSor) sSor.innerText = sor;
+            if(sPsr) sPsr.innerText = psr;
+            if(sSrr) sSrr.innerText = srr;
+            if(sCo7) sCo7.innerText = localSevensComeout;
+
+            const ribbonContainer = document.getElementById('historyContainer');
+            if (ribbonContainer) ribbonContainer.scrollLeft = ribbonContainer.scrollWidth;
+        }
+
+        function evaluateRollingTemperatures() {
+            for (let num in probabilityWindows) {
+                const windowSize = probabilityWindows[num];
+                const sampleSlice = state.rawSequenceLog.slice(-windowSize);
+                const hitCount = sampleSlice.filter(x => x == parseInt(num)).length;
+                const chip = document.getElementById(`temp-${num}`);
+                if (!chip) continue;
+
+                if (state.totalRolls < windowSize) chip.innerText = '';
+                else if (hitCount > 1) chip.innerText = '🔥';
+                else if (hitCount < 1) chip.innerText = '❄️';
+                else chip.innerText = '';
+            }
+        }
+
+        async function pushCloudState(docId, customName = null) {
+            if(!currentUid) return;
+            const payload = {
+                totalRolls: state.totalRolls,
+                currentHandRolls: state.currentHandRolls,
+                sevensTotal: state.sevensTotal,
+                sevensRed: state.sevensRed,
+                sevensComeout: state.sevensComeout,
+                totalPointsMade: state.totalPointsMade,
+                activePoint: state.activePoint,
+                shooterHistory: state.shooterHistory,
+                rawSequenceLog: state.rawSequenceLog,
+                rollHistoryLog: JSON.stringify(state.rollHistoryLog),
+                matrix: JSON.stringify(state.matrix),
+                userShootersList: userShootersList,
+                userLocationsList: userLocationsList,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
             };
-            state.rollHistoryLog.push(r); state.rawSequenceLog.push(0);
-            executeCalculationsLoop(r); clearSelectionPads(); pushCloudState("active_session");
+            if(customName) payload.name = customName.toUpperCase();
+            await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).set(payload, { merge: true });
         }
 
-        async function pushCloudState(docId, name = null) {
-            if(!currentUid) return; let uppercaseName = name ? name.toUpperCase() : null;
-            let p = { module_id: "DICE_TRACKER", totalRolls: state.totalRolls, currentHandRolls: state.currentHandRolls, currentHandPoints: state.currentHandPoints, sevensTotal: state.sevensTotal, sevensRed: state.sevensRed, sevensComeout: state.sevensComeout, totalPointsMade: state.totalPointsMade, activePoint: state.activePoint, value: state.activePoint, shooterHistory: state.shooterHistory, rawSequenceLog: state.rawSequenceLog, payload_log: JSON.stringify(state.rollHistoryLog), matrix: JSON.stringify(state.matrix), meta_tags: { location: document.getElementById('ctxLocationSelect').value, base_unit: 1 }, timestamp: firebase.firestore.FieldValue.serverTimestamp() };
-            if(uppercaseName) p.name = uppercaseName; await db.collection("users").doc(currentUid).collection("crypt").doc(docId).set(p, { merge: true });
+        function fetchCloudState() {
+            db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").get().then(doc => {
+                if(doc.exists) {
+                    const data = doc.data();
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
+                    rebuildUIFromStoredData(data);
+                } else {
+                    executeAnalyticalFilterEngine();
+                }
+            });
         }
 
-        function fetchCloudState() { db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get().then(doc => { if(doc.exists) rebuildUIFromStoredData(doc.data()); }); }
+        function rebuildUIFromStoredData(data) {
+            state.totalRolls = data.totalRolls || 0;
+            state.currentHandRolls = data.currentHandRolls || 0;
+            state.sevensTotal = data.sevensTotal || 0;
+            state.sevensRed = data.sevensRed || 0;
+            state.sevensComeout = data.sevensComeout || 0;
+            state.totalPointsMade = data.totalPointsMade || 0;
+            state.activePoint = data.activePoint !== undefined ? data.activePoint : null;
+            state.shooterHistory = data.shooterHistory || [];
+            state.rawSequenceLog = data.rawSequenceLog || [];
+            state.matrix = data.matrix ? (typeof data.matrix === 'string' ? JSON.parse(data.matrix) : data.matrix) : state.matrix;
 
-        function rebuildUIFromStoredData(d) {
-            state.totalRolls = d.totalRolls || 0; 
-            state.currentHandRolls = d.currentHandRolls || 0; 
-            state.currentHandPoints = d.currentHandPoints || 0;
-            state.sevensTotal = d.sevensTotal || 0; state.sevensRed = d.sevensRed || 0; state.sevensComeout = d.sevensComeout || 0; state.totalPointsMade = d.totalPointsMade || 0; state.activePoint = d.activePoint !== undefined ? d.activePoint : null; state.shooterHistory = d.shooterHistory || []; state.rawSequenceLog = d.rawSequenceLog || [];
-            try { state.matrix = d.matrix ? (typeof d.matrix === 'string' ? JSON.parse(d.matrix) : d.matrix) : state.matrix; } catch(e){}
-            let rawLog = d.payload_log || d.rollHistoryLog || []; try { state.rollHistoryLog = typeof rawLog === 'string' ? JSON.parse(rawLog) : rawLog; } catch(e){}
+            if (data.rollHistoryLog) {
+                try {
+                    const parsedLog = typeof data.rollHistoryLog === 'string' ? JSON.parse(data.rollHistoryLog) : data.rollHistoryLog;
+                    if (Array.isArray(parsedLog)) {
+                        state.rollHistoryLog = parsedLog.map((row, idx) => {
+                            // Self-Healing Interface Logic Conversion Block
+                            if (row && typeof row === 'object' && 'Total_Sum' in row) {
+                                return row;
+                            } else {
+                                const oldSum = row.sum || row.Total_Sum || 7;
+                                const oldL = row.leftDie || row.Left_Die || 3;
+                                const oldR = row.rightDie || row.Right_Die || 4;
+                                return {
+                                    Parent_Module_Context: "DICE_TRACKER",
+                                    Session_Designation: "HEALED_BATCH",
+                                    Time_Stamp: row.Time_Stamp || new Date().toISOString(),
+                                    Roll_Index: row.Roll_Index || (idx + 1),
+                                    Puck_Before_Roll: row.Puck_Before_Roll || "OFF",
+                                    Left_Die: oldL,
+                                    Right_Die: oldR,
+                                    Total_Sum: oldSum,
+                                    Location_ID: row.locationId || row.Location_ID || "BALLY'S",
+                                    Table_Position: row.Table_Position || "SL-1",
+                                    Shooter_ID: row.shooterId || row.Shooter_ID || "ME",
+                                    Left_Top: row.Left_Top || 3,
+                                    Left_Back: row.Left_Back || 6,
+                                    Right_Top: row.Right_Top || 3,
+                                    Right_Back: row.Right_Back || 2,
+                                    Kinematic_Status: row.Kinematic_Status !== undefined ? row.Kinematic_Status : false,
+                                    Left_Kinematic: row.Left_Kinematic || "",
+                                    Right_Kinematic: row.Right_Kinematic || "",
+                                    Invalid_Roll: row.Invalid_Roll || false,
+                                    Is_Point_Established: row.Is_Point_Established || false,
+                                    Is_Point_Hit: row.Is_Point_Hit || false,
+                                    Notes: row.description || row.Notes || ""
+                                };
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error("Historical Log Array Corruptions Cleared:", e);
+                    state.rollHistoryLog = [];
+                }
+            }
+
             executeAnalyticalFilterEngine();
         }
 
-        async function handleCryptNavigationTrigger() {
-            if(state.rollHistoryLog.length > 0 && confirm("Archive current active workspace tracking session inside the Crypt?")) {
-                const n = prompt("ENTER ARCHIVE NAME:"); if(n && n.trim()) await pushCloudState("archive_" + Date.now(), n.trim().toUpperCase());
+        async function fetchVaultArchiveList() {
+            if(!currentUid) return;
+            try {
+                const snap = await db.collection("users").doc(currentUid).collection("dice_sessions").get();
+                const container = document.getElementById('vaultArchiveContainer');
+                if (!container) return;
+                container.innerHTML = '';
+                
+                let foundArchivesCount = 0;
+                snap.forEach(doc => {
+                    if(doc.id !== "active_session") {
+                        foundArchivesCount++;
+                        container.innerHTML += generateArchiveCardHtml(doc.id, doc.data());
+                    }
+                });
+
+                if(foundArchivesCount === 0) {
+                    container.innerHTML = `<div class="text-xs text-slate-500 uppercase p-4 italic">No archived session files found in database path.</div>`;
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        function generateArchiveCardHtml(id, data) {
+            const dateStr = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : 'ARCHIVE';
+            return `
+                <div class="vault-card">
+                    <div class="flex justify-between items-center">
+                        <span class="vault-card-title">
+                            ${data.name || 'UNNAMED DEPLOYMENT'}
+                            <button onclick="renameArchiveSession('${id}', '${data.name || ''}')" class="text-slate-500 hover:text-emerald-400 ml-1"><i class="fa-solid fa-pen-to-square text-[10px]"></i></button>
+                        </span>
+                        <span class="text-[10px] text-slate-500 font-bold">${dateStr}</span>
+                    </div>
+                    <div class="vault-card-meta">
+                        <span>TOTAL ROLLS: <b class="text-white">${data.totalRolls || 0}</b></span>
+                        <span>SEVENS OUT: <b class="text-red-400">${data.sevensRed || 0}</b></span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="resumeArchivedSession('${id}')" class="act-btn btn-green py-2 text-xs font-black flex-1">
+                            <i class="fa-solid fa-play mr-1"></i>Resume
+                        </button>
+                        <button onclick="deleteArchiveSession('${id}')" class="act-btn btn-red py-2 px-3 text-xs font-black">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function resumeArchivedSession(docId) {
+            if(!confirm("Overwrite active workspace with this saved session state?")) return;
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).get();
+                if(doc.exists) {
+                    const data = doc.data();
+                    await db.collection("users").doc(currentUid).collection("dice_sessions").doc("active_session").set(data);
+                    if(data.userShootersList) userShootersList = data.userShootersList;
+                    if(data.userLocationsList) userLocationsList = data.userLocationsList;
+                    syncConfigurationDropdowns();
+                    rebuildUIFromStoredData(data);
+                    alert("Vault Session state recovered.");
+                }
+            } catch (e) { alert("Session recovery aborted."); }
+        }
+
+        async function renameArchiveSession(docId, oldName) {
+            const name = prompt("New designation:", oldName);
+            if(name) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).update({ name: name.toUpperCase() });
+                fetchVaultArchiveList();
             }
-            window.location.assign('crypt.html');
+        }
+
+        async function deleteArchiveSession(docId) {
+            if(confirm("Delete this archive card permanently from database storage?")) {
+                await db.collection("users").doc(currentUid).collection("dice_sessions").doc(docId).delete();
+                fetchVaultArchiveList();
+            }
+        }
+
+        async function commitArchiveSession() {
+            const sessionName = prompt("DESIGNATE ARCHIVE SESSION NAME:");
+            if(!sessionName || !sessionName.trim()) return alert("Designate a valid name string prior to archive creation.");
+            
+            const newDocId = "archive_" + Date.now();
+            await pushCloudState(newDocId, sessionName.trim());
+            alert("Session archived successfully.");
+            fetchVaultArchiveList();
         }
 
         function executeUndo() {
-            if(state.rollHistoryLog.length === 0) return; 
-            state.rollHistoryLog.pop(); state.rawSequenceLog.pop();
+            if(state.rollHistoryLog.length === 0) return alert("History underflow.");
             
-            const ribbon = document.getElementById('historyContainer');
-            if(ribbon) ribbon.innerHTML = '';
+            state.rollHistoryLog.pop();
+            state.rawSequenceLog.pop();
+            
+            if(state.rollHistoryLog.length === 0) {
+                executeClearReset();
+            } else {
+                state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+                state.activePoint = null; state.shooterHistory = [];
+                for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
 
-            state.totalRolls = 0; state.currentHandRolls = 0; state.currentHandPoints = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null;
-            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-            
-            const b = [...state.rollHistoryLog]; state.rollHistoryLog = []; state.rawSequenceLog = [];
-            b.forEach(row => { 
-                state.rollHistoryLog.push(row); 
-                if(!row.Invalid_Roll) state.rawSequenceLog.push(row.sum); 
-                executeCalculationsLoop(row); 
-            }); 
-            pushCloudState("active_session");
+                const backupLog = [...state.rollHistoryLog];
+                state.rollHistoryLog = [];
+                state.rawSequenceLog = [];
+
+                backupLog.forEach(row => {
+                    state.rollHistoryLog.push(row);
+                    state.rawSequenceLog.push(row.Total_Sum);
+                    executeCalculationsLoop(row);
+                });
+
+                pushCloudState("active_session");
+            }
         }
 
         function executeClearReset() {
-            if(!confirm("Clear session data?")) return;
-            state.totalRolls = 0; state.currentHandRolls = 0; state.currentHandPoints = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0; state.activePoint = null; state.rollHistoryLog = []; state.rawSequenceLog = [];
-            for(let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
-            const ribbon = document.getElementById('historyContainer');
-            if(ribbon) ribbon.innerHTML = '';
-            clearSelectionPads(); executeAnalyticalFilterEngine(); pushCloudState("active_session");
+            if(!confirm("Clear active metrics dataset?")) return;
+            state.totalRolls = 0; state.currentHandRolls = 0; state.sevensTotal = 0; state.sevensRed = 0; state.sevensComeout = 0; state.totalPointsMade = 0;
+            state.activePoint = null; state.shooterHistory = []; state.rollHistoryLog = []; state.rawSequenceLog = [];
+            for (let k in state.matrix) { state.matrix[k].cur = 0; state.matrix[k].tot = 0; }
+            const container = document.getElementById('historyContainer');
+            if(container) container.innerHTML = '';
+            clearSelectionPads();
+            executeAnalyticalFilterEngine();
+            pushCloudState("active_session");
         }
 
-        function clearSelectionPads() { state.selectedLeft = null; state.selectedRight = null; for(let i=1; i<=6; i++) { const lBtn = document.getElementById(`l-pad-${i}`); if(lBtn) lBtn.classList.remove('active', 'active-kinematic'); const rBtn = document.getElementById(`r-pad-${i}`); if(rBtn) rBtn.classList.remove('active', 'active-kinematic'); } }
-        function getSelectedText(type) { const el = document.getElementById(type === 'Location' ? 'ctxLocationSelect' : 'ctxShooterSelect'); if (!el || el.value === 'ALL' || el.selectedIndex < 0) return "UNASSIGNED"; return el.options[el.selectedIndex].text; }
+        function clearSelectionPads() {
+            state.selectedLeft = null; state.selectedRight = null;
+            for(let i=1; i<=6; i++) {
+                const lPad = document.getElementById(`l-pad-${i}`);
+                const rPad = document.getElementById(`r-pad-${i}`);
+                if(lPad) lPad.classList.remove('active');
+                if(rPad) rPad.classList.remove('active');
+            }
+            calculateLiveKinematicsPreview();
+        }
     </script>
 </body>
 </html>
