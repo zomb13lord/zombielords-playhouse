@@ -278,20 +278,29 @@
                 let csvString = "";
                 
                 if (data.module_id === "DICE_TRACKER") {
-                    csvString = '"Parent_Module_Context","Session_Designation","Time_Stamp","Roll_Index","Puck_Before_Roll","Left_Die","Right_Die","Total_Sum","Location_ID","Table_Position","Shooter_ID","Left_Set_Face","Right_Set_Face","Kinematic_Status","Left_Kinematic","Right_Kinematic","Invalid_Roll","Notes"\n';
+                    csvString = '"Time_Stamp","Roll_Index","Puck_Before_Roll","Left_Die","Right_Die","Total_Sum","Location_ID","Table_Position","Shooter_ID","Left_Top","Left_Back","Right_Top","Right_Back","Kinematic_Status","Left_Kinematic","Right_Kinematic","Invalid_Roll","Notes"\n';
                     logArray.forEach(r => {
-                        csvString += `"DICE_TRACKER","${data.name || 'UNNAMED'}",`
-                                  + `"${r.Time_Stamp || r.timeStamp || ''}","${r.Roll_Index || r.rollIndex || 0}","${r.Puck_Before_Roll || r.puckBeforeRoll || 'OFF'}",`
+                        // Handle legacy data where Left_Set_Face might still exist, or new data where Left_Top exists
+                        let lTop = r.Left_Top !== undefined ? r.Left_Top : (r.Left_Set_Face ? r.Left_Set_Face.split('/')[0] : 3);
+                        let lBack = r.Left_Back !== undefined ? r.Left_Back : (r.Left_Set_Face ? r.Left_Set_Face.split('/')[1] : 6);
+                        let rTop = r.Right_Top !== undefined ? r.Right_Top : (r.Right_Set_Face ? r.Right_Set_Face.split('/')[0] : 3);
+                        let rBack = r.Right_Back !== undefined ? r.Right_Back : (r.Right_Set_Face ? r.Right_Set_Face.split('/')[1] : 2);
+                        
+                        // Handle legacy kinematic objects vs new integers
+                        let lKin = r.Left_Kinematic !== null && r.Left_Kinematic !== undefined ? (typeof r.Left_Kinematic === 'object' ? r.Left_Kinematic.rot : r.Left_Kinematic) : '';
+                        let rKin = r.Right_Kinematic !== null && r.Right_Kinematic !== undefined ? (typeof r.Right_Kinematic === 'object' ? r.Right_Kinematic.rot : r.Right_Kinematic) : '';
+
+                        csvString += `"${r.Time_Stamp || r.timeStamp || ''}","${r.Roll_Index || r.rollIndex || 0}","${r.Puck_Before_Roll || r.puckBeforeRoll || 'OFF'}",`
                                   + `"${r.Left_Die || r.leftDie || 0}","${r.Right_Die || r.rightDie || 0}","${r.Total_Sum || r.sum || 0}",`
                                   + `"${r.Location_ID || r.locationId || 'UNASSIGNED'}","${r.Table_Position || r.tablePosition || 'UNASSIGNED'}","${r.Shooter_ID || r.shooterId || 'UNASSIGNED'}",`
-                                  + `"${r.Left_Set_Face || r.leftSetFace || '3/6'}","${r.Right_Set_Face || r.rightSetFace || '3/2'}","${r.Kinematic_Status || r.kinematicStatus || false}",`
-                                  + `"${r.Left_Kinematic !== null && r.Left_Kinematic !== undefined ? r.Left_Kinematic : (r.leftKinematic || '')}","${r.Right_Kinematic !== null && r.Right_Kinematic !== undefined ? r.Right_Kinematic : (r.rightKinematic || '')}",`
+                                  + `"${lTop}","${lBack}","${rTop}","${rBack}","${r.Kinematic_Status || r.kinematicStatus || false}",`
+                                  + `"${lKin}","${rKin}",`
                                   + `"${r.Invalid_Roll || r.invalidRoll || false}","${(r.Notes || r.description || '').replace(/"/g, '""')}"\n`;
                     });
                 } else if (data.module_id === "ROULETTE_TRACKER") {
-                    csvString = '"Parent_Module_Context","Session_Designation","Time_Stamp","Value"\n';
+                    csvString = '"Time_Stamp","Value"\n';
                     logArray.forEach(r => {
-                        csvString += `"ROULETTE_TRACKER","${data.name || 'UNNAMED'}","${r.t || ''}","${r.n || ''}"\n`;
+                        csvString += `"${r.t || ''}","${r.n || ''}"\n`;
                     });
                 } else {
                     return alert("Unsupported export transformation context.");
@@ -316,57 +325,71 @@
                     const lines = text.split(/\r?\n/);
                     if (lines.length < 2) return alert("File underflow detected.");
                     
-                    lines.shift(); 
                     const cleanStr = (val) => (val || '').replace(/^"|"$/g, '').trim();
                     
-                    let firstRowCells = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                    if (!firstRowCells) return alert("Empty row parse failure.");
+                    // Dynamic Header Parsing
+                    const headers = lines[0].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g).map(cleanStr);
+                    if (!headers || headers.length === 0) return alert("Empty header parse failure.");
                     
-                    let modId = cleanStr(firstRowCells[0]);
-                    let sessionName = cleanStr(firstRowCells[1]) || "IMPORTED_SESSION";
+                    lines.shift(); // Remove header row
+                    
+                    // Auto-Detect Module Context
+                    let modId = "UNKNOWN";
+                    if (headers.includes("Puck_Before_Roll")) modId = "DICE_TRACKER";
+                    else if (headers.includes("Value") || headers.includes("n")) modId = "ROULETTE_TRACKER";
+                    
+                    if (modId === "UNKNOWN") return alert("Unrecognized Polymorphic Metadata Signature. Could not detect module type.");
+
+                    // Prompt for Session Designation
+                    let sessionName = prompt("Enter a designation for this imported session:", "IMPORTED_SESSION");
+                    if (!sessionName) return; // User cancelled
+                    sessionName = sessionName.trim().toUpperCase();
+                    
                     let payloadArray = [];
                     
-                    if (modId === "DICE_TRACKER") {
-                        lines.forEach(line => {
-                            if (!line.trim()) return;
-                            let cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                            if (!cells || cells.length < 18) return;
-                            payloadArray.push({
-                                Time_Stamp: cleanStr(cells[2]),
-                                Roll_Index: parseInt(cleanStr(cells[3])) || 0,
-                                Puck_Before_Roll: cleanStr(cells[4]) === 'OFF' ? null : parseInt(cleanStr(cells[4])),
-                                Left_Die: parseInt(cleanStr(cells[5])) || 0,
-                                Right_Die: parseInt(cleanStr(cells[6])) || 0,
-                                Total_Sum: parseInt(cleanStr(cells[7])) || 0,
-                                Location_ID: cleanStr(cells[8]),
-                                Table_Position: cleanStr(cells[9]),
-                                Shooter_ID: cleanStr(cells[10]),
-                                Left_Set_Face: cleanStr(cells[11]),
-                                Right_Set_Face: cleanStr(cells[12]),
-                                Kinematic_Status: cleanStr(cells[13]) === 'true',
-                                Left_Kinematic: cleanStr(cells[14]) !== '' ? parseInt(cleanStr(cells[14])) : null,
-                                Right_Kinematic: cleanStr(cells[15]) !== '' ? parseInt(cleanStr(cells[15])) : null,
-                                Invalid_Roll: cleanStr(cells[16]) === 'true',
-                                Notes: cleanStr(cells[17])
-                            });
+                    lines.forEach(line => {
+                        if (!line.trim()) return;
+                        let cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+                        if (!cells) return;
+                        
+                        // Map cells to headers dynamically
+                        let rowData = {};
+                        headers.forEach((header, index) => {
+                            rowData[header] = cells[index] ? cleanStr(cells[index]) : "";
                         });
-                    } else if (modId === "ROULETTE_TRACKER") {
-                        lines.forEach(line => {
-                            if (!line.trim()) return;
-                            let cells = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-                            if (!cells || cells.length < 4) return;
+
+                        if (modId === "DICE_TRACKER") {
                             payloadArray.push({
-                                t: parseInt(cleanStr(cells[2])) || Date.now(),
-                                n: cleanStr(cells[3])
+                                Time_Stamp: rowData["Time_Stamp"] || "",
+                                Roll_Index: parseInt(rowData["Roll_Index"]) || 0,
+                                Puck_Before_Roll: rowData["Puck_Before_Roll"] === 'OFF' ? null : parseInt(rowData["Puck_Before_Roll"]),
+                                Left_Die: parseInt(rowData["Left_Die"]) || 0,
+                                Right_Die: parseInt(rowData["Right_Die"]) || 0,
+                                Total_Sum: parseInt(rowData["Total_Sum"]) || 0,
+                                Location_ID: rowData["Location_ID"] || "UNASSIGNED",
+                                Table_Position: rowData["Table_Position"] || "UNASSIGNED",
+                                Shooter_ID: rowData["Shooter_ID"] || "UNASSIGNED",
+                                Left_Top: parseInt(rowData["Left_Top"]) || 3,
+                                Left_Back: parseInt(rowData["Left_Back"]) || 6,
+                                Right_Top: parseInt(rowData["Right_Top"]) || 3,
+                                Right_Back: parseInt(rowData["Right_Back"]) || 2,
+                                Kinematic_Status: rowData["Kinematic_Status"] === 'true',
+                                Left_Kinematic: rowData["Left_Kinematic"] !== '' ? parseInt(rowData["Left_Kinematic"]) : null,
+                                Right_Kinematic: rowData["Right_Kinematic"] !== '' ? parseInt(rowData["Right_Kinematic"]) : null,
+                                Invalid_Roll: rowData["Invalid_Roll"] === 'true',
+                                Notes: rowData["Notes"] || ""
                             });
-                        });
-                    } else {
-                        return alert("Unrecognized Polymorphic Metadata Signature.");
-                    }
+                        } else if (modId === "ROULETTE_TRACKER") {
+                            payloadArray.push({
+                                t: parseInt(rowData["Time_Stamp"]) || Date.now(),
+                                n: rowData["Value"] || ""
+                            });
+                        }
+                    });
 
                     const payloadDocument = {
                         module_id: modId,
-                        name: sessionName.toUpperCase(),
+                        name: sessionName,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                         is_favorite: false,
                         meta_tags: { 
@@ -380,7 +403,10 @@
                     await db.collection("users").doc(currentUid).collection("crypt").doc("archive_" + Date.now()).set(payloadDocument);
                     alert(`Tabular Inscription Resolved: Extracted ${payloadArray.length} items.`);
                     fetchCryptData();
-                } catch(err) { alert("Data Layout Parsing Collapse."); }
+                } catch(err) { 
+                    console.error(err);
+                    alert("Data Layout Parsing Collapse."); 
+                }
             };
             reader.readAsText(fileObject);
         }
