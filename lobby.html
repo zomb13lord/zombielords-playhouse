@@ -1,30 +1,59 @@
-<!-- name: lobby.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playhouse Lobby | Zombie Lord's</title>
+    <title>Playhouse Lobby | ZombieLord's</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Creepster&display=swap');
         body {
             margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
             font-family: 'Cinzel', serif; min-height: 100vh;
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), 
-            url('https://zomb13lord.github.io/zombielords-playhouse/background.png');
+            url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
             background-size: cover; background-position: center; background-attachment: fixed;
         }
-        .shard-card {
-            background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(16, 185, 129, 0.2); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .shard-card:hover {
-            border-color: #10b981; box-shadow: 0 0 30px rgba(16, 185, 129, 0.2); transform: translateY(-8px);
-        }
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        
+        .playhouse-glow {
+            text-shadow: 
+                -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+                0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1);
+        }
+
+        .bleeding-header {
+            font-family: 'Creepster', system-ui;
+            color: #ffffff; 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 25px rgba(16, 185, 129, 0.9), 
+                0 0 10px rgba(16, 185, 129, 0.6), 
+                4px 4px 0px #000, 
+                -2px -2px 0px #000;
+            animation: pulse-glow 3s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 15px rgba(16, 185, 129, 0.6), 4px 4px 0px #000; }
+            100% { text-shadow: 0 0 35px rgba(16, 185, 129, 1), 0 0 15px rgba(16, 185, 129, 0.8), 4px 4px 0px #000; }
+        }
+
+        .text-shadow-heavy {
+            text-shadow: 2px 2px 5px #000, 0 0 15px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,1);
+        }
+
+        .module-card {
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+        }
+        .module-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
     </style>
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
@@ -38,10 +67,10 @@
     </script>
 </head>
 <body class="flex flex-col">
-    <nav class="p-4 flex justify-between items-center bg-slate-950/60 backdrop-blur-xl border-b border-emerald-900/30 sticky top-0 z-50">
+    <nav class="p-4 flex justify-between items-center bg-slate-950/80 backdrop-blur-xl border-b border-emerald-900/50 sticky top-0 z-50">
         <div class="flex flex-col items-center">
-            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">Zombie Lord's</h2>
-            <span class="text-[9px] text-slate-200 tracking-[0.4em] uppercase font-bold mt-1">Playhouse</span>
+            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">ZombieLord's</h2>
+            <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
         <div class="flex items-center gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
@@ -49,33 +78,95 @@
         </div>
     </nav>
 
-    <main class="flex-grow flex flex-col items-center justify-center p-6">
+    <main class="flex-grow flex flex-col items-center justify-center p-6 py-12">
         <header class="mb-16 text-center">
-            <h1 class="text-5xl md:text-7xl font-black mb-3 tracking-widest uppercase">Playhouse</h1>
-            <p class="emerald-text text-[11px] tracking-[0.6em] uppercase font-bold opacity-80">Choose Your Fate</p>
+            <h1 class="text-5xl md:text-7xl mb-3 bleeding-header">PLAYHOUSE</h1>
+            <p class="text-white text-[11px] tracking-[0.6em] uppercase font-black text-shadow-heavy" style="text-shadow: 0 0 10px #10b981, 2px 2px 4px #000;">Choose Your Fate</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
-            <div class="shard-card p-8 rounded-sm cursor-pointer group" onclick="window.location.href='roulette-config.html'">
-                <div class="text-4xl mb-6 opacity-60 group-hover:opacity-100 transition-opacity">🛡️</div>
-                <h3 class="text-lg font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Roulette Tracker</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">Advanced calibration engine. Physical matrix tracking and sector auditing maps.</p>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/30 pt-4 flex justify-between items-center">Calibrate <span>&rarr;</span></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
+            
+            <!-- ROULETTE CARD -->
+            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.location.href='roulette-config.html'">
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/roulette-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/80 group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Roulette Tracker</h3>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Advanced calibration engine. Physical matrix tracking and sector auditing maps.</p>
+                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Calibrate <span>&rarr;</span></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="shard-card p-8 rounded-sm cursor-pointer group border-emerald-500/30" onclick="window.location.href='dice.html'">
-                <div class="text-4xl mb-6 opacity-60 group-hover:opacity-100 transition-opacity">🎲</div>
-                <h3 class="text-lg font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">Dice Tracker</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">Track craps roll metrics, shooter sets, and real-time axis stability trends.</p>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/30 pt-4 flex justify-between items-center">Roll Bones <span>&rarr;</span></div>
+            <!-- DICE CARD -->
+            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.location.href='dice.html'">
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/80 group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Dice Tracker</h3>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Track craps roll metrics, shooter sets, and real-time axis stability trends.</p>
+                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Roll Bones <span>&rarr;</span></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="shard-card p-8 rounded-sm cursor-pointer group border-emerald-500/30" onclick="window.location.href='crypt.html'">
-                <div class="text-4xl mb-6 opacity-60 group-hover:opacity-100 transition-opacity">🗄️</div>
-                <h3 class="text-lg font-black mb-3 uppercase tracking-wider group-hover:emerald-text transition-colors">The Crypt</h3>
-                <p class="text-slate-400 text-xs leading-relaxed mb-10 font-serif italic h-12">Unified polymorphic repository. Store, review, import or export multi-module history.</p>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/30 pt-4 flex justify-between items-center">Exhume <span>&rarr;</span></div>
+            <!-- CRYPT CARD -->
+            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.location.href='crypt.html'">
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/crypt-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/80 group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Crypt</h3>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Unified polymorphic repository. Store, review, import or export multi-module history.</p>
+                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Exhume <span>&rarr;</span></div>
+                    </div>
+                </div>
             </div>
+
+            <!-- BACCARAT CARD (DISABLED) -->
+            <div class="relative overflow-hidden rounded-sm border border-slate-700/50 cursor-not-allowed min-h-[280px] flex flex-col justify-end p-6 opacity-70 grayscale-[50%]">
+                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/90"></div>
+                <div class="absolute top-4 right-4 bg-red-900/80 text-red-200 text-[8px] font-black tracking-widest px-2 py-1 rounded border border-red-500/50 uppercase z-20">Coming Soon</div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-slate-400 text-shadow-heavy">Baccarat</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Track player and banker streaks, tie anomalies, and shoe trends.</p>
+                        <div class="text-[10px] font-bold text-slate-600 tracking-[0.4em] uppercase border-t border-slate-800 pt-4 flex justify-between items-center">Locked <span>&times;</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SPORTS BETTING CARD (DISABLED) -->
+            <div class="relative overflow-hidden rounded-sm border border-slate-700/50 cursor-not-allowed min-h-[280px] flex flex-col justify-end p-6 opacity-70 grayscale-[50%]">
+                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/sportsbetting-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/90"></div>
+                <div class="absolute top-4 right-4 bg-red-900/80 text-red-200 text-[8px] font-black tracking-widest px-2 py-1 rounded border border-red-500/50 uppercase z-20">Coming Soon</div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-slate-400 text-shadow-heavy">Sportsbook</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Advanced odds calculation, parlay tracking, and edge detection.</p>
+                        <div class="text-[10px] font-bold text-slate-600 tracking-[0.4em] uppercase border-t border-slate-800 pt-4 flex justify-between items-center">Locked <span>&times;</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POKER CARD (DISABLED) -->
+            <div class="relative overflow-hidden rounded-sm border border-slate-700/50 cursor-not-allowed min-h-[280px] flex flex-col justify-end p-6 opacity-70 grayscale-[50%]">
+                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/poker-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/90"></div>
+                <div class="absolute top-4 right-4 bg-red-900/80 text-red-200 text-[8px] font-black tracking-widest px-2 py-1 rounded border border-red-500/50 uppercase z-20">Coming Soon</div>
+                <div class="relative z-10 flex flex-col h-full justify-between">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-slate-400 text-shadow-heavy">Poker Room</h3>
+                        <p class="text-slate-500 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Session bankroll management, hand analysis, and opponent profiling.</p>
+                        <div class="text-[10px] font-bold text-slate-600 tracking-[0.4em] uppercase border-t border-slate-800 pt-4 flex justify-between items-center">Locked <span>&times;</span></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 </body>
