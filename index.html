@@ -18,70 +18,29 @@
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Creepster&display=swap');
 
         body {
-            margin: 0; 
-            padding: 0; 
-            height: 100dvh; 
-            width: 100vw;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
+            margin: 0; padding: 0; height: 100dvh; width: 100vw;
+            display: flex; flex-direction: column; justify-content: flex-end; align-items: center;
             background-color: #020617;
-            background-image: 
-                linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0) 65%), 
-                url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
-            background-size: cover;
-            background-position: center top; 
-            background-attachment: fixed;
-            font-family: 'Cinzel', serif;
-            overflow: hidden; 
+            background-image: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 35%, rgba(0,0,0,0) 65%), url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
+            background-size: cover; background-position: center top; background-attachment: fixed;
+            font-family: 'Cinzel', serif; overflow: hidden; 
         }
 
-        .top-module {
-            text-align: center;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 2vh;
-        }
-
-        .bottom-module {
-            margin-bottom: 6vh;
-            width: 90%; 
-            max-width: 420px; 
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            z-index: 10;
-        }
+        .top-module { text-align: center; z-index: 10; display: flex; flex-direction: column; align-items: center; margin-bottom: 2vh; }
+        .bottom-module { margin-bottom: 6vh; width: 90%; max-width: 420px; text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 10; }
 
         @media (min-width: 768px) {
             body {
                 justify-content: space-between;
-                background-image: 
-                    linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.95) 100%), 
-                    url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
+                background-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
             }
-            .top-module {
-                margin-top: 10vh;
-                margin-bottom: 0;
-            }
+            .top-module { margin-top: 10vh; margin-bottom: 0; }
         }
 
         .bleeding-header {
-            font-family: 'Creepster', system-ui;
-            font-size: clamp(2.5rem, 11vw, 5.5rem);
-            color: #ffffff; 
-            text-transform: uppercase; 
-            letter-spacing: 3px;
-            line-height: 1.1;
-            text-shadow: 
-                0 0 25px rgba(16, 185, 129, 0.9), 
-                0 0 10px rgba(16, 185, 129, 0.6), 
-                4px 4px 0px #000, 
-                -2px -2px 0px #000;
+            font-family: 'Creepster', system-ui; font-size: clamp(2.5rem, 11vw, 5.5rem); color: #ffffff; 
+            text-transform: uppercase; letter-spacing: 3px; line-height: 1.1;
+            text-shadow: 0 0 25px rgba(16, 185, 129, 0.9), 0 0 10px rgba(16, 185, 129, 0.6), 4px 4px 0px #000, -2px -2px 0px #000;
             animation: pulse-glow 3s infinite alternate;
         }
 
@@ -90,72 +49,28 @@
             100% { text-shadow: 0 0 35px rgba(16, 185, 129, 1), 0 0 15px rgba(16, 185, 129, 0.8), 4px 4px 0px #000; }
         }
 
-        .text-shadow-heavy {
-            text-shadow: 2px 2px 5px #000, 0 0 15px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,1);
-        }
-
-        .playhouse-glow {
-            text-shadow: 
-                -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
-                0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1);
-        }
+        .text-shadow-heavy { text-shadow: 2px 2px 5px #000, 0 0 15px rgba(0,0,0,0.9), 0 0 30px rgba(0,0,0,1); }
+        .playhouse-glow { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1); }
 
         .wicked-btn {
-            background: linear-gradient(180deg, #064e3b 0%, #022c22 100%); 
-            color: #a7f3d0; 
-            font-weight: 900; 
-            text-transform: uppercase;
-            letter-spacing: 0.15em; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid #10b981;
-            border-bottom: 3px solid #047857;
-            border-radius: 6px;
+            background: linear-gradient(180deg, #064e3b 0%, #022c22 100%); color: #a7f3d0; font-weight: 900; 
+            text-transform: uppercase; letter-spacing: 0.15em; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #10b981; border-bottom: 3px solid #047857; border-radius: 6px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.8), inset 0 1px 1px rgba(16, 185, 129, 0.4);
         }
+        .wicked-btn:hover { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(16, 185, 129, 0.6); border-color: #34d399; color: #ffffff; }
+        .wicked-btn:active { transform: translateY(2px); border-bottom-width: 1px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); }
 
-        .wicked-btn:hover {
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(16, 185, 129, 0.6);
-            border-color: #34d399;
-            color: #ffffff;
-        }
-
-        .wicked-btn:active {
-            transform: translateY(2px);
-            border-bottom-width: 1px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.8);
-        }
-
-        /* Modal Styles */
-        .modal-mask {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);
-            z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px;
-        }
-        .modal-box {
-            background: #020617; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 400px;
-            padding: 30px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(0,0,0,1);
-            text-align: center; position: relative;
-        }
-        .input-wicked {
-            background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace;
-            padding: 12px; border-radius: 4px; width: 100%; text-align: center; font-size: 16px;
-            outline: none; text-transform: uppercase; letter-spacing: 2px;
-        }
+        .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-box { background: #020617; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 400px; padding: 30px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(0,0,0,1); text-align: center; }
+        .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: center; font-size: 16px; outline: none; text-transform: uppercase; letter-spacing: 2px; }
         .input-wicked:focus { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
     </style>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY",
-            authDomain: "zombielords-playhouse.firebaseapp.com",
-            projectId: "zombielords-playhouse",
-            storageBucket: "zombielords-playhouse.firebasestorage.app",
-            messagingSenderId: "795162260246",
-            appId: "1:795162260246:web:97f0361751ac1359b31637"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
+        const auth = firebase.auth(); const db = firebase.firestore();
         let pendingUser = null;
 
         async function loginWithGoogle() {
@@ -163,56 +78,36 @@
             try {
                 const result = await auth.signInWithPopup(provider);
                 pendingUser = result.user;
-                
-                // Check if user exists in Firestore
                 const userDoc = await db.collection('users').doc(pendingUser.uid).get();
-                
-                if (userDoc.exists) {
-                    // Existing user, proceed to lobby
-                    window.location.href = "lobby.html";
-                } else {
-                    // New user, show path selection modal
-                    document.getElementById('fate-modal').style.display = 'flex';
-                }
-            } catch (error) {
-                console.error("Authentication Error:", error);
-                alert("Authentication failed. The spirits reject you.");
-            }
+                if (userDoc.exists) window.location.href = "lobby.html";
+                else document.getElementById('fate-modal').style.display = 'flex';
+            } catch (error) { alert("Authentication failed. The spirits reject you."); }
         }
 
         async function selectMortalPath() {
             if (!pendingUser) return;
             try {
                 await db.collection('users').doc(pendingUser.uid).set({
-                    email: pendingUser.email,
-                    displayName: pendingUser.displayName,
-                    role: 'User',
-                    permissions: {
-                        crypt: true,
-                        baccarat: false,
-                        dice: false,
-                        poker: false,
-                        roulette: false,
-                        sportsbook: false
-                    },
+                    email: pendingUser.email, displayName: pendingUser.displayName, role: 'User',
+                    permissions: { crypt: true, baccarat: false, dice: false, poker: false, roulette: false, sportsbook: false },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 window.location.href = "lobby.html";
-            } catch (error) {
-                console.error("Error creating mortal profile:", error);
-                alert("Failed to forge your soul in the database.");
-            }
+            } catch (error) { alert("Failed to forge your soul in the database."); }
         }
 
-        function showAdminInput() {
-            document.getElementById('path-selection').style.display = 'none';
-            document.getElementById('admin-verification').style.display = 'block';
-        }
+        function showAdminInput() { document.getElementById('path-selection').style.display = 'none'; document.getElementById('admin-verification').style.display = 'block'; }
+        function cancelAdminInput() { document.getElementById('admin-verification').style.display = 'none'; document.getElementById('path-selection').style.display = 'block'; document.getElementById('admin-code').value = ''; }
 
-        function cancelAdminInput() {
-            document.getElementById('admin-verification').style.display = 'none';
-            document.getElementById('path-selection').style.display = 'block';
-            document.getElementById('admin-code').value = '';
+        function formatAdminCode(e) {
+            let val = e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+            // Exception for Genesis Code
+            if (val.startsWith("ZOMBIE")) { e.target.value = val; return; }
+            // Standard 16-char hyphenated format
+            val = val.replace(/_/g, '');
+            if (val.length > 16) val = val.substring(0, 16);
+            let formatted = val.match(/.{1,4}/g)?.join('-') || val;
+            e.target.value = formatted;
         }
 
         async function verifyAdminCode() {
@@ -221,121 +116,68 @@
             if (!codeInput) return alert("Enter the sacred text.");
 
             try {
-                // 1. Check Genesis Code (Master Admin)
                 if (codeInput === "ZOMBIELORD_REIGNS") {
                     const genesisRef = db.collection('system').doc('genesis');
                     const genesisDoc = await genesisRef.get();
-                    
-                    if (genesisDoc.exists && genesisDoc.data().used) {
-                        alert("The Genesis Code has already been consumed.");
-                        return;
-                    }
-
-                    // Consume Genesis Code
-                    await genesisRef.set({
-                        used: true,
-                        consumedBy: pendingUser.uid,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    // Create Master Admin Profile
+                    if (genesisDoc.exists && genesisDoc.data().used) return alert("The Genesis Code has already been consumed.");
+                    await genesisRef.set({ used: true, consumedBy: pendingUser.uid, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                     await db.collection('users').doc(pendingUser.uid).set({
-                        email: pendingUser.email,
-                        displayName: pendingUser.displayName,
-                        role: 'Master Admin',
+                        email: pendingUser.email, displayName: pendingUser.displayName, role: 'Master Admin',
                         permissions: { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
-
-                    window.location.href = "lobby.html";
-                    return;
+                    window.location.href = "lobby.html"; return;
                 }
 
-                // 2. Check Standard Invite Codes (Admin)
                 const codeRef = db.collection('invite_codes').doc(codeInput);
                 const codeDoc = await codeRef.get();
-
-                if (!codeDoc.exists || codeDoc.data().used) {
-                    alert("Invalid or expired code. The shadows laugh at your attempt.");
-                    return;
-                }
-
-                // Consume Invite Code
-                await codeRef.update({
-                    used: true,
-                    consumedBy: pendingUser.uid,
-                    consumedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // Create Admin Profile
+                if (!codeDoc.exists || codeDoc.data().used) return alert("Invalid or expired code. The shadows laugh at your attempt.");
+                
+                await codeRef.update({ used: true, consumedBy: pendingUser.uid, consumedAt: firebase.firestore.FieldValue.serverTimestamp() });
                 await db.collection('users').doc(pendingUser.uid).set({
-                    email: pendingUser.email,
-                    displayName: pendingUser.displayName,
-                    role: 'Admin',
+                    email: pendingUser.email, displayName: pendingUser.displayName, role: 'Admin',
                     permissions: { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-
                 window.location.href = "lobby.html";
-
-            } catch (error) {
-                console.error("Verification Error:", error);
-                alert("A disturbance in the ether prevented verification.");
-            }
+            } catch (error) { alert("A disturbance in the ether prevented verification."); }
         }
     </script>
 </head>
 <body>
-    
     <div class="top-module">
         <h1 class="bleeding-header">ZombieLord's</h1>
         <p class="text-[13px] md:text-[15px] text-white font-black uppercase tracking-[1em] md:tracking-[1.2em] mt-3 md:mt-4 playhouse-glow">Playhouse</p>
     </div>
-
     <div class="bottom-module">
         <p class="text-slate-300 text-[12px] italic mb-8 leading-relaxed font-serif px-2 text-shadow-heavy">
             "Kneel before the <span class="text-white font-bold">Throne</span>. <span class="text-emerald-400 uppercase font-black text-[14px] tracking-wider" style="text-shadow: 0 0 12px #10b981, 2px 2px 4px #000;">ZombieLord</span> reigns absolute by the universal laws of mathematics.<br>
             Master of equations and probabilities, architect of strategy, and the true sovereign of the odds.<br>
             Enter, and let the numbers dictate your destiny."
         </p>
-
         <button onclick="loginWithGoogle()" class="wicked-btn w-full py-4 flex items-center justify-center gap-3">
             <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="16" alt="G" style="filter: brightness(0) invert(1) opacity(0.8);">
             <span class="text-[13px]">Enter At Your Own Risk</span>
         </button>
     </div>
 
-    <!-- FATE SELECTION MODAL -->
     <div id="fate-modal" class="modal-mask">
         <div class="modal-box">
             <h2 class="text-2xl font-black text-emerald-400 uppercase tracking-widest mb-2" style="font-family: 'Creepster', system-ui; letter-spacing: 4px;">Choose Your Fate</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Your soul is unrecognized. State your purpose.</p>
-            
-            <!-- Path Selection -->
             <div id="path-selection" class="flex flex-col gap-4">
-                <button onclick="selectMortalPath()" class="wicked-btn w-full py-3 text-xs">
-                    Enter as Mortal (User)
-                </button>
-                <button onclick="showAdminInput()" class="bg-transparent border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 w-full py-3 text-xs font-black uppercase tracking-widest transition-all">
-                    Claim the Throne (Admin)
-                </button>
+                <button onclick="selectMortalPath()" class="wicked-btn w-full py-3 text-xs">Enter as Mortal (User)</button>
+                <button onclick="showAdminInput()" class="bg-transparent border border-slate-700 text-slate-400 hover:text-white hover:border-slate-500 w-full py-3 text-xs font-black uppercase tracking-widest transition-all">Claim the Throne (Admin)</button>
             </div>
-
-            <!-- Admin Verification -->
             <div id="admin-verification" style="display: none;" class="flex flex-col gap-4">
                 <p class="text-[10px] text-amber-500 font-bold uppercase tracking-widest">Speak the incantation</p>
-                <input type="text" id="admin-code" class="input-wicked" placeholder="ENTER CODE" autocomplete="off">
+                <input type="text" id="admin-code" class="input-wicked" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" oninput="formatAdminCode(event)">
                 <div class="grid grid-cols-2 gap-3 mt-2">
-                    <button onclick="cancelAdminInput()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-[10px] font-black uppercase tracking-widest transition-all">
-                        Retreat
-                    </button>
-                    <button onclick="verifyAdminCode()" class="wicked-btn py-3 text-[10px]">
-                        Verify
-                    </button>
+                    <button onclick="cancelAdminInput()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-[10px] font-black uppercase tracking-widest transition-all">Retreat</button>
+                    <button onclick="verifyAdminCode()" class="wicked-btn py-3 text-[10px]">Verify</button>
                 </div>
             </div>
         </div>
     </div>
-
 </body>
 </html>
