@@ -37,6 +37,7 @@
         
         .select-wicked { background: #020617; border: 1px solid rgba(16, 185, 129, 0.4); color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 4px; outline: none; text-transform: uppercase; }
         .select-wicked:focus { border-color: #10b981; }
+        .select-wicked:disabled { opacity: 0.5; cursor: not-allowed; border-color: #334155; }
 
         .input-wicked { background: #0f172a; border: 1px solid rgba(16, 185, 129, 0.4); color: #fff; font-family: monospace; padding: 8px; border-radius: 4px; width: 100%; font-size: 11px; outline: none; }
         .input-wicked:focus { border-color: #10b981; }
@@ -97,26 +98,44 @@
                 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (doc.id === currentUserDoc.uid) return;
+                    const isMe = (doc.id === currentUserDoc.uid);
+                    const myRole = currentUserDoc.role;
+                    const theirRole = data.role || 'User';
+
+                    // Admin Visibility Hierarchy
+                    if (myRole === 'Admin') {
+                        // Standard Admins cannot see other Admins or Master Admins
+                        if (theirRole === 'Admin' || theirRole === 'Master Admin') return;
+                    }
 
                     const perms = data.permissions || {};
-                    const isMaster = currentUserDoc.role === 'Master Admin';
+                    const isMaster = (myRole === 'Master Admin');
                     
-                    let roleHtml = `<span class="text-xs font-bold text-slate-300 uppercase">${data.role}</span>`;
+                    let roleHtml = `<span class="text-xs font-bold text-slate-300 uppercase">${theirRole}</span>`;
+                    
                     if (isMaster) {
+                        const disabledAttr = isMe ? 'disabled' : '';
                         roleHtml = `
-                        <select class="select-wicked" onchange="updateRole('${doc.id}', this.value)">
-                            <option value="User" ${data.role === 'User' ? 'selected' : ''}>User</option>
-                            <option value="Beta User" ${data.role === 'Beta User' ? 'selected' : ''}>Beta User</option>
-                            <option value="Admin" ${data.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                        <select class="select-wicked" onchange="updateRole('${doc.id}', this.value)" ${disabledAttr}>
+                            <option value="User" ${theirRole === 'User' ? 'selected' : ''}>User</option>
+                            <option value="Beta User" ${theirRole === 'Beta User' ? 'selected' : ''}>Beta User</option>
+                            <option value="Admin" ${theirRole === 'Admin' ? 'selected' : ''}>Admin</option>
+                            <option value="Master Admin" ${theirRole === 'Master Admin' ? 'selected' : ''}>Master Admin</option>
                         </select>`;
+                    }
+
+                    let deleteBtn = '';
+                    if (!isMe) {
+                        deleteBtn = `<button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400 transition-colors" title="Eradicate Soul"><i class="fa-solid fa-skull"></i></button>`;
+                    } else {
+                        deleteBtn = `<span class="text-slate-600" title="Immortal"><i class="fa-solid fa-shield-halved"></i></span>`;
                     }
 
                     const tr = document.createElement('tr');
                     tr.className = "border-b border-slate-800 hover:bg-slate-900/50 transition-colors";
                     tr.innerHTML = `
                         <td class="p-3">
-                            <div class="font-bold text-sm text-white">${data.displayName || 'Unknown Soul'}</div>
+                            <div class="font-bold text-sm text-white">${data.displayName || 'Unknown Soul'} ${isMe ? '<span class="text-[9px] text-emerald-500 ml-1">(YOU)</span>' : ''}</div>
                             <div class="text-[10px] text-slate-500">${data.email}</div>
                         </td>
                         <td class="p-3">${roleHtml}</td>
@@ -127,11 +146,7 @@
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'roulette', perms.roulette)}</td>
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'sportsbook', perms.sportsbook)}</td>
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'bloodlord', perms.bloodlord)}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400 transition-colors" title="Eradicate Soul">
-                                <i class="fa-solid fa-skull"></i>
-                            </button>
-                        </td>
+                        <td class="p-3 text-center">${deleteBtn}</td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -139,7 +154,6 @@
         }
 
         function createPermissionSelect(uid, module, val) {
-            // Legacy support mapping
             if (val === true) val = 'Enabled';
             if (val === false) val = 'Visible';
             if (!val) val = (module === 'bloodlord') ? 'Hidden' : 'Visible';
@@ -222,16 +236,40 @@
             } catch (e) { console.error("Failed to fetch recommendations", e); }
         }
 
+        // YouTube Auto-Converter
+        function convertToEmbedUrl(url) {
+            if (!url) return '';
+            let videoId = '';
+            
+            if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.includes('youtube.com/watch')) {
+                const urlParams = new URLSearchParams(url.split('?')[1]);
+                videoId = urlParams.get('v');
+            } else if (url.includes('youtube.com/embed/')) {
+                return url; // Already correct
+            }
+            
+            if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+            return url; // Fallback
+        }
+
         async function saveRecommendations() {
             const payload = {
-                baccaratVideo: document.getElementById('rec-baccarat').value.trim(),
-                diceVideo: document.getElementById('rec-dice').value.trim(),
-                pokerVideo: document.getElementById('rec-poker').value.trim(),
-                rouletteVideo: document.getElementById('rec-roulette').value.trim(),
+                baccaratVideo: convertToEmbedUrl(document.getElementById('rec-baccarat').value.trim()),
+                diceVideo: convertToEmbedUrl(document.getElementById('rec-dice').value.trim()),
+                pokerVideo: convertToEmbedUrl(document.getElementById('rec-poker').value.trim()),
+                rouletteVideo: convertToEmbedUrl(document.getElementById('rec-roulette').value.trim()),
                 sportsbookUrl: document.getElementById('rec-sportsbook-url').value.trim(),
                 sportsbookBet: document.getElementById('rec-sportsbook-bet').value.trim(),
                 bloodlordUrl: document.getElementById('rec-bloodlord-url').value.trim()
             };
+
+            // Update UI with converted URLs so user sees the change
+            document.getElementById('rec-baccarat').value = payload.baccaratVideo;
+            document.getElementById('rec-dice').value = payload.diceVideo;
+            document.getElementById('rec-poker').value = payload.pokerVideo;
+            document.getElementById('rec-roulette').value = payload.rouletteVideo;
 
             if (payload.sportsbookBet) {
                 let now = new Date();
@@ -326,8 +364,8 @@
                 <div>
                     <h2 class="cinzel text-lg text-emerald-400 uppercase tracking-widest">ZombieLord's Picks</h2>
                     <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">
-                        <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
-                        To get a YouTube Embed URL: Go to the video &rarr; Click 'Share' &rarr; Click 'Embed' &rarr; Copy the URL inside the src="..." attribute.
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400 mr-1"></i>
+                        Paste any standard YouTube link (e.g., youtu.be/xyz). The system will automatically convert it for the Viewing Orb.
                     </p>
                 </div>
                 <button onclick="saveRecommendations()" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest px-6 py-2 rounded transition-colors uppercase">
@@ -336,10 +374,10 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Baccarat Video URL</label><input type="text" id="rec-baccarat" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Video URL</label><input type="text" id="rec-dice" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Video URL</label><input type="text" id="rec-poker" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Video URL</label><input type="text" id="rec-roulette" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Baccarat Video URL</label><input type="text" id="rec-baccarat" class="input-wicked" placeholder="https://youtu.be/..."></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Video URL</label><input type="text" id="rec-dice" class="input-wicked" placeholder="https://youtu.be/..."></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Video URL</label><input type="text" id="rec-poker" class="input-wicked" placeholder="https://youtu.be/..."></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Video URL</label><input type="text" id="rec-roulette" class="input-wicked" placeholder="https://youtu.be/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Target URL</label><input type="text" id="rec-sportsbook-url" class="input-wicked" placeholder="https://wagershack.com/"></div>
                 <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord's Target URL</label><input type="text" id="rec-bloodlord-url" class="input-wicked border-red-900/50 focus:border-red-500" placeholder="https://..."></div>
                 <div class="md:col-span-2 lg:col-span-3"><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Sportsbook Daily Prophecy (Purges at 2 AM)</label><textarea id="rec-sportsbook-bet" class="input-wicked h-16 resize-none" placeholder="Enter the daily recommended bet..."></textarea></div>
