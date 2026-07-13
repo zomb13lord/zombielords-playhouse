@@ -106,8 +106,7 @@
                     if (recommendations.sportsbookBet && recommendations.sportsbookExpiration) {
                         const now = new Date().getTime();
                         if (now < recommendations.sportsbookExpiration) {
-                            // Active Bet - Replace Lore
-                            document.getElementById('sportsbook-lore').innerHTML = `<span class="text-amber-400 font-bold uppercase tracking-widest">DAILY PROPHECY:</span><br><span class="text-white">${recommendations.sportsbookBet}</span>`;
+                            document.getElementById('sportsbook-lore').innerHTML = `<span class="text-amber-400 font-bold uppercase tracking-widest">ZOMBIELORD'S PROPHECY:</span><br><span class="text-white">${recommendations.sportsbookBet}</span>`;
                         }
                     }
                 }
@@ -123,12 +122,35 @@
                 if(adminCard) { adminCard.classList.remove('hidden'); adminCard.classList.add('flex'); }
             }
 
-            const modules = ['crypt', 'baccarat', 'dice', 'poker', 'roulette', 'sportsbook'];
+            const modules = ['crypt', 'baccarat', 'dice', 'poker', 'roulette', 'sportsbook', 'bloodlord'];
+            
             modules.forEach(mod => {
+                const card = document.getElementById(`card-${mod}`);
                 const lockIcon = document.getElementById(`lock-${mod}`);
-                if (lockIcon) {
-                    if (perms[mod] === true) lockIcon.classList.add('hidden');
-                    else lockIcon.classList.remove('hidden');
+                if (!card) return;
+
+                let state = perms[mod];
+                
+                // Backward compatibility for true/false
+                if (state === true) state = 'Enabled';
+                if (state === false) state = 'Visible';
+                
+                // Default states if undefined
+                if (state === undefined) {
+                    state = (mod === 'bloodlord') ? 'Hidden' : 'Visible';
+                }
+
+                if (state === 'Hidden') {
+                    card.classList.add('hidden');
+                    card.classList.remove('flex');
+                } else if (state === 'Visible') {
+                    card.classList.remove('hidden');
+                    card.classList.add('flex');
+                    if(lockIcon) lockIcon.classList.remove('hidden');
+                } else if (state === 'Enabled') {
+                    card.classList.remove('hidden');
+                    card.classList.add('flex');
+                    if(lockIcon) lockIcon.classList.add('hidden');
                 }
             });
         }
@@ -144,34 +166,50 @@
                     window.location.href = stableUrl;
                     return;
                 }
-                if (moduleId === 'sportsbook') {
-                    // Sportsbook bypasses Manager's Pick modal, goes straight to URL
-                    const targetUrl = recommendations.sportsbookUrl || stableUrl;
-                    window.open(targetUrl, '_blank');
-                    return;
-                }
+                
+                const videoUrl = recommendations[`${moduleId}Video`];
+                const hasVideo = !!videoUrl;
+                const bypassVideo = ['crypt', 'sportsbook', 'bloodlord'].includes(moduleId) || !hasVideo;
 
-                // Open Manager's Pick Modal
-                openManagersPickModal(moduleId, stableUrl, betaUrl);
+                if (bypassVideo) {
+                    // Check access directly
+                    let state = userProfile.permissions[moduleId];
+                    if (state === true) state = 'Enabled';
+                    const isEnabled = (state === 'Enabled');
+
+                    if (!isEnabled) {
+                        document.getElementById('lockout-modal').style.display = 'flex';
+                        return;
+                    }
+                    
+                    if (moduleId === 'sportsbook') {
+                        window.open(recommendations.sportsbookUrl || stableUrl, '_blank');
+                        return;
+                    }
+                    if (moduleId === 'bloodlord') {
+                        window.open(recommendations.bloodlordUrl || '#', '_blank');
+                        return;
+                    }
+                    
+                    executeModuleAction(moduleId, stableUrl, betaUrl);
+                } else {
+                    openZombielordsPickModal(moduleId, stableUrl, betaUrl, videoUrl);
+                }
             }
         }
 
-        function openManagersPickModal(moduleId, stableUrl, betaUrl) {
-            const modal = document.getElementById('managers-pick-modal');
+        function openZombielordsPickModal(moduleId, stableUrl, betaUrl, videoUrl) {
+            const modal = document.getElementById('zombielords-pick-modal');
             const watchBtn = document.getElementById('btn-watch-tape');
             const enterBtn = document.getElementById('btn-enter-module');
             
-            // Setup Watch Button
-            const videoUrl = recommendations[`${moduleId}Video`];
-            if (videoUrl) {
-                watchBtn.style.display = 'block';
-                watchBtn.onclick = () => openViewingOrb(videoUrl);
-            } else {
-                watchBtn.style.display = 'none';
-            }
+            watchBtn.onclick = () => openViewingOrb(videoUrl);
 
-            // Setup Enter Button (Ghosting Logic)
-            if (!userProfile.permissions[moduleId]) {
+            let state = userProfile.permissions[moduleId];
+            if (state === true) state = 'Enabled';
+            const isEnabled = (state === 'Enabled');
+
+            if (!isEnabled) {
                 enterBtn.classList.add('ghosted-btn');
                 enterBtn.onclick = () => {
                     modal.style.display = 'none';
@@ -189,7 +227,7 @@
         }
 
         function openViewingOrb(url) {
-            document.getElementById('managers-pick-modal').style.display = 'none';
+            document.getElementById('zombielords-pick-modal').style.display = 'none';
             const orb = document.getElementById('viewing-orb-modal');
             const iframe = document.getElementById('orb-iframe');
             iframe.src = url;
@@ -198,7 +236,7 @@
 
         function closeViewingOrb() {
             document.getElementById('viewing-orb-modal').style.display = 'none';
-            document.getElementById('orb-iframe').src = ""; // Stop playback
+            document.getElementById('orb-iframe').src = ""; 
         }
 
         function executeModuleAction(moduleId, stableUrl, betaUrl) {
@@ -218,7 +256,7 @@
         function closeModals() {
             document.getElementById('lockout-modal').style.display = 'none';
             document.getElementById('version-modal').style.display = 'none';
-            document.getElementById('managers-pick-modal').style.display = 'none';
+            document.getElementById('zombielords-pick-modal').style.display = 'none';
         }
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
@@ -313,7 +351,7 @@
             <!-- 6. SPORTSBOOK CARD -->
             <div id="card-sportsbook" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('sportsbook', 'https://wagershack.com/', null)">
                 <div id="lock-sportsbook" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
-                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/sportsbetting-card.jpg');"></div>
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/sportsbook-card.jpg');"></div>
                 <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
@@ -323,7 +361,20 @@
                 </div>
             </div>
 
-            <!-- 7. ADMIN DASHBOARD CARD -->
+            <!-- 7. BLOODLORD'S REVENGE CARD (Hidden by default) -->
+            <div id="card-bloodlord" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('bloodlord', '#', null)">
+                <div id="lock-bloodlord" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
+                <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/bloodlord-card.jpg');"></div>
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
+                    <div class="mt-auto">
+                        <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-red-500 transition-colors text-shadow-heavy">BloodLord's Revenge</h3>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">The heir to the underworld throne demands tribute. Enter the domain of the BloodLord, where the games are fierce, the stakes are fun, and the young prince rules supreme.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. ADMIN DASHBOARD CARD (Hidden by default) -->
             <div id="card-admin" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('admin', 'admin.html', null)">
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/admin-card.jpg');"></div>
                 <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
@@ -333,6 +384,7 @@
                         <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Govern the souls of the damned. Dictate access, forge new overlords, and manage the bureaucratic nightmare of the Playhouse.</p>
                     </div>
                 </div>
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center relative z-20 pointer-events-none">OPEN LEDGER <span>&rarr;</span></div>
             </div>
 
         </div>
@@ -340,11 +392,11 @@
 
     <!-- CUSTOM MODALS -->
     
-    <!-- Manager's Pick Modal -->
-    <div id="managers-pick-modal" class="modal-mask">
+    <!-- ZombieLord's Pick Modal -->
+    <div id="zombielords-pick-modal" class="modal-mask">
         <div class="modal-box border-amber-500">
             <i class="fa-solid fa-video text-amber-500 text-4xl mb-4" style="filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.8));"></i>
-            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">Manager's Pick</h2>
+            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">ZombieLord's Pick</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">A recommendation from the Overlord.</p>
             <div class="flex flex-col gap-4">
                 <button id="btn-watch-tape" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded"><i class="fa-solid fa-play mr-2"></i> Watch Tape</button>
