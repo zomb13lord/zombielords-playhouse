@@ -110,6 +110,14 @@
 
     <!-- CUSTOM MODALS -->
     
+    <!-- Loading Modal -->
+    <div id="modal-loading" class="modal-mask">
+        <div class="text-center">
+            <i class="fa-solid fa-circle-notch fa-spin text-emerald-500 text-5xl mb-4 glow-emerald"></i>
+            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest cinzel">Resurrecting Archive...</h2>
+        </div>
+    </div>
+
     <!-- Alert Modal -->
     <div id="modal-alert" class="modal-mask">
         <div class="modal-box border-red-500">
@@ -322,7 +330,6 @@
                     outTime = d.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
                 }
             } else {
-                // Generic fallback for Baccarat, Poker, Sportsbook
                 const lastRow = logArray[logArray.length - 1];
                 const rawTime = lastRow.Time_Stamp || lastRow.timestamp || lastRow.t;
                 if (rawTime) {
@@ -422,29 +429,17 @@
             </div>`;
         }
 
-        async function toggleFavorite(docId, currentStatus) {
-            try {
-                await db.collection("users").doc(currentUid).collection("crypt").doc(docId).update({
-                    is_favorite: !currentStatus
-                });
-                fetchCryptData();
-            } catch(e) { console.error("Favorite write fault: ", e); }
-        }
-
         async function resumeInsc(docId) {
             try {
                 const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
                 if(!doc.exists) return await customAlert("Could not find the selected session.");
                 
                 const data = doc.data();
-                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(data);
-                
                 const mod = data.module_id;
                 let prefix = "";
 
-                // Check if user has Beta privileges
+                // Check Beta Privileges
                 if (['Beta User', 'Admin', 'Master Admin'].includes(userRole)) {
-                    // Only prompt for modules that actually have a beta version
                     if (['DICE_TRACKER', 'ROULETTE_TRACKER', 'BACCARAT_TRACKER'].includes(mod)) {
                         const choice = await customVersionSelect();
                         if (!choice) return; // User cancelled
@@ -452,14 +447,27 @@
                     }
                 }
 
+                // Show Loading Screen to mask DB write delay
+                document.getElementById('modal-loading').style.display = 'flex';
+
+                // Write to active session
+                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(data);
+                
+                // Redirect
                 if (mod === "DICE_TRACKER") window.location.assign(`${prefix}dice.html`);
                 else if (mod === "ROULETTE_TRACKER") window.location.assign(`${prefix}roulette.html`);
                 else if (mod === "BACCARAT_TRACKER") window.location.assign(`${prefix}baccarat.html`);
                 else if (mod === "POKER_LEDGER") window.location.assign(`poker.html`);
                 else if (mod === "SPORTSBOOK_LEDGER") window.location.assign(`sportsbook.html`);
-                else await customAlert("Could not determine which tracker to open.");
+                else {
+                    document.getElementById('modal-loading').style.display = 'none';
+                    await customAlert("Could not determine which tracker to open.");
+                }
 
-            } catch (e) { await customAlert("Failed to resume session."); }
+            } catch (e) { 
+                document.getElementById('modal-loading').style.display = 'none';
+                await customAlert("Failed to resume session."); 
+            }
         }
 
         async function exportInscToCSV(docId) {
