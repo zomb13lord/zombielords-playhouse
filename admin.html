@@ -34,10 +34,6 @@
             border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
         }
-
-        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
-        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
         
         .select-wicked { background: #020617; border: 1px solid rgba(16, 185, 129, 0.4); color: #fff; font-size: 10px; padding: 4px 8px; border-radius: 4px; outline: none; text-transform: uppercase; }
         .select-wicked:focus { border-color: #10b981; }
@@ -84,7 +80,7 @@
 
                 if (currentUserDoc.role === 'Master Admin') {
                     document.getElementById('master-admin-panel').style.display = 'block';
-                    document.getElementById('managers-picks-panel').style.display = 'block';
+                    document.getElementById('zombielords-picks-panel').style.display = 'block';
                     fetchRecommendations();
                 }
 
@@ -124,12 +120,13 @@
                             <div class="text-[10px] text-slate-500">${data.email}</div>
                         </td>
                         <td class="p-3">${roleHtml}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'crypt', perms.crypt)}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'baccarat', perms.baccarat)}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'dice', perms.dice)}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'poker', perms.poker)}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'roulette', perms.roulette)}</td>
-                        <td class="p-3 text-center">${createToggle(doc.id, 'sportsbook', perms.sportsbook)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'crypt', perms.crypt)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'baccarat', perms.baccarat)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'dice', perms.dice)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'poker', perms.poker)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'roulette', perms.roulette)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'sportsbook', perms.sportsbook)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'bloodlord', perms.bloodlord)}</td>
                         <td class="p-3 text-center">
                             <button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400 transition-colors" title="Eradicate Soul">
                                 <i class="fa-solid fa-skull"></i>
@@ -141,13 +138,18 @@
             });
         }
 
-        function createToggle(uid, module, isChecked) {
-            const checkedAttr = isChecked ? 'checked' : '';
+        function createPermissionSelect(uid, module, val) {
+            // Legacy support mapping
+            if (val === true) val = 'Enabled';
+            if (val === false) val = 'Visible';
+            if (!val) val = (module === 'bloodlord') ? 'Hidden' : 'Visible';
+
             return `
-            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                <input type="checkbox" name="toggle" id="${uid}-${module}" ${checkedAttr} onchange="updatePermission('${uid}', '${module}', this.checked)" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-slate-700 appearance-none cursor-pointer z-10 top-0 left-0 transition-transform duration-300 ease-in-out"/>
-                <label for="${uid}-${module}" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-700 cursor-pointer transition-colors duration-300 ease-in-out"></label>
-            </div>`;
+            <select class="select-wicked w-full" onchange="updatePermission('${uid}', '${module}', this.value)">
+                <option value="Enabled" ${val === 'Enabled' ? 'selected' : ''}>Enabled</option>
+                <option value="Visible" ${val === 'Visible' ? 'selected' : ''}>Visible</option>
+                <option value="Hidden" ${val === 'Hidden' ? 'selected' : ''}>Hidden</option>
+            </select>`;
         }
 
         async function updatePermission(uid, module, value) {
@@ -203,35 +205,34 @@
             }
         }
 
-        // --- MANAGER'S PICKS LOGIC ---
+        // --- ZOMBIELORD'S PICKS LOGIC ---
         async function fetchRecommendations() {
             try {
                 const doc = await db.collection('system').doc('recommendations').get();
                 if (doc.exists) {
                     const data = doc.data();
-                    document.getElementById('rec-crypt').value = data.cryptVideo || '';
                     document.getElementById('rec-baccarat').value = data.baccaratVideo || '';
                     document.getElementById('rec-dice').value = data.diceVideo || '';
                     document.getElementById('rec-poker').value = data.pokerVideo || '';
                     document.getElementById('rec-roulette').value = data.rouletteVideo || '';
                     document.getElementById('rec-sportsbook-url').value = data.sportsbookUrl || '';
                     document.getElementById('rec-sportsbook-bet').value = data.sportsbookBet || '';
+                    document.getElementById('rec-bloodlord-url').value = data.bloodlordUrl || '';
                 }
             } catch (e) { console.error("Failed to fetch recommendations", e); }
         }
 
         async function saveRecommendations() {
             const payload = {
-                cryptVideo: document.getElementById('rec-crypt').value.trim(),
                 baccaratVideo: document.getElementById('rec-baccarat').value.trim(),
                 diceVideo: document.getElementById('rec-dice').value.trim(),
                 pokerVideo: document.getElementById('rec-poker').value.trim(),
                 rouletteVideo: document.getElementById('rec-roulette').value.trim(),
                 sportsbookUrl: document.getElementById('rec-sportsbook-url').value.trim(),
-                sportsbookBet: document.getElementById('rec-sportsbook-bet').value.trim()
+                sportsbookBet: document.getElementById('rec-sportsbook-bet').value.trim(),
+                bloodlordUrl: document.getElementById('rec-bloodlord-url').value.trim()
             };
 
-            // Calculate next 2:00 AM for Sportsbook expiration
             if (payload.sportsbookBet) {
                 let now = new Date();
                 let next2AM = new Date(now);
@@ -246,9 +247,10 @@
 
             try {
                 await db.collection('system').doc('recommendations').set(payload, { merge: true });
-                showModal('success', "Manager's Picks successfully updated.");
+                showModal('success', "ZombieLord's Picks successfully updated.");
             } catch (e) {
-                showModal('error', "Failed to save recommendations.");
+                console.error(e);
+                showModal('error', "Failed to save recommendations. Check console for details.");
             }
         }
 
@@ -280,17 +282,18 @@
             <div class="glass-panel p-6 flex-grow overflow-hidden">
                 <h2 class="cinzel text-lg text-white uppercase tracking-widest border-b border-emerald-900/50 pb-2 mb-4">Registered Souls</h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[800px]">
+                    <table class="w-full text-left border-collapse min-w-[1000px]">
                         <thead>
                             <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
                                 <th class="p-3">Identity</th>
                                 <th class="p-3">Rank</th>
-                                <th class="p-3 text-center">Crypt</th>
-                                <th class="p-3 text-center">Baccarat</th>
-                                <th class="p-3 text-center">Dice</th>
-                                <th class="p-3 text-center">Poker</th>
-                                <th class="p-3 text-center">Roulette</th>
-                                <th class="p-3 text-center">Sports</th>
+                                <th class="p-2 text-center">Crypt</th>
+                                <th class="p-2 text-center">Baccarat</th>
+                                <th class="p-2 text-center">Dice</th>
+                                <th class="p-2 text-center">Poker</th>
+                                <th class="p-2 text-center">Roulette</th>
+                                <th class="p-2 text-center">Sports</th>
+                                <th class="p-2 text-center text-red-400">BloodLord</th>
                                 <th class="p-3 text-center">Purge</th>
                             </tr>
                         </thead>
@@ -317,12 +320,15 @@
             </div>
         </div>
 
-        <!-- BOTTOM PANEL: MANAGER'S PICKS (Master Admin Only) -->
-        <div id="managers-picks-panel" class="glass-panel p-6 w-full" style="display: none;">
+        <!-- BOTTOM PANEL: ZOMBIELORD'S PICKS (Master Admin Only) -->
+        <div id="zombielords-picks-panel" class="glass-panel p-6 w-full" style="display: none;">
             <div class="flex justify-between items-end border-b border-emerald-900/50 pb-2 mb-6">
                 <div>
-                    <h2 class="cinzel text-lg text-emerald-400 uppercase tracking-widest">Manager's Picks</h2>
-                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">Note: Video URLs must use the YouTube Embed format (e.g., https://www.youtube.com/embed/xyz)</p>
+                    <h2 class="cinzel text-lg text-emerald-400 uppercase tracking-widest">ZombieLord's Picks</h2>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">
+                        <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i>
+                        To get a YouTube Embed URL: Go to the video &rarr; Click 'Share' &rarr; Click 'Embed' &rarr; Copy the URL inside the src="..." attribute.
+                    </p>
                 </div>
                 <button onclick="saveRecommendations()" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest px-6 py-2 rounded transition-colors uppercase">
                     Save All
@@ -330,12 +336,12 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Crypt Video URL</label><input type="text" id="rec-crypt" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Baccarat Video URL</label><input type="text" id="rec-baccarat" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Video URL</label><input type="text" id="rec-dice" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Video URL</label><input type="text" id="rec-poker" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Video URL</label><input type="text" id="rec-roulette" class="input-wicked" placeholder="https://www.youtube.com/embed/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Target URL</label><input type="text" id="rec-sportsbook-url" class="input-wicked" placeholder="https://wagershack.com/"></div>
+                <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord's Target URL</label><input type="text" id="rec-bloodlord-url" class="input-wicked border-red-900/50 focus:border-red-500" placeholder="https://..."></div>
                 <div class="md:col-span-2 lg:col-span-3"><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Sportsbook Daily Prophecy (Purges at 2 AM)</label><textarea id="rec-sportsbook-bet" class="input-wicked h-16 resize-none" placeholder="Enter the daily recommended bet..."></textarea></div>
             </div>
         </div>
