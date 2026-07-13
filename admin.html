@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +23,11 @@
         
         .cinzel { font-family: 'Cinzel', serif; }
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        .playhouse-glow { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1); }
+
+        .zombie-navbar { position: relative; background-image: url('https://zomb13lord.github.io/zombielords-playhouse/navbar-bg.jpg'); background-size: cover; background-position: center; }
+        .zombie-navbar::before { content: ''; position: absolute; inset: 0; background: rgba(2, 6, 23, 0.75); z-index: 0; }
+        .zombie-navbar > div { position: relative; z-index: 1; }
         
         .glass-panel {
             background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
@@ -52,6 +56,7 @@
 
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = "index.html"; return; }
+            document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
             try {
                 const docSnap = await db.collection('users').doc(user.uid).get();
                 if (!docSnap.exists) { window.location.href = "index.html"; return; }
@@ -131,26 +136,22 @@
         }
 
         async function updatePermission(uid, module, value) {
-            try {
-                await db.collection('users').doc(uid).update({ [`permissions.${module}`]: value });
-            } catch (error) { alert("Failed to update permission."); }
+            try { await db.collection('users').doc(uid).update({ [`permissions.${module}`]: value }); } 
+            catch (error) { alert("Failed to update permission."); }
         }
 
         async function updateRole(uid, newRole) {
-            try {
-                await db.collection('users').doc(uid).update({ role: newRole });
-            } catch (error) { alert("Failed to update role."); }
+            try { await db.collection('users').doc(uid).update({ role: newRole }); } 
+            catch (error) { alert("Failed to update role."); }
         }
 
         async function deleteUser(uid) {
             if (confirm("Are you sure you want to eradicate this soul? They will lose all access.")) {
-                try {
-                    await db.collection('users').doc(uid).delete();
-                } catch (error) { alert("Failed to delete user."); }
+                try { await db.collection('users').doc(uid).delete(); } 
+                catch (error) { alert("Failed to delete user."); }
             }
         }
 
-        // --- MASTER ADMIN CODE GENERATION ---
         async function generateInviteCode() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let rawCode = '';
@@ -159,9 +160,7 @@
 
             try {
                 await db.collection('invite_codes').doc(formattedCode).set({
-                    used: false,
-                    createdBy: currentUserDoc.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    used: false, createdBy: currentUserDoc.uid, createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             } catch (error) { alert("Failed to forge invite code."); }
         }
@@ -188,63 +187,73 @@
                 await db.collection('invite_codes').doc(codeId).delete();
             }
         }
+
+        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
     </script>
 </head>
-<body class="p-4 md:p-8">
+<body class="flex flex-col">
 
-    <header class="flex justify-between items-center mb-8 glass-panel p-4">
-        <div class="flex flex-col">
+    <nav class="zombie-navbar p-4 flex justify-between items-center border-b border-emerald-900/50 sticky top-0 z-[50] h-[76px] flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+        <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
+            <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">ZombieLord's</h2>
+            <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
+        </div>
+        <div class="flex items-center gap-4 md:gap-6">
+            <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+        </div>
+    </nav>
+
+    <main class="flex-grow p-4 md:p-8">
+        <header class="mb-8 text-center">
             <h1 class="cinzel text-2xl md:text-3xl font-black emerald-text uppercase tracking-widest">Underworld Ledger</h1>
             <span class="text-[10px] text-slate-400 tracking-[0.3em] uppercase font-bold mt-1">Bureau of Souls</span>
-        </div>
-        <button onclick="window.location.href='lobby.html'" class="text-[10px] border border-emerald-500/40 px-4 py-2 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.2em] text-white">
-            &larr; Return to Lobby
-        </button>
-    </header>
+        </header>
 
-    <div class="flex flex-col lg:flex-row gap-6">
-        
-        <!-- LEFT PANEL: USER LEDGER -->
-        <div class="glass-panel p-6 flex-grow overflow-hidden">
-            <h2 class="cinzel text-lg text-white uppercase tracking-widest border-b border-emerald-900/50 pb-2 mb-4">Registered Souls</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
-                    <thead>
-                        <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
-                            <th class="p-3">Identity</th>
-                            <th class="p-3">Rank</th>
-                            <th class="p-3 text-center">Crypt</th>
-                            <th class="p-3 text-center">Baccarat</th>
-                            <th class="p-3 text-center">Dice</th>
-                            <th class="p-3 text-center">Poker</th>
-                            <th class="p-3 text-center">Roulette</th>
-                            <th class="p-3 text-center">Sports</th>
-                            <th class="p-3 text-center">Purge</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-tbody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- RIGHT PANEL: THE THRONE (Master Admin Only) -->
-        <div id="master-admin-panel" class="glass-panel p-6 w-full lg:w-80 flex-shrink-0" style="display: none;">
-            <h2 class="cinzel text-lg text-amber-500 uppercase tracking-widest border-b border-amber-900/50 pb-2 mb-4">The Throne</h2>
-            <p class="text-xs text-slate-400 mb-6 leading-relaxed">Forge new invite codes to grant Admin access to worthy mortals.</p>
+        <div class="flex flex-col lg:flex-row gap-6">
             
-            <button onclick="generateInviteCode()" class="w-full bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[11px] font-black tracking-widest py-3 rounded transition-colors uppercase mb-6">
-                <i class="fa-solid fa-key mr-2"></i> Forge Invite Code
-            </button>
-
-            <h3 class="text-[10px] uppercase tracking-widest text-slate-500 mb-3 font-bold">Active Unused Codes</h3>
-            <div id="active-codes-list" class="flex flex-col gap-2">
-                <!-- Populated by JS -->
+            <!-- LEFT PANEL: USER LEDGER -->
+            <div class="glass-panel p-6 flex-grow overflow-hidden">
+                <h2 class="cinzel text-lg text-white uppercase tracking-widest border-b border-emerald-900/50 pb-2 mb-4">Registered Souls</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead>
+                            <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                                <th class="p-3">Identity</th>
+                                <th class="p-3">Rank</th>
+                                <th class="p-3 text-center">Crypt</th>
+                                <th class="p-3 text-center">Baccarat</th>
+                                <th class="p-3 text-center">Dice</th>
+                                <th class="p-3 text-center">Poker</th>
+                                <th class="p-3 text-center">Roulette</th>
+                                <th class="p-3 text-center">Sports</th>
+                                <th class="p-3 text-center">Purge</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-tbody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-    </div>
+            <!-- RIGHT PANEL: THE THRONE (Master Admin Only) -->
+            <div id="master-admin-panel" class="glass-panel p-6 w-full lg:w-80 flex-shrink-0" style="display: none;">
+                <h2 class="cinzel text-lg text-amber-500 uppercase tracking-widest border-b border-amber-900/50 pb-2 mb-4">The Throne</h2>
+                <p class="text-xs text-slate-400 mb-6 leading-relaxed">Forge new invite codes to grant Admin access to worthy mortals.</p>
+                
+                <button onclick="generateInviteCode()" class="w-full bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[11px] font-black tracking-widest py-3 rounded transition-colors uppercase mb-6">
+                    <i class="fa-solid fa-key mr-2"></i> Forge Invite Code
+                </button>
+
+                <h3 class="text-[10px] uppercase tracking-widest text-slate-500 mb-3 font-bold">Active Unused Codes</h3>
+                <div id="active-codes-list" class="flex flex-col gap-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+        </div>
+    </main>
 
 </body>
 </html>
