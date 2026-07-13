@@ -82,6 +82,7 @@
                 if (currentUserDoc.role === 'Master Admin') {
                     document.getElementById('master-admin-panel').style.display = 'block';
                     document.getElementById('zombielords-picks-panel').style.display = 'block';
+                    document.getElementById('grimoire-inscriptions-panel').style.display = 'block';
                     fetchRecommendations();
                 }
 
@@ -102,9 +103,7 @@
                     const myRole = currentUserDoc.role;
                     const theirRole = data.role || 'User';
 
-                    // Admin Visibility Hierarchy
                     if (myRole === 'Admin') {
-                        // Standard Admins cannot see other Admins or Master Admins
                         if (theirRole === 'Admin' || theirRole === 'Master Admin') return;
                     }
 
@@ -219,7 +218,7 @@
             }
         }
 
-        // --- ZOMBIELORD'S PICKS LOGIC ---
+        // --- ZOMBIELORD'S PICKS & LORE LOGIC ---
         async function fetchRecommendations() {
             try {
                 const doc = await db.collection('system').doc('recommendations').get();
@@ -232,26 +231,30 @@
                     document.getElementById('rec-sportsbook-url').value = data.sportsbookUrl || '';
                     document.getElementById('rec-sportsbook-bet').value = data.sportsbookBet || '';
                     document.getElementById('rec-bloodlord-url').value = data.bloodlordUrl || '';
+
+                    document.getElementById('lore-crypt').value = data.lore_crypt || '';
+                    document.getElementById('lore-baccarat').value = data.lore_baccarat || '';
+                    document.getElementById('lore-dice').value = data.lore_dice || '';
+                    document.getElementById('lore-poker').value = data.lore_poker || '';
+                    document.getElementById('lore-roulette').value = data.lore_roulette || '';
+                    document.getElementById('lore-sportsbook').value = data.lore_sportsbook || '';
+                    document.getElementById('lore-bloodlord').value = data.lore_bloodlord || '';
+                    document.getElementById('lore-admin').value = data.lore_admin || '';
                 }
             } catch (e) { console.error("Failed to fetch recommendations", e); }
         }
 
-        // YouTube Auto-Converter
         function convertToEmbedUrl(url) {
             if (!url) return '';
             let videoId = '';
-            
-            if (url.includes('youtu.be/')) {
-                videoId = url.split('youtu.be/')[1].split('?')[0];
-            } else if (url.includes('youtube.com/watch')) {
+            if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
+            else if (url.includes('youtube.com/watch')) {
                 const urlParams = new URLSearchParams(url.split('?')[1]);
                 videoId = urlParams.get('v');
-            } else if (url.includes('youtube.com/embed/')) {
-                return url; // Already correct
-            }
+            } else if (url.includes('youtube.com/embed/')) return url; 
             
             if (videoId) return `https://www.youtube.com/embed/${videoId}`;
-            return url; // Fallback
+            return url; 
         }
 
         async function saveRecommendations() {
@@ -262,10 +265,18 @@
                 rouletteVideo: convertToEmbedUrl(document.getElementById('rec-roulette').value.trim()),
                 sportsbookUrl: document.getElementById('rec-sportsbook-url').value.trim(),
                 sportsbookBet: document.getElementById('rec-sportsbook-bet').value.trim(),
-                bloodlordUrl: document.getElementById('rec-bloodlord-url').value.trim()
+                bloodlordUrl: document.getElementById('rec-bloodlord-url').value.trim(),
+                
+                lore_crypt: document.getElementById('lore-crypt').value.trim(),
+                lore_baccarat: document.getElementById('lore-baccarat').value.trim(),
+                lore_dice: document.getElementById('lore-dice').value.trim(),
+                lore_poker: document.getElementById('lore-poker').value.trim(),
+                lore_roulette: document.getElementById('lore-roulette').value.trim(),
+                lore_sportsbook: document.getElementById('lore-sportsbook').value.trim(),
+                lore_bloodlord: document.getElementById('lore-bloodlord').value.trim(),
+                lore_admin: document.getElementById('lore-admin').value.trim()
             };
 
-            // Update UI with converted URLs so user sees the change
             document.getElementById('rec-baccarat').value = payload.baccaratVideo;
             document.getElementById('rec-dice').value = payload.diceVideo;
             document.getElementById('rec-poker').value = payload.pokerVideo;
@@ -275,9 +286,7 @@
                 let now = new Date();
                 let next2AM = new Date(now);
                 next2AM.setHours(2, 0, 0, 0);
-                if (now.getHours() >= 2) {
-                    next2AM.setDate(next2AM.getDate() + 1);
-                }
+                if (now.getHours() >= 2) next2AM.setDate(next2AM.getDate() + 1);
                 payload.sportsbookExpiration = next2AM.getTime();
             } else {
                 payload.sportsbookExpiration = null;
@@ -285,7 +294,7 @@
 
             try {
                 await db.collection('system').doc('recommendations').set(payload, { merge: true });
-                showModal('success', "ZombieLord's Picks successfully updated.");
+                showModal('success', "ZombieLord's Picks and Grimoire Inscriptions successfully updated.");
             } catch (e) {
                 console.error(e);
                 showModal('error', "Failed to save recommendations. Check console for details.");
@@ -359,7 +368,7 @@
         </div>
 
         <!-- BOTTOM PANEL: ZOMBIELORD'S PICKS (Master Admin Only) -->
-        <div id="zombielords-picks-panel" class="glass-panel p-6 w-full" style="display: none;">
+        <div id="zombielords-picks-panel" class="glass-panel p-6 w-full mb-6" style="display: none;">
             <div class="flex justify-between items-end border-b border-emerald-900/50 pb-2 mb-6">
                 <div>
                     <h2 class="cinzel text-lg text-emerald-400 uppercase tracking-widest">ZombieLord's Picks</h2>
@@ -381,6 +390,33 @@
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Target URL</label><input type="text" id="rec-sportsbook-url" class="input-wicked" placeholder="https://wagershack.com/"></div>
                 <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord's Target URL</label><input type="text" id="rec-bloodlord-url" class="input-wicked border-red-900/50 focus:border-red-500" placeholder="https://..."></div>
                 <div class="md:col-span-2 lg:col-span-3"><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Sportsbook Daily Prophecy (Purges at 2 AM)</label><textarea id="rec-sportsbook-bet" class="input-wicked h-16 resize-none" placeholder="Enter the daily recommended bet..."></textarea></div>
+            </div>
+        </div>
+
+        <!-- BOTTOM PANEL: GRIMOIRE INSCRIPTIONS (Master Admin Only) -->
+        <div id="grimoire-inscriptions-panel" class="glass-panel p-6 w-full" style="display: none;">
+            <div class="flex justify-between items-end border-b border-emerald-900/50 pb-2 mb-6">
+                <div>
+                    <h2 class="cinzel text-lg text-emerald-400 uppercase tracking-widest">Grimoire Inscriptions</h2>
+                    <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">
+                        <i class="fa-solid fa-pen-nib text-emerald-400 mr-1"></i>
+                        Edit the lore text displayed on the Lobby cards. Leave blank to use the hardcoded defaults.
+                    </p>
+                </div>
+                <button onclick="saveRecommendations()" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest px-6 py-2 rounded transition-colors uppercase">
+                    Save All
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Crypt Lore</label><textarea id="lore-crypt" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Baccarat Lore</label><textarea id="lore-baccarat" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Lore</label><textarea id="lore-dice" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Lore</label><textarea id="lore-poker" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Lore</label><textarea id="lore-roulette" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Lore</label><textarea id="lore-sportsbook" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord Lore</label><textarea id="lore-bloodlord" class="input-wicked border-red-900/50 focus:border-red-500 h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Admin Lore</label><textarea id="lore-admin" class="input-wicked h-24 resize-none"></textarea></div>
             </div>
         </div>
 
