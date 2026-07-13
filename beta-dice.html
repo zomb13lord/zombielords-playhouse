@@ -19,7 +19,7 @@
             font-family: 'Montserrat', sans-serif; min-height: 100vh;
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.8) 0%, rgba(2, 6, 23, 0.98) 100%);
             background-attachment: fixed;
-            padding-bottom: 250px; /* Space for Input Pad */
+            padding-bottom: 280px; /* Space for Input Pad */
         }
 
         /* MODULE 1: ZOMBIELORD NAVBAR */
@@ -77,10 +77,14 @@
         .pt-10 { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #000; border-color: #67e8f9; }
         .pt-11 { background: linear-gradient(135deg, #ffffff, #f8fafc); color: #000; border-color: #fff; box-shadow: 0 0 15px #fff; }
 
-        /* Superscripts Formatting */
+        /* Superscripts Formatting & Perfect Centering */
         .content-wrapper { display: flex; align-items: center; justify-content: center; }
-        .sup-container { display: flex; flex-direction: row; gap: 4px; transform: translateY(-6px); margin-left: 4px; }
-        .sup-text { font-size: inherit; font-weight: 900; line-height: 1; }
+        .main-val { display: flex; align-items: center; justify-content: center; }
+        .sup-container { 
+            display: flex; flex-direction: row; gap: 2px; margin-left: 2px; 
+            transform: translateY(-6px); height: 0; align-items: center; overflow: visible; 
+        }
+        .sup-text { font-size: inherit; font-weight: 900; line-height: 0; }
 
         /* GRAPHICAL DICE FOR ACTIVE ROLL */
         .dice-container { display: flex; gap: 4px; padding: 0 4px; align-items: center; }
@@ -96,12 +100,12 @@
         #input-pad {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(51, 65, 85, 0.8); padding: 15px;
+            border-top: 1px solid rgba(51, 65, 85, 0.8); padding: 12px;
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
         .die-btn {
             background: #020617; border: 1px solid #334155; color: #f8fafc;
-            font-size: 20px; font-weight: 900; border-radius: 6px; padding: 12px 0;
+            font-size: 18px; font-weight: 900; border-radius: 6px; padding: 8px 0;
             transition: all 0.2s ease; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
         }
         .die-btn.selected-left { background: #10b981; border-color: #059669; color: #fff; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); transform: translateY(-2px); }
@@ -141,40 +145,43 @@
 
     <!-- MODULE 4: INPUT PAD -->
     <div id="input-pad">
-        <div class="flex flex-col md:flex-row gap-6 max-w-4xl mx-auto">
+        <div class="flex flex-col gap-3 max-w-4xl mx-auto">
             
-            <!-- Left Die Grid -->
-            <div class="flex-1">
-                <div class="text-center text-[10px] text-emerald-500 font-bold mb-2 tracking-widest">LEFT DIE</div>
-                <div class="grid grid-cols-3 grid-rows-2 gap-2">
-                    <button onclick="selectDie('left', 1)" id="btn-l-1" class="die-btn">1</button>
-                    <button onclick="selectDie('left', 2)" id="btn-l-2" class="die-btn">2</button>
-                    <button onclick="selectDie('left', 3)" id="btn-l-3" class="die-btn">3</button>
-                    <button onclick="selectDie('left', 4)" id="btn-l-4" class="die-btn">4</button>
-                    <button onclick="selectDie('left', 5)" id="btn-l-5" class="die-btn">5</button>
-                    <button onclick="selectDie('left', 6)" id="btn-l-6" class="die-btn">6</button>
+            <!-- Dice Grids Row (Side-by-Side) -->
+            <div class="flex flex-row gap-3 md:gap-6">
+                <!-- Left Die Grid -->
+                <div class="flex-1">
+                    <div class="text-center text-[10px] text-emerald-500 font-bold mb-1.5 tracking-widest">LEFT DIE</div>
+                    <div class="grid grid-cols-3 grid-rows-2 gap-1.5">
+                        <button onclick="selectDie('left', 1)" id="btn-l-1" class="die-btn">1</button>
+                        <button onclick="selectDie('left', 2)" id="btn-l-2" class="die-btn">2</button>
+                        <button onclick="selectDie('left', 3)" id="btn-l-3" class="die-btn">3</button>
+                        <button onclick="selectDie('left', 4)" id="btn-l-4" class="die-btn">4</button>
+                        <button onclick="selectDie('left', 5)" id="btn-l-5" class="die-btn">5</button>
+                        <button onclick="selectDie('left', 6)" id="btn-l-6" class="die-btn">6</button>
+                    </div>
+                </div>
+
+                <!-- Right Die Grid -->
+                <div class="flex-1">
+                    <div class="text-center text-[10px] text-amber-500 font-bold mb-1.5 tracking-widest">RIGHT DIE</div>
+                    <div class="grid grid-cols-3 grid-rows-2 gap-1.5">
+                        <button onclick="selectDie('right', 1)" id="btn-r-1" class="die-btn">1</button>
+                        <button onclick="selectDie('right', 2)" id="btn-r-2" class="die-btn">2</button>
+                        <button onclick="selectDie('right', 3)" id="btn-r-3" class="die-btn">3</button>
+                        <button onclick="selectDie('right', 4)" id="btn-r-4" class="die-btn">4</button>
+                        <button onclick="selectDie('right', 5)" id="btn-r-5" class="die-btn">5</button>
+                        <button onclick="selectDie('right', 6)" id="btn-r-6" class="die-btn">6</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right Die Grid -->
-            <div class="flex-1">
-                <div class="text-center text-[10px] text-amber-500 font-bold mb-2 tracking-widest">RIGHT DIE</div>
-                <div class="grid grid-cols-3 grid-rows-2 gap-2">
-                    <button onclick="selectDie('right', 1)" id="btn-r-1" class="die-btn">1</button>
-                    <button onclick="selectDie('right', 2)" id="btn-r-2" class="die-btn">2</button>
-                    <button onclick="selectDie('right', 3)" id="btn-r-3" class="die-btn">3</button>
-                    <button onclick="selectDie('right', 4)" id="btn-r-4" class="die-btn">4</button>
-                    <button onclick="selectDie('right', 5)" id="btn-r-5" class="die-btn">5</button>
-                    <button onclick="selectDie('right', 6)" id="btn-r-6" class="die-btn">6</button>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex-1 flex flex-col gap-3 justify-end">
-                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-4 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">Accept Roll</button>
-                <div class="flex gap-3">
-                    <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-3 rounded font-bold text-xs uppercase transition-all">Invalid</button>
-                    <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-3 rounded font-bold text-xs uppercase transition-all">Undo</button>
+            <!-- Controls Row -->
+            <div class="flex flex-col gap-2 mt-1">
+                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">Accept Roll</button>
+                <div class="flex gap-2">
+                    <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
+                    <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
                 </div>
             </div>
 
@@ -255,7 +262,7 @@
 
         let currentUid = null;
         let universalLog = []; 
-        let activeState = { currentPoint: null }; // Tracked during render
+        let activeState = { currentPoint: null }; 
 
         // Input Pad State
         let selectedLeft = null;
@@ -304,7 +311,7 @@
 
         function submitRoll() {
             if (!selectedLeft || !selectedRight) {
-                alert("Select both dice before accepting."); // Temporary native alert for basic validation
+                alert("Select both dice before accepting."); 
                 return;
             }
             const r = {
@@ -327,7 +334,6 @@
         // --- INVALID & WRONG POINT LOGIC ---
         function openInvalidModal() {
             const container = document.getElementById('invalid-options-container');
-            // Reset to standard 5
             container.innerHTML = `
                 <button class="modal-btn" onclick="submitInvalid('Dice Off Table (One)')">Dice Off Table (One)</button>
                 <button class="modal-btn" onclick="submitInvalid('Dice Off Table (Two)')">Dice Off Table (Two)</button>
@@ -335,7 +341,6 @@
                 <button class="modal-btn" onclick="submitInvalid('Dice to Tall')">Dice to Tall</button>
                 <button class="modal-btn" onclick="submitInvalid('Dice to Short')">Dice to Short</button>
             `;
-            // Inject Wrong Point if point is established
             if (activeState.currentPoint !== null) {
                 container.innerHTML += `<button class="modal-btn border-emerald-500 text-emerald-400 mt-2" onclick="openWrongPointModal()">Wrong Point</button>`;
             }
@@ -354,7 +359,6 @@
         }
 
         function submitWrongPoint(newPoint) {
-            // Find the roll that established the current point
             let pointRollIndex = -1;
             let tempIsComeout = true;
             let tempPoint = null;
@@ -417,8 +421,16 @@
             
             el.innerHTML = `
                 <div class="content-wrapper">
-                    ${rolls}<span style="color: ${rColor}; font-size: 10px; margin-right: 4px; transform: translateY(-6px);">R</span>
-                    ${points}<span style="color: ${pColor}; font-size: 10px; transform: translateY(-6px);">P</span>
+                    <div class="main-val">${rolls}</div>
+                    <div class="sup-container">
+                        <span class="sup-text" style="color: ${rColor};">R</span>
+                    </div>
+                </div>
+                <div class="content-wrapper" style="margin-left: 8px;">
+                    <div class="main-val">${points}</div>
+                    <div class="sup-container">
+                        <span class="sup-text" style="color: ${pColor};">P</span>
+                    </div>
                 </div>
             `;
             return el;
@@ -448,7 +460,7 @@
                 const die1 = parseInt(r.Left_Die || r.leftDie || 0);
                 const die2 = parseInt(r.Right_Die || r.rightDie || 0);
                 const rawSum = parseInt(r.Total_Sum || r.sum || 0);
-                const sum = r.Corrected_Point || rawSum; // Use corrected point if it exists
+                const sum = r.Corrected_Point || rawSum; 
                 
                 const isHardway = (die1 === die2) && [4,6,8,10].includes(rawSum);
                 const isLastRoll = (index === universalLog.length - 1);
@@ -498,7 +510,7 @@
                     el.onclick = () => showErrorReason(r.Notes);
                 } else {
                     let superHTML = '';
-                    if (currentRepeats > 0) superHTML += `<span class="sup-text text-slate-300">${currentRepeats + 1}</span>`;
+                    if (currentRepeats > 0) superHTML += `<span class="sup-text">R${currentRepeats + 1}</span>`;
                     if (isHardway) superHTML += `<span class="sup-text text-yellow-400">(H)</span>`;
 
                     let displayNum = sum;
@@ -507,9 +519,11 @@
                     if (isLastRoll) {
                         el.innerHTML = `
                             <div class="content-wrapper">
-                                <div class="dice-container">
-                                    ${getDicePipsHTML(die1)}
-                                    ${getDicePipsHTML(die2)}
+                                <div class="main-val">
+                                    <div class="dice-container">
+                                        ${getDicePipsHTML(die1)}
+                                        ${getDicePipsHTML(die2)}
+                                    </div>
                                 </div>
                                 ${superHTML ? `<div class="sup-container">${superHTML}</div>` : ''}
                             </div>
@@ -517,7 +531,7 @@
                     } else {
                         el.innerHTML = `
                             <div class="content-wrapper">
-                                <span>${displayNum}</span>
+                                <div class="main-val">${displayNum}</div>
                                 ${superHTML ? `<div class="sup-container">${superHTML}</div>` : ''}
                             </div>
                         `;
@@ -533,10 +547,8 @@
                 }
             });
 
-            // Update global state for UI checks
             activeState.currentPoint = currentPoint;
 
-            // Reverse array so newest is on the left
             nodesToInject.reverse().forEach(node => fragment.appendChild(node));
             historyBar.appendChild(fragment);
         }
