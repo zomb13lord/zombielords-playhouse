@@ -1,1 +1,250 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underworld Ledger | ZombieLord's</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;700&display=swap');
+        
+        body {
+            margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
+            font-family: 'Montserrat', sans-serif; min-height: 100vh;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/admin-card.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        
+        .cinzel { font-family: 'Cinzel', serif; }
+        .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+        
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px);
+            border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+        }
+
+        /* Custom Toggle Switch */
+        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
+        
+        .select-wicked {
+            background: #020617; border: 1px solid rgba(16, 185, 129, 0.4); color: #fff;
+            font-size: 10px; padding: 4px 8px; border-radius: 4px; outline: none; text-transform: uppercase;
+        }
+        .select-wicked:focus { border-color: #10b981; }
+    </style>
+    
+    <script>
+        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); const db = firebase.firestore();
+        
+        let currentUserDoc = null;
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = "index.html"; return; }
+            try {
+                const docSnap = await db.collection('users').doc(user.uid).get();
+                if (!docSnap.exists) { window.location.href = "index.html"; return; }
+                
+                currentUserDoc = docSnap.data();
+                currentUserDoc.uid = user.uid;
+
+                if (currentUserDoc.role !== 'Admin' && currentUserDoc.role !== 'Master Admin') {
+                    window.location.href = "lobby.html"; return;
+                }
+
+                if (currentUserDoc.role === 'Master Admin') {
+                    document.getElementById('master-admin-panel').style.display = 'block';
+                }
+
+                fetchUsers();
+                if (currentUserDoc.role === 'Master Admin') fetchActiveCodes();
+
+            } catch (error) { console.error("Auth Error:", error); }
+        });
+
+        function fetchUsers() {
+            db.collection('users').onSnapshot(snapshot => {
+                const tbody = document.getElementById('users-tbody');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Hide Master Admin from the list to prevent self-deletion
+                    if (doc.id === currentUserDoc.uid) return;
+
+                    const perms = data.permissions || {};
+                    const isMaster = currentUserDoc.role === 'Master Admin';
+                    
+                    let roleHtml = `<span class="text-xs font-bold text-slate-300 uppercase">${data.role}</span>`;
+                    if (isMaster) {
+                        roleHtml = `
+                        <select class="select-wicked" onchange="updateRole('${doc.id}', this.value)">
+                            <option value="User" ${data.role === 'User' ? 'selected' : ''}>User</option>
+                            <option value="Beta User" ${data.role === 'Beta User' ? 'selected' : ''}>Beta User</option>
+                            <option value="Admin" ${data.role === 'Admin' ? 'selected' : ''}>Admin</option>
+                        </select>`;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-slate-800 hover:bg-slate-900/50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="p-3">
+                            <div class="font-bold text-sm text-white">${data.displayName || 'Unknown Soul'}</div>
+                            <div class="text-[10px] text-slate-500">${data.email}</div>
+                        </td>
+                        <td class="p-3">${roleHtml}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'crypt', perms.crypt)}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'baccarat', perms.baccarat)}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'dice', perms.dice)}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'poker', perms.poker)}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'roulette', perms.roulette)}</td>
+                        <td class="p-3 text-center">${createToggle(doc.id, 'sportsbook', perms.sportsbook)}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteUser('${doc.id}')" class="text-red-500 hover:text-red-400 transition-colors" title="Eradicate Soul">
+                                <i class="fa-solid fa-skull"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function createToggle(uid, module, isChecked) {
+            const checkedAttr = isChecked ? 'checked' : '';
+            return `
+            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                <input type="checkbox" name="toggle" id="${uid}-${module}" ${checkedAttr} onchange="updatePermission('${uid}', '${module}', this.checked)" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-slate-700 appearance-none cursor-pointer z-10 top-0 left-0 transition-transform duration-300 ease-in-out"/>
+                <label for="${uid}-${module}" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-700 cursor-pointer transition-colors duration-300 ease-in-out"></label>
+            </div>`;
+        }
+
+        async function updatePermission(uid, module, value) {
+            try {
+                await db.collection('users').doc(uid).update({ [`permissions.${module}`]: value });
+            } catch (error) { alert("Failed to update permission."); }
+        }
+
+        async function updateRole(uid, newRole) {
+            try {
+                await db.collection('users').doc(uid).update({ role: newRole });
+            } catch (error) { alert("Failed to update role."); }
+        }
+
+        async function deleteUser(uid) {
+            if (confirm("Are you sure you want to eradicate this soul? They will lose all access.")) {
+                try {
+                    await db.collection('users').doc(uid).delete();
+                } catch (error) { alert("Failed to delete user."); }
+            }
+        }
+
+        // --- MASTER ADMIN CODE GENERATION ---
+        async function generateInviteCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let rawCode = '';
+            for(let i=0; i<16; i++) rawCode += chars.charAt(Math.floor(Math.random() * chars.length));
+            const formattedCode = rawCode.match(/.{1,4}/g).join('-');
+
+            try {
+                await db.collection('invite_codes').doc(formattedCode).set({
+                    used: false,
+                    createdBy: currentUserDoc.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } catch (error) { alert("Failed to forge invite code."); }
+        }
+
+        function fetchActiveCodes() {
+            db.collection('invite_codes').where('used', '==', false).onSnapshot(snapshot => {
+                const list = document.getElementById('active-codes-list');
+                list.innerHTML = '';
+                if (snapshot.empty) {
+                    list.innerHTML = '<div class="text-xs text-slate-500 italic">No active codes.</div>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    list.innerHTML += `<div class="text-xs font-mono text-emerald-400 bg-slate-900 p-2 rounded border border-slate-700 flex justify-between items-center">
+                        ${doc.id}
+                        <button onclick="revokeCode('${doc.id}')" class="text-red-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+                    </div>`;
+                });
+            });
+        }
+
+        async function revokeCode(codeId) {
+            if(confirm("Revoke this code?")) {
+                await db.collection('invite_codes').doc(codeId).delete();
+            }
+        }
+    </script>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="flex justify-between items-center mb-8 glass-panel p-4">
+        <div class="flex flex-col">
+            <h1 class="cinzel text-2xl md:text-3xl font-black emerald-text uppercase tracking-widest">Underworld Ledger</h1>
+            <span class="text-[10px] text-slate-400 tracking-[0.3em] uppercase font-bold mt-1">Bureau of Souls</span>
+        </div>
+        <button onclick="window.location.href='lobby.html'" class="text-[10px] border border-emerald-500/40 px-4 py-2 bg-emerald-950/30 hover:bg-emerald-600 transition-all uppercase font-black tracking-[0.2em] text-white">
+            &larr; Return to Lobby
+        </button>
+    </header>
+
+    <div class="flex flex-col lg:flex-row gap-6">
+        
+        <!-- LEFT PANEL: USER LEDGER -->
+        <div class="glass-panel p-6 flex-grow overflow-hidden">
+            <h2 class="cinzel text-lg text-white uppercase tracking-widest border-b border-emerald-900/50 pb-2 mb-4">Registered Souls</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead>
+                        <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                            <th class="p-3">Identity</th>
+                            <th class="p-3">Rank</th>
+                            <th class="p-3 text-center">Crypt</th>
+                            <th class="p-3 text-center">Baccarat</th>
+                            <th class="p-3 text-center">Dice</th>
+                            <th class="p-3 text-center">Poker</th>
+                            <th class="p-3 text-center">Roulette</th>
+                            <th class="p-3 text-center">Sports</th>
+                            <th class="p-3 text-center">Purge</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL: THE THRONE (Master Admin Only) -->
+        <div id="master-admin-panel" class="glass-panel p-6 w-full lg:w-80 flex-shrink-0" style="display: none;">
+            <h2 class="cinzel text-lg text-amber-500 uppercase tracking-widest border-b border-amber-900/50 pb-2 mb-4">The Throne</h2>
+            <p class="text-xs text-slate-400 mb-6 leading-relaxed">Forge new invite codes to grant Admin access to worthy mortals.</p>
+            
+            <button onclick="generateInviteCode()" class="w-full bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[11px] font-black tracking-widest py-3 rounded transition-colors uppercase mb-6">
+                <i class="fa-solid fa-key mr-2"></i> Forge Invite Code
+            </button>
+
+            <h3 class="text-[10px] uppercase tracking-widest text-slate-500 mb-3 font-bold">Active Unused Codes</h3>
+            <div id="active-codes-list" class="flex flex-col gap-2">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
