@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZombieLord's Playhouse</title>
     
-    <meta property="og:title" content="ZombieLord's Playhouse">
-    <meta property="og:type" content="website">
-    <meta name="twitter:title" content="ZombieLord's Playhouse">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@900&family=Creepster&display=swap');
@@ -30,10 +27,7 @@
         .bottom-module { margin-bottom: 6vh; width: 90%; max-width: 420px; text-align: center; display: flex; flex-direction: column; align-items: center; z-index: 10; }
 
         @media (min-width: 768px) {
-            body {
-                justify-content: space-between;
-                background-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
-            }
+            body { justify-content: space-between; background-image: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 25%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg'); }
             .top-module { margin-top: 10vh; margin-bottom: 0; }
         }
 
@@ -65,6 +59,7 @@
         .modal-box { background: #020617; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 400px; padding: 30px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(0,0,0,1); text-align: center; }
         .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: center; font-size: 16px; outline: none; text-transform: uppercase; letter-spacing: 2px; }
         .input-wicked:focus { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        .glow-red { filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9)) drop-shadow(0 0 4px rgba(239, 68, 68, 1)); }
     </style>
 
     <script>
@@ -72,6 +67,12 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth(); const db = firebase.firestore();
         let pendingUser = null;
+
+        function showSystemMessage(msg) {
+            document.getElementById('sys-msg-text').innerText = msg;
+            document.getElementById('sys-msg-modal').style.display = 'flex';
+        }
+        function closeSystemMessage() { document.getElementById('sys-msg-modal').style.display = 'none'; }
 
         async function loginWithGoogle() {
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -81,7 +82,7 @@
                 const userDoc = await db.collection('users').doc(pendingUser.uid).get();
                 if (userDoc.exists) window.location.href = "lobby.html";
                 else document.getElementById('fate-modal').style.display = 'flex';
-            } catch (error) { alert("Authentication failed. The spirits reject you."); }
+            } catch (error) { showSystemMessage("Authentication failed. The spirits reject you."); }
         }
 
         async function selectMortalPath() {
@@ -93,7 +94,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 window.location.href = "lobby.html";
-            } catch (error) { alert("Failed to forge your soul in the database."); }
+            } catch (error) { showSystemMessage("Failed to forge your soul in the database."); }
         }
 
         function showAdminInput() { document.getElementById('path-selection').style.display = 'none'; document.getElementById('admin-verification').style.display = 'block'; }
@@ -109,13 +110,13 @@
         async function verifyAdminCode() {
             if (!pendingUser) return;
             const codeInput = document.getElementById('admin-code').value.trim().toUpperCase();
-            if (!codeInput) return alert("Enter the sacred text.");
+            if (!codeInput) return showSystemMessage("Enter the sacred text.");
 
             try {
                 if (codeInput === "1234-5678-ABCD-EFGH") {
                     const genesisRef = db.collection('system').doc('genesis');
                     const genesisDoc = await genesisRef.get();
-                    if (genesisDoc.exists && genesisDoc.data().used) return alert("The Genesis Code has already been consumed.");
+                    if (genesisDoc.exists && genesisDoc.data().used) return showSystemMessage("The Genesis Code has already been consumed.");
                     await genesisRef.set({ used: true, consumedBy: pendingUser.uid, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                     await db.collection('users').doc(pendingUser.uid).set({
                         email: pendingUser.email, displayName: pendingUser.displayName, role: 'Master Admin',
@@ -127,7 +128,7 @@
 
                 const codeRef = db.collection('invite_codes').doc(codeInput);
                 const codeDoc = await codeRef.get();
-                if (!codeDoc.exists || codeDoc.data().used) return alert("Invalid or expired code. The shadows laugh at your attempt.");
+                if (!codeDoc.exists || codeDoc.data().used) return showSystemMessage("Invalid or expired code. The shadows laugh at your attempt.");
                 
                 await codeRef.update({ used: true, consumedBy: pendingUser.uid, consumedAt: firebase.firestore.FieldValue.serverTimestamp() });
                 await db.collection('users').doc(pendingUser.uid).set({
@@ -136,7 +137,10 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 window.location.href = "lobby.html";
-            } catch (error) { alert("A disturbance in the ether prevented verification."); }
+            } catch (error) { 
+                console.error(error);
+                showSystemMessage("A disturbance in the ether prevented verification. Check Firestore Rules."); 
+            }
         }
     </script>
 </head>
@@ -173,6 +177,16 @@
                     <button onclick="verifyAdminCode()" class="wicked-btn py-3 text-[10px]">Verify</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Custom System Message Modal -->
+    <div id="sys-msg-modal" class="modal-mask">
+        <div class="modal-box border-red-500">
+            <i class="fa-solid fa-skull text-red-500 text-4xl mb-4 glow-red"></i>
+            <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">System Fault</h2>
+            <p id="sys-msg-text" class="text-xs text-slate-400 font-mono mb-6"></p>
+            <button onclick="closeSystemMessage()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white w-full py-3 text-xs font-black uppercase tracking-widest transition-all">Acknowledge</button>
         </div>
     </div>
 </body>
