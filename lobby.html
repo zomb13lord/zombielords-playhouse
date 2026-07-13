@@ -72,6 +72,17 @@
         let selectedCard = null;
         let recommendations = {};
 
+        const loreFallbacks = {
+            crypt: "A subterranean repository for your statistical souls. Exhume past sessions, dissect historical variances, and resurrect data from the ashes of forgotten wagers.",
+            baccarat: "Decode the eternal symmetry of Player and Banker. Map the rhythmic decay of the shoe, isolate tie anomalies, and exploit the deterministic laws governing the draw.",
+            dice: "Map the kinematic chaos of the bones. Track the shooter's axis stability, isolate mechanical signatures, and capitalize on the inevitable collapse into the seven.",
+            poker: "A grimoire for the psychological predator. Calculate true table equity, log your bloodline bankroll, and systematically dissect the behavioral flaws of your prey.",
+            roulette: "Audit the physical matrix of the Devil's Wheel. Map rotor deceleration, exploit mechanical biases, and chart the deterministic ball drop against the illusion of chance.",
+            sportsbook: "Quantify the geometry of human conflict. Uncover edge detection paradigms, weaponize parlay structures, and systematically drain the bookmaker's reserves.",
+            bloodlord: "The heir to the underworld throne demands tribute. Enter the domain of the BloodLord, where the games are fierce, the stakes are fun, and the young prince rules supreme.",
+            admin: "Govern the souls of the damned. Dictate access, forge new overlords, and manage the bureaucratic nightmare of the Playhouse."
+        };
+
         function showSystemMessage(msg) {
             document.getElementById('sys-msg-text').innerText = msg;
             document.getElementById('sys-msg-modal').style.display = 'flex';
@@ -102,11 +113,25 @@
                 if (recDoc.exists) {
                     recommendations = recDoc.data();
                     
-                    // Sportsbook 2 AM Purge Logic
-                    if (recommendations.sportsbookBet && recommendations.sportsbookExpiration) {
-                        const now = new Date().getTime();
-                        if (now < recommendations.sportsbookExpiration) {
-                            document.getElementById('sportsbook-lore').innerHTML = `<span class="text-amber-400 font-bold uppercase tracking-widest">ZOMBIELORD'S PROPHECY:</span><br><span class="text-white">${recommendations.sportsbookBet}</span>`;
+                    // Apply Dynamic Lore
+                    ['crypt', 'baccarat', 'dice', 'poker', 'roulette', 'bloodlord', 'admin'].forEach(mod => {
+                        const el = document.getElementById(`lore-${mod}`);
+                        if (el) el.innerText = recommendations[`lore_${mod}`] || loreFallbacks[mod];
+                    });
+
+                    // Sportsbook Lore / Prophecy Logic
+                    const sbEl = document.getElementById('lore-sportsbook');
+                    if (sbEl) {
+                        let showProphecy = false;
+                        if (recommendations.sportsbookBet && recommendations.sportsbookExpiration) {
+                            const now = new Date().getTime();
+                            if (now < recommendations.sportsbookExpiration) {
+                                showProphecy = true;
+                                sbEl.innerHTML = `<span class="text-amber-400 font-bold uppercase tracking-widest">ZOMBIELORD'S PROPHECY:</span><br><span class="text-white">${recommendations.sportsbookBet}</span>`;
+                            }
+                        }
+                        if (!showProphecy) {
+                            sbEl.innerText = recommendations.lore_sportsbook || loreFallbacks.sportsbook;
                         }
                     }
                 }
@@ -130,15 +155,9 @@
                 if (!card) return;
 
                 let state = perms[mod];
-                
-                // Backward compatibility for true/false
                 if (state === true) state = 'Enabled';
                 if (state === false) state = 'Visible';
-                
-                // Default states if undefined
-                if (state === undefined) {
-                    state = (mod === 'bloodlord') ? 'Hidden' : 'Visible';
-                }
+                if (state === undefined) state = (mod === 'bloodlord') ? 'Hidden' : 'Visible';
 
                 if (state === 'Hidden') {
                     card.classList.add('hidden');
@@ -172,7 +191,6 @@
                 const bypassVideo = ['crypt', 'sportsbook', 'bloodlord'].includes(moduleId) || !hasVideo;
 
                 if (bypassVideo) {
-                    // Check access directly
                     let state = userProfile.permissions[moduleId];
                     if (state === true) state = 'Enabled';
                     const isEnabled = (state === 'Enabled');
@@ -226,17 +244,42 @@
             modal.style.display = 'flex';
         }
 
-        function openViewingOrb(url) {
+        async function openViewingOrb(url) {
             document.getElementById('zombielords-pick-modal').style.display = 'none';
             const orb = document.getElementById('viewing-orb-modal');
             const iframe = document.getElementById('orb-iframe');
             iframe.src = url;
             orb.style.display = 'flex';
+
+            // Attempt Fullscreen & Landscape Lock
+            try {
+                if (orb.requestFullscreen) await orb.requestFullscreen();
+                else if (orb.webkitRequestFullscreen) await orb.webkitRequestFullscreen();
+                
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                console.log("Fullscreen/Orientation lock not supported or denied.", err);
+            }
         }
 
-        function closeViewingOrb() {
+        async function closeViewingOrb() {
             document.getElementById('viewing-orb-modal').style.display = 'none';
             document.getElementById('orb-iframe').src = ""; 
+
+            // Attempt Exit Fullscreen & Unlock
+            try {
+                if (document.fullscreenElement) {
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+                }
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                }
+            } catch (err) {
+                console.log("Exit fullscreen/unlock failed.", err);
+            }
         }
 
         function executeModuleAction(moduleId, stableUrl, betaUrl) {
@@ -291,7 +334,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Crypt</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">A subterranean repository for your statistical souls. Exhume past sessions, dissect historical variances, and resurrect data from the ashes of forgotten wagers.</p>
+                        <p id="lore-crypt" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
@@ -304,7 +347,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Baccarat</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Decode the eternal symmetry of Player and Banker. Map the rhythmic decay of the shoe, isolate tie anomalies, and exploit the deterministic laws governing the draw.</p>
+                        <p id="lore-baccarat" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
@@ -317,7 +360,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Dice Tracker</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Map the kinematic chaos of the bones. Track the shooter's axis stability, isolate mechanical signatures, and capitalize on the inevitable collapse into the seven.</p>
+                        <p id="lore-dice" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
@@ -330,7 +373,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Poker Room</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">A grimoire for the psychological predator. Calculate true table equity, log your bloodline bankroll, and systematically dissect the behavioral flaws of your prey.</p>
+                        <p id="lore-poker" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
@@ -343,7 +386,7 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Roulette Tracker</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Audit the physical matrix of the Devil's Wheel. Map rotor deceleration, exploit mechanical biases, and chart the deterministic ball drop against the illusion of chance.</p>
+                        <p id="lore-roulette" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
@@ -356,12 +399,12 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Sportsbook</h3>
-                        <p id="sportsbook-lore" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Quantify the geometry of human conflict. Uncover edge detection paradigms, weaponize parlay structures, and systematically drain the bookmaker's reserves.</p>
+                        <p id="lore-sportsbook" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
 
-            <!-- 7. BLOODLORD'S REVENGE CARD (Hidden by default) -->
+            <!-- 7. BLOODLORD'S REVENGE CARD -->
             <div id="card-bloodlord" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('bloodlord', '#', null)">
                 <div id="lock-bloodlord" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/bloodlord-card.jpg');"></div>
@@ -369,22 +412,21 @@
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-red-500 transition-colors text-shadow-heavy">BloodLord's Revenge</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">The heir to the underworld throne demands tribute. Enter the domain of the BloodLord, where the games are fierce, the stakes are fun, and the young prince rules supreme.</p>
+                        <p id="lore-bloodlord" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
             </div>
 
-            <!-- 8. ADMIN DASHBOARD CARD (Hidden by default) -->
+            <!-- 8. ADMIN DASHBOARD CARD -->
             <div id="card-admin" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('admin', 'admin.html', null)">
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/admin-card.jpg');"></div>
                 <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Underworld Ledger</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Govern the souls of the damned. Dictate access, forge new overlords, and manage the bureaucratic nightmare of the Playhouse.</p>
+                        <p id="lore-admin" class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy"></p>
                     </div>
                 </div>
-                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center relative z-20 pointer-events-none">OPEN LEDGER <span>&rarr;</span></div>
             </div>
 
         </div>
