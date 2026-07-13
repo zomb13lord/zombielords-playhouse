@@ -144,6 +144,7 @@
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'poker', perms.poker)}</td>
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'roulette', perms.roulette)}</td>
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'sportsbook', perms.sportsbook)}</td>
+                        <td class="p-2 text-center">${createPermissionSelect(doc.id, 'casino', perms.casino)}</td>
                         <td class="p-2 text-center">${createPermissionSelect(doc.id, 'bloodlord', perms.bloodlord)}</td>
                         <td class="p-3 text-center">${deleteBtn}</td>
                     `;
@@ -155,7 +156,7 @@
         function createPermissionSelect(uid, module, val) {
             if (val === true) val = 'Enabled';
             if (val === false) val = 'Visible';
-            if (!val) val = (module === 'bloodlord') ? 'Hidden' : 'Visible';
+            if (!val) val = (module === 'bloodlord' || module === 'casino') ? 'Hidden' : 'Visible';
 
             return `
             <select class="select-wicked w-full" onchange="updatePermission('${uid}', '${module}', this.value)">
@@ -230,6 +231,7 @@
                     document.getElementById('rec-roulette').value = data.rouletteVideo || '';
                     document.getElementById('rec-sportsbook-url').value = data.sportsbookUrl || '';
                     document.getElementById('rec-sportsbook-bet').value = data.sportsbookBet || '';
+                    document.getElementById('rec-casino-url').value = data.casinoUrl || '';
                     document.getElementById('rec-bloodlord-url').value = data.bloodlordUrl || '';
 
                     document.getElementById('lore-crypt').value = data.lore_crypt || '';
@@ -238,6 +240,7 @@
                     document.getElementById('lore-poker').value = data.lore_poker || '';
                     document.getElementById('lore-roulette').value = data.lore_roulette || '';
                     document.getElementById('lore-sportsbook').value = data.lore_sportsbook || '';
+                    document.getElementById('lore-casino').value = data.lore_casino || '';
                     document.getElementById('lore-bloodlord').value = data.lore_bloodlord || '';
                     document.getElementById('lore-admin').value = data.lore_admin || '';
                 }
@@ -265,6 +268,7 @@
                 rouletteVideo: convertToEmbedUrl(document.getElementById('rec-roulette').value.trim()),
                 sportsbookUrl: document.getElementById('rec-sportsbook-url').value.trim(),
                 sportsbookBet: document.getElementById('rec-sportsbook-bet').value.trim(),
+                casinoUrl: document.getElementById('rec-casino-url').value.trim(),
                 bloodlordUrl: document.getElementById('rec-bloodlord-url').value.trim(),
                 
                 lore_crypt: document.getElementById('lore-crypt').value.trim(),
@@ -273,6 +277,7 @@
                 lore_poker: document.getElementById('lore-poker').value.trim(),
                 lore_roulette: document.getElementById('lore-roulette').value.trim(),
                 lore_sportsbook: document.getElementById('lore-sportsbook').value.trim(),
+                lore_casino: document.getElementById('lore-casino').value.trim(),
                 lore_bloodlord: document.getElementById('lore-bloodlord').value.trim(),
                 lore_admin: document.getElementById('lore-admin').value.trim()
             };
@@ -329,7 +334,7 @@
             <div class="glass-panel p-6 flex-grow overflow-hidden">
                 <h2 class="cinzel text-lg text-white uppercase tracking-widest border-b border-emerald-900/50 pb-2 mb-4">Registered Souls</h2>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[1000px]">
+                    <table class="w-full text-left border-collapse min-w-[1100px]">
                         <thead>
                             <tr class="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-700">
                                 <th class="p-3">Identity</th>
@@ -340,6 +345,7 @@
                                 <th class="p-2 text-center">Poker</th>
                                 <th class="p-2 text-center">Roulette</th>
                                 <th class="p-2 text-center">Sports</th>
+                                <th class="p-2 text-center">Casino</th>
                                 <th class="p-2 text-center text-red-400">BloodLord</th>
                                 <th class="p-3 text-center">Purge</th>
                             </tr>
@@ -388,8 +394,9 @@
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Video URL</label><input type="text" id="rec-poker" class="input-wicked" placeholder="https://youtu.be/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Video URL</label><input type="text" id="rec-roulette" class="input-wicked" placeholder="https://youtu.be/..."></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Target URL</label><input type="text" id="rec-sportsbook-url" class="input-wicked" placeholder="https://wagershack.com/"></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Casino Target URL</label><input type="text" id="rec-casino-url" class="input-wicked" placeholder="https://..."></div>
                 <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord's Target URL</label><input type="text" id="rec-bloodlord-url" class="input-wicked border-red-900/50 focus:border-red-500" placeholder="https://..."></div>
-                <div class="md:col-span-2 lg:col-span-3"><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Sportsbook Daily Prophecy (Purges at 2 AM)</label><textarea id="rec-sportsbook-bet" class="input-wicked h-16 resize-none" placeholder="Enter the daily recommended bet..."></textarea></div>
+                <div class="md:col-span-2 lg:col-span-2"><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Sportsbook Daily Prophecy (Purges at 2 AM)</label><textarea id="rec-sportsbook-bet" class="input-wicked h-16 resize-none" placeholder="Enter the daily recommended bet..."></textarea></div>
             </div>
         </div>
 
@@ -415,6 +422,7 @@
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Poker Lore</label><textarea id="lore-poker" class="input-wicked h-24 resize-none"></textarea></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Roulette Lore</label><textarea id="lore-roulette" class="input-wicked h-24 resize-none"></textarea></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sportsbook Lore</label><textarea id="lore-sportsbook" class="input-wicked h-24 resize-none"></textarea></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Casino Lore</label><textarea id="lore-casino" class="input-wicked h-24 resize-none"></textarea></div>
                 <div><label class="block text-[10px] text-red-400 uppercase font-bold mb-1">BloodLord Lore</label><textarea id="lore-bloodlord" class="input-wicked border-red-900/50 focus:border-red-500 h-24 resize-none"></textarea></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Admin Lore</label><textarea id="lore-admin" class="input-wicked h-24 resize-none"></textarea></div>
             </div>
