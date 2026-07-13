@@ -36,50 +36,54 @@
             display: flex; flex-direction: row; align-items: center;
             overflow-x: auto; padding: 10px; gap: 8px; min-height: 70px;
         }
-        #history-bar::-webkit-scrollbar { display: none; } /* Hide scrollbar for clean UI */
+        #history-bar::-webkit-scrollbar { display: none; }
 
-        /* ROLL NODE AESTHETICS */
+        /* ROLL NODE AESTHETICS (High-End Glassmorphism) */
         .hist-node {
             display: flex; align-items: center; justify-content: center;
             font-weight: 900; border-radius: 4px; flex-shrink: 0;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             font-size: 16px; min-width: 40px; height: 40px; padding: 0 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.5); position: relative;
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: #f8fafc;
         }
 
-        /* Roll States (Background Driven) */
-        .state-comeout-win { background-color: #10b981; color: #ffffff; border: 1px solid #059669; }
-        .state-comeout-crap { background-color: #dc2626; color: #ffffff; border: 1px solid #991b1b; }
-        .state-point-established { background-color: #ffffff; color: #000000; border: 1px solid #cbd5e1; }
-        .state-seven-out { background-color: #991b1b; color: #ffffff; border: 1px solid #7f1d1d; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
-        .state-standard { background-color: transparent; color: #e2e8f0; border: 1px solid rgba(148, 163, 184, 0.3); }
-        .state-invalid { background-color: #f59e0b; color: #000000; border: 1px solid #b45309; background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(0,0,0,0.1) 5px, rgba(0,0,0,0.1) 10px); }
-        .state-repeater { background-color: #ea580c; color: #ffffff; border: 1px solid #c2410c; box-shadow: 0 0 15px rgba(234, 88, 12, 0.4); }
-        
-        .state-summary { 
-            background-color: #1e3a8a; color: #ffffff; border: 1px solid #1e40af; 
-            font-family: monospace; font-size: 14px; min-width: 60px; letter-spacing: 1px;
-        }
+        /* Roll States */
+        .state-comeout-win { border-color: #10b981; color: #10b981; box-shadow: inset 0 0 10px rgba(16, 185, 129, 0.2); }
+        .state-comeout-crap { border-color: #ef4444; color: #ef4444; box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.2); }
+        .state-point-established { border-color: #ffffff; color: #ffffff; box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2); }
+        .state-seven-out { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); color: #ffffff; border-color: #ef4444; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
+        .state-invalid { border-color: #f59e0b; color: #f59e0b; background: transparent; }
+        .state-summary { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); color: #ffffff; border-color: #3b82f6; font-family: monospace; font-size: 14px; min-width: 60px; letter-spacing: 1px; }
+        .state-standard { /* Uses base hist-node styling */ }
 
-        /* Modifier: Point Made uses dynamic inline styles for background, so we just set defaults */
-        .state-point-made { color: #000000; border: 1px solid rgba(0,0,0,0.3); }
+        /* Modifiers */
+        .mod-hardway { border: 1px dashed #facc15 !important; }
 
-        /* Modifier: Hardway Border */
-        .mod-hardway { border: 2px dashed #facc15 !important; }
+        /* Point Made Gradients (1-11 Tier) */
+        .pt-1 { background: linear-gradient(135deg, #b87333, #8b5a2b); color: #fff; border-color: #d97706; }
+        .pt-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #000; border-color: #fff; }
+        .pt-3 { background: linear-gradient(135deg, #fde047, #ca8a04); color: #000; border-color: #fef08a; }
+        .pt-4 { background: linear-gradient(135deg, #34d399, #059669); color: #000; border-color: #6ee7b7; }
+        .pt-5 { background: linear-gradient(135deg, #60a5fa, #2563eb); color: #fff; border-color: #93c5fd; }
+        .pt-6 { background: linear-gradient(135deg, #c084fc, #7e22ce); color: #fff; border-color: #d8b4fe; }
+        .pt-7 { background: linear-gradient(135deg, #fb7185, #be123c); color: #fff; border-color: #fda4af; }
+        .pt-8 { background: linear-gradient(135deg, #fb923c, #c2410c); color: #fff; border-color: #fdba74; }
+        .pt-9 { background: linear-gradient(135deg, #f472b6, #db2777); color: #fff; border-color: #fbcfe8; }
+        .pt-10 { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #000; border-color: #67e8f9; }
+        .pt-11 { background: linear-gradient(135deg, #ffffff, #f8fafc); color: #000; border-color: #fff; box-shadow: 0 0 15px #fff; }
 
         /* Superscripts Formatting */
-        .sup-text { font-size: 10px; font-weight: 700; margin-left: 2px; line-height: 1; display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+        .sup-container { display: flex; gap: 2px; margin-left: 4px; }
+        .sup-text { font-size: 10px; font-weight: 700; line-height: 1; vertical-align: super; }
 
         /* GRAPHICAL DICE FOR ACTIVE ROLL */
         .dice-container { display: flex; gap: 4px; padding: 0 4px; }
         .mini-die { 
-            width: 24px; height: 24px; background: #fff; border-radius: 4px; 
+            width: 24px; height: 24px; background: #000000; border-radius: 4px; 
             display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); 
-            padding: 2px; gap: 1px; box-shadow: inset 0 0 2px rgba(0,0,0,0.5);
+            padding: 2px; gap: 1px; border: 1px solid rgba(255,255,255,0.2);
         }
-        .mini-die.dark-die { background: #020617; border: 1px solid rgba(255,255,255,0.2); }
-        .pip { background-color: #000; border-radius: 50%; opacity: 0; }
-        .dark-die .pip { background-color: #fff; }
+        .pip { background-color: #ffffff; border-radius: 50%; opacity: 0; }
         .pip.active { opacity: 1; }
 
         /* Temporary Test Panel */
@@ -104,11 +108,10 @@
 
     <!-- MODULE 2: HISTORY BAR -->
     <div id="history-bar">
-        <!-- JS inserts nodes here (Right-to-Left, newest pinned to left) -->
         <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
     </div>
 
-    <!-- MAIN BODY SPACE (Scrollable to test sticky bar) -->
+    <!-- MAIN BODY SPACE -->
     <div class="p-8 text-center" style="height: 150vh;">
         <h1 class="text-3xl text-emerald-500 cinzel font-black mb-4">Beta Dice Tracker</h1>
         <p class="text-slate-400 text-sm">Scroll down to see the Navbar disappear and the History Bar lock into place.</p>
@@ -122,52 +125,59 @@
         <button class="dev-btn border-blue-400 text-blue-300" onclick="testRoll(4, 4, false)">Hit Point (Hard 8)</button>
         <button class="dev-btn border-yellow-500 text-yellow-400" onclick="testRoll(3, 3, false)">Hardway (6)</button>
         <button class="dev-btn border-orange-500 text-orange-400" onclick="testRoll(5, 4, false)">Repeater (9)</button>
+        <button class="dev-btn border-slate-500 text-slate-300" onclick="testRoll(4, 1, false)">Standard Roll (5)</button>
         <button class="dev-btn border-red-700 bg-red-900" onclick="testRoll(5, 2, false)">Seven Out (7)</button>
-        <button class="dev-btn border-amber-500 bg-amber-700/50" onclick="testRoll(1, 1, true)">Invalid / Error</button>
+        <button class="dev-btn border-amber-500 text-amber-500" onclick="testRoll(1, 1, true)">Invalid / Error</button>
     </div>
 
     <script>
+        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); const db = firebase.firestore();
+
         // --- 11-POINT COLOR PROGRESSION THEME ---
         const POINT_COLORS = {
-            1: '#cd7f32',  // Bronze
-            2: '#c0c0c0',  // Silver
-            3: '#ffd700',  // Gold
-            4: '#10b981',  // Emerald
-            5: '#2563eb',  // Sapphire
-            6: '#9333ea',  // Amethyst
-            7: '#be123c',  // Ruby
-            8: '#ea580c',  // Magma
-            9: '#d946ef',  // Neon Pink
-            10: '#06b6d4', // Ice Cyan
+            1: '#b87333',  // Bronze
+            2: '#e2e8f0',  // Silver
+            3: '#fde047',  // Gold
+            4: '#34d399',  // Emerald
+            5: '#60a5fa',  // Sapphire
+            6: '#c084fc',  // Amethyst
+            7: '#fb7185',  // Ruby
+            8: '#fb923c',  // Magma
+            9: '#f472b6',  // Neon Pink
+            10: '#22d3ee', // Ice Cyan
             11: '#ffffff'  // Pure White
         };
 
-        // --- PIP MAPPING FOR CSS DICE ---
         const PIP_MAP = {
-            1: [4],
-            2: [0, 8],
-            3: [0, 4, 8],
-            4: [0, 2, 6, 8],
-            5: [0, 2, 4, 6, 8],
-            6: [0, 2, 3, 5, 6, 8]
+            1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8]
         };
 
-        // --- TRACKER STATE ---
-        let state = {
-            isComeout: true,
-            currentPoint: null,
-            pointsMadeInHand: 0,
-            rollsInHand: 0,
-            repeatCounts: { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 },
-            historyLog: [] // Stores visual nodes
-        };
+        let currentUid = null;
+        let universalLog = []; // Raw data array
 
-        // DOM Elements
-        const historyBar = document.getElementById('history-bar');
+        auth.onAuthStateChanged(user => {
+            if (!user) { window.location.href = "index.html"; return; }
+            currentUid = user.uid;
+            fetchActiveSession();
+        });
 
-        // Render CSS Pips
-        function getDicePipsHTML(value, isDark = false) {
-            let html = `<div class="mini-die ${isDark ? 'dark-die' : ''}">`;
+        async function fetchActiveSession() {
+            try {
+                const doc = await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get();
+                if (doc.exists) {
+                    const data = doc.data();
+                    let rawLog = data.payload_log || [];
+                    if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
+                    universalLog = rawLog;
+                    renderHistoryBar(universalLog);
+                }
+            } catch (e) { console.error("Failed to fetch active session", e); }
+        }
+
+        function getDicePipsHTML(value) {
+            let html = `<div class="mini-die">`;
             const activePips = PIP_MAP[value] || [];
             for (let i = 0; i < 9; i++) {
                 html += `<div class="pip ${activePips.includes(i) ? 'active' : ''}"></div>`;
@@ -176,146 +186,125 @@
             return html;
         }
 
-        // Collapse previous active roll from Dice to Integer
-        function collapsePreviousRoll() {
-            if (state.historyLog.length > 0) {
-                const prevNode = state.historyLog[0];
-                const data = prevNode.rollData;
-                if (!data) return;
-
-                // Build the text format: Sum + <sup>Repeater</sup> + <sup>(H)</sup>
-                let superHTML = '';
-                if (data.repeats > 0) superHTML += `<span>${data.repeats + 1}</span>`;
-                if (data.isHardway) superHTML += `<span>(H)</span>`;
-
-                prevNode.element.innerHTML = `${data.sum}${superHTML ? `<div class="sup-text">${superHTML}</div>` : ''}`;
-            }
-        }
-
         function createSummaryNode(rolls, points) {
             const el = document.createElement('div');
             el.className = 'hist-node state-summary';
-            
-            const rColor = rolls < 7 ? '#f87171' : '#34d399'; // Crimson vs Emerald
+            const rColor = rolls < 7 ? '#ef4444' : '#10b981'; // Crimson vs Emerald
             const pColor = points >= 11 ? POINT_COLORS[11] : (POINT_COLORS[points] || '#94a3b8');
             let pGlow = points >= 11 ? 'text-shadow: 0 0 10px #fff;' : '';
 
             el.innerHTML = `
-                ${rolls}<span style="color: ${rColor}; font-size: 10px; vertical-align: super; margin-right: 4px;">R</span>
-                ${points}<span style="color: ${pColor}; ${pGlow} font-size: 10px; vertical-align: super;">P</span>
+                ${rolls}<sup style="color: ${rColor}; font-size: 10px; margin-right: 4px;">R</sup>
+                ${points}<sup style="color: ${pColor}; ${pGlow} font-size: 10px;">P</sup>
             `;
             return el;
         }
 
-        // Logic Entry Point
-        function processRoll(die1, die2, isInvalid) {
-            const sum = die1 + die2;
-            const isHardway = (die1 === die2) && [4,6,8,10].includes(sum);
+        // High-Performance Batch Renderer
+        function renderHistoryBar(logArray) {
+            const historyBar = document.getElementById('history-bar');
+            historyBar.innerHTML = '';
+            if (logArray.length === 0) {
+                historyBar.innerHTML = '<div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>';
+                return;
+            }
 
-            let nodeClass = '';
-            let inlineStyle = '';
-            let isSevenOut = false;
-            let currentRepeats = 0;
+            // State Machine
+            let isComeout = true;
+            let currentPoint = null;
+            let pointsMadeInHand = 0;
+            let rollsInHand = 0;
+            let repeatCounts = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
 
-            // Handle Invalid First
-            if (isInvalid) {
-                nodeClass = 'state-invalid';
-            } else {
-                state.rollsInHand++;
+            const fragment = document.createDocumentFragment();
+            let nodesToInject = [];
 
-                // Track Repeats (Excluding Comeout Sevens)
-                if (!(state.isComeout && sum === 7)) {
-                    currentRepeats = state.repeatCounts[sum];
-                    state.repeatCounts[sum]++;
-                }
+            logArray.forEach((r, index) => {
+                const isInvalid = r.Invalid_Roll || r.invalidRoll || false;
+                const die1 = parseInt(r.Left_Die || r.leftDie || 0);
+                const die2 = parseInt(r.Right_Die || r.rightDie || 0);
+                const sum = parseInt(r.Total_Sum || r.sum || 0);
+                const isHardway = (die1 === die2) && [4,6,8,10].includes(sum);
+                const isLastRoll = (index === logArray.length - 1);
 
-                if (state.isComeout) {
-                    if (sum === 7 || sum === 11) {
-                        nodeClass = 'state-comeout-win';
-                    } else if (sum === 2 || sum === 3 || sum === 12) {
-                        nodeClass = 'state-comeout-crap';
-                    } else {
-                        // Point Established
-                        state.isComeout = false;
-                        state.currentPoint = sum;
-                        nodeClass = 'state-point-established';
-                    }
+                let nodeClass = 'state-standard';
+                let inlineClass = '';
+                let isSevenOut = false;
+                let currentRepeats = 0;
+
+                if (isInvalid) {
+                    nodeClass = 'state-invalid';
                 } else {
-                    if (sum === 7) {
-                        nodeClass = 'state-seven-out';
-                        isSevenOut = true;
-                    } else if (sum === state.currentPoint) {
-                        // Point Made
-                        state.pointsMadeInHand++;
-                        state.isComeout = true;
-                        state.currentPoint = null;
-                        nodeClass = 'state-point-made';
-                        
-                        // Apply 11-Tier Color Background
-                        const pointColor = state.pointsMadeInHand >= 11 ? POINT_COLORS[11] : POINT_COLORS[state.pointsMadeInHand];
-                        inlineStyle = `background-color: ${pointColor};`;
-                        if(state.pointsMadeInHand >= 11) inlineStyle += ` box-shadow: 0 0 20px #fff;`;
+                    rollsInHand++;
+                    if (!(isComeout && sum === 7)) {
+                        currentRepeats = repeatCounts[sum];
+                        repeatCounts[sum]++;
+                    }
+
+                    if (isComeout) {
+                        if (sum === 7 || sum === 11) nodeClass = 'state-comeout-win';
+                        else if (sum === 2 || sum === 3 || sum === 12) nodeClass = 'state-comeout-crap';
+                        else {
+                            isComeout = false;
+                            currentPoint = sum;
+                            nodeClass = 'state-point-established';
+                        }
                     } else {
-                        // Standard Roll inside a hand
-                        if (currentRepeats > 0) nodeClass = 'state-repeater';
-                        else nodeClass = 'state-standard';
+                        if (sum === 7) {
+                            nodeClass = 'state-seven-out';
+                            isSevenOut = true;
+                        } else if (sum === currentPoint) {
+                            pointsMadeInHand++;
+                            isComeout = true;
+                            currentPoint = null;
+                            const tier = Math.min(pointsMadeInHand, 11);
+                            inlineClass = `pt-${tier}`;
+                        }
                     }
                 }
-            }
 
-            // Collapse the old front node
-            collapsePreviousRoll();
+                const el = document.createElement('div');
+                el.className = `hist-node ${nodeClass} ${inlineClass} ${isHardway && !isInvalid ? 'mod-hardway' : ''}`;
 
-            // Build New Node (Always renders as graphical dice initially)
-            const newNode = document.createElement('div');
-            newNode.className = `hist-node ${nodeClass} ${isHardway && !isInvalid ? 'mod-hardway' : ''}`;
-            if (inlineStyle) newNode.style = inlineStyle;
+                let superHTML = '';
+                if (!isInvalid) {
+                    if (currentRepeats > 0) superHTML += `<sup class="sup-text text-slate-300">${currentRepeats + 1}</sup>`;
+                    if (isHardway) superHTML += `<sup class="sup-text text-yellow-400">(H)</sup>`;
+                }
 
-            // Generate superscripts for the active dice view
-            let superHTML = '';
-            if (!isInvalid) {
-                if (currentRepeats > 0) superHTML += `<span>${currentRepeats + 1}</span>`;
-                if (isHardway) superHTML += `<span>(H)</span>`;
-            }
+                if (isLastRoll && !isInvalid) {
+                    el.innerHTML = `
+                        <div class="dice-container">
+                            ${getDicePipsHTML(die1)}
+                            ${getDicePipsHTML(die2)}
+                        </div>
+                        ${superHTML ? `<div class="sup-container">${superHTML}</div>` : ''}
+                    `;
+                } else {
+                    el.innerHTML = `${sum}${superHTML ? `<div class="sup-container">${superHTML}</div>` : ''}`;
+                }
 
-            // Note: Second die is rendered "dark" just for visual contrast in the active display
-            newNode.innerHTML = `
-                <div class="dice-container">
-                    ${getDicePipsHTML(die1, false)}
-                    ${getDicePipsHTML(die2, true)}
-                </div>
-                ${superHTML ? `<div class="sup-text">${superHTML}</div>` : ''}
-            `;
+                nodesToInject.push(el);
 
-            // Clear empty state text if first roll
-            if (state.historyLog.length === 0) historyBar.innerHTML = '';
-
-            // Inject to DOM (Far Left)
-            historyBar.prepend(newNode);
-
-            // Store in state log
-            state.historyLog.unshift({
-                element: newNode,
-                rollData: isInvalid ? null : { sum, isHardway, repeats: currentRepeats }
+                if (isSevenOut) {
+                    nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand));
+                    rollsInHand = 0; pointsMadeInHand = 0; isComeout = true; currentPoint = null;
+                    for (let k in repeatCounts) repeatCounts[k] = 0;
+                }
             });
 
-            // Handle Summary Injection after Seven Out
-            if (isSevenOut) {
-                const summaryNode = createSummaryNode(state.rollsInHand, state.pointsMadeInHand);
-                historyBar.insertBefore(summaryNode, newNode.nextSibling); // Insert immediately after the seven
-                
-                // Reset Hand State
-                state.rollsInHand = 0;
-                state.pointsMadeInHand = 0;
-                state.isComeout = true;
-                state.currentPoint = null;
-                for (let k in state.repeatCounts) state.repeatCounts[k] = 0;
-            }
+            // Reverse array so newest is on the left
+            nodesToInject.reverse().forEach(node => fragment.appendChild(node));
+            historyBar.appendChild(fragment);
         }
 
         // Test Panel Wrapper
         function testRoll(d1, d2, invalid) {
-            processRoll(d1, d2, invalid);
+            const r = {
+                Left_Die: d1, Right_Die: d2, Total_Sum: d1 + d2, Invalid_Roll: invalid
+            };
+            universalLog.push(r);
+            renderHistoryBar(universalLog);
         }
     </script>
 </body>
