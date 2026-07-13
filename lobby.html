@@ -4,11 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playhouse Lobby | ZombieLord's</title>
+    
+    <!-- External Scripts & CDNs -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Creepster&display=swap');
+        
         body {
             margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
             font-family: 'Cinzel', serif; min-height: 100vh;
@@ -16,6 +22,7 @@
             url('https://zomb13lord.github.io/zombielords-playhouse/background.jpg');
             background-size: cover; background-position: center; background-attachment: fixed;
         }
+        
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
         
         .playhouse-glow {
@@ -30,6 +37,7 @@
             background-size: cover;
             background-position: center;
         }
+        
         .zombie-navbar::before {
             content: '';
             position: absolute;
@@ -37,6 +45,7 @@
             background: rgba(2, 6, 23, 0.75);
             z-index: 0;
         }
+        
         .zombie-navbar > div {
             position: relative;
             z-index: 1;
@@ -67,35 +76,122 @@
         .module-card {
             border: 1px solid rgba(16, 185, 129, 0.3);
             box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
         }
+        
         .module-card:hover {
             border-color: #10b981;
             box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
         }
+
+        /* Padlock Drop Shadow Glow */
+        .glow-red {
+            filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.9)) drop-shadow(0 0 4px rgba(239, 68, 68, 1));
+        }
     </style>
+    
     <script>
-        const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", 
+            authDomain: "zombielords-playhouse.firebaseapp.com", 
+            projectId: "zombielords-playhouse", 
+            storageBucket: "zombielords-playhouse.firebasestorage.app", 
+            messagingSenderId: "795162260246", 
+            appId: "1:795162260246:web:97f0361751ac1359b31637" 
+        };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        auth.onAuthStateChanged(user => {
-            if (!user) window.location.href = "index.html";
-            else document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+            } else {
+                document.getElementById('user-tag').innerText = user.displayName || "Wicked Soul";
+                
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    if (doc.exists) {
+                        applyPermissions(doc.data());
+                    } else {
+                        // Edge case fallback
+                        alert("Your soul registry could not be located.");
+                        window.location.href = "index.html";
+                    }
+                } catch (error) {
+                    console.error("Firestore Access Error:", error);
+                }
+            }
         });
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
+
+        function applyPermissions(profile) {
+            const role = profile.role || 'User';
+            const perms = profile.permissions || {};
+
+            // 1. Settings Cog (Admin/Master Admin)
+            if (role === 'Admin' || role === 'Master Admin') {
+                const cogBtn = document.getElementById('admin-cog-btn');
+                if(cogBtn) {
+                    cogBtn.classList.remove('hidden');
+                    cogBtn.classList.add('flex');
+                }
+            }
+
+            // 2. Beta Buttons Logic (Standard Users are restricted from beta)
+            if (role === 'User') {
+                const betaBtns = document.querySelectorAll('.beta-btn');
+                betaBtns.forEach(btn => btn.style.display = 'none');
+            }
+
+            // 3. Module Unlocking
+            const modules = ['crypt', 'baccarat', 'dice', 'poker', 'roulette', 'sportsbook'];
+            
+            modules.forEach(mod => {
+                const overlay = document.getElementById(`overlay-${mod}`);
+                if (overlay) {
+                    if (perms[mod] === true) {
+                        // User has access: hide lock overlay entirely
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                    } else {
+                        // User locked: display dark overlay + red lock
+                        overlay.classList.remove('hidden');
+                        overlay.classList.add('flex');
+                    }
+                }
+            });
+        }
+
+        function handleLockedClick() {
+            alert("This grimoire is sealed. Contact the developer for access.");
+        }
+
+        function logout() { 
+            auth.signOut().then(() => { window.location.href = "index.html"; }); 
+        }
     </script>
 </head>
 <body class="flex flex-col">
+    
+    <!-- NAVIGATION -->
     <nav class="zombie-navbar p-4 flex justify-between items-center border-b border-emerald-900/50 sticky top-0 z-[50] h-[76px] flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
         <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">ZombieLord's</h2>
             <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
-        <div class="flex items-center gap-6">
+        <div class="flex items-center gap-4 md:gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            
+            <!-- Admin Settings Cog -->
+            <button id="admin-cog-btn" onclick="window.location.href='admin.html'" class="hidden items-center justify-center text-slate-400 hover:text-emerald-400 transition-colors" title="Admin Dashboard">
+                <i class="fa-solid fa-gear text-xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></i>
+            </button>
+            
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
+    <!-- LOBBY MAIN -->
     <main class="flex-grow flex flex-col items-center justify-center p-6 py-12 relative z-10">
         <header class="mb-16 text-center">
             <h1 class="text-5xl md:text-7xl mb-3 bleeding-header">PLAYHOUSE</h1>
@@ -105,93 +201,137 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
             
             <!-- 1. CRYPT CARD -->
-            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.location.href='crypt.html'">
+            <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-crypt" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+                
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/crypt-card.jpg');"></div>
-                <!-- Mobile: always light overlay. Desktop: dark overlay that lightens on hover -->
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
-                <div class="relative z-10 flex flex-col h-full justify-between">
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Crypt</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Unified polymorphic repository. Store, review, import or export multi-module history.</p>
-                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Exhume <span>&rarr;</span></div>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">A subterranean repository for your statistical souls. Exhume past sessions, dissect historical variances, and resurrect data from the ashes of forgotten wagers.</p>
                     </div>
+                </div>
+                <!-- Action Link -->
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center relative z-20 cursor-pointer" onclick="window.location.href='crypt.html'">
+                    EXHUME <span>&rarr;</span>
                 </div>
             </div>
 
             <!-- 2. BACCARAT CARD -->
             <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-baccarat" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Baccarat</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Track player and banker streaks, tie anomalies, and shoe trends.</p>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Decode the eternal symmetry of Player and Banker. Map the rhythmic decay of the shoe, isolate tie anomalies, and exploit the deterministic laws governing the draw.</p>
                     </div>
                 </div>
-                <!-- Buttons (pointer events re-enabled) -->
+                <!-- Action Buttons -->
                 <div class="grid grid-cols-2 gap-3 border-t border-emerald-900/50 pt-4 relative z-20">
-                    <button onclick="window.location.href='baccarat.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Stable</button>
-                    <button onclick="window.location.href='beta-baccarat.html'" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Beta</button>
+                    <button onclick="window.location.href='baccarat.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">INVOKE (STABLE)</button>
+                    <button onclick="window.location.href='beta-baccarat.html'" class="beta-btn bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">CONJURE (BETA)</button>
                 </div>
             </div>
 
             <!-- 3. DICE CARD -->
             <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-dice" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Dice Tracker</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Track craps roll metrics, shooter sets, and real-time axis stability trends.</p>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Map the kinematic chaos of the bones. Track the shooter's axis stability, isolate mechanical signatures, and capitalize on the inevitable collapse into the seven.</p>
                     </div>
                 </div>
-                <!-- Buttons (pointer events re-enabled) -->
+                <!-- Action Buttons -->
                 <div class="grid grid-cols-2 gap-3 border-t border-emerald-900/50 pt-4 relative z-20">
-                    <button onclick="window.location.href='dice.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Stable</button>
-                    <button onclick="window.location.href='beta-dice.html'" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Beta</button>
+                    <button onclick="window.location.href='dice.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">INVOKE (STABLE)</button>
+                    <button onclick="window.location.href='beta-dice.html'" class="beta-btn bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">CONJURE (BETA)</button>
                 </div>
             </div>
 
             <!-- 4. POKER CARD -->
-            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.open('https://www.playwsop.com/', '_blank')">
+            <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-poker" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/poker-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
-                <div class="relative z-10 flex flex-col h-full justify-between">
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Poker Room</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Session bankroll management, hand analysis, and opponent profiling.</p>
-                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Play Now <span>&rarr;</span></div>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">A grimoire for the psychological predator. Calculate true table equity, log your bloodline bankroll, and systematically dissect the behavioral flaws of your prey.</p>
                     </div>
+                </div>
+                <!-- Action Link -->
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center relative z-20 cursor-pointer" onclick="window.open('https://www.playwsop.com/', '_blank')">
+                    CLAIM SOULS <span>&rarr;</span>
                 </div>
             </div>
 
             <!-- 5. ROULETTE CARD -->
             <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-roulette" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/roulette-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Roulette Tracker</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Advanced calibration engine. Physical matrix tracking and sector auditing maps.</p>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Audit the physical matrix of the Devil's Wheel. Map rotor deceleration, exploit mechanical biases, and chart the deterministic ball drop against the illusion of chance.</p>
                     </div>
                 </div>
-                <!-- Buttons (pointer events re-enabled) -->
+                <!-- Action Buttons -->
                 <div class="grid grid-cols-2 gap-3 border-t border-emerald-900/50 pt-4 relative z-20">
-                    <button onclick="window.location.href='roulette.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Stable</button>
-                    <button onclick="window.location.href='beta-roulette.html'" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">Beta</button>
+                    <button onclick="window.location.href='roulette.html'" class="bg-emerald-950/60 hover:bg-emerald-700/80 border border-emerald-500/50 text-emerald-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">INVOKE (STABLE)</button>
+                    <button onclick="window.location.href='beta-roulette.html'" class="beta-btn bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 text-[10px] font-black tracking-widest py-2 rounded transition-colors uppercase cursor-pointer">CONJURE (BETA)</button>
                 </div>
             </div>
 
             <!-- 6. SPORTSBOOK CARD -->
-            <div class="relative overflow-hidden group rounded-sm module-card cursor-pointer min-h-[280px] flex flex-col justify-end p-6" onclick="window.open('https://wagershack.com/', '_blank')">
+            <div class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6">
+                <!-- Locked Overlay -->
+                <div id="overlay-sportsbook" class="absolute inset-0 z-50 bg-slate-950/90 hidden flex-col items-end justify-start p-4 cursor-pointer" onclick="handleLockedClick()">
+                    <i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i>
+                </div>
+
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/sportsbetting-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500"></div>
-                <div class="relative z-10 flex flex-col h-full justify-between">
+                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                
+                <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Sportsbook</h3>
-                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Advanced odds calculation, parlay tracking, and edge detection.</p>
-                        <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center">Wager <span>&rarr;</span></div>
+                        <p class="text-slate-300 text-xs leading-relaxed mb-4 font-serif italic text-shadow-heavy">Quantify the geometry of human conflict. Uncover edge detection paradigms, weaponize parlay structures, and systematically drain the bookmaker's reserves.</p>
                     </div>
+                </div>
+                <!-- Action Link -->
+                <div class="text-[10px] font-bold text-emerald-400 tracking-[0.4em] uppercase border-t border-emerald-900/50 pt-4 flex justify-between items-center relative z-20 cursor-pointer" onclick="window.open('https://wagershack.com/', '_blank')">
+                    BLEED THE BOOK <span>&rarr;</span>
                 </div>
             </div>
 
