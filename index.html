@@ -100,11 +100,7 @@
         function cancelAdminInput() { document.getElementById('admin-verification').style.display = 'none'; document.getElementById('path-selection').style.display = 'block'; document.getElementById('admin-code').value = ''; }
 
         function formatAdminCode(e) {
-            let val = e.target.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
-            // Exception for Genesis Code
-            if (val.startsWith("ZOMBIE")) { e.target.value = val; return; }
-            // Standard 16-char hyphenated format
-            val = val.replace(/_/g, '');
+            let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
             if (val.length > 16) val = val.substring(0, 16);
             let formatted = val.match(/.{1,4}/g)?.join('-') || val;
             e.target.value = formatted;
@@ -116,7 +112,7 @@
             if (!codeInput) return alert("Enter the sacred text.");
 
             try {
-                if (codeInput === "ZOMBIELORD_REIGNS") {
+                if (codeInput === "1234-5678-ABCD-EFGH") {
                     const genesisRef = db.collection('system').doc('genesis');
                     const genesisDoc = await genesisRef.get();
                     if (genesisDoc.exists && genesisDoc.data().used) return alert("The Genesis Code has already been consumed.");
