@@ -30,15 +30,32 @@
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
         .playhouse-glow { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1); }
 
-        /* HISTORY BAR */
-        #history-bar {
-            position: sticky; top: 0; z-index: 50; 
+        /* STICKY ZONE (Holds HB and SDD) */
+        #sticky-zone {
+            position: sticky; top: 0; z-index: 50;
             background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+
+        /* HISTORY BAR */
+        #history-bar {
             display: flex; flex-direction: row; align-items: center;
             overflow-x: auto; padding: 10px; gap: 8px; min-height: 70px;
         }
         #history-bar::-webkit-scrollbar { display: none; }
+
+        /* SDD PANEL */
+        #sdd-panel {
+            background: rgba(2, 6, 23, 0.95); border-top: 1px solid rgba(51, 65, 85, 0.4);
+            padding: 6px 10px; display: flex; flex-col; gap: 4px;
+            font-family: monospace; font-size: 10px; letter-spacing: 0.5px;
+        }
+        .sdd-row { display: flex; justify-content: space-between; align-items: center; }
+        .sdd-label { font-weight: 900; width: 45px; flex-shrink: 0; }
+        .sdd-metrics { flex-grow: 1; display: flex; justify-content: space-between; color: #94a3b8; }
+        .sdd-metrics b { color: #ffffff; }
+        .sdd-metrics .med { color: #64748b; font-weight: normal; }
 
         /* ROLL NODES */
         .hist-node {
@@ -97,7 +114,7 @@
         .pip { border-radius: 50%; opacity: 0; transition: all 0.2s ease; }
         .pip.active { opacity: 1; }
 
-        /* 12-COLOR GEM PALETTE (Applied to both .mini-die and .pad-die-face) */
+        /* 12-COLOR GEM PALETTE */
         .gem-shine { box-shadow: inset 0 4px 6px rgba(255,255,255,0.5), inset 0 -4px 6px rgba(0,0,0,0.6), 0 4px 6px rgba(0,0,0,0.5) !important; }
         
         .die-ruby.mini-die, .die-ruby .pad-die-face { background: linear-gradient(135deg, #fca5a5 0%, #dc2626 40%, #7f1d1d 100%) !important; border-color: #f87171 !important; }
@@ -219,9 +236,32 @@
         </div>
     </nav>
 
-    <!-- MODULE 2: HISTORY BAR -->
-    <div id="history-bar">
-        <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
+    <!-- STICKY ZONE (Holds HB and SDD) -->
+    <div id="sticky-zone">
+        <!-- MODULE 2: HISTORY BAR -->
+        <div id="history-bar">
+            <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
+        </div>
+
+        <!-- MODULE 6: SESSION DIAGNOSTIC DISPLAY (SDD) -->
+        <div id="sdd-panel" class="flex flex-col gap-1 px-3 py-2 bg-slate-950/90 border-b border-slate-700 text-[10px] font-mono tracking-wide">
+            <div class="sdd-row">
+                <span class="sdd-label text-emerald-400">GLB</span>
+                <div class="sdd-metrics">
+                    <span>SOR: <b id="g-sor-mean">0.0</b>|<span class="med" id="g-sor-med">0.0</span></span>
+                    <span>SRR: <b id="g-srr-mean">0.0</b></span>
+                    <span>PSR: <b id="g-psr-mean">0.0</b>|<span class="med" id="g-psr-med">0.0</span></span>
+                </div>
+            </div>
+            <div class="sdd-row">
+                <span class="sdd-label text-amber-400 truncate" id="sdd-shooter-label">SHTR</span>
+                <div class="sdd-metrics">
+                    <span>SOR: <b id="s-sor-mean">0.0</b>|<span class="med" id="s-sor-med">0.0</span></span>
+                    <span>SRR: <b id="s-srr-mean">0.0</b></span>
+                    <span>PSR: <b id="s-psr-mean">0.0</b>|<span class="med" id="s-psr-med">0.0</span></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- MAIN BODY SPACE -->
@@ -527,6 +567,87 @@
             catch (e) { console.error("Auto-save failed", e); }
         }
 
+        // --- MATH ENGINE (SDD) ---
+        function getMedian(arr) {
+            if (arr.length === 0) return 0;
+            arr.sort((a, b) => a - b);
+            const mid = Math.floor(arr.length / 2);
+            if (arr.length % 2 === 0) return (arr[mid - 1] + arr[mid]) / 2;
+            return arr[mid];
+        }
+
+        function calcStats(log) {
+            let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
+            let handRolls = [], handPoints = [];
+            let currentHandRolls = 0, currentHandPoints = 0;
+            let isComeout = true, currentPoint = null;
+
+            log.forEach(r => {
+                if (r.Invalid_Roll || r.invalidRoll) return;
+                let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
+                
+                TR++;
+                currentHandRolls++;
+
+                if (isComeout) {
+                    if (sum === 7 || sum === 11) {
+                        if (sum === 7) CS++;
+                    } else if (sum === 2 || sum === 3 || sum === 12) {
+                        // Crap
+                    } else {
+                        isComeout = false;
+                        currentPoint = sum;
+                    }
+                } else {
+                    if (sum === 7) {
+                        SO++;
+                        handRolls.push(currentHandRolls);
+                        handPoints.push(currentHandPoints);
+                        currentHandRolls = 0; currentHandPoints = 0;
+                        isComeout = true; currentPoint = null;
+                    } else if (sum === currentPoint) {
+                        TotalPointsMade++;
+                        currentHandPoints++;
+                        isComeout = true;
+                        currentPoint = null;
+                    }
+                }
+            });
+
+            const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
+            const srrMean = (SO + CS) > 0 ? (TR / (SO + CS)).toFixed(1) : TR.toFixed(1);
+            const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
+            const sorMed = getMedian(handRolls).toFixed(1);
+            const psrMed = getMedian(handPoints).toFixed(1);
+
+            return { sorMean, sorMed, srrMean, psrMean, psrMed };
+        }
+
+        function updateSDD() {
+            const gStats = calcStats(universalLog);
+            document.getElementById('g-sor-mean').innerText = gStats.sorMean;
+            document.getElementById('g-sor-med').innerText = gStats.sorMed;
+            document.getElementById('g-srr-mean').innerText = gStats.srrMean;
+            document.getElementById('g-psr-mean').innerText = gStats.psrMean;
+            document.getElementById('g-psr-med').innerText = gStats.psrMed;
+
+            let sLog = universalLog;
+            let sLabel = "ALL";
+            if (globalConfig.shooter !== 'ALL') {
+                sLog = universalLog.filter(r => r.Shooter_ID === globalConfig.shooter);
+                const sObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
+                if (sObj) sLabel = sObj.name.substring(0, 6).toUpperCase();
+            }
+            
+            const sStats = calcStats(sLog);
+            document.getElementById('sdd-shooter-label').innerText = sLabel;
+            document.getElementById('s-sor-mean').innerText = sStats.sorMean;
+            document.getElementById('s-sor-med').innerText = sStats.sorMed;
+            document.getElementById('s-srr-mean').innerText = sStats.srrMean;
+            document.getElementById('s-psr-mean').innerText = sStats.psrMean;
+            document.getElementById('s-psr-med').innerText = sStats.psrMed;
+        }
+
         // --- UI BUILDERS ---
         function getDicePipsHTML(value) {
             let html = `<div class="pad-die-face gem-shine">`;
@@ -604,7 +725,6 @@
             document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
             updatePosChild('cfg', globalConfig.positionChild);
 
-            // Restore selections
             document.getElementById('cfg-loc').value = globalConfig.location || 'ALL';
             document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
@@ -637,16 +757,24 @@
         function selectDie(side, val) {
             const colorClass = `die-${globalConfig.diceColor}`;
             if (side === 'left') {
-                selectedLeft = val;
-                for(let i=1; i<=6; i++) {
-                    const btn = document.getElementById(`btn-l-${i}`);
-                    btn.className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                if (selectedLeft === val) {
+                    selectedLeft = null;
+                    document.getElementById(`btn-l-${val}`).className = 'pad-die-btn die-unselected';
+                } else {
+                    selectedLeft = val;
+                    for(let i=1; i<=6; i++) {
+                        document.getElementById(`btn-l-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                    }
                 }
             } else {
-                selectedRight = val;
-                for(let i=1; i<=6; i++) {
-                    const btn = document.getElementById(`btn-r-${i}`);
-                    btn.className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                if (selectedRight === val) {
+                    selectedRight = null;
+                    document.getElementById(`btn-r-${val}`).className = 'pad-die-btn die-unselected';
+                } else {
+                    selectedRight = val;
+                    for(let i=1; i<=6; i++) {
+                        document.getElementById(`btn-r-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                    }
                 }
             }
         }
@@ -780,6 +908,7 @@
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
             updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
+            
             document.getElementById('modal-config-global').style.display = 'flex';
         }
 
@@ -983,7 +1112,12 @@
 
         async function executeCryptSave() {
             const nameInput = document.getElementById('crypt-save-name').value.trim().toUpperCase();
-            if (!nameInput) return await customAlert("Name cannot be empty.");
+            if (!nameInput) {
+                document.getElementById('modal-crypt-save').style.display = 'none';
+                await customAlert("Name cannot be empty.");
+                document.getElementById('modal-crypt-save').style.display = 'flex';
+                return;
+            }
 
             let dateSuffix = "";
             if (universalLog.length > 0) {
@@ -1010,21 +1144,29 @@
         }
 
         async function enterCryptWithoutSaving() {
+            document.getElementById('modal-crypt-options').style.display = 'none';
             const confirmed = await customConfirm("Are you sure? Unsaved data will be lost.");
             if (confirmed) {
                 try {
                     await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
                     window.location.href = "crypt.html";
                 } catch (e) { console.error(e); }
+            } else {
+                document.getElementById('modal-crypt-options').style.display = 'flex';
             }
         }
 
         async function clearAndRestart() {
+            document.getElementById('modal-crypt-options').style.display = 'none';
             const confirmed = await customConfirm("Are you sure you want to clear the active session?");
             if (confirmed) {
                 universalLog = [];
                 try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete(); } catch(e){}
-                closeModals(); renderHistoryBar();
+                closeModals(); 
+                setIpState('collapsed');
+                renderHistoryBar();
+            } else {
+                document.getElementById('modal-crypt-options').style.display = 'flex';
             }
         }
 
@@ -1072,6 +1214,7 @@
             if (universalLog.length === 0) {
                 historyBar.innerHTML = '<div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>';
                 activeState.currentPoint = null;
+                updateSDD();
                 return;
             }
 
@@ -1184,6 +1327,33 @@
             activeState.currentPoint = currentPoint;
             nodesToInject.reverse().forEach(node => fragment.appendChild(node));
             historyBar.appendChild(fragment);
+            
+            updateSDD();
+        }
+
+        function updateSDD() {
+            const gStats = calcStats(universalLog);
+            document.getElementById('g-sor-mean').innerText = gStats.sorMean;
+            document.getElementById('g-sor-med').innerText = gStats.sorMed;
+            document.getElementById('g-srr-mean').innerText = gStats.srrMean;
+            document.getElementById('g-psr-mean').innerText = gStats.psrMean;
+            document.getElementById('g-psr-med').innerText = gStats.psrMed;
+
+            let sLog = universalLog;
+            let sLabel = "ALL";
+            if (globalConfig.shooter !== 'ALL') {
+                sLog = universalLog.filter(r => r.Shooter_ID === globalConfig.shooter);
+                const sObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
+                if (sObj) sLabel = sObj.name.substring(0, 6).toUpperCase();
+            }
+            
+            const sStats = calcStats(sLog);
+            document.getElementById('sdd-shooter-label').innerText = sLabel;
+            document.getElementById('s-sor-mean').innerText = sStats.sorMean;
+            document.getElementById('s-sor-med').innerText = sStats.sorMed;
+            document.getElementById('s-srr-mean').innerText = sStats.srrMean;
+            document.getElementById('s-psr-mean').innerText = sStats.psrMean;
+            document.getElementById('s-psr-med').innerText = sStats.psrMed;
         }
     </script>
 </body>
