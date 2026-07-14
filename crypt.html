@@ -74,14 +74,6 @@
                 <p class="text-xs text-slate-400 tracking-widest uppercase mt-3 font-montserrat">Unified Data Vault</p>
             </div>
 
-            <div class="mb-12">
-                <div class="flex justify-between items-end border-b border-emerald-900/40 pb-3 mb-6">
-                    <h2 class="cinzel text-lg text-white uppercase tracking-widest">Active Workspace State</h2>
-                    <button onclick="purgeActiveBuffer()" class="text-[10px] text-red-400 hover:text-red-300 font-bold tracking-widest uppercase transition-all"><i class="fa-solid fa-trash-can mr-2"></i>Wipe Active Workspace</button>
-                </div>
-                <div id="active-session-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </div>
-
             <div>
                 <div class="border-b border-emerald-900/40 pb-3 mb-6 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                     <h2 class="cinzel text-lg text-slate-300 uppercase tracking-widest">Archived Inscriptions</h2>
@@ -270,25 +262,9 @@
             fetchCryptData();
         });
 
-        async function purgeActiveBuffer() {
-            const confirmed = await customConfirm("Are you sure you want to clear the active workspace?");
-            if(confirmed) {
-                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
-                fetchCryptData();
-            }
-        }
-
         async function fetchCryptData() {
             const cryptRef = db.collection("users").doc(currentUid).collection("crypt");
             try {
-                const activeDoc = await cryptRef.doc("active_session").get();
-                const activeContainer = document.getElementById('active-session-container');
-                if (activeDoc.exists) { 
-                    activeContainer.innerHTML = generateCardHtml(activeDoc.id, activeDoc.data(), true); 
-                } else { 
-                    activeContainer.innerHTML = `<div class="shard p-8 text-center border-dashed text-xs text-slate-500 tracking-widest uppercase col-span-full">No Active Workspace Document Restored inside the Crypt.</div>`; 
-                }
-
                 const snap = await cryptRef.get();
                 cachedRecords = [];
                 snap.forEach(doc => { 
@@ -429,6 +405,15 @@
             </div>`;
         }
 
+        async function toggleFavorite(docId, currentStatus) {
+            try {
+                await db.collection("users").doc(currentUid).collection("crypt").doc(docId).update({
+                    is_favorite: !currentStatus
+                });
+                fetchCryptData();
+            } catch(e) { console.error("Favorite write fault: ", e); }
+        }
+
         async function resumeInsc(docId) {
             try {
                 const doc = await db.collection("users").doc(currentUid).collection("crypt").doc(docId).get();
@@ -438,22 +423,18 @@
                 const mod = data.module_id;
                 let prefix = "";
 
-                // Check Beta Privileges
                 if (['Beta User', 'Admin', 'Master Admin'].includes(userRole)) {
                     if (['DICE_TRACKER', 'ROULETTE_TRACKER', 'BACCARAT_TRACKER'].includes(mod)) {
                         const choice = await customVersionSelect();
-                        if (!choice) return; // User cancelled
+                        if (!choice) return; 
                         if (choice === 'beta') prefix = "beta-";
                     }
                 }
 
-                // Show Loading Screen to mask DB write delay
                 document.getElementById('modal-loading').style.display = 'flex';
 
-                // Write to active session
                 await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(data);
                 
-                // Redirect
                 if (mod === "DICE_TRACKER") window.location.assign(`${prefix}dice.html`);
                 else if (mod === "ROULETTE_TRACKER") window.location.assign(`${prefix}roulette.html`);
                 else if (mod === "BACCARAT_TRACKER") window.location.assign(`${prefix}baccarat.html`);
@@ -549,7 +530,7 @@
                     };
 
                     const sessionName = await customPrompt("Enter a name for this imported session:", defaultName, validator);
-                    if (!sessionName) return; // User cancelled
+                    if (!sessionName) return; 
                     
                     let payloadArray = [];
                     
@@ -620,7 +601,7 @@
         async function editInscName(docId, oldName) {
             const validator = (val) => {
                 if (!val) return "Name cannot be empty.";
-                if (val === oldName) return null; // No change made
+                if (val === oldName) return null; 
                 if (cachedRecords.some(r => r.name === val && r.id !== docId)) return "A session with this name already exists.";
                 return null;
             };
