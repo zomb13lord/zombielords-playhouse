@@ -17,8 +17,8 @@
         body {
             margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
             font-family: 'Montserrat', sans-serif; min-height: 100vh;
-            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.8) 0%, rgba(2, 6, 23, 0.98) 100%);
-            background-attachment: fixed;
+            background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
             padding-bottom: 320px; 
             user-select: none; -webkit-user-select: none;
         }
@@ -55,6 +55,7 @@
         .state-point-established { border-color: #ffffff; color: #ffffff; background: transparent; box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.2); }
         .state-seven-out { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); color: #ffffff; border-color: #ef4444; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
         .state-invalid { border-color: #f59e0b; color: #f59e0b; background: transparent; cursor: pointer; }
+        .state-invalid:hover { background: rgba(245, 158, 11, 0.1); }
         .state-summary { background: transparent; color: #ffffff; border: 2px dashed #3b82f6; font-family: monospace; font-size: 14px; min-width: 60px; letter-spacing: 1px; cursor: pointer; }
         .state-summary:hover { background: rgba(59, 130, 246, 0.1); }
         .state-standard { }
@@ -82,52 +83,80 @@
 
         /* CSS DICE */
         .dice-container { display: flex; gap: 4px; padding: 0 4px; align-items: center; }
-        .mini-die { width: 24px; height: 24px; border-radius: 4px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 2px; gap: 1px; border: 1px solid rgba(255,255,255,0.2); transition: all 0.2s ease; }
-        .pip { border-radius: 50%; opacity: 0; transition: all 0.2s ease; }
+        .mini-die { 
+            width: 24px; height: 24px; background: #000000; border-radius: 4px; 
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); 
+            padding: 2px; gap: 1px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .pip { background-color: #ffffff; border-radius: 50%; opacity: 0; }
         .pip.active { opacity: 1; }
 
         /* Dice Colors */
-        .die-white { background: #ffffff; border-color: #cbd5e1; } .die-white .pip { background: #000000; }
-        .die-ruby { background: linear-gradient(135deg, #f87171, #991b1b); border-color: #fca5a5; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); } .die-ruby .pip { background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .die-sapphire { background: linear-gradient(135deg, #60a5fa, #1e3a8a); border-color: #93c5fd; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); } .die-sapphire .pip { background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .die-emerald { background: linear-gradient(135deg, #34d399, #064e3b); border-color: #6ee7b7; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); } .die-emerald .pip { background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .die-citrine { background: linear-gradient(135deg, #fde047, #a16207); border-color: #fef08a; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); } .die-citrine .pip { background: #000000; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3); }
-        .die-onyx { background: linear-gradient(135deg, #475569, #020617); border-color: #94a3b8; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); } .die-onyx .pip { background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
-        .die-amethyst { background: linear-gradient(135deg, #c084fc, #581c87); border-color: #d8b4fe; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); } .die-amethyst .pip { background: #ffffff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); }
+        .die-ruby { background: linear-gradient(135deg, #f87171, #991b1b) !important; border-color: #fca5a5 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-ruby .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-sapphire { background: linear-gradient(135deg, #60a5fa, #1e3a8a) !important; border-color: #93c5fd !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-sapphire .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-emerald { background: linear-gradient(135deg, #34d399, #064e3b) !important; border-color: #6ee7b7 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-emerald .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-citrine { background: linear-gradient(135deg, #fde047, #a16207) !important; border-color: #fef08a !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-citrine .pip { background: #000000 !important; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3) !important; }
+        .die-onyx { background: linear-gradient(135deg, #475569, #020617) !important; border-color: #94a3b8 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.8) !important; } .die-onyx .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-amethyst { background: linear-gradient(135deg, #c084fc, #581c87) !important; border-color: #d8b4fe !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-amethyst .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
 
-        /* EXPANDABLE INPUT PAD */
-        #input-pad {
+        /* EXPANDABLE INPUT PAD (3-State) */
+        #input-pad-wrapper {
             position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(51, 65, 85, 0.8); padding: 10px 15px 20px 15px;
+            border-top: 1px solid rgba(51, 65, 85, 0.8);
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8); border-radius: 16px 16px 0 0;
         }
-        .chevron-handle { text-align: center; color: #64748b; padding-bottom: 10px; cursor: pointer; }
-        .chevron-icon { transition: transform 0.3s ease; font-size: 18px; }
-        #input-pad.expanded .chevron-icon { transform: rotate(180deg); }
         
-        #extra-controls { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, margin-top 0.3s ease; margin-top: 0; opacity: 0; }
-        #input-pad.expanded #extra-controls { max-height: 100px; margin-top: 10px; opacity: 1; }
+        .pad-handle {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .handle-btn { color: #94a3b8; font-size: 16px; padding: 4px 10px; cursor: pointer; transition: color 0.2s; }
+        .handle-btn:hover { color: #10b981; }
 
-        .pad-die-btn { background: transparent; border: none; outline: none; padding: 0; margin: 0; cursor: pointer; transition: transform 0.1s ease; aspect-ratio: 1 / 1; width: 100%; }
+        #pad-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
+        #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+
+        /* 3 States */
+        .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
+        .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
+        .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
+
+        /* Input Pad CSS Dice Buttons */
+        .pad-die-btn {
+            background: transparent; border: none; outline: none; padding: 0; margin: 0;
+            cursor: pointer; transition: transform 0.1s ease;
+            aspect-ratio: 1 / 1; width: 100%;
+        }
         .pad-die-btn:active { transform: scale(0.95); }
-        .pad-die-face { width: 100%; height: 100%; border-radius: 12%; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 12%; gap: 6%; box-shadow: 0 4px 6px rgba(0,0,0,0.5); transition: all 0.2s ease; }
+        
+        .pad-die-face {
+            width: 100%; height: 100%; border-radius: 12%;
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+            padding: 12%; gap: 6%; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+        }
         .pad-die-face .pip { border-radius: 50%; opacity: 0; transition: all 0.2s ease; }
         .pad-die-face .pip.active { opacity: 1; }
 
+        /* Unselected State (Forced White with Black Pips) */
+        .die-unselected .pad-die-face { background: #ffffff !important; border: 2px solid #cbd5e1 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important; }
+        .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
+
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-box { background: #020617; border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,1); }
+        .modal-box { background: #020617; border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,1); max-height: 90vh; overflow-y: auto; }
         .modal-btn { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 12px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; }
         .modal-btn:hover { background: #1e293b; border-color: #475569; }
         .select-wicked { background: #0f172a; border: 1px solid #334155; color: #fff; font-family: monospace; padding: 10px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; text-transform: uppercase; }
         .select-wicked:focus { border-color: #10b981; }
-        .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: center; font-size: 16px; outline: none; text-transform: uppercase; letter-spacing: 2px; }
+        .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: left; font-size: 12px; outline: none; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body class="flex flex-col">
 
-    <!-- NAVBAR -->
+    <!-- MODULE 1: ZOMBIELORD NAVBAR -->
     <nav class="zombie-navbar p-4 flex justify-between items-center border-b border-emerald-900/50 flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
         <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">ZombieLord's</h2>
@@ -135,13 +164,13 @@
         </div>
         <div class="flex items-center gap-4 md:gap-6">
             <span class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block">BETA TRACKER</span>
+            <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
-            <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-vault"></i></button>
             <button onclick="window.location.href='lobby.html'" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Exit</button>
         </div>
     </nav>
 
-    <!-- HISTORY BAR -->
+    <!-- MODULE 2: HISTORY BAR -->
     <div id="history-bar">
         <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
     </div>
@@ -152,27 +181,34 @@
         <p class="text-slate-400 text-sm">Scroll down to see the Navbar disappear and the History Bar lock into place.</p>
     </div>
 
-    <!-- EXPANDABLE INPUT PAD -->
-    <div id="input-pad">
-        <div class="chevron-handle" onclick="togglePadExpand()"><i class="fa-solid fa-chevron-up chevron-icon"></i></div>
-        <div class="flex flex-col gap-3 max-w-4xl mx-auto">
-            
-            <div class="flex flex-row gap-4 md:gap-8 justify-center">
-                <div class="flex-1 max-w-[160px]">
-                    <div class="text-center text-[10px] text-emerald-500 font-bold mb-1.5 tracking-widest">LEFT DIE</div>
-                    <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
+    <!-- MODULE 4: EXPANDABLE INPUT PAD -->
+    <div id="input-pad-wrapper" class="state-natural">
+        <div class="pad-handle">
+            <button class="handle-btn" onclick="setIpState('collapsed')"><i class="fa-solid fa-chevron-down"></i></button>
+            <div class="text-[10px] font-bold text-slate-500 tracking-widest">INPUT PAD</div>
+            <button class="handle-btn" onclick="setIpState('expanded')"><i class="fa-solid fa-chevron-up"></i></button>
+        </div>
+        
+        <div id="pad-content">
+            <div class="flex flex-col gap-3 max-w-4xl mx-auto">
+                <!-- Dice Grids Row (Side-by-Side) -->
+                <div class="flex flex-row gap-4 md:gap-8 justify-center">
+                    <!-- Left Die Grid (2 cols x 3 rows) -->
+                    <div class="flex-1 max-w-[160px]">
+                        <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
+                    </div>
+                    <!-- Right Die Grid (2 cols x 3 rows) -->
+                    <div class="flex-1 max-w-[160px]">
+                        <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
+                    </div>
                 </div>
-                <div class="flex-1 max-w-[160px]">
-                    <div class="text-center text-[10px] text-amber-500 font-bold mb-1.5 tracking-widest">RIGHT DIE</div>
-                    <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
-                </div>
-            </div>
 
-            <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Accept Roll</button>
-            
-            <div id="extra-controls" class="flex gap-2">
-                <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
-                <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
+                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Accept Roll</button>
+                
+                <div id="pad-extra" class="flex gap-2">
+                    <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
+                    <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
+                </div>
             </div>
         </div>
     </div>
@@ -180,16 +216,16 @@
     <!-- MODALS -->
     <div id="modal-alert" class="modal-mask">
         <div class="modal-box border-red-500">
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4"></i>
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
             <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">System Notice</h2>
             <p id="alert-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
-            <button onclick="closeModals()" class="modal-btn">Acknowledge</button>
+            <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Acknowledge</button>
         </div>
     </div>
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <i class="fa-solid fa-vault text-emerald-500 text-4xl mb-4"></i>
+            <i class="fa-solid fa-floppy-disk text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
@@ -205,7 +241,7 @@
         <div class="modal-box border-emerald-500">
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Archive Session</h2>
             <p class="text-xs text-slate-400 font-mono mb-4">Enter session designation.</p>
-            <input type="text" id="crypt-save-name" class="input-wicked mb-4" placeholder="e.g. BELLAGIO" autocomplete="off">
+            <input type="text" id="crypt-save-name" class="input-wicked mb-4 text-center" placeholder="e.g. BELLAGIO" autocomplete="off">
             <div class="grid grid-cols-2 gap-3">
                 <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
                 <button onclick="executeCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Archive</button>
@@ -217,10 +253,10 @@
         <div class="modal-box border-slate-500">
             <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel">Global Configuration</h2>
             <div class="flex flex-col gap-3 text-left">
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked"></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked" onchange="checkMetadataTrigger('shooters', this.value)"></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label><select id="cfg-pos" class="select-wicked"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked"></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
                 <div>
                     <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Color</label>
                     <select id="cfg-color" class="select-wicked">
@@ -254,6 +290,18 @@
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
                 <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Hand</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metadata Creation Modal -->
+    <div id="modal-metadata" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <h2 id="meta-title" class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Register Asset</h2>
+            <div id="meta-fields" class="flex flex-col gap-3 text-left"></div>
+            <div class="grid grid-cols-2 gap-3 mt-6">
+                <button onclick="closeMetadataModal()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
+                <button onclick="saveMetadata()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Register</button>
             </div>
         </div>
     </div>
@@ -296,6 +344,7 @@
         let activeState = { currentPoint: null }; 
         let globalConfig = { location: 'ALL', shooter: 'ALL', position: 'ALL', diceSet: 'ALL', diceColor: 'ruby' };
         let masterData = { locations: [], shooters: [], sets: [] };
+        let activeMetaType = null;
 
         let selectedLeft = null;
         let selectedRight = null;
@@ -317,6 +366,7 @@
                     db.collection("users").doc(currentUid).collection("master_shooters").get(),
                     db.collection("users").doc(currentUid).collection("master_dice_sets").get()
                 ]);
+                masterData.locations = []; masterData.shooters = []; masterData.sets = [];
                 lSnap.forEach(doc => masterData.locations.push({ id: doc.id, name: doc.data().name || doc.id }));
                 sSnap.forEach(doc => masterData.shooters.push({ id: doc.id, name: doc.data().name || doc.id }));
                 dSnap.forEach(doc => masterData.sets.push({ id: doc.id, name: doc.data().Set_Name || doc.id }));
@@ -360,7 +410,7 @@
         }
 
         // --- UI BUILDERS ---
-        function getDicePipsHTML(value, colorClass = 'die-white') {
+        function getDicePipsHTML(value) {
             let html = `<div class="pad-die-face">`;
             const activePips = PIP_MAP[value] || [];
             for (let i = 0; i < 9; i++) {
@@ -376,7 +426,7 @@
             lGrid.innerHTML = ''; rGrid.innerHTML = '';
             for(let i=1; i<=6; i++) {
                 lGrid.innerHTML += `<button onclick="selectDie('left', ${i})" id="btn-l-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
-                rGrid.innerHTML += `<button onclick="selectDie('right', ${i})" id="btn-r-1" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
+                rGrid.innerHTML += `<button onclick="selectDie('right', ${i})" id="btn-r-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
             }
         }
 
@@ -388,9 +438,10 @@
         }
 
         function populateConfigDropdowns() {
-            const locs = `<option value="ALL">ALL LOCATIONS</option>` + masterData.locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
-            const shoots = `<option value="ALL">ALL SHOOTERS</option>` + masterData.shooters.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-            const sets = `<option value="ALL">NONE SELECTED</option>` + masterData.sets.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            const addNewOpt = `<option value="ADD_NEW" class="text-emerald-400 font-bold">[+ REGISTER NEW]</option>`;
+            const locs = `<option value="ALL">ALL LOCATIONS</option>` + addNewOpt + masterData.locations.map(l => `<option value="${l.id}">${l.name}</option>`).join('');
+            const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            const sets = `<option value="ALL">NONE SELECTED</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             
             const positions = `<option value="ALL">ALL POSITIONS</option><option value="SL1">SL1</option><option value="SL2">SL2</option><option value="SL3">SL3</option><option value="SR1">SR1</option><option value="SR2">SR2</option><option value="SR3">SR3</option>`;
 
@@ -401,11 +452,10 @@
         }
 
         // --- INPUT PAD LOGIC ---
-        function togglePadExpand() {
-            const pad = document.getElementById('input-pad');
-            pad.classList.toggle('expanded');
+        function setIpState(state) {
+            const wrapper = document.getElementById('input-pad-wrapper');
+            wrapper.className = `state-${state}`;
         }
-        function collapsePad() { document.getElementById('input-pad').classList.remove('expanded'); }
 
         function selectDie(side, val) {
             const colorClass = `die-${globalConfig.diceColor}`;
@@ -432,10 +482,14 @@
             }
         }
 
+        function customAlert(msg) {
+            document.getElementById('alert-msg').innerText = msg;
+            document.getElementById('modal-alert').style.display = 'flex';
+        }
+
         function submitRoll() {
             if (!selectedLeft || !selectedRight) {
-                document.getElementById('alert-msg').innerText = "Select both dice before accepting.";
-                document.getElementById('modal-alert').style.display = 'flex';
+                customAlert("Select both dice before accepting."); 
                 return;
             }
             const r = {
@@ -444,13 +498,13 @@
                 Time_Stamp: new Date().toISOString()
             };
             universalLog.push(r);
-            clearPad(); collapsePad(); renderHistoryBar(); syncActiveSession();
+            clearPad(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
         }
 
         function undoRoll() {
             if (universalLog.length === 0) return;
             universalLog.pop();
-            collapsePad(); renderHistoryBar(); syncActiveSession();
+            setIpState('natural'); renderHistoryBar(); syncActiveSession();
         }
 
         // --- INVALID & WRONG POINT LOGIC ---
@@ -471,7 +525,7 @@
 
         function submitInvalid(reason) {
             universalLog.push({ Invalid_Roll: true, Notes: reason, Time_Stamp: new Date().toISOString() });
-            closeModals(); collapsePad(); renderHistoryBar(); syncActiveSession();
+            closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
         }
 
         function openWrongPointModal() {
@@ -499,7 +553,7 @@
             if(pointRollIndex !== -1) {
                 universalLog[pointRollIndex].Corrected_Point = newPoint;
                 universalLog.push({ Invalid_Roll: true, Notes: `Wrong Point Corrected to ${newPoint}`, Time_Stamp: new Date().toISOString() });
-                closeModals(); collapsePad(); renderHistoryBar(); syncActiveSession();
+                closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
             }
         }
 
@@ -529,7 +583,6 @@
 
         function openHandConfig(sevenOutIndex) {
             document.getElementById('hcfg-index').value = sevenOutIndex;
-            // Find the first roll of this hand to populate defaults
             let startIdx = 0;
             for(let i = sevenOutIndex - 1; i >= 0; i--) {
                 if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7 && activeState.wasSevenOut[i]) {
@@ -569,6 +622,94 @@
             closeModals(); syncActiveSession();
         }
 
+        // --- METADATA CREATION LOGIC ---
+        function checkMetadataTrigger(type, val) {
+            if (val === 'ADD_NEW') {
+                openMetadataModal(type);
+            }
+        }
+
+        function openMetadataModal(type) {
+            activeMetaType = type;
+            document.getElementById('modal-config-global').style.display = 'none';
+            
+            const title = document.getElementById('meta-title');
+            const fields = document.getElementById('meta-fields');
+            
+            let html = `<div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Name / Descriptor</label><input type="text" id="meta-name" class="input-wicked" autocomplete="off"></div>`;
+
+            if (type === 'shooters') {
+                title.innerText = "Register Shooter";
+                html += `
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked"><option value="Standard">Standard</option><option value="Master">Master</option><option value="Favorite">Favorite</option><option value="Online">Online</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Handedness</label><select id="meta-hand" class="select-wicked"><option value="Right">Right</option><option value="Left">Left</option><option value="Neither">Neither</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Style</label><select id="meta-style" class="select-wicked"><option value="Controlled Set">Controlled Set</option><option value="Random">Random</option><option value="Shake">Shake</option><option value="Mechanical">Mechanical</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Notes</label><input type="text" id="meta-notes" class="input-wicked" autocomplete="off"></div>`;
+            } else if (type === 'locations') {
+                title.innerText = "Register Location";
+                html += `
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Table Length</label><select id="meta-len" class="select-wicked"><option value="14 FT">14 FT</option><option value="16 FT">16 FT</option><option value="20 FT">20 FT</option><option value="8 FT Stadium">8 FT Stadium</option><option value="Dome (Bubble)">Dome (Bubble)</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Bouncy Rating</label><select id="meta-bounce" class="select-wicked"><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Surface</label><select id="meta-surf" class="select-wicked"><option value="Felt">Felt</option><option value="Microfiber">Microfiber</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-ltype" class="select-wicked"><option value="Standard">Standard</option><option value="Stadium">Stadium</option><option value="Bubble">Bubble</option><option value="Mechanical Thrower">Mechanical Thrower</option></select></div>`;
+            } else if (type === 'dice_sets') {
+                title.innerText = "Register Dice Set";
+                let opts = ''; for(let i=1; i<=6; i++) opts += `<option value="${i}">${i}</option>`;
+                html += `
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Top</label><select id="meta-lt" class="select-wicked">${opts}</select></div>
+                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Top</label><select id="meta-rt" class="select-wicked">${opts}</select></div>
+                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Back</label><select id="meta-lb" class="select-wicked">${opts}</select></div>
+                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Back</label><select id="meta-rb" class="select-wicked">${opts}</select></div>
+                </div>`;
+            }
+
+            fields.innerHTML = html;
+            document.getElementById('modal-metadata').style.display = 'flex';
+        }
+
+        function closeMetadataModal() {
+            document.getElementById('modal-metadata').style.display = 'none';
+            document.getElementById('modal-config-global').style.display = 'flex';
+            // Reset dropdown to ALL if cancelled
+            if(activeMetaType === 'locations') document.getElementById('cfg-loc').value = 'ALL';
+            if(activeMetaType === 'shooters') document.getElementById('cfg-shooter').value = 'ALL';
+            if(activeMetaType === 'dice_sets') document.getElementById('cfg-set').value = 'ALL';
+        }
+
+        async function saveMetadata() {
+            const nameVal = document.getElementById('meta-name').value.trim().toUpperCase();
+            if (!nameVal) return customAlert("Name cannot be empty.");
+
+            const newId = (activeMetaType === 'dice_sets' ? "SET_" : "REF_") + Date.now();
+            let payload = {};
+
+            if (activeMetaType === 'shooters') {
+                payload = { name: nameVal, Type: document.getElementById('meta-type').value, Handedness: document.getElementById('meta-hand').value, Style: document.getElementById('meta-style').value, Notes: document.getElementById('meta-notes').value.trim().toUpperCase() };
+            } else if (activeMetaType === 'locations') {
+                payload = { name: nameVal, Table_Length: document.getElementById('meta-len').value, Bouncy_Rating: document.getElementById('meta-bounce').value, Table_Surface: document.getElementById('meta-surf').value, LocType: document.getElementById('meta-ltype').value };
+            } else if (activeMetaType === 'dice_sets') {
+                const lt = parseInt(document.getElementById('meta-lt').value);
+                const lb = parseInt(document.getElementById('meta-lb').value);
+                const rt = parseInt(document.getElementById('meta-rt').value);
+                const rb = parseInt(document.getElementById('meta-rb').value);
+                payload = { Set_Name: `${nameVal} [${lt}-${lb}] [${rt}-${rb}]`, Left_Top: lt, Left_Back: lb, Right_Top: rt, Right_Back: rb };
+            }
+
+            try {
+                await db.collection("users").doc(currentUid).collection(`master_${activeMetaType}`).doc(newId).set(payload);
+                await fetchMasterData(); // Refresh arrays and dropdowns
+                
+                // Auto-select the new item
+                if(activeMetaType === 'locations') document.getElementById('cfg-loc').value = newId;
+                if(activeMetaType === 'shooters') document.getElementById('cfg-shooter').value = newId;
+                if(activeMetaType === 'dice_sets') document.getElementById('cfg-set').value = newId;
+
+                document.getElementById('modal-metadata').style.display = 'none';
+                document.getElementById('modal-config-global').style.display = 'flex';
+            } catch (e) { customAlert("Failed to save asset."); }
+        }
+
         // --- CRYPT ROUTING ---
         function openCryptOptions() { document.getElementById('modal-crypt-options').style.display = 'flex'; }
         
@@ -579,11 +720,7 @@
 
         async function executeCryptSave() {
             const nameInput = document.getElementById('crypt-save-name').value.trim().toUpperCase();
-            if (!nameInput) {
-                document.getElementById('alert-msg').innerText = "Name cannot be empty.";
-                document.getElementById('modal-alert').style.display = 'flex';
-                return;
-            }
+            if (!nameInput) return customAlert("Name cannot be empty.");
 
             let dateSuffix = "";
             if (universalLog.length > 0) {
@@ -628,6 +765,7 @@
             document.getElementById('modal-crypt-save').style.display = 'none';
             document.getElementById('modal-config-global').style.display = 'none';
             document.getElementById('modal-config-hand').style.display = 'none';
+            document.getElementById('modal-metadata').style.display = 'none';
             document.getElementById('modal-invalid').style.display = 'none';
             document.getElementById('modal-wrong-point').style.display = 'none';
             document.getElementById('modal-error-display').style.display = 'none';
@@ -676,7 +814,7 @@
             let pointsMadeInHand = 0;
             let rollsInHand = 0;
             let repeatCounts = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
-            activeState.wasSevenOut = {}; // Track seven outs for hand config
+            activeState.wasSevenOut = {}; 
 
             const fragment = document.createDocumentFragment();
             let nodesToInject = [];
