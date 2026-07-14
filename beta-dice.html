@@ -62,18 +62,18 @@
 
         .mod-hardway { border: 2px dashed #facc15 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(0,0,0,0.8) !important; }
 
-        /* 11-Tier Point Colors */
-        .pt-1 { background: linear-gradient(135deg, #b87333, #8b5a2b); color: #fff; border-color: #d97706; }
-        .pt-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #000; border-color: #fff; }
-        .pt-3 { background: linear-gradient(135deg, #fde047, #ca8a04); color: #000; border-color: #fef08a; }
-        .pt-4 { background: linear-gradient(135deg, #34d399, #059669); color: #000; border-color: #6ee7b7; }
-        .pt-5 { background: linear-gradient(135deg, #60a5fa, #2563eb); color: #fff; border-color: #93c5fd; }
-        .pt-6 { background: linear-gradient(135deg, #c084fc, #7e22ce); color: #fff; border-color: #d8b4fe; }
-        .pt-7 { background: linear-gradient(135deg, #fb7185, #be123c); color: #fff; border-color: #fda4af; }
-        .pt-8 { background: linear-gradient(135deg, #fb923c, #c2410c); color: #fff; border-color: #fdba74; }
-        .pt-9 { background: linear-gradient(135deg, #f472b6, #db2777); color: #fff; border-color: #fbcfe8; }
-        .pt-10 { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #000; border-color: #67e8f9; }
-        .pt-11 { background: linear-gradient(135deg, #ffffff, #f8fafc); color: #000; border-color: #fff; box-shadow: 0 0 15px #fff; }
+        /* Point Made Gradients (1-11 Tier) - Renamed to fix Tailwind conflict */
+        .point-tier-1 { background: linear-gradient(135deg, #b87333, #8b5a2b); color: #fff; border-color: #d97706; }
+        .point-tier-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #000; border-color: #fff; }
+        .point-tier-3 { background: linear-gradient(135deg, #fde047, #ca8a04); color: #000; border-color: #fef08a; }
+        .point-tier-4 { background: linear-gradient(135deg, #34d399, #059669); color: #000; border-color: #6ee7b7; }
+        .point-tier-5 { background: linear-gradient(135deg, #60a5fa, #2563eb); color: #fff; border-color: #93c5fd; }
+        .point-tier-6 { background: linear-gradient(135deg, #c084fc, #7e22ce); color: #fff; border-color: #d8b4fe; }
+        .point-tier-7 { background: linear-gradient(135deg, #fb7185, #be123c); color: #fff; border-color: #fda4af; }
+        .point-tier-8 { background: linear-gradient(135deg, #fb923c, #c2410c); color: #fff; border-color: #fdba74; }
+        .point-tier-9 { background: linear-gradient(135deg, #f472b6, #db2777); color: #fff; border-color: #fbcfe8; }
+        .point-tier-10 { background: linear-gradient(135deg, #22d3ee, #0891b2); color: #000; border-color: #67e8f9; }
+        .point-tier-11 { background: linear-gradient(135deg, #ffffff, #f8fafc); color: #000; border-color: #fff; box-shadow: 0 0 15px #fff; }
 
         /* Perfect Centering & Superscripts */
         .content-wrapper { display: flex; align-items: center; justify-content: center; }
@@ -105,6 +105,7 @@
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
             border-top: 1px solid rgba(51, 65, 85, 0.8);
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8); border-radius: 16px 16px 0 0;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .pad-handle {
@@ -119,6 +120,10 @@
         #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
 
         /* 3 States */
+        .state-collapsed { transform: translateY(calc(100% - 40px)); } /* 40px is approx handle height */
+        .state-natural { transform: translateY(0); }
+        .state-expanded { transform: translateY(0); }
+        
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
@@ -152,6 +157,12 @@
         .select-wicked { background: #0f172a; border: 1px solid #334155; color: #fff; font-family: monospace; padding: 10px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; text-transform: uppercase; }
         .select-wicked:focus { border-color: #10b981; }
         .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: left; font-size: 12px; outline: none; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .cfg-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 12px; }
+        .cfg-row > div { flex-grow: 1; }
+        .cfg-action-btn { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 10px; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
+        .cfg-action-btn:hover { color: #fff; border-color: #10b981; }
+        .cfg-action-btn.del:hover { color: #ef4444; border-color: #ef4444; }
     </style>
 </head>
 <body class="flex flex-col">
@@ -184,21 +195,20 @@
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-natural">
         <div class="pad-handle">
-            <button class="handle-btn" onclick="setIpState('collapsed')"><i class="fa-solid fa-chevron-down"></i></button>
+            <button class="handle-btn" onclick="handleIpDown()"><i class="fa-solid fa-chevron-down"></i></button>
             <div class="text-[10px] font-bold text-slate-500 tracking-widest">INPUT PAD</div>
-            <button class="handle-btn" onclick="setIpState('expanded')"><i class="fa-solid fa-chevron-up"></i></button>
+            <button class="handle-btn" onclick="handleIpUp()"><i class="fa-solid fa-chevron-up"></i></button>
         </div>
         
         <div id="pad-content">
             <div class="flex flex-col gap-3 max-w-4xl mx-auto">
-                <!-- Dice Grids Row (Side-by-Side) -->
                 <div class="flex flex-row gap-4 md:gap-8 justify-center">
-                    <!-- Left Die Grid (2 cols x 3 rows) -->
                     <div class="flex-1 max-w-[160px]">
+                        <div class="text-center text-[10px] text-emerald-500 font-bold mb-1.5 tracking-widest">LEFT DIE</div>
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
                     </div>
-                    <!-- Right Die Grid (2 cols x 3 rows) -->
                     <div class="flex-1 max-w-[160px]">
+                        <div class="text-center text-[10px] text-amber-500 font-bold mb-1.5 tracking-widest">RIGHT DIE</div>
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
                     </div>
                 </div>
@@ -223,9 +233,21 @@
         </div>
     </div>
 
+    <div id="modal-confirm" class="modal-mask">
+        <div class="modal-box border-red-500">
+            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
+            <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">Confirm Action</h2>
+            <p id="confirm-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
+            <div class="grid grid-cols-2 gap-3">
+                <button id="btn-confirm-no" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
+                <button id="btn-confirm-yes" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Proceed</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <i class="fa-solid fa-floppy-disk text-emerald-500 text-4xl mb-4"></i>
+            <i class="fa-solid fa-vault text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
@@ -252,12 +274,35 @@
     <div id="modal-config-global" class="modal-mask">
         <div class="modal-box border-slate-500">
             <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel">Global Configuration</h2>
-            <div class="flex flex-col gap-3 text-left">
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked" onchange="checkMetadataTrigger('shooters', this.value)"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label><select id="cfg-pos" class="select-wicked"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
-                <div>
+            <div class="flex flex-col text-left">
+                
+                <div class="cfg-row">
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
+                    <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                
+                <div class="cfg-row">
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked" onchange="checkMetadataTrigger('shooters', this.value)"></select></div>
+                    <button onclick="editAsset('shooters')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button onclick="deleteAsset('shooters')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                
+                <div class="cfg-row">
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
+                    <button onclick="editAsset('dice_sets')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                    <button onclick="deleteAsset('dice_sets')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                </div>
+
+                <div class="mb-3">
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
+                    <div class="flex gap-2">
+                        <select id="cfg-pos-parent" class="select-wicked w-1/2" onchange="updatePosChild('cfg')"></select>
+                        <select id="cfg-pos-child" class="select-wicked w-1/2"></select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
                     <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Color</label>
                     <select id="cfg-color" class="select-wicked">
                         <option value="ruby">Ruby (Red)</option>
@@ -269,7 +314,7 @@
                     </select>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-3 mt-6">
+            <div class="grid grid-cols-2 gap-3 mt-4">
                 <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
                 <button onclick="saveGlobalConfig()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
             </div>
@@ -284,8 +329,14 @@
             <div class="flex flex-col gap-3 text-left">
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked"></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label><select id="hcfg-pos" class="select-wicked"></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked"></select></div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
+                    <div class="flex gap-2">
+                        <select id="hcfg-pos-parent" class="select-wicked w-1/2" onchange="updatePosChild('hcfg')"></select>
+                        <select id="hcfg-pos-child" class="select-wicked w-1/2"></select>
+                    </div>
+                </div>
             </div>
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
@@ -301,7 +352,7 @@
             <div id="meta-fields" class="flex flex-col gap-3 text-left"></div>
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeMetadataModal()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
-                <button onclick="saveMetadata()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Register</button>
+                <button onclick="saveMetadata()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
             </div>
         </div>
     </div>
@@ -338,16 +389,24 @@
 
         const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#ffffff' };
         const PIP_MAP = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+        
+        const POS_MAP = {
+            'All': ['All', 'Left', 'Right', 'Stick', 'Stick Left', 'Stick Right', 'Hook', 'Hook Left', 'Hook Right'],
+            'Left': ['SL-1', 'SL-2', 'SL-3', 'SL-4', 'SL-5', 'HL-1', 'HL-2', 'HL-3', 'HL-4', 'HL-5'],
+            'Right': ['SR-1', 'SR-2', 'SR-3', 'SR-4', 'SR-5', 'HR-1', 'HR-2', 'HR-3', 'HR-4', 'HR-5']
+        };
 
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null }; 
-        let globalConfig = { location: 'ALL', shooter: 'ALL', position: 'ALL', diceSet: 'ALL', diceColor: 'ruby' };
+        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby' };
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
+        let activeMetaId = null;
 
         let selectedLeft = null;
         let selectedRight = null;
+        let ipState = 'natural';
 
         // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
@@ -359,6 +418,15 @@
             buildWrongPointGrid();
         });
 
+        function sortAssets(arr) {
+            return arr.sort((a, b) => {
+                const aFav = a.Type === 'Favorite' ? 0 : 1;
+                const bFav = b.Type === 'Favorite' ? 0 : 1;
+                if (aFav !== bFav) return aFav - bFav;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+        }
+
         async function fetchMasterData() {
             try {
                 const [lSnap, sSnap, dSnap] = await Promise.all([
@@ -367,9 +435,13 @@
                     db.collection("users").doc(currentUid).collection("master_dice_sets").get()
                 ]);
                 masterData.locations = []; masterData.shooters = []; masterData.sets = [];
-                lSnap.forEach(doc => masterData.locations.push({ id: doc.id, name: doc.data().name || doc.id }));
-                sSnap.forEach(doc => masterData.shooters.push({ id: doc.id, name: doc.data().name || doc.id }));
-                dSnap.forEach(doc => masterData.sets.push({ id: doc.id, name: doc.data().Set_Name || doc.id }));
+                lSnap.forEach(doc => masterData.locations.push({ id: doc.id, ...doc.data(), name: doc.data().name || doc.id }));
+                sSnap.forEach(doc => masterData.shooters.push({ id: doc.id, ...doc.data(), name: doc.data().name || doc.id }));
+                dSnap.forEach(doc => masterData.sets.push({ id: doc.id, ...doc.data(), name: doc.data().Set_Name || doc.id }));
+                
+                masterData.shooters = sortAssets(masterData.shooters);
+                masterData.sets = sortAssets(masterData.sets);
+
                 populateConfigDropdowns();
             } catch (e) { console.error("Master Data Fetch Error", e); }
         }
@@ -382,7 +454,8 @@
                     if (data.meta_tags) {
                         globalConfig.location = data.meta_tags.location || 'ALL';
                         globalConfig.shooter = data.meta_tags.shooter_or_dealer || 'ALL';
-                        globalConfig.position = data.meta_tags.position || 'ALL';
+                        globalConfig.positionParent = data.meta_tags.positionParent || 'All';
+                        globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
                     }
@@ -401,7 +474,8 @@
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 meta_tags: { 
                     location: globalConfig.location, shooter_or_dealer: globalConfig.shooter, 
-                    position: globalConfig.position, dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, base_unit: 1 
+                    positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
+                    dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -443,18 +517,37 @@
             const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             const sets = `<option value="ALL">NONE SELECTED</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             
-            const positions = `<option value="ALL">ALL POSITIONS</option><option value="SL1">SL1</option><option value="SL2">SL2</option><option value="SL3">SL3</option><option value="SR1">SR1</option><option value="SR2">SR2</option><option value="SR3">SR3</option>`;
+            const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
             document.getElementById('cfg-loc').innerHTML = locs; document.getElementById('hcfg-loc').innerHTML = locs;
             document.getElementById('cfg-shooter').innerHTML = shoots; document.getElementById('hcfg-shooter').innerHTML = shoots;
             document.getElementById('cfg-set').innerHTML = sets; document.getElementById('hcfg-set').innerHTML = sets;
-            document.getElementById('cfg-pos').innerHTML = positions; document.getElementById('hcfg-pos').innerHTML = positions;
+            
+            document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
+            updatePosChild('cfg', globalConfig.positionChild);
+        }
+
+        function updatePosChild(prefix, defaultChild = null) {
+            const parentVal = document.getElementById(`${prefix}-pos-parent`).value;
+            const childSelect = document.getElementById(`${prefix}-pos-child`);
+            childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
+            if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
+                childSelect.value = defaultChild;
+            }
         }
 
         // --- INPUT PAD LOGIC ---
+        function handleIpUp() {
+            if (ipState === 'collapsed') setIpState('natural');
+            else if (ipState === 'natural') setIpState('expanded');
+        }
+        function handleIpDown() {
+            if (ipState === 'expanded') setIpState('natural');
+            else if (ipState === 'natural') setIpState('collapsed');
+        }
         function setIpState(state) {
-            const wrapper = document.getElementById('input-pad-wrapper');
-            wrapper.className = `state-${state}`;
+            ipState = state;
+            document.getElementById('input-pad-wrapper').className = `state-${state}`;
         }
 
         function selectDie(side, val) {
@@ -483,18 +576,41 @@
         }
 
         function customAlert(msg) {
-            document.getElementById('alert-msg').innerText = msg;
-            document.getElementById('modal-alert').style.display = 'flex';
+            return new Promise(resolve => {
+                document.getElementById('alert-msg').innerText = msg;
+                document.getElementById('modal-alert').style.display = 'flex';
+                document.getElementById('modal-alert').onclick = (e) => {
+                    if(e.target.id === 'modal-alert' || e.target.tagName === 'BUTTON') {
+                        document.getElementById('modal-alert').style.display = 'none';
+                        resolve();
+                    }
+                };
+            });
         }
 
-        function submitRoll() {
+        function customConfirm(msg) {
+            return new Promise(resolve => {
+                document.getElementById('confirm-msg').innerText = msg;
+                document.getElementById('modal-confirm').style.display = 'flex';
+                document.getElementById('btn-confirm-yes').onclick = () => {
+                    document.getElementById('modal-confirm').style.display = 'none';
+                    resolve(true);
+                };
+                document.getElementById('btn-confirm-no').onclick = () => {
+                    document.getElementById('modal-confirm').style.display = 'none';
+                    resolve(false);
+                };
+            });
+        }
+
+        async function submitRoll() {
             if (!selectedLeft || !selectedRight) {
-                customAlert("Select both dice before accepting."); 
+                await customAlert("Select both dice before accepting."); 
                 return;
             }
             const r = {
                 Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: selectedLeft + selectedRight, Invalid_Roll: false,
-                Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.position, Dice_Set: globalConfig.diceSet,
+                Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
                 Time_Stamp: new Date().toISOString()
             };
             universalLog.push(r);
@@ -566,16 +682,18 @@
         function openGlobalConfig() {
             document.getElementById('cfg-loc').value = globalConfig.location;
             document.getElementById('cfg-shooter').value = globalConfig.shooter;
-            document.getElementById('cfg-pos').value = globalConfig.position;
             document.getElementById('cfg-set').value = globalConfig.diceSet;
             document.getElementById('cfg-color').value = globalConfig.diceColor;
+            document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
+            updatePosChild('cfg', globalConfig.positionChild);
             document.getElementById('modal-config-global').style.display = 'flex';
         }
 
         function saveGlobalConfig() {
             globalConfig.location = document.getElementById('cfg-loc').value;
             globalConfig.shooter = document.getElementById('cfg-shooter').value;
-            globalConfig.position = document.getElementById('cfg-pos').value;
+            globalConfig.positionParent = document.getElementById('cfg-pos-parent').value;
+            globalConfig.positionChild = document.getElementById('cfg-pos-child').value;
             globalConfig.diceSet = document.getElementById('cfg-set').value;
             globalConfig.diceColor = document.getElementById('cfg-color').value;
             closeModals(); renderHistoryBar(); syncActiveSession();
@@ -592,8 +710,16 @@
             const refRoll = universalLog[startIdx] || {};
             document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
-            document.getElementById('hcfg-pos').value = refRoll.Table_Position || 'ALL';
             document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
+            
+            // Reverse engineer parent from child position
+            let childPos = refRoll.Table_Position || 'All';
+            let parentPos = 'All';
+            for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
+            
+            document.getElementById('hcfg-pos-parent').value = parentPos;
+            updatePosChild('hcfg', childPos);
+            
             document.getElementById('modal-config-hand').style.display = 'flex';
         }
 
@@ -608,7 +734,7 @@
             
             const loc = document.getElementById('hcfg-loc').value;
             const shooter = document.getElementById('hcfg-shooter').value;
-            const pos = document.getElementById('hcfg-pos').value;
+            const pos = document.getElementById('hcfg-pos-child').value;
             const set = document.getElementById('hcfg-set').value;
 
             for(let i = startIdx; i <= sevenOutIndex; i++) {
@@ -624,43 +750,83 @@
 
         // --- METADATA CREATION LOGIC ---
         function checkMetadataTrigger(type, val) {
-            if (val === 'ADD_NEW') {
-                openMetadataModal(type);
+            if (val === 'ADD_NEW') openMetadataModal(type);
+        }
+
+        async function editAsset(type) {
+            const selectId = type === 'locations' ? 'cfg-loc' : (type === 'shooters' ? 'cfg-shooter' : 'cfg-set');
+            const id = document.getElementById(selectId).value;
+            if (id === 'ALL' || id === 'ADD_NEW') return await customAlert("Select a valid asset to edit.");
+            
+            const asset = masterData[type].find(a => a.id === id);
+            openMetadataModal(type, asset);
+        }
+
+        async function deleteAsset(type) {
+            const selectId = type === 'locations' ? 'cfg-loc' : (type === 'shooters' ? 'cfg-shooter' : 'cfg-set');
+            const id = document.getElementById(selectId).value;
+            if (id === 'ALL' || id === 'ADD_NEW') return await customAlert("Select a valid asset to delete.");
+            
+            const confirmed = await customConfirm("Are you sure you want to delete this asset?");
+            if (confirmed) {
+                try {
+                    await db.collection("users").doc(currentUid).collection(`master_${type}`).doc(id).delete();
+                    await fetchMasterData();
+                } catch (e) { await customAlert("Failed to delete asset."); }
             }
         }
 
-        function openMetadataModal(type) {
+        function openMetadataModal(type, existingAsset = null) {
             activeMetaType = type;
+            activeMetaId = existingAsset ? existingAsset.id : null;
             document.getElementById('modal-config-global').style.display = 'none';
             
             const title = document.getElementById('meta-title');
             const fields = document.getElementById('meta-fields');
             
-            let html = `<div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Name / Descriptor</label><input type="text" id="meta-name" class="input-wicked" autocomplete="off"></div>`;
+            let html = `<div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Name / Descriptor</label><input type="text" id="meta-name" class="input-wicked" autocomplete="off" value="${existingAsset ? (existingAsset.name || existingAsset.Set_Name) : ''}"></div>`;
 
             if (type === 'shooters') {
-                title.innerText = "Register Shooter";
+                title.innerText = existingAsset ? "Edit Shooter" : "Register Shooter";
+                const t = existingAsset ? existingAsset.Type : 'Standard';
+                const h = existingAsset ? existingAsset.Handedness : 'Right';
+                const s = existingAsset ? existingAsset.Style : 'Controlled Set';
                 html += `
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked"><option value="Standard">Standard</option><option value="Master">Master</option><option value="Favorite">Favorite</option><option value="Online">Online</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Handedness</label><select id="meta-hand" class="select-wicked"><option value="Right">Right</option><option value="Left">Left</option><option value="Neither">Neither</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Style</label><select id="meta-style" class="select-wicked"><option value="Controlled Set">Controlled Set</option><option value="Random">Random</option><option value="Shake">Shake</option><option value="Mechanical">Mechanical</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Notes</label><input type="text" id="meta-notes" class="input-wicked" autocomplete="off"></div>`;
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked"><option value="Standard" ${t==='Standard'?'selected':''}>Standard</option><option value="Master" ${t==='Master'?'selected':''}>Master</option><option value="Favorite" ${t==='Favorite'?'selected':''}>Favorite</option><option value="Online" ${t==='Online'?'selected':''}>Online</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Handedness</label><select id="meta-hand" class="select-wicked"><option value="Right" ${h==='Right'?'selected':''}>Right</option><option value="Left" ${h==='Left'?'selected':''}>Left</option><option value="Neither" ${h==='Neither'?'selected':''}>Neither</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Style</label><select id="meta-style" class="select-wicked"><option value="Controlled Set" ${s==='Controlled Set'?'selected':''}>Controlled Set</option><option value="Random" ${s==='Random'?'selected':''}>Random</option><option value="Shake" ${s==='Shake'?'selected':''}>Shake</option><option value="Mechanical" ${s==='Mechanical'?'selected':''}>Mechanical</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Notes</label><input type="text" id="meta-notes" class="input-wicked" autocomplete="off" value="${existingAsset ? (existingAsset.Notes || '') : ''}"></div>`;
             } else if (type === 'locations') {
-                title.innerText = "Register Location";
+                title.innerText = existingAsset ? "Edit Location" : "Register Location";
+                const len = existingAsset ? existingAsset.Table_Length : '14 FT';
+                const b = existingAsset ? existingAsset.Bouncy_Rating : 'Low';
+                const surf = existingAsset ? existingAsset.Table_Surface : 'Felt';
+                const ltype = existingAsset ? existingAsset.LocType : 'Standard';
                 html += `
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Table Length</label><select id="meta-len" class="select-wicked"><option value="14 FT">14 FT</option><option value="16 FT">16 FT</option><option value="20 FT">20 FT</option><option value="8 FT Stadium">8 FT Stadium</option><option value="Dome (Bubble)">Dome (Bubble)</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Bouncy Rating</label><select id="meta-bounce" class="select-wicked"><option value="Low">Low</option><option value="Medium">Medium</option><option value="High">High</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Surface</label><select id="meta-surf" class="select-wicked"><option value="Felt">Felt</option><option value="Microfiber">Microfiber</option></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-ltype" class="select-wicked"><option value="Standard">Standard</option><option value="Stadium">Stadium</option><option value="Bubble">Bubble</option><option value="Mechanical Thrower">Mechanical Thrower</option></select></div>`;
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Table Length</label><select id="meta-len" class="select-wicked"><option value="14 FT" ${len==='14 FT'?'selected':''}>14 FT</option><option value="16 FT" ${len==='16 FT'?'selected':''}>16 FT</option><option value="20 FT" ${len==='20 FT'?'selected':''}>20 FT</option><option value="8 FT Stadium" ${len==='8 FT Stadium'?'selected':''}>8 FT Stadium</option><option value="Dome (Bubble)" ${len==='Dome (Bubble)'?'selected':''}>Dome (Bubble)</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Bouncy Rating</label><select id="meta-bounce" class="select-wicked"><option value="Low" ${b==='Low'?'selected':''}>Low</option><option value="Medium" ${b==='Medium'?'selected':''}>Medium</option><option value="High" ${b==='High'?'selected':''}>High</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Surface</label><select id="meta-surf" class="select-wicked"><option value="Felt" ${surf==='Felt'?'selected':''}>Felt</option><option value="Microfiber" ${surf==='Microfiber'?'selected':''}>Microfiber</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-ltype" class="select-wicked"><option value="Standard" ${ltype==='Standard'?'selected':''}>Standard</option><option value="Stadium" ${ltype==='Stadium'?'selected':''}>Stadium</option><option value="Bubble" ${ltype==='Bubble'?'selected':''}>Bubble</option><option value="Mechanical Thrower" ${ltype==='Mechanical Thrower'?'selected':''}>Mechanical Thrower</option></select></div>`;
             } else if (type === 'dice_sets') {
-                title.innerText = "Register Dice Set";
-                let opts = ''; for(let i=1; i<=6; i++) opts += `<option value="${i}">${i}</option>`;
+                title.innerText = existingAsset ? "Edit Dice Set" : "Register Dice Set";
+                const t = existingAsset ? existingAsset.Type : 'Standard';
+                const lt = existingAsset ? existingAsset.Left_Top : 3;
+                const rt = existingAsset ? existingAsset.Right_Top : 3;
+                const lb = existingAsset ? existingAsset.Left_Back : 6;
+                const rb = existingAsset ? existingAsset.Right_Back : 2;
+                
+                let optsLT = ''; for(let i=1; i<=6; i++) optsLT += `<option value="${i}" ${lt===i?'selected':''}>${i}</option>`;
+                let optsRT = ''; for(let i=1; i<=6; i++) optsRT += `<option value="${i}" ${rt===i?'selected':''}>${i}</option>`;
+                let optsLB = ''; for(let i=1; i<=6; i++) optsLB += `<option value="${i}" ${lb===i?'selected':''}>${i}</option>`;
+                let optsRB = ''; for(let i=1; i<=6; i++) optsRB += `<option value="${i}" ${rb===i?'selected':''}>${i}</option>`;
+
                 html += `
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked"><option value="Standard" ${t==='Standard'?'selected':''}>Standard</option><option value="Favorite" ${t==='Favorite'?'selected':''}>Favorite</option></select></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Top</label><select id="meta-lt" class="select-wicked">${opts}</select></div>
-                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Top</label><select id="meta-rt" class="select-wicked">${opts}</select></div>
-                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Back</label><select id="meta-lb" class="select-wicked">${opts}</select></div>
-                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Back</label><select id="meta-rb" class="select-wicked">${opts}</select></div>
+                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Top</label><select id="meta-lt" class="select-wicked">${optsLT}</select></div>
+                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Top</label><select id="meta-rt" class="select-wicked">${optsRT}</select></div>
+                    <div><label class="block text-[10px] text-emerald-400 uppercase font-bold mb-1">Left Back</label><select id="meta-lb" class="select-wicked">${optsLB}</select></div>
+                    <div><label class="block text-[10px] text-amber-400 uppercase font-bold mb-1">Right Back</label><select id="meta-rb" class="select-wicked">${optsRB}</select></div>
                 </div>`;
             }
 
@@ -671,17 +837,18 @@
         function closeMetadataModal() {
             document.getElementById('modal-metadata').style.display = 'none';
             document.getElementById('modal-config-global').style.display = 'flex';
-            // Reset dropdown to ALL if cancelled
-            if(activeMetaType === 'locations') document.getElementById('cfg-loc').value = 'ALL';
-            if(activeMetaType === 'shooters') document.getElementById('cfg-shooter').value = 'ALL';
-            if(activeMetaType === 'dice_sets') document.getElementById('cfg-set').value = 'ALL';
+            if(!activeMetaId) {
+                if(activeMetaType === 'locations') document.getElementById('cfg-loc').value = 'ALL';
+                if(activeMetaType === 'shooters') document.getElementById('cfg-shooter').value = 'ALL';
+                if(activeMetaType === 'dice_sets') document.getElementById('cfg-set').value = 'ALL';
+            }
         }
 
         async function saveMetadata() {
             const nameVal = document.getElementById('meta-name').value.trim().toUpperCase();
-            if (!nameVal) return customAlert("Name cannot be empty.");
+            if (!nameVal) return await customAlert("Name cannot be empty.");
 
-            const newId = (activeMetaType === 'dice_sets' ? "SET_" : "REF_") + Date.now();
+            const newId = activeMetaId || ((activeMetaType === 'dice_sets' ? "SET_" : "REF_") + Date.now());
             let payload = {};
 
             if (activeMetaType === 'shooters') {
@@ -693,21 +860,21 @@
                 const lb = parseInt(document.getElementById('meta-lb').value);
                 const rt = parseInt(document.getElementById('meta-rt').value);
                 const rb = parseInt(document.getElementById('meta-rb').value);
-                payload = { Set_Name: `${nameVal} [${lt}-${lb}] [${rt}-${rb}]`, Left_Top: lt, Left_Back: lb, Right_Top: rt, Right_Back: rb };
+                payload = { Set_Name: `${nameVal} [${lt}-${lb}] [${rt}-${rb}]`, Type: document.getElementById('meta-type').value, Left_Top: lt, Left_Back: lb, Right_Top: rt, Right_Back: rb };
             }
 
             try {
                 await db.collection("users").doc(currentUid).collection(`master_${activeMetaType}`).doc(newId).set(payload);
-                await fetchMasterData(); // Refresh arrays and dropdowns
+                await fetchMasterData(); 
                 
-                // Auto-select the new item
-                if(activeMetaType === 'locations') document.getElementById('cfg-loc').value = newId;
-                if(activeMetaType === 'shooters') document.getElementById('cfg-shooter').value = newId;
-                if(activeMetaType === 'dice_sets') document.getElementById('cfg-set').value = newId;
+                if(activeMetaType === 'locations') { globalConfig.location = newId; document.getElementById('cfg-loc').value = newId; }
+                if(activeMetaType === 'shooters') { globalConfig.shooter = newId; document.getElementById('cfg-shooter').value = newId; }
+                if(activeMetaType === 'dice_sets') { globalConfig.diceSet = newId; document.getElementById('cfg-set').value = newId; }
 
                 document.getElementById('modal-metadata').style.display = 'none';
                 document.getElementById('modal-config-global').style.display = 'flex';
-            } catch (e) { customAlert("Failed to save asset."); }
+                syncActiveSession();
+            } catch (e) { await customAlert("Failed to save asset."); }
         }
 
         // --- CRYPT ROUTING ---
@@ -720,7 +887,7 @@
 
         async function executeCryptSave() {
             const nameInput = document.getElementById('crypt-save-name').value.trim().toUpperCase();
-            if (!nameInput) return customAlert("Name cannot be empty.");
+            if (!nameInput) return await customAlert("Name cannot be empty.");
 
             let dateSuffix = "";
             if (universalLog.length > 0) {
@@ -862,7 +1029,7 @@
                             isComeout = true;
                             currentPoint = null;
                             const tier = Math.min(pointsMadeInHand, 11);
-                            inlineClass = `pt-${tier}`;
+                            inlineClass = `point-tier-${tier}`;
                         }
                     }
                 }
