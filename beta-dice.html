@@ -56,13 +56,19 @@
         .state-seven-out { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); color: #ffffff; border-color: #ef4444; box-shadow: 0 0 15px rgba(220, 38, 38, 0.6); }
         .state-invalid { border-color: #f59e0b; color: #f59e0b; background: transparent; cursor: pointer; }
         .state-invalid:hover { background: rgba(245, 158, 11, 0.1); }
-        .state-summary { background: transparent; color: #ffffff; border: 2px dashed #3b82f6; font-family: monospace; font-size: 14px; min-width: 60px; letter-spacing: 1px; cursor: pointer; }
-        .state-summary:hover { background: rgba(59, 130, 246, 0.1); }
         .state-standard { }
 
         .mod-hardway { border: 2px dashed #facc15 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(0,0,0,0.8) !important; }
 
-        /* Point Made Gradients (1-11 Tier) - Renamed to fix Tailwind conflict */
+        /* Summary Node (4 Dynamic States) */
+        .state-summary { font-family: monospace; font-size: 14px; letter-spacing: 1px; cursor: pointer; padding: 0 12px; min-width: auto; }
+        .state-summary:hover { filter: brightness(1.2); }
+        .sum-bad { background: linear-gradient(135deg, #7f1d1d, #000000); border: 1px solid #ef4444; color: #fca5a5; }
+        .sum-neutral { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 1px solid #3b82f6; color: #bfdbfe; }
+        .sum-good { background: linear-gradient(135deg, #065f46, #022c22); border: 1px solid #10b981; color: #a7f3d0; }
+        .sum-great { background: linear-gradient(135deg, #b45309, #451a03); border: 1px solid #f59e0b; color: #fde68a; box-shadow: 0 0 15px rgba(245,158,11,0.5); }
+
+        /* Point Made Gradients (1-11 Tier) */
         .point-tier-1 { background: linear-gradient(135deg, #b87333, #8b5a2b); color: #fff; border-color: #d97706; }
         .point-tier-2 { background: linear-gradient(135deg, #e2e8f0, #94a3b8); color: #000; border-color: #fff; }
         .point-tier-3 { background: linear-gradient(135deg, #fde047, #ca8a04); color: #000; border-color: #fef08a; }
@@ -98,6 +104,10 @@
         .die-citrine { background: linear-gradient(135deg, #fde047, #a16207) !important; border-color: #fef08a !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-citrine .pip { background: #000000 !important; box-shadow: inset 0 2px 4px rgba(255,255,255,0.3) !important; }
         .die-onyx { background: linear-gradient(135deg, #475569, #020617) !important; border-color: #94a3b8 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.8) !important; } .die-onyx .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
         .die-amethyst { background: linear-gradient(135deg, #c084fc, #581c87) !important; border-color: #d8b4fe !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-amethyst .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-pearl { background: linear-gradient(135deg, #f8fafc, #cbd5e1) !important; border-color: #ffffff !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.2) !important; } .die-pearl .pip { background: #000000 !important; box-shadow: inset 0 2px 4px rgba(255,255,255,0.5) !important; }
+        .die-topaz { background: linear-gradient(135deg, #f59e0b, #b45309) !important; border-color: #fcd34d !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-topaz .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-aquamarine { background: linear-gradient(135deg, #22d3ee, #0891b2) !important; border-color: #67e8f9 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-aquamarine .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
+        .die-jade { background: linear-gradient(135deg, #4ade80, #166534) !important; border-color: #86efac !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; } .die-jade .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
 
         /* EXPANDABLE INPUT PAD (3-State) */
         #input-pad-wrapper {
@@ -120,13 +130,17 @@
         #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
 
         /* 3 States */
-        .state-collapsed { transform: translateY(calc(100% - 40px)); } /* 40px is approx handle height */
+        .state-collapsed { transform: translateY(calc(100% - 40px)); } 
         .state-natural { transform: translateY(0); }
         .state-expanded { transform: translateY(0); }
         
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
+
+        /* Dynamic Chevron Visibility */
+        .state-collapsed .chevron-down { visibility: hidden; }
+        .state-expanded .chevron-up { visibility: hidden; }
 
         /* Input Pad CSS Dice Buttons */
         .pad-die-btn {
@@ -193,27 +207,25 @@
     </div>
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
-    <div id="input-pad-wrapper" class="state-natural">
+    <div id="input-pad-wrapper" class="state-collapsed">
         <div class="pad-handle">
-            <button class="handle-btn" onclick="handleIpDown()"><i class="fa-solid fa-chevron-down"></i></button>
+            <button class="handle-btn chevron-down" onclick="handleIpDown()"><i class="fa-solid fa-chevron-down"></i></button>
             <div class="text-[10px] font-bold text-slate-500 tracking-widest">INPUT PAD</div>
-            <button class="handle-btn" onclick="handleIpUp()"><i class="fa-solid fa-chevron-up"></i></button>
+            <button class="handle-btn chevron-up" onclick="handleIpUp()"><i class="fa-solid fa-chevron-up"></i></button>
         </div>
         
         <div id="pad-content">
             <div class="flex flex-col gap-3 max-w-4xl mx-auto">
                 <div class="flex flex-row gap-4 md:gap-8 justify-center">
                     <div class="flex-1 max-w-[160px]">
-                        <div class="text-center text-[10px] text-emerald-500 font-bold mb-1.5 tracking-widest">LEFT DIE</div>
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
                     </div>
                     <div class="flex-1 max-w-[160px]">
-                        <div class="text-center text-[10px] text-amber-500 font-bold mb-1.5 tracking-widest">RIGHT DIE</div>
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
                     </div>
                 </div>
 
-                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Accept Roll</button>
+                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Next Roll</button>
                 
                 <div id="pad-extra" class="flex gap-2">
                     <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
@@ -247,7 +259,6 @@
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <i class="fa-solid fa-vault text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
@@ -304,14 +315,21 @@
 
                 <div class="mb-3">
                     <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Color</label>
-                    <select id="cfg-color" class="select-wicked">
-                        <option value="ruby">Ruby (Red)</option>
-                        <option value="sapphire">Sapphire (Blue)</option>
-                        <option value="emerald">Emerald (Green)</option>
-                        <option value="citrine">Citrine (Yellow)</option>
-                        <option value="onyx">Onyx (Black)</option>
-                        <option value="amethyst">Amethyst (Purple)</option>
+                    <select id="cfg-color" class="select-wicked" onchange="updateColorPreview()">
+                        <option value="ruby">Ruby</option>
+                        <option value="sapphire">Sapphire</option>
+                        <option value="emerald">Emerald</option>
+                        <option value="citrine">Citrine</option>
+                        <option value="onyx">Onyx</option>
+                        <option value="amethyst">Amethyst</option>
+                        <option value="pearl">Pearl</option>
+                        <option value="topaz">Topaz</option>
+                        <option value="aquamarine">Aquamarine</option>
+                        <option value="jade">Jade</option>
                     </select>
+                    <div class="mt-3 flex justify-center" id="color-preview-container">
+                        <!-- Live Preview Injected Here -->
+                    </div>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3 mt-4">
@@ -323,7 +341,7 @@
 
     <div id="modal-config-hand" class="modal-mask">
         <div class="modal-box border-blue-500">
-            <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-2 cinzel">Hand Configuration</h2>
+            <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-2 cinzel">Roll Configuration</h2>
             <p class="text-[10px] text-slate-400 font-mono mb-4">Retroactively update parameters for this specific hand.</p>
             <input type="hidden" id="hcfg-index">
             <div class="flex flex-col gap-3 text-left">
@@ -340,7 +358,19 @@
             </div>
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Cancel</button>
-                <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Hand</button>
+                <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Roll</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-shooter-transition" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <i class="fa-solid fa-users text-emerald-500 text-4xl mb-4"></i>
+            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Seven Out</h2>
+            <p class="text-xs text-slate-400 font-mono mb-6">Is the dice passing to a new shooter?</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Same Shooter</button>
+                <button onclick="handleNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
             </div>
         </div>
     </div>
@@ -398,7 +428,7 @@
 
         let currentUid = null;
         let universalLog = []; 
-        let activeState = { currentPoint: null }; 
+        let activeState = { currentPoint: null, wasSevenOut: {} }; 
         let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby' };
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
@@ -406,7 +436,7 @@
 
         let selectedLeft = null;
         let selectedRight = null;
-        let ipState = 'natural';
+        let ipState = 'collapsed';
 
         // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
@@ -536,6 +566,16 @@
             }
         }
 
+        function updateColorPreview() {
+            const color = document.getElementById('cfg-color').value;
+            const container = document.getElementById('color-preview-container');
+            container.innerHTML = `<div class="mini-die die-${color}" style="width: 40px; height: 40px; padding: 4px; gap: 2px; border-radius: 6px;">
+                <div class="pip"></div><div class="pip"></div><div class="pip active"></div>
+                <div class="pip"></div><div class="pip active"></div><div class="pip"></div>
+                <div class="pip active"></div><div class="pip"></div><div class="pip"></div>
+            </div>`;
+        }
+
         // --- INPUT PAD LOGIC ---
         function handleIpUp() {
             if (ipState === 'collapsed') setIpState('natural');
@@ -615,12 +655,23 @@
             };
             universalLog.push(r);
             clearPad(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
+
+            // Check for Shooter Transition
+            if (universalLog.length > 0 && activeState.wasSevenOut[universalLog.length - 1]) {
+                document.getElementById('modal-shooter-transition').style.display = 'flex';
+            }
         }
 
         function undoRoll() {
             if (universalLog.length === 0) return;
             universalLog.pop();
             setIpState('natural'); renderHistoryBar(); syncActiveSession();
+        }
+
+        function handleNewShooter() {
+            closeModals();
+            globalConfig.shooter = 'ALL';
+            openGlobalConfig();
         }
 
         // --- INVALID & WRONG POINT LOGIC ---
@@ -686,6 +737,7 @@
             document.getElementById('cfg-color').value = globalConfig.diceColor;
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
             updatePosChild('cfg', globalConfig.positionChild);
+            updateColorPreview();
             document.getElementById('modal-config-global').style.display = 'flex';
         }
 
@@ -712,7 +764,6 @@
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
             document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
-            // Reverse engineer parent from child position
             let childPos = refRoll.Table_Position || 'All';
             let parentPos = 'All';
             for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
@@ -758,7 +809,8 @@
             const id = document.getElementById(selectId).value;
             if (id === 'ALL' || id === 'ADD_NEW') return await customAlert("Select a valid asset to edit.");
             
-            const asset = masterData[type].find(a => a.id === id);
+            const assetArray = type === 'dice_sets' ? masterData.sets : masterData[type];
+            const asset = assetArray.find(a => a.id === id);
             openMetadataModal(type, asset);
         }
 
@@ -772,6 +824,7 @@
                 try {
                     await db.collection("users").doc(currentUid).collection(`master_${type}`).doc(id).delete();
                     await fetchMasterData();
+                    document.getElementById(selectId).value = 'ALL';
                 } catch (e) { await customAlert("Failed to delete asset."); }
             }
         }
@@ -914,20 +967,27 @@
         }
 
         async function enterCryptWithoutSaving() {
-            try {
-                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
-                window.location.href = "crypt.html";
-            } catch (e) { console.error(e); }
+            const confirmed = await customConfirm("Are you sure? Unsaved data will be lost.");
+            if (confirmed) {
+                try {
+                    await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
+                    window.location.href = "crypt.html";
+                } catch (e) { console.error(e); }
+            }
         }
 
         async function clearAndRestart() {
-            universalLog = [];
-            try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete(); } catch(e){}
-            closeModals(); renderHistoryBar();
+            const confirmed = await customConfirm("Are you sure you want to clear the active session?");
+            if (confirmed) {
+                universalLog = [];
+                try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete(); } catch(e){}
+                closeModals(); renderHistoryBar();
+            }
         }
 
         function closeModals() {
             document.getElementById('modal-alert').style.display = 'none';
+            document.getElementById('modal-confirm').style.display = 'none';
             document.getElementById('modal-crypt-options').style.display = 'none';
             document.getElementById('modal-crypt-save').style.display = 'none';
             document.getElementById('modal-config-global').style.display = 'none';
@@ -936,6 +996,7 @@
             document.getElementById('modal-invalid').style.display = 'none';
             document.getElementById('modal-wrong-point').style.display = 'none';
             document.getElementById('modal-error-display').style.display = 'none';
+            document.getElementById('modal-shooter-transition').style.display = 'none';
         }
 
         // --- RENDERING ENGINE ---
@@ -947,21 +1008,22 @@
             return html;
         }
 
-        function createSummaryNode(rolls, points, index) {
+        function createSummaryNode(rolls, points, repeats, index) {
             const el = document.createElement('div');
-            el.className = 'hist-node state-summary';
+            
+            let stateClass = 'sum-bad';
+            if (rolls >= 6 && rolls <= 12) stateClass = 'sum-neutral';
+            else if (rolls >= 13 && rolls <= 24) stateClass = 'sum-good';
+            else if (rolls >= 25) stateClass = 'sum-great';
+
+            el.className = `hist-node state-summary ${stateClass}`;
             el.onclick = () => openHandConfig(index);
-            const rColor = rolls < 7 ? '#ef4444' : '#10b981'; 
-            const pColor = points >= 11 ? POINT_COLORS[11] : (POINT_COLORS[points] || '#94a3b8');
             
             el.innerHTML = `
-                <div class="content-wrapper">
-                    <div class="main-val">${rolls}</div>
-                    <div class="sup-container"><span class="sup-text" style="color: ${rColor};">R</span></div>
-                </div>
-                <div class="content-wrapper" style="margin-left: 8px;">
-                    <div class="main-val">${points}</div>
-                    <div class="sup-container"><span class="sup-text" style="color: ${pColor};">P</span></div>
+                <div class="flex gap-3 px-2">
+                    <span>${rolls} R</span>
+                    <span>${points} P</span>
+                    <span>${repeats} REP</span>
                 </div>
             `;
             return el;
@@ -980,6 +1042,7 @@
             let currentPoint = null;
             let pointsMadeInHand = 0;
             let rollsInHand = 0;
+            let totalRepeatsInHand = 0;
             let repeatCounts = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
             activeState.wasSevenOut = {}; 
 
@@ -1009,6 +1072,7 @@
                     if (!(isComeout && sum === 7)) {
                         currentRepeats = repeatCounts[sum];
                         repeatCounts[sum]++;
+                        if (currentRepeats > 0) totalRepeatsInHand++;
                     }
 
                     if (isComeout) {
@@ -1074,8 +1138,8 @@
                 nodesToInject.push(el);
 
                 if (isSevenOut) {
-                    nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, index));
-                    rollsInHand = 0; pointsMadeInHand = 0; isComeout = true; currentPoint = null;
+                    nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, totalRepeatsInHand, index));
+                    rollsInHand = 0; pointsMadeInHand = 0; totalRepeatsInHand = 0; isComeout = true; currentPoint = null;
                     for (let k in repeatCounts) repeatCounts[k] = 0;
                 }
             });
