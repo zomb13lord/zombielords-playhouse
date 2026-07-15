@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dice Tracker | ZombieLord's</title>
+    <title>Dice Tracker Beta | ZombieLord's</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -44,6 +44,18 @@
             overflow-x: auto; padding: 15px 10px; gap: 12px; min-height: 90px;
         }
         #history-bar::-webkit-scrollbar { display: none; }
+
+        /* SDD PANEL */
+        .sdd-ribbon {
+            display: flex; flex-direction: row; align-items: center;
+            overflow-x: auto; background: rgba(2, 6, 23, 0.95); border-top: 1px solid rgba(51, 65, 85, 0.4);
+            padding: 12px 16px; gap: 24px; font-family: monospace; font-size: 16px; letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        .sdd-ribbon::-webkit-scrollbar { display: none; }
+        .sdd-metric { color: #94a3b8; }
+        .sdd-metric b { color: #ffffff; }
+        .sdd-metric .med { color: #64748b; font-weight: normal; }
 
         /* ROLL NODES */
         .hist-node {
@@ -112,7 +124,7 @@
         .die-sapphire.mini-die, .die-sapphire .pad-die-face { background: linear-gradient(135deg, #93c5fd 0%, #2563eb 40%, #1e3a8a 100%) !important; border-color: #60a5fa !important; }
         .die-sapphire.mini-die .pip, .die-sapphire .pad-die-face .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
         
-        .die-emerald.mini-die, .die-emerald .pad-die-face { background: linear-gradient(135deg, #6ee7b7 0%, #059669 40%, #022c22 100%) !important; border-color: #34d399 !important; }
+        .die-emerald.mini-die, .die-emerald .pad-die-face { background: linear-gradient(135deg, #34d399, #064e3b) !important; border-color: #6ee7b7 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; }
         .die-emerald.mini-die .pip, .die-emerald .pad-die-face .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
         
         .die-citrine.mini-die, .die-citrine .pad-die-face { background: linear-gradient(135deg, #fde047 0%, #eab308 40%, #713f12 100%) !important; border-color: #facc15 !important; }
@@ -141,18 +153,6 @@
         
         .die-cobalt.mini-die, .die-cobalt .pad-die-face { background: linear-gradient(135deg, #60a5fa 0%, #1d4ed8 40%, #172554 100%) !important; border-color: #3b82f6 !important; }
         .die-cobalt.mini-die .pip, .die-cobalt .pad-die-face .pip { background: #22d3ee !important; box-shadow: 0 0 6px rgba(34,211,238,0.9), inset 0 2px 4px rgba(0,0,0,0.5) !important; }
-
-        /* SDD RIBBONS */
-        .sdd-ribbon {
-            display: flex; flex-direction: row; align-items: center;
-            overflow-x: auto; background: rgba(2, 6, 23, 0.95); border-top: 1px solid rgba(51, 65, 85, 0.4);
-            padding: 12px 16px; gap: 24px; font-family: monospace; font-size: 16px; letter-spacing: 1px;
-            white-space: nowrap;
-        }
-        .sdd-ribbon::-webkit-scrollbar { display: none; }
-        .sdd-metric { color: #94a3b8; }
-        .sdd-metric b { color: #ffffff; }
-        .sdd-metric .med { color: #64748b; font-weight: normal; }
 
         /* EXPANDABLE INPUT PAD (3-State) */
         #input-pad-wrapper {
@@ -197,7 +197,7 @@
         
         .pad-die-face {
             width: 100%; height: 100%; border-radius: 12% !important;
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+            display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);
             padding: 12%; gap: 6%; transition: all 0.2s ease;
         }
 
@@ -250,7 +250,7 @@
 
         <!-- MODULE 6: SESSION DIAGNOSTIC DISPLAY (SDD) -->
         <div id="sdd-global" class="sdd-ribbon">
-            <span class="text-emerald-400 font-black">GLOBAL</span>
+            <span class="text-emerald-400 font-black">GLB</span>
             <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
             <span class="sdd-metric">CR: <b id="g-cr">0</b></span>
             <span class="sdd-metric">SOR: <b id="g-sor-mean">0.0</b>|<span class="med" id="g-sor-med">0.0</span></span>
@@ -284,12 +284,10 @@
             <div class="flex flex-col gap-3 max-w-4xl mx-auto">
                 <div class="flex flex-row gap-4 md:gap-8 justify-center">
                     <div class="flex-1 max-w-[160px]">
-                        <div class="text-center text-[10px] text-emerald-500 font-bold mb-1.5 tracking-widest">LEFT DIE</div>
-                        <div class="grid grid-cols-3 grid-rows-2 gap-2" id="pad-left-grid"></div>
+                        <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
                     </div>
                     <div class="flex-1 max-w-[160px]">
-                        <div class="text-center text-[10px] text-amber-500 font-bold mb-1.5 tracking-widest">RIGHT DIE</div>
-                        <div class="grid grid-cols-3 grid-rows-2 gap-2" id="pad-right-grid"></div>
+                        <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
                     </div>
                 </div>
 
@@ -327,6 +325,7 @@
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
+            <i class="fa-solid fa-floppy-disk text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
@@ -528,6 +527,17 @@
             buildInputPad();
             buildWrongPointGrid();
             buildColorGrid();
+            
+            // Desktop Scroll Listener
+            const hb = document.getElementById('history-bar');
+            if(hb) {
+                hb.addEventListener('wheel', (e) => {
+                    if (e.deltaY !== 0) {
+                        e.preventDefault();
+                        hb.scrollLeft += e.deltaY;
+                    }
+                }, { passive: false });
+            }
         });
 
         function sortAssets(arr) {
@@ -733,8 +743,7 @@
             const rGrid = document.getElementById('pad-right-grid');
             lGrid.innerHTML = ''; rGrid.innerHTML = '';
             
-            // 3 cols x 2 rows (1,4 | 2,5 | 3,6)
-            const order = [1, 2, 3, 4, 5, 6];
+            const order = [1, 4, 2, 5, 3, 6];
             order.forEach(i => {
                 lGrid.innerHTML += `<button onclick="selectDie('left', ${i})" id="btn-l-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
                 rGrid.innerHTML += `<button onclick="selectDie('right', ${i})" id="btn-r-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
@@ -1185,7 +1194,7 @@
                 const lt = parseInt(document.getElementById('meta-lt').value);
                 const lb = parseInt(document.getElementById('meta-lb').value);
                 const rt = parseInt(document.getElementById('meta-rt').value);
-                const rb = parseInt(document.getElementById('meta-rb').value);
+                const rb = parseInt(document.getElementById('meta-rt').value);
                 payload = { Set_Name: `${nameVal} [${lt}-${lb}] [${rt}-${rb}]`, Type: document.getElementById('meta-type').value, Left_Top: lt, Left_Back: lb, Right_Top: rt, Right_Back: rb };
             }
 
