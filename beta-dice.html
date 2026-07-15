@@ -129,7 +129,7 @@
         .die-sapphire.mini-die, .die-sapphire .pad-die-face { background: linear-gradient(135deg, #93c5fd 0%, #2563eb 40%, #1e3a8a 100%) !important; border-color: #60a5fa !important; }
         .die-sapphire.mini-die .pip, .die-sapphire .pad-die-face .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
         
-        .die-emerald.mini-die, .die-emerald .pad-die-face { background: linear-gradient(135deg, #6ee7b7 0%, #059669 40%, #022c22 100%) !important; border-color: #34d399 !important; }
+        .die-emerald.mini-die, .die-emerald .pad-die-face { background: linear-gradient(135deg, #34d399, #064e3b) !important; border-color: #6ee7b7 !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.5) !important; }
         .die-emerald.mini-die .pip, .die-emerald .pad-die-face .pip { background: #ffffff !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5) !important; }
         
         .die-citrine.mini-die, .die-citrine .pad-die-face { background: linear-gradient(135deg, #fde047 0%, #eab308 40%, #713f12 100%) !important; border-color: #facc15 !important; }
@@ -169,11 +169,10 @@
         }
         
         .pad-handle {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative;
         }
-        .handle-btn { color: #94a3b8; font-size: 16px; padding: 4px 10px; transition: color 0.2s; pointer-events: none; }
 
         #pad-content { transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
         #pad-extra { transition: max-height 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease; overflow: hidden; }
@@ -186,10 +185,6 @@
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
-
-        /* Dynamic Chevron Visibility */
-        .state-collapsed .chevron-down { visibility: hidden; }
-        .state-expanded .chevron-up { visibility: hidden; }
 
         /* Input Pad CSS Dice Buttons */
         .pad-die-btn {
@@ -239,6 +234,7 @@
             <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
         <div class="flex items-center gap-4 md:gap-6">
+            <span class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block">BETA TRACKER</span>
             <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
@@ -278,10 +274,10 @@
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle" id="pad-handle-bar" onclick="handlePadClick(event)">
-            <div class="handle-btn chevron-down"><i class="fa-solid fa-chevron-down"></i></div>
-            <div class="text-[10px] font-bold text-slate-500 tracking-widest pointer-events-none">INPUT PAD</div>
-            <div class="handle-btn chevron-up"><i class="fa-solid fa-chevron-up"></i></div>
+        <div class="pad-handle relative">
+            <div class="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10" onclick="handleLeftClick()"></div>
+            <div class="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10" onclick="handleRightClick()"></div>
+            <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">INPUT PAD</div>
         </div>
         
         <div id="pad-content">
@@ -498,7 +494,7 @@
         // Portrait Lock
         try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(e=>{}); } catch(e) {}
 
-        const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#ffffff' };
+        const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#000000' };
         const PIP_MAP = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
         const DICE_COLORS = ['ruby', 'sapphire', 'emerald', 'citrine', 'onyx', 'obsidian', 'amethyst', 'rosegold', 'topaz', 'aquamarine', 'jade', 'cobalt'];
         
@@ -857,19 +853,14 @@
         }
 
         // --- INPUT PAD LOGIC ---
-        function handlePadClick(e) {
-            const rect = document.currentTarget.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const isLeft = clickX < (rect.width / 2);
+        function handleLeftClick() {
+            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
+            else if (ipState === 'natural') setIpState('collapsed');
+        }
 
-            if (ipState === 'collapsed') {
-                setIpState('natural');
-            } else if (ipState === 'expanded') {
-                setIpState('natural');
-            } else if (ipState === 'natural') {
-                if (isLeft) setIpState('collapsed');
-                else setIpState('expanded');
-            }
+        function handleRightClick() {
+            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
+            else if (ipState === 'natural') setIpState('expanded');
         }
 
         function setIpState(state) {
@@ -1463,8 +1454,6 @@
             
             updateSDD();
         }
-
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
     </script>
 </body>
 </html>
