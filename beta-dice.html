@@ -165,7 +165,7 @@
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
             border-top: 1px solid rgba(51, 65, 85, 0.8);
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8); border-radius: 16px 16px 0 0;
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .pad-handle {
@@ -174,8 +174,8 @@
             border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative;
         }
 
-        #pad-content { transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
-        #pad-extra { transition: max-height 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease; overflow: hidden; }
+        #pad-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
+        #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
 
         /* 3 States */
         .state-collapsed { transform: translateY(calc(100% - 40px)); } 
@@ -234,7 +234,6 @@
             <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
         <div class="flex items-center gap-4 md:gap-6">
-            <span class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block">BETA TRACKER</span>
             <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
@@ -494,7 +493,7 @@
         // Portrait Lock
         try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(e=>{}); } catch(e) {}
 
-        const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#000000' };
+        const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#ffffff' };
         const PIP_MAP = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
         const DICE_COLORS = ['ruby', 'sapphire', 'emerald', 'citrine', 'onyx', 'obsidian', 'amethyst', 'rosegold', 'topaz', 'aquamarine', 'jade', 'cobalt'];
         
@@ -591,7 +590,7 @@
                         globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
-                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd || 'true';
+                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'true';
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -601,7 +600,7 @@
             } catch (e) { console.error("Failed to fetch active session", e); }
         }
 
-        async function syncActiveSession() {
+        function syncActiveSession() {
             if (!currentUid) return;
             const payload = {
                 module_id: "DICE_TRACKER",
@@ -614,11 +613,10 @@
                 },
                 payload_log: JSON.stringify(universalLog)
             };
-            try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(payload, { merge: true }); } 
-            catch (e) { console.error("Auto-save failed", e); }
+            db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(payload, { merge: true }).catch(e => console.error(e));
         }
 
-        async function checkAndSaveShooterMemory() {
+        function checkAndSaveShooterMemory() {
             if (globalConfig.shooter === 'ALL' || globalConfig.shooter === 'ADD_NEW') return;
             const shooterObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
             if (!shooterObj) return;
@@ -630,16 +628,15 @@
             );
 
             if (needsUpdate) {
-                try {
-                    await db.collection("users").doc(currentUid).collection("master_shooters").doc(globalConfig.shooter).update({
-                        last_positionParent: globalConfig.positionParent,
-                        last_positionChild: globalConfig.positionChild,
-                        last_diceSet: globalConfig.diceSet
-                    });
-                    shooterObj.last_positionParent = globalConfig.positionParent;
-                    shooterObj.last_positionChild = globalConfig.positionChild;
-                    shooterObj.last_diceSet = globalConfig.diceSet;
-                } catch (e) { console.error("Failed to save shooter memory", e); }
+                db.collection("users").doc(currentUid).collection("master_shooters").doc(globalConfig.shooter).set({
+                    last_positionParent: globalConfig.positionParent,
+                    last_positionChild: globalConfig.positionChild,
+                    last_diceSet: globalConfig.diceSet
+                }, { merge: true }).catch(e => console.error(e));
+                
+                shooterObj.last_positionParent = globalConfig.positionParent;
+                shooterObj.last_positionChild = globalConfig.positionChild;
+                shooterObj.last_diceSet = globalConfig.diceSet;
             }
         }
 
@@ -1030,7 +1027,7 @@
             document.getElementById('modal-config-global').style.display = 'flex';
         }
 
-        async function saveGlobalConfig() {
+        function saveGlobalConfig() {
             closeModals(); 
             globalConfig.location = document.getElementById('cfg-loc').value;
             globalConfig.shooter = document.getElementById('cfg-shooter').value;
@@ -1040,7 +1037,7 @@
             globalConfig.diceColor = document.getElementById('cfg-color').value;
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
             
-            await checkAndSaveShooterMemory();
+            checkAndSaveShooterMemory();
             renderHistoryBar(); syncActiveSession();
         }
 
@@ -1410,7 +1407,7 @@
                     el.onclick = () => showErrorReason(r.Notes);
                 } else {
                     let superHTML = '';
-                    if (currentRepeats > 0) superHTML += `<span class="sup-text">${currentRepeats + 1}</span>`;
+                    if (currentRepeats > 0) superHTML += `<span class="sup-text"><i class="fa-solid fa-fire text-[10px] mr-0.5"></i>${currentRepeats + 1}</span>`;
                     if (isHardway) superHTML += `<span class="sup-text text-yellow-400">(H)</span>`;
 
                     let displayNum = sum;
@@ -1454,6 +1451,8 @@
             
             updateSDD();
         }
+
+        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
     </script>
 </body>
 </html>
