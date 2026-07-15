@@ -169,10 +169,12 @@
         }
         
         .pad-handle {
-            display: flex; justify-content: center; align-items: center;
-            padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
         }
+        .handle-btn { color: #94a3b8; font-size: 16px; padding: 4px 10px; cursor: pointer; transition: color 0.2s; }
+        .handle-btn:hover { color: #10b981; }
 
         #pad-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
         #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
@@ -186,6 +188,10 @@
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
 
+        /* Dynamic Chevron Visibility */
+        .state-collapsed .chevron-down { visibility: hidden; }
+        .state-expanded .chevron-up { visibility: hidden; }
+
         /* Input Pad CSS Dice Buttons */
         .pad-die-btn {
             background: transparent; border: none; outline: none; padding: 0; margin: 0;
@@ -196,7 +202,7 @@
         
         .pad-die-face {
             width: 100%; height: 100%; border-radius: 12% !important;
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+            display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);
             padding: 12%; gap: 6%; transition: all 0.2s ease;
         }
 
@@ -234,6 +240,7 @@
             <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
         <div class="flex items-center gap-4 md:gap-6">
+            <span class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block">BETA TRACKER</span>
             <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
@@ -273,10 +280,10 @@
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle relative">
-            <div class="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10" onclick="handleLeftClick()"></div>
-            <div class="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10" onclick="handleRightClick()"></div>
-            <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">INPUT PAD</div>
+        <div class="pad-handle">
+            <button class="handle-btn chevron-down" onclick="handleIpDown()"><i class="fa-solid fa-chevron-down"></i></button>
+            <div class="text-[10px] font-bold text-slate-500 tracking-widest">INPUT PAD</div>
+            <button class="handle-btn chevron-up" onclick="handleIpUp()"><i class="fa-solid fa-chevron-up"></i></button>
         </div>
         
         <div id="pad-content">
@@ -324,6 +331,7 @@
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
+            <i class="fa-solid fa-vault text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
@@ -409,7 +417,7 @@
             <input type="hidden" id="hcfg-index">
             <div class="flex flex-col gap-3 text-left">
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                 <div>
                     <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
@@ -506,7 +514,7 @@
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
-        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'true' };
+        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'false' };
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
         let activeMetaId = null;
@@ -590,7 +598,7 @@
                         globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
-                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'true';
+                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'false';
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -600,7 +608,7 @@
             } catch (e) { console.error("Failed to fetch active session", e); }
         }
 
-        function syncActiveSession() {
+        async function syncActiveSession() {
             if (!currentUid) return;
             const payload = {
                 module_id: "DICE_TRACKER",
@@ -613,10 +621,11 @@
                 },
                 payload_log: JSON.stringify(universalLog)
             };
-            db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(payload, { merge: true }).catch(e => console.error(e));
+            try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(payload, { merge: true }); } 
+            catch (e) { console.error("Auto-save failed", e); }
         }
 
-        function checkAndSaveShooterMemory() {
+        async function checkAndSaveShooterMemory() {
             if (globalConfig.shooter === 'ALL' || globalConfig.shooter === 'ADD_NEW') return;
             const shooterObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
             if (!shooterObj) return;
@@ -628,15 +637,16 @@
             );
 
             if (needsUpdate) {
-                db.collection("users").doc(currentUid).collection("master_shooters").doc(globalConfig.shooter).set({
-                    last_positionParent: globalConfig.positionParent,
-                    last_positionChild: globalConfig.positionChild,
-                    last_diceSet: globalConfig.diceSet
-                }, { merge: true }).catch(e => console.error(e));
-                
-                shooterObj.last_positionParent = globalConfig.positionParent;
-                shooterObj.last_positionChild = globalConfig.positionChild;
-                shooterObj.last_diceSet = globalConfig.diceSet;
+                try {
+                    await db.collection("users").doc(currentUid).collection("master_shooters").doc(globalConfig.shooter).set({
+                        last_positionParent: globalConfig.positionParent,
+                        last_positionChild: globalConfig.positionChild,
+                        last_diceSet: globalConfig.diceSet
+                    }, { merge: true });
+                    shooterObj.last_positionParent = globalConfig.positionParent;
+                    shooterObj.last_positionChild = globalConfig.positionChild;
+                    shooterObj.last_diceSet = globalConfig.diceSet;
+                } catch (e) { console.error("Failed to save shooter memory", e); }
             }
         }
 
@@ -724,7 +734,7 @@
             document.getElementById('s-psr-mean').innerText = sStats.psrMean;
             document.getElementById('s-psr-med').innerText = sStats.psrMed;
 
-            document.getElementById('sdd-shooter').style.display = globalConfig.showShooterSDD === 'true' ? 'flex' : 'none';
+            document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
 
         // --- UI BUILDERS ---
@@ -810,7 +820,7 @@
             document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
-            document.getElementById('cfg-show-sdd').value = globalConfig.showShooterSDD || 'true';
+            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
         }
 
         function updatePosChild(prefix, defaultChild = null) {
@@ -849,17 +859,40 @@
             }
         }
 
-        // --- INPUT PAD LOGIC ---
-        function handleLeftClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
-            else if (ipState === 'natural') setIpState('collapsed');
+        function handleHandShooterSelect() {
+            const val = document.getElementById('hcfg-shooter').value;
+            if (val !== 'ALL' && val !== 'ADD_NEW') {
+                const shooterObj = masterData.shooters.find(s => s.id === val);
+                if (shooterObj) {
+                    if (shooterObj.last_positionParent) {
+                        document.getElementById('hcfg-pos-parent').value = shooterObj.last_positionParent;
+                        updatePosChild('hcfg', shooterObj.last_positionChild);
+                    } else {
+                        document.getElementById('hcfg-pos-parent').value = 'All';
+                        updatePosChild('hcfg', 'All');
+                    }
+                    if (shooterObj.last_diceSet) {
+                        document.getElementById('hcfg-set').value = shooterObj.last_diceSet;
+                    } else {
+                        document.getElementById('hcfg-set').value = 'ALL';
+                    }
+                }
+            } else {
+                document.getElementById('hcfg-pos-parent').value = 'All';
+                updatePosChild('hcfg', 'All');
+                document.getElementById('hcfg-set').value = 'ALL';
+            }
         }
 
-        function handleRightClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
+        // --- INPUT PAD LOGIC ---
+        function handleIpUp() {
+            if (ipState === 'collapsed') setIpState('natural');
             else if (ipState === 'natural') setIpState('expanded');
         }
-
+        function handleIpDown() {
+            if (ipState === 'expanded') setIpState('natural');
+            else if (ipState === 'natural') setIpState('collapsed');
+        }
         function setIpState(state) {
             ipState = state;
             document.getElementById('input-pad-wrapper').className = `state-${state}`;
@@ -1022,12 +1055,12 @@
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
             updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
-            document.getElementById('cfg-show-sdd').value = globalConfig.showShooterSDD;
+            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
             
             document.getElementById('modal-config-global').style.display = 'flex';
         }
 
-        function saveGlobalConfig() {
+        async function saveGlobalConfig() {
             closeModals(); 
             globalConfig.location = document.getElementById('cfg-loc').value;
             globalConfig.shooter = document.getElementById('cfg-shooter').value;
@@ -1037,7 +1070,7 @@
             globalConfig.diceColor = document.getElementById('cfg-color').value;
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
             
-            checkAndSaveShooterMemory();
+            await checkAndSaveShooterMemory();
             renderHistoryBar(); syncActiveSession();
         }
 
@@ -1075,18 +1108,36 @@
             
             const loc = document.getElementById('hcfg-loc').value;
             const shooter = document.getElementById('hcfg-shooter').value;
-            const pos = document.getElementById('hcfg-pos-child').value;
+            const posParent = document.getElementById('hcfg-pos-parent').value;
+            const posChild = document.getElementById('hcfg-pos-child').value;
             const set = document.getElementById('hcfg-set').value;
 
             for(let i = startIdx; i <= sevenOutIndex; i++) {
                 if(!universalLog[i].Invalid_Roll) {
                     universalLog[i].Location_ID = loc;
                     universalLog[i].Shooter_ID = shooter;
-                    universalLog[i].Table_Position = pos;
+                    universalLog[i].Table_Position = posChild;
                     universalLog[i].Dice_Set = set;
                 }
             }
-            closeModals(); syncActiveSession();
+
+            if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
+                const shooterObj = masterData.shooters.find(s => s.id === shooter);
+                if (shooterObj) {
+                    db.collection("users").doc(currentUid).collection("master_shooters").doc(shooter).set({
+                        last_positionParent: posParent,
+                        last_positionChild: posChild,
+                        last_diceSet: set
+                    }, { merge: true }).catch(e => console.error(e));
+                    shooterObj.last_positionParent = posParent;
+                    shooterObj.last_positionChild = posChild;
+                    shooterObj.last_diceSet = set;
+                }
+            }
+
+            closeModals(); 
+            renderHistoryBar(); 
+            syncActiveSession();
         }
 
         // --- METADATA CREATION LOGIC ---
