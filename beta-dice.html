@@ -17,10 +17,10 @@
         body {
             margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
             font-family: 'Montserrat', sans-serif; 
-            min-height: 120vh; /* Forces scrollability so navbar vanishes */
+            min-height: 120vh; 
             background-image: linear-gradient(to bottom, rgba(2, 6, 23, 0.7) 0%, rgba(2, 6, 23, 0.95) 100%), url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');
             background-size: cover; 
-            background-position: center 146px; /* Anchors below Nav + HB */
+            background-position: center 146px; 
             background-attachment: fixed;
             padding-bottom: 320px; 
             user-select: none; -webkit-user-select: none;
@@ -45,7 +45,7 @@
         #history-bar {
             display: flex; flex-direction: row; align-items: center;
             overflow-x: auto; padding: 12px 10px; gap: 10px; min-height: 76px;
-            cursor: grab; /* For desktop drag-to-scroll */
+            cursor: grab; 
         }
         #history-bar:active { cursor: grabbing; }
         #history-bar::-webkit-scrollbar { display: none; }
@@ -171,8 +171,9 @@
         .pad-handle {
             display: flex; justify-content: center; align-items: center;
             padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); cursor: pointer;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5); cursor: grab;
         }
+        .pad-handle:active { cursor: grabbing; }
 
         #pad-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
         #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
@@ -196,7 +197,7 @@
         
         .pad-die-face {
             width: 100%; height: 100%; border-radius: 12% !important;
-            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+            display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);
             padding: 12%; gap: 6%; transition: all 0.2s ease;
         }
 
@@ -273,7 +274,7 @@
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle" id="pad-handle-bar" onclick="handlePadClick(event)">
+        <div class="pad-handle" id="pad-handle-bar" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)" onmousedown="handleTouchStart(event)" onmouseup="handleTouchEnd(event)">
             <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">INPUT PAD</div>
         </div>
         
@@ -322,12 +323,11 @@
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <i class="fa-solid fa-vault text-emerald-500 text-4xl mb-4"></i>
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
             <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
             <div class="flex flex-col gap-3">
                 <button onclick="promptCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save & Enter Crypt</button>
-                <button onclick="enterCryptWithoutSaving()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
+                <button onclick="enterCryptWithoutSaving()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
                 <button onclick="clearAndRestart()" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Clear & Restart</button>
                 <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
             </div>
@@ -348,7 +348,7 @@
 
     <div id="modal-config-global" class="modal-mask">
         <div class="modal-box border-blue-500">
-            <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-4 cinzel">Global Configuration</h2>
+            <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel">Global Configuration</h2>
             <div class="flex flex-col text-left">
                 
                 <div class="cfg-row">
@@ -480,7 +480,7 @@
             <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
             <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Roll Exception</h2>
             <p id="error-display-text" class="text-sm text-slate-300 font-mono mb-6"></p>
-            <button onclick="closeModals()" class="btn-cancel">Acknowledge</button>
+            <button onclick="closeModals()" class="btn-cancel w-full">Acknowledge</button>
         </div>
     </div>
 
@@ -712,7 +712,7 @@
             if (globalConfig.shooter !== 'ALL') {
                 sLog = universalLog.filter(r => r.Shooter_ID === globalConfig.shooter);
                 const sObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
-                if (sObj) sLabel = sObj.name.substring(0, 6).toUpperCase();
+                if (sObj) sLabel = sObj.name.substring(0, 8).toUpperCase();
             }
             
             const sStats = calcStats(sLog);
@@ -851,18 +851,30 @@
         }
 
         // --- INPUT PAD LOGIC ---
-        function handlePadClick(e) {
-            const rect = document.currentTarget.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const isLeft = clickX < (rect.width / 2);
+        let touchStartY = 0;
+        let touchEndY = 0;
 
-            if (ipState === 'collapsed') {
-                setIpState('natural');
-            } else if (ipState === 'expanded') {
-                setIpState('natural');
-            } else if (ipState === 'natural') {
-                if (isLeft) setIpState('collapsed');
-                else setIpState('expanded');
+        function handleTouchStart(e) {
+            touchStartY = e.changedTouches ? e.changedTouches[0].screenY : e.screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndY = e.changedTouches ? e.changedTouches[0].screenY : e.screenY;
+            handleSwipe();
+        }
+
+        function handleSwipe() {
+            const deltaY = touchEndY - touchStartY;
+            const threshold = 30; 
+
+            if (deltaY < -threshold) {
+                // Swipe Up
+                if (ipState === 'collapsed') setIpState('natural');
+                else if (ipState === 'natural') setIpState('expanded');
+            } else if (deltaY > threshold) {
+                // Swipe Down
+                if (ipState === 'expanded') setIpState('natural');
+                else if (ipState === 'natural') setIpState('collapsed');
             }
         }
 
@@ -1034,6 +1046,7 @@
         }
 
         async function saveGlobalConfig() {
+            closeModals(); 
             globalConfig.location = document.getElementById('cfg-loc').value;
             globalConfig.shooter = document.getElementById('cfg-shooter').value;
             globalConfig.positionParent = document.getElementById('cfg-pos-parent').value;
@@ -1043,8 +1056,7 @@
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
             
             await checkAndSaveShooterMemory();
-            
-            closeModals(); renderHistoryBar(); syncActiveSession();
+            renderHistoryBar(); syncActiveSession();
         }
 
         function openHandConfig(sevenOutIndex) {
