@@ -165,18 +165,18 @@
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
             border-top: 1px solid rgba(51, 65, 85, 0.8);
             box-shadow: 0 -10px 30px rgba(0,0,0,0.8); border-radius: 16px 16px 0 0;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .pad-handle {
-            display: flex; justify-content: center; align-items: center;
-            padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); cursor: grab;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5); cursor: pointer;
         }
-        .pad-handle:active { cursor: grabbing; }
+        .handle-btn { color: #94a3b8; font-size: 16px; padding: 4px 10px; transition: color 0.2s; pointer-events: none; }
 
-        #pad-content { transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
-        #pad-extra { transition: max-height 0.3s ease, margin-top 0.3s ease, opacity 0.3s ease; overflow: hidden; }
+        #pad-content { transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
+        #pad-extra { transition: max-height 0.2s ease, margin-top 0.2s ease, opacity 0.2s ease; overflow: hidden; }
 
         /* 3 States */
         .state-collapsed { transform: translateY(calc(100% - 40px)); } 
@@ -186,6 +186,10 @@
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
+
+        /* Dynamic Chevron Visibility */
+        .state-collapsed .chevron-down { visibility: hidden; }
+        .state-expanded .chevron-up { visibility: hidden; }
 
         /* Input Pad CSS Dice Buttons */
         .pad-die-btn {
@@ -197,7 +201,7 @@
         
         .pad-die-face {
             width: 100%; height: 100%; border-radius: 12% !important;
-            display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr);
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
             padding: 12%; gap: 6%; transition: all 0.2s ease;
         }
 
@@ -274,8 +278,10 @@
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle" id="pad-handle-bar" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)" onmousedown="handleTouchStart(event)" onmouseup="handleTouchEnd(event)">
-            <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">INPUT PAD</div>
+        <div class="pad-handle" id="pad-handle-bar" onclick="handlePadClick(event)">
+            <div class="handle-btn chevron-down"><i class="fa-solid fa-chevron-down"></i></div>
+            <div class="text-[10px] font-bold text-slate-500 tracking-widest pointer-events-none">INPUT PAD</div>
+            <div class="handle-btn chevron-up"><i class="fa-solid fa-chevron-up"></i></div>
         </div>
         
         <div id="pad-content">
@@ -712,7 +718,7 @@
             if (globalConfig.shooter !== 'ALL') {
                 sLog = universalLog.filter(r => r.Shooter_ID === globalConfig.shooter);
                 const sObj = masterData.shooters.find(s => s.id === globalConfig.shooter);
-                if (sObj) sLabel = sObj.name.substring(0, 8).toUpperCase();
+                if (sObj) sLabel = sObj.name.substring(0, 6).toUpperCase();
             }
             
             const sStats = calcStats(sLog);
@@ -851,30 +857,18 @@
         }
 
         // --- INPUT PAD LOGIC ---
-        let touchStartY = 0;
-        let touchEndY = 0;
+        function handlePadClick(e) {
+            const rect = document.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const isLeft = clickX < (rect.width / 2);
 
-        function handleTouchStart(e) {
-            touchStartY = e.changedTouches ? e.changedTouches[0].screenY : e.screenY;
-        }
-
-        function handleTouchEnd(e) {
-            touchEndY = e.changedTouches ? e.changedTouches[0].screenY : e.screenY;
-            handleSwipe();
-        }
-
-        function handleSwipe() {
-            const deltaY = touchEndY - touchStartY;
-            const threshold = 30; 
-
-            if (deltaY < -threshold) {
-                // Swipe Up
-                if (ipState === 'collapsed') setIpState('natural');
-                else if (ipState === 'natural') setIpState('expanded');
-            } else if (deltaY > threshold) {
-                // Swipe Down
-                if (ipState === 'expanded') setIpState('natural');
-                else if (ipState === 'natural') setIpState('collapsed');
+            if (ipState === 'collapsed') {
+                setIpState('natural');
+            } else if (ipState === 'expanded') {
+                setIpState('natural');
+            } else if (ipState === 'natural') {
+                if (isLeft) setIpState('collapsed');
+                else setIpState('expanded');
             }
         }
 
