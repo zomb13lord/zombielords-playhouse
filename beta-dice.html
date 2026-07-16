@@ -242,11 +242,18 @@
         </div>
     </nav>
 
-    <!-- STICKY ZONE (Holds HB and SDD) -->
+    <!-- STICKY ZONE (Holds HB, Bonus Trackers, and SDD) -->
     <div id="sticky-zone">
         <!-- MODULE 2: HISTORY BAR -->
         <div id="history-bar">
             <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
+        </div>
+
+        <!-- BONUS TRACKERS -->
+        <div id="bonus-trackers" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner">
+            <div id="ats-smalls" class="flex gap-1 p-1 rounded"></div>
+            <div id="sharpshooter-stack" class="relative w-12 h-10 flex items-end justify-center"></div>
+            <div id="ats-talls" class="flex gap-1 p-1 rounded"></div>
         </div>
 
         <!-- MODULE 6: SESSION DIAGNOSTIC DISPLAY (SDD) -->
@@ -395,6 +402,20 @@
                             <option value="false">No</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">ATS Tracker</label>
+                        <select id="cfg-track-ats" class="select-wicked border-blue-500/50 focus:border-blue-400">
+                            <option value="true">On</option>
+                            <option value="false">Off</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sharpshooter</label>
+                        <select id="cfg-track-ss" class="select-wicked border-blue-500/50 focus:border-blue-400">
+                            <option value="true">On</option>
+                            <option value="false">Off</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3 mt-4">
@@ -520,7 +541,7 @@
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
-        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'false' };
+        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'false', trackATS: 'false', trackSharpshooter: 'false' };
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
         let activeMetaId = null;
@@ -606,6 +627,8 @@
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
                         globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'false';
+                        globalConfig.trackATS = data.meta_tags.track_ats !== undefined ? String(data.meta_tags.track_ats) : 'false';
+                        globalConfig.trackSharpshooter = data.meta_tags.track_sharpshooter !== undefined ? String(data.meta_tags.track_sharpshooter) : 'false';
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -624,7 +647,8 @@
                     location: globalConfig.location, shooter_or_dealer: globalConfig.shooter, 
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
-                    show_shooter_sdd: globalConfig.showShooterSDD, base_unit: 1 
+                    show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
+                    base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -733,6 +757,105 @@
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
 
+        function updateBonusTrackers() {
+            const container = document.getElementById('bonus-trackers');
+            if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
+                container.classList.add('hidden');
+                container.classList.remove('flex');
+                return;
+            }
+            container.classList.remove('hidden');
+            container.classList.add('flex');
+
+            // Calculate ATS (Resets on ANY 7)
+            let atsCounts = {2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0};
+            let lastAnySevenIndex = -1;
+            for(let i = universalLog.length - 1; i >= 0; i--) {
+                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7) {
+                    lastAnySevenIndex = i;
+                    break;
+                }
+            }
+            for(let i = lastAnySevenIndex + 1; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll) continue;
+                let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(atsCounts[sum] !== undefined) atsCounts[sum]++;
+            }
+
+            // Calculate Sharpshooter (Resets on SEVEN OUT)
+            let pointsMade = 0;
+            let isComeout = true;
+            let currentPoint = null;
+            for(let i = 0; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll) continue;
+                let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(isComeout) {
+                    if(![2,3,7,11,12].includes(sum)) {
+                        isComeout = false;
+                        currentPoint = sum;
+                    }
+                } else {
+                    if(sum === 7) {
+                        pointsMade = 0; 
+                        isComeout = true;
+                        currentPoint = null;
+                    } else if(sum === currentPoint) {
+                        pointsMade++;
+                        isComeout = true;
+                        currentPoint = null;
+                    }
+                }
+            }
+
+            // Render ATS
+            const smalls = [2,3,4,5,6];
+            const talls = [8,9,10,11,12];
+            
+            const renderATSGroup = (group, id) => {
+                const el = document.getElementById(id);
+                if (globalConfig.trackATS !== 'true') { el.innerHTML = ''; el.className = ''; return; }
+                
+                let allHit = true;
+                let html = '';
+                group.forEach(num => {
+                    const hits = atsCounts[num];
+                    if (hits === 0) allHit = false;
+                    const bgClass = hits > 0 ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-transparent text-yellow-400 border-yellow-400/50';
+                    const sup = hits > 1 ? `<span class="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1 rounded-full">${hits}</span>` : '';
+                    html += `<div class="relative w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center font-black text-xs md:text-sm ${bgClass}">${num}${sup}</div>`;
+                });
+                el.innerHTML = html;
+                el.className = `flex gap-1 md:gap-2 p-1 rounded transition-all ${allHit ? 'shadow-[0_0_15px_rgba(250,204,21,0.8)] bg-yellow-400/20 border border-yellow-400' : 'border border-transparent'}`;
+            };
+
+            renderATSGroup(smalls, 'ats-smalls');
+            renderATSGroup(talls, 'ats-talls');
+
+            // Render Sharpshooter
+            const ssEl = document.getElementById('sharpshooter-stack');
+            if (globalConfig.trackSharpshooter !== 'true') {
+                ssEl.innerHTML = '';
+            } else {
+                let html = '';
+                if (pointsMade === 0) {
+                    html = `<div class="w-8 h-8 rounded-full border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-xs font-black">0</div>`;
+                } else {
+                    const maxDisplay = Math.min(pointsMade, 11);
+                    for(let i=0; i<maxDisplay; i++) {
+                        const tier = i + 1;
+                        const color = POINT_COLORS[tier] || '#fff';
+                        const isTop = (i === maxDisplay - 1);
+                        const text = isTop ? pointsMade : '';
+                        const textColor = [1, 11].includes(tier) ? '#fff' : '#000';
+                        const bottom = i * 3;
+                        const right = i * 2;
+                        html += `<div class="absolute rounded-full border-2 border-black flex items-center justify-center font-black text-sm shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="width: 32px; height: 32px; bottom: ${bottom}px; right: ${right}px; background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
+                    }
+                }
+                ssEl.innerHTML = html;
+            }
+        }
+
         // --- UI BUILDERS ---
         function getDicePipsHTML(value) {
             let html = `<div class="pad-die-face gem-shine">`;
@@ -801,7 +924,7 @@
             const addNewOpt = `<option value="ADD_NEW" class="text-emerald-400 font-bold">[+ REGISTER NEW]</option>`;
             const locs = `<option value="ALL">ALL LOCATIONS</option>` + addNewOpt + masterData.locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
             const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-            const sets = `<option value="ALL">NONE SELECTED</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            const sets = `<option value="ALL">NONE</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
@@ -817,6 +940,8 @@
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
             document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
+            document.getElementById('cfg-track-ats').value = String(globalConfig.trackATS);
+            document.getElementById('cfg-track-ss').value = String(globalConfig.trackSharpshooter);
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -824,6 +949,15 @@
         function updatePosChild(prefix, defaultChild = null) {
             const parentVal = document.getElementById(`${prefix}-pos-parent`).value;
             const childSelect = document.getElementById(`${prefix}-pos-child`);
+            childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
+            if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
+                childSelect.value = defaultChild;
+            }
+        }
+
+        function updateMetaPosChild(defaultChild = null) {
+            const parentVal = document.getElementById('meta-last-pos-parent').value;
+            const childSelect = document.getElementById('meta-last-pos-child');
             childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
             if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
                 childSelect.value = defaultChild;
@@ -1093,6 +1227,8 @@
             updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
             document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
+            document.getElementById('cfg-track-ats').value = String(globalConfig.trackATS);
+            document.getElementById('cfg-track-ss').value = String(globalConfig.trackSharpshooter);
             
             document.getElementById('modal-config-global').style.display = 'flex';
         }
@@ -1106,6 +1242,8 @@
             globalConfig.diceSet = document.getElementById('cfg-set').value;
             globalConfig.diceColor = document.getElementById('cfg-color').value;
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
+            globalConfig.trackATS = document.getElementById('cfg-track-ats').value;
+            globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').value;
             
             // Push dirty shooters to Firestore
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
@@ -1237,10 +1375,22 @@
                 const t = existingAsset ? existingAsset.Type : 'Standard';
                 const h = existingAsset ? existingAsset.Handedness : 'Right';
                 const s = existingAsset ? existingAsset.Style : 'Controlled Set';
+                
+                let optsSets = `<option value="ALL">NONE</option>` + masterData.sets.map(set => `<option value="${set.name}" ${existingAsset && existingAsset.last_diceSet === set.name ? 'selected' : ''}>${set.name}</option>`).join('');
+                let optsParents = Object.keys(POS_MAP).map(p => `<option value="${p}" ${existingAsset && existingAsset.last_positionParent === p ? 'selected' : ''}>${p}</option>`).join('');
+
                 html += `
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Standard" ${t==='Standard'?'selected':''}>Standard</option><option value="Master" ${t==='Master'?'selected':''}>Master</option><option value="Favorite" ${t==='Favorite'?'selected':''}>Favorite</option><option value="Online" ${t==='Online'?'selected':''}>Online</option></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Handedness</label><select id="meta-hand" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Right" ${h==='Right'?'selected':''}>Right</option><option value="Left" ${h==='Left'?'selected':''}>Left</option><option value="Neither" ${h==='Neither'?'selected':''}>Neither</option></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Style</label><select id="meta-style" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Controlled Set" ${s==='Controlled Set'?'selected':''}>Controlled Set</option><option value="Random" ${s==='Random'?'selected':''}>Random</option><option value="Shake" ${s==='Shake'?'selected':''}>Shake</option><option value="Mechanical" ${s==='Mechanical'?'selected':''}>Mechanical</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Last Known Dice Set</label><select id="meta-last-set" class="select-wicked border-blue-500/50 focus:border-blue-400">${optsSets}</select></div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Last Known Position</label>
+                    <div class="flex gap-2">
+                        <select id="meta-last-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updateMetaPosChild()">${optsParents}</select>
+                        <select id="meta-last-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2"></select>
+                    </div>
+                </div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Notes</label><input type="text" id="meta-notes" class="input-wicked border-blue-500/50 focus:border-blue-400" autocomplete="off" value="${existingAsset ? (existingAsset.Notes || '') : ''}"></div>`;
             } else if (type === 'locations') {
                 title.innerText = existingAsset ? "Edit Location" : "Register Location";
@@ -1277,6 +1427,9 @@
             }
 
             fields.innerHTML = html;
+            if (type === 'shooters') {
+                updateMetaPosChild(existingAsset ? existingAsset.last_positionChild : 'All');
+            }
             document.getElementById('modal-metadata').style.display = 'flex';
         }
 
@@ -1298,7 +1451,16 @@
             let payload = {};
 
             if (activeMetaType === 'shooters') {
-                payload = { name: nameVal, Type: document.getElementById('meta-type').value, Handedness: document.getElementById('meta-hand').value, Style: document.getElementById('meta-style').value, Notes: document.getElementById('meta-notes').value.trim().toUpperCase() };
+                payload = { 
+                    name: nameVal, 
+                    Type: document.getElementById('meta-type').value, 
+                    Handedness: document.getElementById('meta-hand').value, 
+                    Style: document.getElementById('meta-style').value, 
+                    Notes: document.getElementById('meta-notes').value.trim().toUpperCase(),
+                    last_diceSet: document.getElementById('meta-last-set').value,
+                    last_positionParent: document.getElementById('meta-last-pos-parent').value,
+                    last_positionChild: document.getElementById('meta-last-pos-child').value
+                };
             } else if (activeMetaType === 'locations') {
                 payload = { name: nameVal, Table_Length: document.getElementById('meta-len').value, Bouncy_Rating: document.getElementById('meta-bounce').value, Table_Surface: document.getElementById('meta-surf').value, LocType: document.getElementById('meta-ltype').value };
             } else if (activeMetaType === 'dice_sets') {
@@ -1437,6 +1599,7 @@
                 historyBar.innerHTML = '<div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>';
                 activeState.currentPoint = null;
                 updateSDD();
+                updateBonusTrackers();
                 return;
             }
 
@@ -1552,6 +1715,7 @@
             historyBar.appendChild(fragment);
             
             updateSDD();
+            updateBonusTrackers();
         }
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
