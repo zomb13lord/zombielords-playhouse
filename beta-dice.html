@@ -182,6 +182,8 @@
         .state-natural { transform: translateY(0); }
         .state-expanded { transform: translateY(0); }
         
+        .state-natural .pad-handle, .state-expanded .pad-handle { display: none; }
+        
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; }
         .state-natural #pad-extra { max-height: 0; margin-top: 0; opacity: 0; }
         .state-expanded #pad-extra { max-height: 100px; margin-top: 8px; opacity: 1; }
@@ -267,7 +269,7 @@
     </div>
 
     <!-- MAIN BODY SPACE -->
-    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto">
+    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto" onclick="setIpState('collapsed')">
         <!-- Future SDD expansion space -->
     </div>
 
@@ -276,7 +278,7 @@
         <div class="pad-handle relative">
             <div class="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10" onclick="handleLeftClick()"></div>
             <div class="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10" onclick="handleRightClick()"></div>
-            <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">INPUT PAD</div>
+            <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">CLICK TO INPUT ROLL</div>
         </div>
         
         <div id="pad-content">
@@ -290,7 +292,7 @@
                     </div>
                 </div>
 
-                <button onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Next Roll</button>
+                <button id="btn-submit-roll" onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Next Roll</button>
                 
                 <div id="pad-extra" class="flex gap-2">
                     <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
@@ -325,7 +327,7 @@
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
-            <p class="text-xs text-slate-400 font-serif italic mb-6">Manage your active workspace.</p>
+            <p class="text-xs text-slate-400 font-serif italic mb-6">Manage archived souls in the Crypt.</p>
             <div class="flex flex-col gap-3">
                 <button onclick="promptCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save & Enter Crypt</button>
                 <button onclick="enterCryptWithoutSaving()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
@@ -462,8 +464,20 @@
                 <button class="modal-btn border-emerald-500 text-emerald-400 hidden" id="inv-opt-wp" onclick="selectInvalidReason('Wrong Point', 'wp')">Wrong Point</button>
             </div>
             <div class="grid grid-cols-2 gap-3 mt-4">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                <button onclick="cancelInvalid()" class="btn-cancel">Cancel</button>
                 <button onclick="acceptInvalid()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-incomplete-roll" class="modal-mask">
+        <div class="modal-box border-amber-500">
+            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
+            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Incomplete Roll</h2>
+            <p class="text-xs text-slate-400 font-mono mb-6">2 selections must be made to input roll. Would you like to edit the roll?</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                <button onclick="editIncompleteRoll()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Edit Roll</button>
             </div>
         </div>
     </div>
@@ -888,6 +902,7 @@
         }
 
         function selectDie(side, val) {
+            document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
             const colorClass = `die-${globalConfig.diceColor}`;
             if (side === 'left') {
                 selectedLeft = val;
@@ -939,17 +954,38 @@
         }
 
         async function submitRoll() {
-            if (!selectedLeft || !selectedRight) {
-                await customAlert("Select both dice before accepting."); 
+            const btn = document.getElementById('btn-submit-roll');
+            
+            if (!selectedLeft && !selectedRight) {
+                if (ipState === 'expanded') {
+                    await customAlert("2 selections must be made to input roll.");
+                } else {
+                    if (btn.innerText === "EDIT ROLL") {
+                        setIpState('expanded');
+                        btn.innerText = "NEXT ROLL";
+                    } else {
+                        btn.innerText = "EDIT ROLL";
+                    }
+                }
                 return;
             }
+            
+            if (!selectedLeft || !selectedRight) {
+                document.getElementById('modal-incomplete-roll').style.display = 'flex';
+                return;
+            }
+
             const r = {
                 Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: selectedLeft + selectedRight, Invalid_Roll: false,
                 Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
                 Time_Stamp: new Date().toISOString()
             };
             universalLog.push(r);
-            clearPad(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
+            clearPad(); 
+            setIpState('natural'); 
+            btn.innerText = "NEXT ROLL";
+            renderHistoryBar(); 
+            syncActiveSession();
 
             if (universalLog.length > 0 && activeState.wasSevenOut[universalLog.length - 1]) {
                 document.getElementById('modal-shooter-transition').style.display = 'flex';
@@ -959,7 +995,9 @@
         function undoRoll() {
             if (universalLog.length === 0) return;
             universalLog.pop();
-            setIpState('natural'); renderHistoryBar(); syncActiveSession();
+            setIpState('expanded'); 
+            renderHistoryBar(); 
+            syncActiveSession();
         }
 
         function handleNewShooter() {
@@ -1000,6 +1038,16 @@
                 universalLog.push({ Invalid_Roll: true, Notes: selectedInvalidReason, Time_Stamp: new Date().toISOString() });
                 closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
             }
+        }
+
+        function cancelInvalid() {
+            closeModals();
+            setIpState('natural');
+        }
+
+        function editIncompleteRoll() {
+            closeModals();
+            setIpState('expanded');
         }
 
         function openWrongPointModal() {
@@ -1355,6 +1403,7 @@
             document.getElementById('modal-wrong-point').style.display = 'none';
             document.getElementById('modal-error-display').style.display = 'none';
             document.getElementById('modal-shooter-transition').style.display = 'none';
+            document.getElementById('modal-incomplete-roll').style.display = 'none';
         }
 
         // --- RENDERING ENGINE ---
