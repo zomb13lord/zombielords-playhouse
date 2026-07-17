@@ -60,7 +60,6 @@
         .sdd-ribbon::-webkit-scrollbar { display: none; }
         .sdd-metric { color: #94a3b8; }
         .sdd-metric b { color: #ffffff; }
-        .sdd-metric .med { color: #64748b; font-weight: normal; }
 
         /* ROLL NODES (Scaled 1.2x) */
         .hist-node {
@@ -280,19 +279,21 @@
         <!-- MODULE 6: SESSION DIAGNOSTIC DISPLAY (SDD) -->
         <div id="sdd-global" class="sdd-ribbon">
             <span class="text-emerald-400 font-black">GLB</span>
-            <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
             <span class="sdd-metric">CR: <b id="g-cr">0</b></span>
-            <span class="sdd-metric">SOR: <b id="g-sor-mean">0.0</b>|<span class="med" id="g-sor-med">0.0</span></span>
-            <span class="sdd-metric">SRR: <b id="g-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b id="g-psr-mean">0.0</b>|<span class="med" id="g-psr-med">0.0</span></span>
+            <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
+            <span class="sdd-metric">SOR: <b class="text-white" id="g-sor-med">0</b>|<b class="text-white" id="g-sor-mean">0.0</b></span>
+            <span class="sdd-metric">SRR: <b class="text-white" id="g-srr-med">0</b>|<b class="text-white" id="g-srr-mean">0.0</b></span>
+            <span class="sdd-metric">PSR: <b class="text-white" id="g-psr-med">0</b>|<b class="text-white" id="g-psr-mean">0.0</b></span>
+            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="g-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="g-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="g-ats-a">0</b></span>
         </div>
         <div id="sdd-shooter" class="sdd-ribbon" style="display: none;">
             <span class="text-amber-400 font-black" id="sdd-shooter-label">SHTR</span>
-            <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
             <span class="sdd-metric">CR: <b id="s-cr">0</b></span>
-            <span class="sdd-metric">SOR: <b id="s-sor-mean">0.0</b>|<span class="med" id="s-sor-med">0.0</span></span>
-            <span class="sdd-metric">SRR: <b id="s-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b id="s-psr-mean">0.0</b>|<span class="med" id="s-psr-med">0.0</span></span>
+            <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
+            <span class="sdd-metric">SOR: <b class="text-white" id="s-sor-med">0</b>|<b class="text-white" id="s-sor-mean">0.0</b></span>
+            <span class="sdd-metric">SRR: <b class="text-white" id="s-srr-med">0</b>|<b class="text-white" id="s-srr-mean">0.0</b></span>
+            <span class="sdd-metric">PSR: <b class="text-white" id="s-psr-med">0</b>|<b class="text-white" id="s-psr-mean">0.0</b></span>
+            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="s-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="s-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="s-ats-a">0</b></span>
         </div>
     </div>
 
@@ -321,8 +322,7 @@
                 <div id="btn-submit-container" class="mt-1">
                     <button id="btn-submit-roll" onclick="submitRoll()" class="w-full bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">Next Roll</button>
                     <div id="btn-split-roll" class="hidden flex gap-2 w-full">
-                        <button onclick="setIpState('natural')" class="flex-1 bg-slate-700 hover:bg-slate-600 border border-slate-500 text-white font-black py-3 rounded uppercase tracking-widest transition-all">Collapse Roll</button>
-                        <button onclick="setIpState('collapsed')" class="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 font-black py-3 rounded uppercase tracking-widest transition-all">Hide Roll</button>
+                        <button onclick="setIpState('collapsed')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-black py-3 rounded uppercase tracking-widest transition-all">Hide Roll Input</button>
                     </div>
                 </div>
                 
@@ -393,7 +393,7 @@
         <div class="modal-box border-emerald-500">
             <div class="modal-content-layer text-center">
                 <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
-                <p class="text-xs text-slate-400 font-serif italic mb-6">Manage archived souls in the Crypt.</p>
+                <p class="text-xs text-slate-400 font-serif italic mb-6">Manage archived entities in the Crypt.</p>
                 <div class="flex flex-col gap-3">
                     <button onclick="promptCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save & Enter Crypt</button>
                     <button onclick="enterCryptWithoutSaving()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
@@ -619,7 +619,14 @@
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
-        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'false', trackATS: 'false', trackSharpshooter: 'false' };
+        
+        let globalConfig = { 
+            location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', 
+            showShooterSDD: localStorage.getItem('cfg_showShooterSDD') || 'false', 
+            trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
+            trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false' 
+        };
+        
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
         let activeMetaId = null;
@@ -706,9 +713,9 @@
                         globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
-                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'false';
-                        globalConfig.trackATS = data.meta_tags.track_ats !== undefined ? String(data.meta_tags.track_ats) : 'false';
-                        globalConfig.trackSharpshooter = data.meta_tags.track_sharpshooter !== undefined ? String(data.meta_tags.track_sharpshooter) : 'false';
+                        if (data.meta_tags.show_shooter_sdd !== undefined) globalConfig.showShooterSDD = String(data.meta_tags.show_shooter_sdd);
+                        if (data.meta_tags.track_ats !== undefined) globalConfig.trackATS = String(data.meta_tags.track_ats);
+                        if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -759,16 +766,31 @@
 
         function calcStats(log) {
             let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
-            let handRolls = [], handPoints = [];
-            let currentHandRolls = 0, currentHandPoints = 0;
+            let handRolls = [], handPoints = [], srrRolls = [];
+            let currentHandRolls = 0, currentHandPoints = 0, currentSrrRolls = 0;
             let isComeout = true, currentPoint = null;
+            let atsS = 0, atsT = 0, atsA = 0;
 
             log.forEach(r => {
-                if (r.Invalid_Roll || r.invalidRoll || r.is_NS_Marker) return;
+                if (r.is_NS_Marker) return;
+                if (r.Invalid_Roll || r.invalidRoll) return;
+                
                 let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
                 
                 TR++;
                 currentHandRolls++;
+                currentSrrRolls++;
+
+                if (r.Notes) {
+                    if (r.Notes.includes("ATS Small Hit")) atsS++;
+                    if (r.Notes.includes("ATS Tall Hit")) atsT++;
+                    if (r.Notes.includes("ATS All Hit")) atsA++;
+                }
+
+                if (sum === 7) {
+                    srrRolls.push(currentSrrRolls);
+                    currentSrrRolls = 0;
+                }
 
                 if (isComeout) {
                     if (sum === 7 || sum === 11) {
@@ -798,10 +820,12 @@
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
             const srrMean = (SO + CS) > 0 ? (TR / (SO + CS)).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
-            const sorMed = getMedian(handRolls).toFixed(1);
-            const psrMed = getMedian(handPoints).toFixed(1);
+            
+            const sorMed = Math.round(getMedian(handRolls));
+            const srrMed = Math.round(getMedian(srrRolls));
+            const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, sorMean, sorMed, srrMean, psrMean, psrMed };
+            return { TR, CR: currentHandRolls, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
         }
 
         function updateSDD() {
@@ -811,8 +835,12 @@
             document.getElementById('g-sor-mean').innerText = gStats.sorMean;
             document.getElementById('g-sor-med').innerText = gStats.sorMed;
             document.getElementById('g-srr-mean').innerText = gStats.srrMean;
+            document.getElementById('g-srr-med').innerText = gStats.srrMed;
             document.getElementById('g-psr-mean').innerText = gStats.psrMean;
             document.getElementById('g-psr-med').innerText = gStats.psrMed;
+            document.getElementById('g-ats-s').innerText = gStats.atsS;
+            document.getElementById('g-ats-t').innerText = gStats.atsT;
+            document.getElementById('g-ats-a').innerText = gStats.atsA;
 
             let sLog = universalLog;
             let sLabel = "ALL";
@@ -831,8 +859,12 @@
             document.getElementById('s-sor-mean').innerText = sStats.sorMean;
             document.getElementById('s-sor-med').innerText = sStats.sorMed;
             document.getElementById('s-srr-mean').innerText = sStats.srrMean;
+            document.getElementById('s-srr-med').innerText = sStats.srrMed;
             document.getElementById('s-psr-mean').innerText = sStats.psrMean;
             document.getElementById('s-psr-med').innerText = sStats.psrMed;
+            document.getElementById('s-ats-s').innerText = sStats.atsS;
+            document.getElementById('s-ats-t').innerText = sStats.atsT;
+            document.getElementById('s-ats-a').innerText = sStats.atsA;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
@@ -936,7 +968,7 @@
                     html = `<div class="w-10 h-10 rounded-full border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-sm font-black">0</div>`;
                 } else {
                     const maxDisplay = Math.min(pointsMade, 11);
-                    const yOffset = 4; 
+                    const yOffset = 2; 
                     const totalY = (maxDisplay - 1) * yOffset;
                     const messyX = [0, -2, 2, -1, 1, -3, 3, -2, 2, -1, 1];
                     
@@ -950,9 +982,12 @@
                         const textColor = [1, 11].includes(tier) ? '#fff' : '#000';
                         const bottom = i * yOffset;
                         const leftOffset = messyX[i] || 0;
-                        const pulseClass = isTop ? 'animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.6)]' : 'shadow-[0_2px_4px_rgba(0,0,0,0.8)]';
                         
-                        html += `<div class="absolute rounded-full border-2 border-black flex items-center justify-center font-black text-lg ${pulseClass}" style="width: 36px; height: 36px; bottom: ${bottom}px; left: calc(50% + ${leftOffset}px); transform: translateX(-50%); background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
+                        let styleClass = isTop 
+                            ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' 
+                            : 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)] brightness-75';
+                            
+                        html += `<div class="absolute rounded-full border-2 flex items-center justify-center font-black text-lg ${styleClass}" style="width: 36px; height: 36px; bottom: ${bottom}px; left: calc(50% + ${leftOffset}px); transform: translateX(-50%); background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
                     }
                     html += `</div>`;
                 }
@@ -1233,11 +1268,47 @@
                 return;
             }
 
+            // Calculate ATS Live State
+            let smalls = new Set();
+            let talls = new Set();
+            let last7Idx = -1;
+            for(let i = universalLog.length - 1; i >= 0; i--) {
+                if(universalLog[i].is_NS_Marker) continue;
+                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7) {
+                    last7Idx = i; break;
+                }
+            }
+            for(let i = last7Idx + 1; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
+                let s = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(s >= 2 && s <= 6) smalls.add(s);
+                if(s >= 8 && s <= 12) talls.add(s);
+            }
+
+            let newSum = selectedLeft + selectedRight;
+            let notesArr = [];
+            let smallHitNow = false;
+            let tallHitNow = false;
+
+            if(newSum >= 2 && newSum <= 6 && !smalls.has(newSum)) {
+                smalls.add(newSum);
+                if(smalls.size === 5) { notesArr.push("ATS Small Hit"); smallHitNow = true; }
+            }
+            if(newSum >= 8 && newSum <= 12 && !talls.has(newSum)) {
+                talls.add(newSum);
+                if(talls.size === 5) { notesArr.push("ATS Tall Hit"); tallHitNow = true; }
+            }
+            if((smallHitNow && talls.size === 5) || (tallHitNow && smalls.size === 5)) {
+                notesArr.push("ATS All Hit");
+            }
+
             const r = {
-                Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: selectedLeft + selectedRight, Invalid_Roll: false,
+                Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: newSum, Invalid_Roll: false,
                 Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
+                Notes: notesArr.join(", "),
                 Time_Stamp: new Date().toISOString()
             };
+            
             universalLog.push(r);
             clearPad(); 
             setIpState('natural'); 
@@ -1374,6 +1445,10 @@
             globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
             globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
             
+            localStorage.setItem('cfg_showShooterSDD', globalConfig.showShooterSDD);
+            localStorage.setItem('cfg_trackATS', globalConfig.trackATS);
+            localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
+
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
                 db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
                     last_positionParent: s.last_positionParent,
@@ -1383,10 +1458,14 @@
                 s.isDirty = false;
             });
 
-            if ((globalConfig.shooter !== preConfigShooter || forceNextSaveAsNS) && universalLog.length > 0) {
+            if ((globalConfig.shooter !== preConfigShooter || forceNextSaveAsNS)) {
                 universalLog.push({
                     is_NS_Marker: true,
                     Shooter_ID: globalConfig.shooter,
+                    Location_ID: globalConfig.location,
+                    Table_Position: globalConfig.positionChild,
+                    Dice_Set: globalConfig.diceSet,
+                    Notes: "New Shooter",
                     Time_Stamp: new Date().toISOString()
                 });
                 forceNextSaveAsNS = false;
@@ -1433,7 +1512,7 @@
             document.getElementById('hcfg-end-idx').value = endIdx;
             document.getElementById('hcfg-is-forward').value = 'true';
 
-            const refRoll = universalLog[startIdx] || {};
+            const refRoll = universalLog[startIdx] || universalLog[nsIndex] || {};
             document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
             document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
@@ -1904,6 +1983,27 @@
                 }
 
                 nodesToInject.push(el);
+
+                if (r.Notes) {
+                    if (r.Notes.includes("ATS Small Hit")) {
+                        const sNode = document.createElement('div');
+                        sNode.className = `hist-node bg-emerald-500 text-black border-emerald-400 text-[10px] px-2`;
+                        sNode.innerHTML = `ATS SMALL`;
+                        nodesToInject.push(sNode);
+                    }
+                    if (r.Notes.includes("ATS Tall Hit")) {
+                        const tNode = document.createElement('div');
+                        tNode.className = `hist-node bg-red-600 text-white border-red-500 text-[10px] px-2`;
+                        tNode.innerHTML = `ATS TALL`;
+                        nodesToInject.push(tNode);
+                    }
+                    if (r.Notes.includes("ATS All Hit")) {
+                        const aNode = document.createElement('div');
+                        aNode.className = `hist-node bg-yellow-400 text-black border-yellow-300 text-[10px] px-2 shadow-[0_0_10px_rgba(250,204,21,0.8)]`;
+                        aNode.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> ATS ALL`;
+                        nodesToInject.push(aNode);
+                    }
+                }
 
                 if (isSevenOut) {
                     nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, totalRepeatsInHand, index));
