@@ -91,19 +91,19 @@
         .sum-good { background: linear-gradient(135deg, #1e3a8a, #0f172a); border: 2px solid #3b82f6; color: #bfdbfe; }
         .sum-great { background: linear-gradient(135deg, #b45309, #451a03); border: 2px solid #f59e0b; color: #fde68a; box-shadow: 0 0 18px rgba(245,158,11,0.5); }
 
-        /* Point Made Inner Borders (1-11 Tier) */
-        .state-point-made { background: #ffffff !important; color: #000000 !important; border: none !important; }
-        .point-tier-1 { box-shadow: inset 0 0 0 5px #b87333 !important; }
-        .point-tier-2 { box-shadow: inset 0 0 0 5px #94a3b8 !important; }
-        .point-tier-3 { box-shadow: inset 0 0 0 5px #ca8a04 !important; }
-        .point-tier-4 { box-shadow: inset 0 0 0 5px #059669 !important; }
-        .point-tier-5 { box-shadow: inset 0 0 0 5px #2563eb !important; }
-        .point-tier-6 { box-shadow: inset 0 0 0 5px #7e22ce !important; }
-        .point-tier-7 { box-shadow: inset 0 0 0 5px #be123c !important; }
-        .point-tier-8 { box-shadow: inset 0 0 0 5px #c2410c !important; }
-        .point-tier-9 { box-shadow: inset 0 0 0 5px #db2777 !important; }
-        .point-tier-10 { box-shadow: inset 0 0 0 5px #0891b2 !important; }
-        .point-tier-11 { box-shadow: inset 0 0 0 5px #000000, 0 0 15px #fff !important; }
+        /* Point Made Dashed Borders (1-11 Tier) */
+        .state-point-made { background: #ffffff !important; color: #000000 !important; }
+        .point-tier-1 { border: 2px dashed #b87333 !important; }
+        .point-tier-2 { border: 2px dashed #94a3b8 !important; }
+        .point-tier-3 { border: 2px dashed #ca8a04 !important; }
+        .point-tier-4 { border: 2px dashed #059669 !important; }
+        .point-tier-5 { border: 2px dashed #2563eb !important; }
+        .point-tier-6 { border: 2px dashed #7e22ce !important; }
+        .point-tier-7 { border: 2px dashed #be123c !important; }
+        .point-tier-8 { border: 2px dashed #c2410c !important; }
+        .point-tier-9 { border: 2px dashed #db2777 !important; }
+        .point-tier-10 { border: 2px dashed #0891b2 !important; }
+        .point-tier-11 { border: 2px dashed #000000 !important; box-shadow: 0 0 15px #fff !important; }
 
         /* Perfect Centering & Superscripts */
         .content-wrapper { display: flex; align-items: center; justify-content: center; }
@@ -207,6 +207,14 @@
         .die-unselected .pad-die-face { background: #ffffff !important; border: 2px solid #cbd5e1 !important; box-shadow: 0 4px 6px rgba(0,0,0,0.5) !important; }
         .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
 
+        /* NID Module CSS */
+        #nid-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .nid-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .nid-box { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 8px; padding: 10px; min-width: 80px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
+        .nid-num { font-size: 24px; font-weight: 900; color: #ffffff; margin-bottom: 5px; }
+        .nid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; font-size: 10px; font-family: monospace; color: #94a3b8; text-align: left; }
+        .nid-stats span:nth-child(even) { color: #10b981; font-weight: bold; text-align: right; }
+
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
         
@@ -299,7 +307,10 @@
 
     <!-- MAIN BODY SPACE -->
     <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto">
-        <!-- Future SDD expansion space -->
+        <!-- NID Container -->
+        <div id="nid-container" style="display: none;">
+            <!-- Injected by JS -->
+        </div>
     </div>
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
@@ -478,6 +489,13 @@
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
                         </label>
                     </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
@@ -620,11 +638,13 @@
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
         
+        let storedNID = localStorage.getItem('cfg_showNID');
         let globalConfig = { 
             location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', 
             showShooterSDD: localStorage.getItem('cfg_showShooterSDD') || 'false', 
             trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
-            trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false' 
+            trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false',
+            showNID: storedNID !== null ? storedNID : 'true'
         };
         
         let masterData = { locations: [], shooters: [], sets: [] };
@@ -716,6 +736,7 @@
                         if (data.meta_tags.show_shooter_sdd !== undefined) globalConfig.showShooterSDD = String(data.meta_tags.show_shooter_sdd);
                         if (data.meta_tags.track_ats !== undefined) globalConfig.trackATS = String(data.meta_tags.track_ats);
                         if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
+                        if (data.meta_tags.show_nid !== undefined) globalConfig.showNID = String(data.meta_tags.show_nid);
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -735,7 +756,7 @@
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
-                    base_unit: 1 
+                    show_nid: globalConfig.showNID, base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -755,7 +776,7 @@
             }
         }
 
-        // --- MATH ENGINE (SDD) ---
+        // --- MATH ENGINE (SDD & NID) ---
         function getMedian(arr) {
             if (arr.length === 0) return 0;
             arr.sort((a, b) => a - b);
@@ -869,6 +890,75 @@
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
 
+        function updateNID() {
+            const container = document.getElementById('nid-container');
+            if (globalConfig.showNID !== 'true') {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+
+            let counts = {
+                GLB: {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0},
+                SHTR: {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0},
+                HND: {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0}
+            };
+
+            let lastSevenOutIdx = -1;
+            let isComeout = true;
+            let currentPoint = null;
+            
+            for(let i=0; i<universalLog.length; i++) {
+                let r = universalLog[i];
+                if(r.Invalid_Roll || r.is_NS_Marker) continue;
+                let sum = r.Corrected_Point || r.Total_Sum;
+                if(isComeout) {
+                    if(![2,3,7,11,12].includes(sum)) { isComeout = false; currentPoint = sum; }
+                } else {
+                    if(sum === 7) { lastSevenOutIdx = i; isComeout = true; currentPoint = null; }
+                    else if(sum === currentPoint) { isComeout = true; currentPoint = null; }
+                }
+            }
+
+            universalLog.forEach((r, i) => {
+                if(r.Invalid_Roll || r.is_NS_Marker) return;
+                let sum = r.Corrected_Point || r.Total_Sum;
+                
+                counts.GLB[sum]++;
+                
+                let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
+                let sId = sObj ? sObj.id : globalConfig.shooter;
+                if (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId) {
+                    counts.SHTR[sum]++;
+                }
+
+                if (i > lastSevenOutIdx) {
+                    counts.HND[sum]++;
+                }
+            });
+
+            const renderBox = (num) => {
+                return `
+                <div class="nid-box">
+                    <div class="nid-num">${num}</div>
+                    <div class="nid-stats">
+                        <span>GLB</span><span>${counts.GLB[num]}</span>
+                        <span>SHTR</span><span>${counts.SHTR[num]}</span>
+                        <span>HND</span><span>${counts.HND[num]}</span>
+                    </div>
+                </div>`;
+            };
+
+            container.innerHTML = `
+                <div class="nid-row">
+                    ${[4,5,6,8,9,10].map(renderBox).join('')}
+                </div>
+                <div class="nid-row">
+                    ${[2,3,7,11,12].map(renderBox).join('')}
+                </div>
+            `;
+        }
+
         function updateBonusTrackers() {
             const container = document.getElementById('bonus-trackers');
             if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
@@ -976,17 +1066,28 @@
                     
                     for(let i=0; i<maxDisplay; i++) {
                         const tier = i + 1;
-                        const color = POINT_COLORS[tier] || '#fff';
                         const isTop = (i === maxDisplay - 1);
                         const text = isTop ? pointsMade : '';
-                        const textColor = [1, 11].includes(tier) ? '#fff' : '#000';
                         const bottom = i * yOffset;
                         const leftOffset = messyX[i] || 0;
                         
-                        let styleClass = isTop 
-                            ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' 
-                            : 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)] brightness-75';
-                            
+                        let color, textColor, styleClass;
+                        
+                        if (tier === 1 || tier === 2) {
+                            color = '#ffffff';
+                            textColor = '#000000';
+                            styleClass = 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)]';
+                            if (!isTop) styleClass += ' brightness-75';
+                        } else {
+                            color = POINT_COLORS[tier] || '#fff';
+                            textColor = [1, 11].includes(tier) ? '#fff' : '#000';
+                            if (isTop) {
+                                styleClass = 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]';
+                            } else {
+                                styleClass = 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)] brightness-75';
+                            }
+                        }
+                        
                         html += `<div class="absolute rounded-full border-2 flex items-center justify-center font-black text-lg ${styleClass}" style="width: 36px; height: 36px; bottom: ${bottom}px; left: calc(50% + ${leftOffset}px); transform: translateX(-50%); background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
                     }
                     html += `</div>`;
@@ -1082,6 +1183,7 @@
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
             document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
+            document.getElementById('cfg-show-nid').checked = (String(globalConfig.showNID) === 'true');
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -1429,6 +1531,7 @@
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
             document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
+            document.getElementById('cfg-show-nid').checked = (String(globalConfig.showNID) === 'true');
             
             document.getElementById('modal-config-global').style.display = 'flex';
         }
@@ -1444,10 +1547,12 @@
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').checked ? 'true' : 'false';
             globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
             globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
+            globalConfig.showNID = document.getElementById('cfg-show-nid').checked ? 'true' : 'false';
             
             localStorage.setItem('cfg_showShooterSDD', globalConfig.showShooterSDD);
             localStorage.setItem('cfg_trackATS', globalConfig.trackATS);
             localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
+            localStorage.setItem('cfg_showNID', globalConfig.showNID);
 
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
                 db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
@@ -1872,6 +1977,7 @@
                 activeState.currentPoint = null;
                 updateSDD();
                 updateBonusTrackers();
+                updateNID();
                 return;
             }
 
@@ -2018,6 +2124,7 @@
             
             updateSDD();
             updateBonusTrackers();
+            updateNID();
         }
     </script>
 </body>
