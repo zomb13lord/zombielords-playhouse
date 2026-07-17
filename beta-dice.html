@@ -78,6 +78,8 @@
         .state-seven-out { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); color: #ffffff; border-color: #ef4444; box-shadow: 0 0 18px rgba(220, 38, 38, 0.6); }
         .state-invalid { border-color: #f59e0b; color: #f59e0b; background: transparent; cursor: pointer; }
         .state-invalid:hover { background: rgba(245, 158, 11, 0.1); }
+        .state-ns { border-color: #3b82f6; color: #3b82f6; background: transparent; cursor: pointer; font-size: 14px; }
+        .state-ns:hover { background: rgba(59, 130, 246, 0.1); }
         .state-standard { }
 
         .mod-hardway { border: 2px dashed #facc15 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(0,0,0,0.8) !important; }
@@ -171,7 +173,7 @@
         .pad-handle {
             display: flex; justify-content: center; align-items: center;
             padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative; cursor: pointer;
         }
 
         #pad-content { transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
@@ -225,6 +227,11 @@
         
         .btn-cancel { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 12px; border-radius: 4px; font-weight: 900; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; letter-spacing: 0.1em; }
         .btn-cancel:hover { background: #1e293b; color: #fff; border-color: #475569; }
+
+        /* CSS Toggles */
+        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
     </style>
 </head>
 <body class="flex flex-col">
@@ -238,7 +245,7 @@
         <div class="flex items-center gap-4 md:gap-6">
             <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+            <button onclick="promptLogout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
@@ -276,15 +283,13 @@
     </div>
 
     <!-- MAIN BODY SPACE -->
-    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto" onclick="setIpState('collapsed')">
+    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto">
         <!-- Future SDD expansion space -->
     </div>
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle relative">
-            <div class="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10" onclick="handleLeftClick()"></div>
-            <div class="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10" onclick="handleRightClick()"></div>
+        <div class="pad-handle" onclick="setIpState('natural')">
             <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">CLICK TO INPUT ROLL</div>
         </div>
         
@@ -299,17 +304,36 @@
                     </div>
                 </div>
 
-                <button id="btn-submit-roll" onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Next Roll</button>
+                <div id="btn-submit-container" class="mt-1">
+                    <button id="btn-submit-roll" onclick="submitRoll()" class="w-full bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">Next Roll</button>
+                    <div id="btn-split-roll" class="hidden flex gap-2 w-full">
+                        <button onclick="setIpState('natural')" class="flex-1 bg-slate-700 hover:bg-slate-600 border border-slate-500 text-white font-black py-3 rounded uppercase tracking-widest transition-all">Collapse Roll</button>
+                        <button onclick="setIpState('collapsed')" class="flex-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 font-black py-3 rounded uppercase tracking-widest transition-all">Hide Roll</button>
+                    </div>
+                </div>
                 
                 <div id="pad-extra" class="flex gap-2">
                     <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
                     <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
+                    <button onclick="openGlobalConfig()" class="flex-1 border border-emerald-500 text-emerald-400 hover:bg-emerald-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">New Shooter</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODALS -->
+    <div id="modal-logout" class="modal-mask">
+        <div class="modal-box border-red-500">
+            <i class="fa-solid fa-skull text-red-500 text-4xl mb-4 glow-red"></i>
+            <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">Disconnect</h2>
+            <p class="text-xs text-slate-400 font-mono mb-6">Are you sure you want to disconnect your soul?</p>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                <button onclick="executeLogout()" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Disconnect</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-alert" class="modal-mask">
         <div class="modal-box border-red-500">
             <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
@@ -394,31 +418,29 @@
                     </div>
                 </div>
 
-                <div class="cfg-row mt-2">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Show Shooter SDD</label>
-                        <select id="cfg-show-sdd" class="select-wicked border-blue-500/50 focus:border-blue-400">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">ATS Tracker</label>
-                        <select id="cfg-track-ats" class="select-wicked border-blue-500/50 focus:border-blue-400">
-                            <option value="true">On</option>
-                            <option value="false">Off</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Sharpshooter</label>
-                        <select id="cfg-track-ss" class="select-wicked border-blue-500/50 focus:border-blue-400">
-                            <option value="true">On</option>
-                            <option value="false">Off</option>
-                        </select>
-                    </div>
+                <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="cfg-show-sdd" class="sr-only peer toggle-checkbox">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold">ATS</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="cfg-track-ats" class="sr-only peer toggle-checkbox">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold">Sharpshooter</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="cfg-track-ss" class="sr-only peer toggle-checkbox">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-3 mt-4">
+            <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeModals()" class="btn-cancel">Cancel</button>
                 <button onclick="saveGlobalConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
             </div>
@@ -428,8 +450,10 @@
     <div id="modal-config-hand" class="modal-mask">
         <div class="modal-box border-blue-500">
             <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-2 cinzel">Roll Configuration</h2>
-            <p class="text-[10px] text-slate-400 font-mono mb-4">Retroactively update parameters for this specific hand.</p>
-            <input type="hidden" id="hcfg-index">
+            <p class="text-[10px] text-slate-400 font-mono mb-4">Retroactively update parameters for this segment.</p>
+            <input type="hidden" id="hcfg-start-idx">
+            <input type="hidden" id="hcfg-end-idx">
+            <input type="hidden" id="hcfg-is-forward">
             <div class="flex flex-col gap-3 text-left">
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
@@ -444,7 +468,7 @@
             </div>
             <div class="grid grid-cols-2 gap-3 mt-6">
                 <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Roll</button>
+                <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Segment</button>
             </div>
         </div>
     </div>
@@ -455,7 +479,7 @@
             <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Seven Out</h2>
             <p class="text-xs text-slate-400 font-mono mb-6">Is the dice passing to a new shooter?</p>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModals()" class="btn-cancel">Same Shooter</button>
+                <button onclick="handleSameShooter()" class="btn-cancel">Same Shooter</button>
                 <button onclick="handleNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
             </div>
         </div>
@@ -487,18 +511,6 @@
             <div class="grid grid-cols-2 gap-3 mt-4">
                 <button onclick="cancelInvalid()" class="btn-cancel">Cancel</button>
                 <button onclick="acceptInvalid()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Accept</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-incomplete-roll" class="modal-mask">
-        <div class="modal-box border-amber-500">
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
-            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Incomplete Roll</h2>
-            <p class="text-xs text-slate-400 font-mono mb-6">2 selections must be made to input roll. Would you like to edit the roll?</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="editIncompleteRoll()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Edit Roll</button>
             </div>
         </div>
     </div>
@@ -546,6 +558,7 @@
         let activeMetaType = null;
         let activeMetaId = null;
         let currentConfigShooter = 'ALL';
+        let preConfigShooter = 'ALL';
 
         let selectedLeft = null;
         let selectedRight = null;
@@ -684,7 +697,7 @@
             let isComeout = true, currentPoint = null;
 
             log.forEach(r => {
-                if (r.Invalid_Roll || r.invalidRoll) return;
+                if (r.Invalid_Roll || r.invalidRoll || r.is_NS_Marker) return;
                 let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
                 
                 TR++;
@@ -771,13 +784,14 @@
             let atsCounts = {2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0};
             let lastAnySevenIndex = -1;
             for(let i = universalLog.length - 1; i >= 0; i--) {
+                if(universalLog[i].is_NS_Marker) continue;
                 if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7) {
                     lastAnySevenIndex = i;
                     break;
                 }
             }
             for(let i = lastAnySevenIndex + 1; i < universalLog.length; i++) {
-                if(universalLog[i].Invalid_Roll) continue;
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
                 let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
                 if(atsCounts[sum] !== undefined) atsCounts[sum]++;
             }
@@ -787,7 +801,7 @@
             let isComeout = true;
             let currentPoint = null;
             for(let i = 0; i < universalLog.length; i++) {
-                if(universalLog[i].Invalid_Roll) continue;
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
                 let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
                 if(isComeout) {
                     if(![2,3,7,11,12].includes(sum)) {
@@ -811,7 +825,7 @@
             const smalls = [2,3,4,5,6];
             const talls = [8,9,10,11,12];
             
-            const renderATSGroup = (group, id) => {
+            const renderATSGroup = (group, id, themeColor) => {
                 const el = document.getElementById(id);
                 if (globalConfig.trackATS !== 'true') { el.innerHTML = ''; el.className = ''; return; }
                 
@@ -820,16 +834,30 @@
                 group.forEach(num => {
                     const hits = atsCounts[num];
                     if (hits === 0) allHit = false;
-                    const bgClass = hits > 0 ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-transparent text-yellow-400 border-yellow-400/50';
-                    const sup = hits > 1 ? `<span class="absolute -top-2 -right-2 bg-red-600 text-white text-[8px] font-black px-1 rounded-full">${hits}</span>` : '';
-                    html += `<div class="relative w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center font-black text-xs md:text-sm ${bgClass}">${num}${sup}</div>`;
+                    
+                    let bgClass = '';
+                    if (themeColor === 'emerald') {
+                        bgClass = hits > 0 ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-transparent text-emerald-500 border-emerald-500/50';
+                    } else {
+                        bgClass = hits > 0 ? 'bg-red-600 text-white border-red-600' : 'bg-transparent text-red-500 border-red-500/50';
+                    }
+
+                    const sup = hits > 1 ? `<span class="absolute -top-2 -right-2 bg-white text-black text-[8px] font-black px-1 rounded-full shadow-md">${hits}</span>` : '';
+                    html += `<div class="relative w-7 h-7 md:w-9 md:h-9 rounded-full border-2 flex items-center justify-center font-black text-sm md:text-base ${bgClass}">${num}${sup}</div>`;
                 });
                 el.innerHTML = html;
-                el.className = `flex gap-1 md:gap-2 p-1 rounded transition-all ${allHit ? 'shadow-[0_0_15px_rgba(250,204,21,0.8)] bg-yellow-400/20 border border-yellow-400' : 'border border-transparent'}`;
+                
+                let glowClass = '';
+                if (allHit) {
+                    glowClass = themeColor === 'emerald' ? 'shadow-[0_0_15px_rgba(16,185,129,0.8)] bg-emerald-500/20 border border-emerald-500' : 'shadow-[0_0_15px_rgba(220,38,38,0.8)] bg-red-600/20 border border-red-600';
+                } else {
+                    glowClass = 'border border-transparent';
+                }
+                el.className = `flex gap-1 md:gap-2 p-1 rounded transition-all ${glowClass}`;
             };
 
-            renderATSGroup(smalls, 'ats-smalls');
-            renderATSGroup(talls, 'ats-talls');
+            renderATSGroup(smalls, 'ats-smalls', 'emerald');
+            renderATSGroup(talls, 'ats-talls', 'red');
 
             // Render Sharpshooter
             const ssEl = document.getElementById('sharpshooter-stack');
@@ -838,19 +866,29 @@
             } else {
                 let html = '';
                 if (pointsMade === 0) {
-                    html = `<div class="w-8 h-8 rounded-full border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-xs font-black">0</div>`;
+                    html = `<div class="w-10 h-10 rounded-full border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-sm font-black">0</div>`;
                 } else {
                     const maxDisplay = Math.min(pointsMade, 11);
+                    const xOffset = 2; 
+                    const yOffset = 3; 
+                    const totalX = (maxDisplay - 1) * xOffset;
+                    const totalY = (maxDisplay - 1) * yOffset;
+                    
+                    html += `<div class="relative w-10 h-10" style="transform: translate(-${totalX/2}px, -${totalY/2}px);">`;
+                    
                     for(let i=0; i<maxDisplay; i++) {
                         const tier = i + 1;
                         const color = POINT_COLORS[tier] || '#fff';
                         const isTop = (i === maxDisplay - 1);
                         const text = isTop ? pointsMade : '';
                         const textColor = [1, 11].includes(tier) ? '#fff' : '#000';
-                        const bottom = i * 3;
-                        const right = i * 2;
-                        html += `<div class="absolute rounded-full border-2 border-black flex items-center justify-center font-black text-sm shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="width: 32px; height: 32px; bottom: ${bottom}px; right: ${right}px; background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
+                        const bottom = i * yOffset;
+                        const right = i * xOffset;
+                        const pulseClass = isTop ? 'animate-pulse shadow-[0_0_15px_rgba(255,255,255,0.6)]' : 'shadow-[0_2px_4px_rgba(0,0,0,0.8)]';
+                        
+                        html += `<div class="absolute rounded-full border-2 border-black flex items-center justify-center font-black text-lg ${pulseClass}" style="width: 40px; height: 40px; bottom: ${bottom}px; right: ${right}px; background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
                     }
+                    html += `</div>`;
                 }
                 ssEl.innerHTML = html;
             }
@@ -939,9 +977,10 @@
             document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
-            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
-            document.getElementById('cfg-track-ats').value = String(globalConfig.trackATS);
-            document.getElementById('cfg-track-ss').value = String(globalConfig.trackSharpshooter);
+            
+            document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
+            document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
+            document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -1021,22 +1060,37 @@
 
         // --- INPUT PAD LOGIC ---
         function handleLeftClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
-            else if (ipState === 'natural') setIpState('collapsed');
+            if (ipState === 'collapsed') setIpState('natural');
         }
 
         function handleRightClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
-            else if (ipState === 'natural') setIpState('expanded');
+            if (ipState === 'collapsed') setIpState('natural');
         }
 
         function setIpState(state) {
             ipState = state;
             document.getElementById('input-pad-wrapper').className = `state-${state}`;
+            
+            const btnSubmit = document.getElementById('btn-submit-roll');
+            const btnSplit = document.getElementById('btn-split-roll');
+            
+            if (state === 'natural') {
+                btnSubmit.classList.remove('hidden');
+                btnSplit.classList.add('hidden');
+                btnSubmit.innerText = "NEXT ROLL";
+            } else if (state === 'expanded') {
+                if (!selectedLeft || !selectedRight) {
+                    btnSubmit.classList.add('hidden');
+                    btnSplit.classList.remove('hidden');
+                } else {
+                    btnSubmit.classList.remove('hidden');
+                    btnSplit.classList.add('hidden');
+                    btnSubmit.innerText = "NEXT ROLL";
+                }
+            }
         }
 
         function selectDie(side, val) {
-            document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
             const colorClass = `die-${globalConfig.diceColor}`;
             if (side === 'left') {
                 selectedLeft = val;
@@ -1048,6 +1102,14 @@
                 for(let i=1; i<=6; i++) {
                     document.getElementById(`btn-r-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
                 }
+            }
+
+            if (ipState === 'expanded' && selectedLeft && selectedRight) {
+                document.getElementById('btn-submit-roll').classList.remove('hidden');
+                document.getElementById('btn-split-roll').classList.add('hidden');
+                document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
+            } else if (ipState === 'natural') {
+                document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
             }
         }
 
@@ -1090,22 +1152,14 @@
         async function submitRoll() {
             const btn = document.getElementById('btn-submit-roll');
             
-            if (!selectedLeft && !selectedRight) {
-                if (ipState === 'expanded') {
-                    await customAlert("2 selections must be made to input roll.");
-                } else {
+            if (!selectedLeft || !selectedRight) {
+                if (ipState === 'natural') {
                     if (btn.innerText === "EDIT ROLL") {
                         setIpState('expanded');
-                        btn.innerText = "NEXT ROLL";
                     } else {
                         btn.innerText = "EDIT ROLL";
                     }
                 }
-                return;
-            }
-            
-            if (!selectedLeft || !selectedRight) {
-                document.getElementById('modal-incomplete-roll').style.display = 'flex';
                 return;
             }
 
@@ -1117,7 +1171,6 @@
             universalLog.push(r);
             clearPad(); 
             setIpState('natural'); 
-            btn.innerText = "NEXT ROLL";
             renderHistoryBar(); 
             syncActiveSession();
 
@@ -1134,9 +1187,12 @@
             syncActiveSession();
         }
 
+        function handleSameShooter() {
+            closeModals();
+        }
+
         function handleNewShooter() {
             closeModals();
-            globalConfig.shooter = 'ALL';
             openGlobalConfig();
         }
 
@@ -1196,7 +1252,7 @@
             
             for(let i=0; i<universalLog.length; i++) {
                 let r = universalLog[i];
-                if(r.Invalid_Roll) continue;
+                if(r.Invalid_Roll || r.is_NS_Marker) continue;
                 let sum = r.Corrected_Point || r.Total_Sum;
                 
                 if(tempIsComeout) {
@@ -1220,15 +1276,17 @@
 
         // --- CONFIGURATION LOGIC ---
         function openGlobalConfig() {
+            preConfigShooter = globalConfig.shooter;
             document.getElementById('cfg-loc').value = globalConfig.location;
             document.getElementById('cfg-shooter').value = globalConfig.shooter;
             document.getElementById('cfg-set').value = globalConfig.diceSet;
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
             updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
-            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
-            document.getElementById('cfg-track-ats').value = String(globalConfig.trackATS);
-            document.getElementById('cfg-track-ss').value = String(globalConfig.trackSharpshooter);
+            
+            document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
+            document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
+            document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             
             document.getElementById('modal-config-global').style.display = 'flex';
         }
@@ -1240,12 +1298,11 @@
             globalConfig.positionParent = document.getElementById('cfg-pos-parent').value;
             globalConfig.positionChild = document.getElementById('cfg-pos-child').value;
             globalConfig.diceSet = document.getElementById('cfg-set').value;
-            // globalConfig.diceColor is updated directly via selectConfigColor()
-            globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
-            globalConfig.trackATS = document.getElementById('cfg-track-ats').value;
-            globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').value;
             
-            // Push dirty shooters to Firestore
+            globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').checked ? 'true' : 'false';
+            globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
+            globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
+            
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
                 db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
                     last_positionParent: s.last_positionParent,
@@ -1255,17 +1312,59 @@
                 s.isDirty = false;
             });
 
+            if (globalConfig.shooter !== preConfigShooter && universalLog.length > 0) {
+                universalLog.push({
+                    is_NS_Marker: true,
+                    Shooter_ID: globalConfig.shooter,
+                    Time_Stamp: new Date().toISOString()
+                });
+            }
+
             renderHistoryBar(); syncActiveSession();
         }
 
         function openHandConfig(sevenOutIndex) {
             document.getElementById('hcfg-index').value = sevenOutIndex;
+            document.getElementById('hcfg-is-forward').value = 'false';
+            
             let startIdx = 0;
             for(let i = sevenOutIndex - 1; i >= 0; i--) {
-                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7 && activeState.wasSevenOut[i]) {
+                if(universalLog[i].is_NS_Marker) {
                     startIdx = i + 1; break;
                 }
             }
+            document.getElementById('hcfg-start-idx').value = startIdx;
+            document.getElementById('hcfg-end-idx').value = sevenOutIndex;
+
+            const refRoll = universalLog[startIdx] || {};
+            document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
+            document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
+            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
+            
+            let childPos = refRoll.Table_Position || 'All';
+            let parentPos = 'All';
+            for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
+            
+            document.getElementById('hcfg-pos-parent').value = parentPos;
+            updatePosChild('hcfg', childPos);
+            
+            document.getElementById('modal-config-hand').style.display = 'flex';
+        }
+
+        function openForwardConfig(nsIndex) {
+            document.getElementById('hcfg-index').value = nsIndex;
+            document.getElementById('hcfg-is-forward').value = 'true';
+            
+            let startIdx = nsIndex + 1;
+            let endIdx = universalLog.length - 1;
+            for(let i = startIdx; i < universalLog.length; i++) {
+                if(universalLog[i].is_NS_Marker) {
+                    endIdx = i - 1; break;
+                }
+            }
+            document.getElementById('hcfg-start-idx').value = startIdx;
+            document.getElementById('hcfg-end-idx').value = endIdx;
+
             const refRoll = universalLog[startIdx] || {};
             document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
@@ -1282,13 +1381,9 @@
         }
 
         function saveHandConfig() {
-            const sevenOutIndex = parseInt(document.getElementById('hcfg-index').value);
-            let startIdx = 0;
-            for(let i = sevenOutIndex - 1; i >= 0; i--) {
-                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7 && activeState.wasSevenOut[i]) {
-                    startIdx = i + 1; break;
-                }
-            }
+            const startIdx = parseInt(document.getElementById('hcfg-start-idx').value);
+            const endIdx = parseInt(document.getElementById('hcfg-end-idx').value);
+            const isForward = document.getElementById('hcfg-is-forward').value === 'true';
             
             const loc = document.getElementById('hcfg-loc').value;
             const shooter = document.getElementById('hcfg-shooter').value;
@@ -1296,13 +1391,21 @@
             const posChild = document.getElementById('hcfg-pos-child').value;
             const set = document.getElementById('hcfg-set').value;
 
-            for(let i = startIdx; i <= sevenOutIndex; i++) {
-                if(!universalLog[i].Invalid_Roll) {
+            for(let i = startIdx; i <= endIdx; i++) {
+                if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
                     universalLog[i].Location_ID = loc;
                     universalLog[i].Shooter_ID = shooter;
                     universalLog[i].Table_Position = posChild;
                     universalLog[i].Dice_Set = set;
                 }
+            }
+
+            if (isForward && endIdx === universalLog.length - 1) {
+                globalConfig.location = loc;
+                globalConfig.shooter = shooter;
+                globalConfig.positionParent = posParent;
+                globalConfig.positionChild = posChild;
+                globalConfig.diceSet = set;
             }
 
             if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
@@ -1566,6 +1669,7 @@
             document.getElementById('modal-error-display').style.display = 'none';
             document.getElementById('modal-shooter-transition').style.display = 'none';
             document.getElementById('modal-incomplete-roll').style.display = 'none';
+            document.getElementById('modal-logout').style.display = 'none';
         }
 
         // --- RENDERING ENGINE ---
@@ -1586,7 +1690,7 @@
                     <span class="text-slate-400">|</span>
                     <span><i class="fa-solid fa-bullseye"></i> ${points}</span>
                     <span class="text-slate-400">|</span>
-                    <span><i class="fa-solid fa-fire"></i> ${repeats}</span>
+                    <span>${repeats} <i class="fa-solid fa-fire"></i></span>
                 </div>
             `;
             return el;
@@ -1615,6 +1719,15 @@
             let nodesToInject = [];
 
             universalLog.forEach((r, index) => {
+                if (r.is_NS_Marker) {
+                    const el = document.createElement('div');
+                    el.className = `hist-node state-ns`;
+                    el.innerHTML = `NS`;
+                    el.onclick = () => openForwardConfig(index);
+                    nodesToInject.push(el);
+                    return;
+                }
+
                 const isInvalid = r.Invalid_Roll || r.invalidRoll || false;
                 const die1 = parseInt(r.Left_Die || r.leftDie || 0);
                 const die2 = parseInt(r.Right_Die || r.rightDie || 0);
@@ -1672,7 +1785,7 @@
                     el.onclick = () => showErrorReason(r.Notes);
                 } else {
                     let superHTML = '';
-                    if (currentRepeats > 0) superHTML += `<span class="sup-text"><i class="fa-solid fa-fire text-[10px] mr-0.5"></i>${currentRepeats + 1}</span>`;
+                    if (currentRepeats > 0) superHTML += `<span class="sup-text">${currentRepeats + 1} <i class="fa-solid fa-fire text-[10px] ml-0.5"></i></span>`;
                     if (isHardway) superHTML += `<span class="sup-text text-yellow-400">(H)</span>`;
 
                     let displayNum = sum;
@@ -1718,7 +1831,13 @@
             updateBonusTrackers();
         }
 
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
+        function promptLogout() {
+            document.getElementById('modal-logout').style.display = 'flex';
+        }
+
+        function executeLogout() {
+            auth.signOut().then(() => { window.location.href = "index.html"; });
+        }
     </script>
 </body>
 </html>
