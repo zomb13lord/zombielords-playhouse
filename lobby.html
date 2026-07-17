@@ -56,7 +56,7 @@
         }
         .dynamic-modal-bg::before {
             content: ''; position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0;
-            var(--dynamic-bg);
+            background-image: var(--dynamic-bg);
         }
         .dynamic-modal-content {
             position: relative; z-index: 1; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); padding: 30px; height: 100%;
@@ -73,6 +73,9 @@
 
         .btn-cancel { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 12px; border-radius: 4px; font-weight: 900; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; letter-spacing: 0.1em; }
         .btn-cancel:hover { background: #1e293b; color: #fff; border-color: #475569; }
+
+        .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: center; font-size: 16px; outline: none; text-transform: uppercase; letter-spacing: 2px; }
+        .input-wicked:focus { box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
 
         .ghosted-btn { opacity: 0.4; cursor: not-allowed; filter: grayscale(100%); }
     </style>
@@ -229,7 +232,7 @@
             const title = document.getElementById('dynamic-modal-title');
             const btnContainer = document.getElementById('dynamic-btn-container');
             
-            bgContainer.style.backgroundImage = `url('${bgUrl}')`;
+            bgContainer.style.setProperty('--dynamic-bg', `url('${bgUrl}')`);
             title.innerText = cardName;
 
             btnContainer.innerHTML = `
@@ -306,7 +309,7 @@
                 const title = document.getElementById('dynamic-modal-title');
                 const btnContainer = document.getElementById('dynamic-btn-container');
                 
-                bgContainer.style.backgroundImage = `url('https://zomb13lord.github.io/zombielords-playhouse/${moduleId}-card.jpg')`;
+                bgContainer.style.setProperty('--dynamic-bg', `url('https://zomb13lord.github.io/zombielords-playhouse/${moduleId}-card.jpg')`);
                 title.innerText = moduleId.toUpperCase();
 
                 btnContainer.innerHTML = `
@@ -323,9 +326,60 @@
             }
         }
 
+        // --- UPGRADE CODE LOGIC ---
+        function openUpgradeModal() {
+            document.getElementById('upgrade-code').value = '';
+            document.getElementById('modal-upgrade').style.display = 'flex';
+        }
+
+        function formatUpgradeCode(e) {
+            let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (val.length > 16) val = val.substring(0, 16);
+            let formatted = val.match(/.{1,4}/g)?.join('-') || val;
+            e.target.value = formatted;
+        }
+
+        async function verifyUpgradeCode() {
+            const codeInput = document.getElementById('upgrade-code').value.trim().toUpperCase();
+            if (!codeInput) return showSystemMessage("Enter the sacred text.");
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const codeRef = db.collection('invite_codes').doc(codeInput);
+                const codeDoc = await codeRef.get();
+                if (!codeDoc.exists || codeDoc.data().used) {
+                    closeModals();
+                    return showSystemMessage("Invalid or expired code. The shadows laugh at your attempt.");
+                }
+                
+                const codeData = codeDoc.data();
+                const forgedRole = codeData.role || 'Admin';
+                const forgedPerms = codeData.permissions || {};
+
+                await codeRef.update({ used: true, consumedBy: user.uid, consumedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                
+                const newPerms = { ...userProfile.permissions, ...forgedPerms };
+
+                await db.collection('users').doc(user.uid).update({
+                    role: forgedRole,
+                    permissions: newPerms
+                });
+                
+                closeModals();
+                window.location.reload();
+            } catch (error) { 
+                console.error(error);
+                closeModals();
+                showSystemMessage("A disturbance in the ether prevented verification."); 
+            }
+        }
+
         function closeModals() {
             document.getElementById('lockout-modal').style.display = 'none';
             document.getElementById('dynamic-module-modal').style.display = 'none';
+            document.getElementById('modal-upgrade').style.display = 'none';
         }
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
@@ -340,6 +394,7 @@
         </div>
         <div class="flex items-center gap-4 md:gap-6">
             <span id="user-tag" class="text-[9px] tracking-[0.2em] uppercase text-emerald-500/70 font-bold hidden md:block"></span>
+            <button onclick="openUpgradeModal()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg" title="Upgrade Soul"><i class="fa-solid fa-gear"></i></button>
             <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
@@ -482,6 +537,20 @@
                 <div id="dynamic-btn-container" class="flex flex-col gap-4">
                     <!-- Injected by JS -->
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div id="modal-upgrade" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <i class="fa-solid fa-key text-emerald-500 text-4xl mb-4" style="filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.8));"></i>
+            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">Upgrade Soul</h2>
+            <p class="text-xs text-slate-400 font-serif italic mb-6">Enter your incantation to unlock new realms.</p>
+            <input type="text" id="upgrade-code" class="input-wicked mb-4" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" oninput="formatUpgradeCode(event)">
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                <button onclick="verifyUpgradeCode()" class="wicked-btn py-3 text-xs">Verify</button>
             </div>
         </div>
     </div>
