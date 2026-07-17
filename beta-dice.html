@@ -22,8 +22,12 @@
             background-size: cover; 
             background-position: center 146px; 
             background-attachment: fixed;
-            padding-bottom: 180px; 
+            padding-bottom: 320px; /* Mobile padding */
             user-select: none; -webkit-user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            body { padding-bottom: 180px; } /* Desktop padding */
         }
 
         /* NAVBAR */
@@ -33,7 +37,7 @@
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
         .playhouse-glow { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1); }
 
-        /* STICKY ZONE (Holds HB and SDD) */
+        /* STICKY ZONE (Holds HB, Bonus, SDD, NID Header) */
         #sticky-zone {
             position: sticky; top: 0; z-index: 50;
             background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
@@ -213,12 +217,9 @@
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
-            width: calc(50% - 6px); max-width: 160px; height: 190px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            width: calc(50% - 6px); max-width: 160px; min-height: 240px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
         }
-        .nid-box-7 { width: 100%; }
-        
-        /* Mobile Order */
-        .nid-box-7 { order: 1; }
+        .nid-box-7 { width: 100%; max-width: 100%; order: 1; }
         .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
         .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
         .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
@@ -227,11 +228,10 @@
 
         @media (min-width: 768px) {
             .nid-box { width: 160px; }
-            .nid-box-7 { width: 160px; }
-            /* Desktop Order */
+            .nid-box-7 { width: 160px; max-width: 160px; order: 9; }
             .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
             .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
-            .nid-box-2 { order: 7; } .nid-box-3 { order: 8; } .nid-box-7 { order: 9; }
+            .nid-box-2 { order: 7; } .nid-box-3 { order: 8; }
             .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
         }
 
@@ -249,13 +249,10 @@
         .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 4px; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; mt-auto; }
-        .nid-footer-global { background: #475569; color: #cbd5e1; text-align: center; font-size: 11px; font-weight: 900; padding: 4px 0; border-bottom: 1px solid #334155; }
-        .nid-footer-global span { color: #10b981; margin-left: 4px; }
+        .nid-footer-global { background: #475569; color: #ffffff; text-align: center; font-size: 14px; font-weight: 900; padding: 4px 0; border-bottom: 1px solid #334155; }
         .nid-footer-split { display: flex; }
-        .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; padding: 4px 0; border-right: 1px solid #334155; }
-        .nid-footer-left span { color: #10b981; margin-left: 4px; }
-        .nid-footer-right { flex: 1; background: #1e293b; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; padding: 4px 0; }
-        .nid-footer-right span { color: #10b981; margin-left: 4px; }
+        .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; border-right: 1px solid #334155; }
+        .nid-footer-right { flex: 1; background: #1e293b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; }
 
         /* Micro Dice for Kinematic List */
         .micro-die { width: 14px; height: 14px; border-radius: 2px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 1px; gap: 1px; background: #ffffff; border: 1px solid #000000; }
@@ -317,7 +314,7 @@
         </div>
     </nav>
 
-    <!-- STICKY ZONE (Holds HB, Bonus Trackers, and SDD) -->
+    <!-- STICKY ZONE (Holds HB, Bonus Trackers, SDD, and NID Header) -->
     <div id="sticky-zone">
         <!-- MODULE 2: HISTORY BAR -->
         <div id="history-bar">
@@ -349,6 +346,11 @@
             <span class="sdd-metric">SRR: <b class="text-white" id="s-srr-med">0</b>|<b class="text-white" id="s-srr-mean">0.0</b></span>
             <span class="sdd-metric">PSR: <b class="text-white" id="s-psr-med">0</b>|<b class="text-white" id="s-psr-mean">0.0</b></span>
             <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="s-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="s-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="s-ats-a">0</b></span>
+        </div>
+
+        <!-- NID STICKY HEADER -->
+        <div id="nid-sticky-header" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner text-xs font-bold text-slate-300">
+            <!-- Injected by JS -->
         </div>
     </div>
 
@@ -1051,11 +1053,17 @@
 
         function updateNID() {
             const container = document.getElementById('nid-container');
+            const nidHeader = document.getElementById('nid-sticky-header');
+            
             if (globalConfig.showNID !== 'true') {
                 container.style.display = 'none';
+                nidHeader.classList.add('hidden');
+                nidHeader.classList.remove('flex');
                 return;
             }
             container.style.display = 'flex';
+            nidHeader.classList.remove('hidden');
+            nidHeader.classList.add('flex');
 
             let validRolls = universalLog.filter(r => !r.Invalid_Roll && !r.is_NS_Marker);
             
@@ -1112,6 +1120,20 @@
                 
                 let kinData = getKinematicData(lastSetStr, kinematicRolls);
                 targetHot = kinData.hot; targetCold = kinData.cold;
+                
+                let [ld1, ld2] = lastSetStr.split('-');
+                nidHeader.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">LAST:</span>
+                        <div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div>
+                    </div>
+                    <div class="flex items-center gap-4 font-black text-sm">
+                        <span class="text-red-500">🔥 ${targetHot}</span>
+                        <span class="text-blue-400">❄️ ${targetCold}</span>
+                    </div>
+                `;
+            } else {
+                nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING ROLL</div>`;
             }
 
             const renderBox = (num) => {
@@ -1162,10 +1184,10 @@
                         <div class="nid-indicator">${indicatorHtml}</div>
                     </div>
                     <div class="nid-footer">
-                        <div class="nid-footer-global">G: <span>${counts.GLB[num]}</span></div>
+                        <div class="nid-footer-global">${counts.GLB[num]}</div>
                         <div class="nid-footer-split">
-                            <div class="nid-footer-left">H: <span>${counts.HND[num]}</span></div>
-                            <div class="nid-footer-right">S: <span>${counts.SHTR[num]}</span></div>
+                            <div class="nid-footer-left">${counts.HND[num]}</div>
+                            <div class="nid-footer-right">${counts.SHTR[num]}</div>
                         </div>
                     </div>
                 </div>`;
