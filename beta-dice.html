@@ -22,12 +22,12 @@
             background-size: cover; 
             background-position: center 146px; 
             background-attachment: fixed;
-            padding-bottom: 380px; /* Mobile padding */
+            padding-bottom: 420px; /* Mobile padding */
             user-select: none; -webkit-user-select: none;
         }
 
         @media (min-width: 768px) {
-            body { padding-bottom: 240px; } /* Desktop padding */
+            body { padding-bottom: 280px; } /* Desktop padding */
             #nid-sticky-header { display: none !important; }
         }
 
@@ -214,15 +214,15 @@
 
         /* NID Module CSS */
         .nid-grid-container {
-            display: grid; grid-template-columns: repeat(2, 160px); justify-content: center; gap: 12px; max-width: 1050px; margin: 10px auto 0;
+            display: grid; grid-template-columns: repeat(2, 160px); justify-content: center; gap: 16px; max-width: 1050px; margin: 10px auto 0;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
-            background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); width: 100%;
+            width: 160px; height: 210px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
         }
         
         /* Mobile Order */
-        .nid-box-7 { grid-column: span 2; justify-self: center; width: 160px; order: 1; }
+        .nid-box-7 { grid-column: span 2; justify-self: center; order: 1; }
         .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
         .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
         .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
@@ -230,8 +230,10 @@
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
         @media (min-width: 768px) {
-            .nid-grid-container { grid-template-columns: repeat(6, 160px); }
-            .nid-box-7 { grid-column: span 1; order: 9; }
+            .nid-grid-container { 
+                display: flex; flex-wrap: wrap; 
+            }
+            .nid-box-7 { grid-column: auto; justify-self: auto; order: 9; }
             /* Desktop Order */
             .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
             .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
