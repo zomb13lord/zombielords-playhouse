@@ -22,12 +22,13 @@
             background-size: cover; 
             background-position: center 146px; 
             background-attachment: fixed;
-            padding-bottom: 320px; /* Mobile padding */
+            padding-bottom: 380px; /* Mobile padding */
             user-select: none; -webkit-user-select: none;
         }
 
         @media (min-width: 768px) {
-            body { padding-bottom: 180px; } /* Desktop padding */
+            body { padding-bottom: 240px; } /* Desktop padding */
+            #nid-sticky-header { display: none !important; }
         }
 
         /* NAVBAR */
@@ -37,7 +38,7 @@
         .emerald-text { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
         .playhouse-glow { text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 0 15px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,1), 0 0 45px rgba(0,0,0,1); }
 
-        /* STICKY ZONE (Holds HB, Bonus, SDD, NID Header) */
+        /* STICKY ZONE (Holds HB and SDD) */
         #sticky-zone {
             position: sticky; top: 0; z-index: 50;
             background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(12px);
@@ -213,13 +214,15 @@
 
         /* NID Module CSS */
         .nid-grid-container {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 1050px; margin: 0 auto; margin-top: 10px;
+            display: grid; grid-template-columns: repeat(2, 160px); justify-content: center; gap: 12px; max-width: 1050px; margin: 10px auto 0;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
-            width: calc(50% - 6px); max-width: 160px; min-height: 240px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); width: 100%;
         }
-        .nid-box-7 { width: 100%; max-width: 100%; order: 1; }
+        
+        /* Mobile Order */
+        .nid-box-7 { grid-column: span 2; justify-self: center; width: 160px; order: 1; }
         .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
         .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
         .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
@@ -227,8 +230,9 @@
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
         @media (min-width: 768px) {
-            .nid-box { width: 160px; }
-            .nid-box-7 { width: 160px; max-width: 160px; order: 9; }
+            .nid-grid-container { grid-template-columns: repeat(6, 160px); }
+            .nid-box-7 { grid-column: span 1; order: 9; }
+            /* Desktop Order */
             .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
             .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
             .nid-box-2 { order: 7; } .nid-box-3 { order: 8; }
@@ -246,9 +250,9 @@
         
         .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; }
         .nid-kinematic-row { display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 10px; font-family: monospace; color: #cbd5e1; margin-bottom: 4px; }
-        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 4px; }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 4px; margin-bottom: 8px; }
         
-        .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; mt-auto; }
+        .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
         .nid-footer-global { background: #475569; color: #ffffff; text-align: center; font-size: 14px; font-weight: 900; padding: 4px 0; border-bottom: 1px solid #334155; }
         .nid-footer-split { display: flex; }
         .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; border-right: 1px solid #334155; }
@@ -552,6 +556,15 @@
                             <option value="Shooter">Shooter</option>
                         </select>
                     </div>
+                    <div class="flex justify-between items-center mt-3" id="cfg-kinematic-range-container">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
+                        <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                            <option value="ALL">All</option>
+                            <option value="50">Last 50</option>
+                            <option value="100">Last 100</option>
+                            <option value="200">Last 200</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
@@ -708,7 +721,8 @@
             trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
             trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false',
             showNID: storedNID !== null ? storedNID : 'true',
-            kinematicSource: localStorage.getItem('cfg_kinematicSource') || 'Global'
+            kinematicSource: localStorage.getItem('cfg_kinematicSource') || 'Global',
+            kinematicRange: localStorage.getItem('cfg_kinematicRange') || 'ALL'
         };
         
         let masterData = { locations: [], shooters: [], sets: [] };
@@ -802,6 +816,7 @@
                         if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
                         if (data.meta_tags.show_nid !== undefined) globalConfig.showNID = String(data.meta_tags.show_nid);
                         if (data.meta_tags.kinematic_source !== undefined) globalConfig.kinematicSource = String(data.meta_tags.kinematic_source);
+                        if (data.meta_tags.kinematic_range !== undefined) globalConfig.kinematicRange = String(data.meta_tags.kinematic_range);
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -821,7 +836,7 @@
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
-                    show_nid: globalConfig.showNID, kinematic_source: globalConfig.kinematicSource, base_unit: 1 
+                    show_nid: globalConfig.showNID, kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -957,29 +972,38 @@
 
         function getHotColdIcons(num, validRolls) {
             const cycles = CYCLE_MAP[num];
-            let hits = 0;
-            let rollsChecked = 0;
             
-            for(let i = validRolls.length - 1; i >= 0; i--) {
-                rollsChecked++;
-                if (rollsChecked > cycles[2]) break;
-                let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
-                if (sum === num) hits++;
-            }
-
-            let hotHtml = '';
-            let coldHtml = '';
-            let status = 'neutral';
-
             let hitsInC1 = 0;
             for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[0]); i--) {
                 let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                 if (sum === num) hitsInC1++;
             }
 
+            let hotHtml = '';
+            let coldHtml = '';
+            let status = 'neutral';
+
             if (hitsInC1 > 1) {
                 hotHtml = '🔥';
                 status = 'hot';
+                
+                let hitsInC2 = 0;
+                for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[1]); i--) {
+                    let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                    if (sum === num) hitsInC2++;
+                }
+                if (hitsInC2 > 2) {
+                    hotHtml = '🔥🔥';
+                    
+                    let hitsInC3 = 0;
+                    for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[2]); i--) {
+                        let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                        if (sum === num) hitsInC3++;
+                    }
+                    if (hitsInC3 > 3) {
+                        hotHtml = '🔥🔥🔥';
+                    }
+                }
             } else if (hitsInC1 === 0) {
                 let hitsInC2 = 0;
                 for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[1]); i--) {
@@ -1003,10 +1027,11 @@
             return { hot: hotHtml, cold: coldHtml, status: status };
         }
 
-        function getKinematicData(targetSetOrNum, validRolls) {
-            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
-            let totalNext = 0;
+        function getKinematicData(targetSetOrNum, validRolls, limitStr) {
+            let limit = parseInt(limitStr);
+            if (isNaN(limit)) limit = 999999;
 
+            let occurrences = [];
             for(let i=0; i<validRolls.length - 1; i++) {
                 let r = validRolls[i];
                 let isMatch = false;
@@ -1023,12 +1048,19 @@
                 if (isMatch) {
                     let nextR = validRolls[i+1];
                     let nextSum = nextR.Corrected_Point || nextR.Total_Sum;
-                    nextRolls[nextSum]++;
-                    totalNext++;
+                    occurrences.push(nextSum);
                 }
             }
 
+            if (occurrences.length > limit) {
+                occurrences = occurrences.slice(-limit);
+            }
+
+            let totalNext = occurrences.length;
             if (totalNext === 0) return { total: 0, hot: '--', cold: '--' };
+
+            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
+            occurrences.forEach(sum => nextRolls[sum]++);
 
             let maxDev = -999; let minDev = 999;
             let hotNum = '--'; let coldNum = '--';
@@ -1061,7 +1093,7 @@
                 nidHeader.classList.remove('flex');
                 return;
             }
-            container.style.display = 'flex';
+            container.style.display = 'grid';
             nidHeader.classList.remove('hidden');
             nidHeader.classList.add('flex');
 
@@ -1118,7 +1150,7 @@
                 let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
                 lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
                 
-                let kinData = getKinematicData(lastSetStr, kinematicRolls);
+                let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange);
                 targetHot = kinData.hot; targetCold = kinData.cold;
                 
                 let [ld1, ld2] = lastSetStr.split('-');
@@ -1142,7 +1174,7 @@
                 
                 let kinHtml = '';
                 sets.forEach(set => {
-                    let kData = getKinematicData(set, kinematicRolls);
+                    let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
                     if (kData.total > 0) {
                         let [d1, d2] = set.split('-');
                         let diceHtml = `<div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
@@ -1153,7 +1185,7 @@
                     }
                 });
                 
-                let kAll = getKinematicData(num, kinematicRolls);
+                let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
                 if (kAll.total > 0) {
                     kinHtml += `<div class="nid-kinematic-row mt-1 pt-1 border-t border-slate-700">
                         <div class="font-bold">ALL</div>
@@ -1165,10 +1197,10 @@
                 if (lastSetStr) {
                     if (num === targetHot) {
                         let [d1, d2] = lastSetStr.split('-');
-                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-red-500 mt-2">HOTTEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
+                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-red-500">HOTTEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
                     } else if (num === targetCold) {
                         let [d1, d2] = lastSetStr.split('-');
-                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-400 mt-2">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
+                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-400">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
                     }
                 }
 
@@ -1194,9 +1226,7 @@
             };
 
             container.innerHTML = `
-                <div class="nid-grid-container">
-                    ${[2,3,4,5,6,7,8,9,10,11,12].map(renderBox).join('')}
-                </div>
+                ${[2,3,4,5,6,7,8,9,10,11,12].map(renderBox).join('')}
             `;
         }
 
@@ -1426,6 +1456,18 @@
             document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             document.getElementById('cfg-show-nid').checked = (String(globalConfig.showNID) === 'true');
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
+            document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
+            
+            const kinContainer = document.getElementById('cfg-kinematic-container');
+            const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
+            const isNidOn = (String(globalConfig.showNID) === 'true');
+            kinContainer.style.display = isNidOn ? 'flex' : 'none';
+            kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
+
+            document.getElementById('cfg-show-nid').onchange = (e) => {
+                kinContainer.style.display = e.target.checked ? 'flex' : 'none';
+                kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
+            };
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -1778,11 +1820,17 @@
             nidToggle.checked = (String(globalConfig.showNID) === 'true');
             
             const kinContainer = document.getElementById('cfg-kinematic-container');
-            kinContainer.style.display = nidToggle.checked ? 'flex' : 'none';
+            const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
+            const isNidOn = (String(globalConfig.showNID) === 'true');
+            kinContainer.style.display = isNidOn ? 'flex' : 'none';
+            kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
+            
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
+            document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
 
             nidToggle.onchange = (e) => {
                 kinContainer.style.display = e.target.checked ? 'flex' : 'none';
+                kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             document.getElementById('modal-config-global').style.display = 'flex';
@@ -1801,12 +1849,14 @@
             globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
             globalConfig.showNID = document.getElementById('cfg-show-nid').checked ? 'true' : 'false';
             globalConfig.kinematicSource = document.getElementById('cfg-kinematic-source').value;
+            globalConfig.kinematicRange = document.getElementById('cfg-kinematic-range').value;
             
             localStorage.setItem('cfg_showShooterSDD', globalConfig.showShooterSDD);
             localStorage.setItem('cfg_trackATS', globalConfig.trackATS);
             localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
             localStorage.setItem('cfg_showNID', globalConfig.showNID);
             localStorage.setItem('cfg_kinematicSource', globalConfig.kinematicSource);
+            localStorage.setItem('cfg_kinematicRange', globalConfig.kinematicRange);
 
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
                 db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
