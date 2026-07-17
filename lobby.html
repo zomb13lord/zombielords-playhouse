@@ -51,6 +51,17 @@
         .modal-box { background: #020617; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 400px; padding: 30px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(0,0,0,1); text-align: center; }
         .modal-box-large { max-width: 800px; padding: 15px; }
         
+        .dynamic-modal-bg {
+            position: relative; overflow: hidden; border: 1px solid #10b981; border-radius: 8px; width: 100%; max-width: 400px; box-shadow: 0 0 40px rgba(16, 185, 129, 0.2), inset 0 0 20px rgba(0,0,0,1); text-align: center;
+        }
+        .dynamic-modal-bg::before {
+            content: ''; position: absolute; inset: 0; background-size: cover; background-position: center; z-index: 0;
+            var(--dynamic-bg);
+        }
+        .dynamic-modal-content {
+            position: relative; z-index: 1; background: rgba(2, 6, 23, 0.85); backdrop-filter: blur(8px); padding: 30px; height: 100%;
+        }
+
         .wicked-btn {
             background: linear-gradient(180deg, #064e3b 0%, #022c22 100%); color: #a7f3d0; font-weight: 900; 
             text-transform: uppercase; letter-spacing: 0.15em; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -59,6 +70,9 @@
         }
         .wicked-btn:hover { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5), inset 0 1px 1px rgba(16, 185, 129, 0.6); border-color: #34d399; color: #ffffff; }
         .wicked-btn:active { transform: translateY(2px); border-bottom-width: 1px; box-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+
+        .btn-cancel { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 12px; border-radius: 4px; font-weight: 900; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; letter-spacing: 0.1em; }
+        .btn-cancel:hover { background: #1e293b; color: #fff; border-color: #475569; }
 
         .ghosted-btn { opacity: 0.4; cursor: not-allowed; filter: grayscale(100%); }
     </style>
@@ -114,13 +128,11 @@
                 if (recDoc.exists) {
                     recommendations = recDoc.data();
                     
-                    // Apply Dynamic Lore
                     ['crypt', 'baccarat', 'dice', 'poker', 'roulette', 'casino', 'bloodlord', 'admin'].forEach(mod => {
                         const el = document.getElementById(`lore-${mod}`);
                         if (el) el.innerText = recommendations[`lore_${mod}`] || loreFallbacks[mod];
                     });
 
-                    // Sportsbook Lore / Prophecy Logic
                     const sbEl = document.getElementById('lore-sportsbook');
                     if (sbEl) {
                         let showProphecy = false;
@@ -175,13 +187,12 @@
             });
         }
 
-        function handleCardTap(moduleId, stableUrl, betaUrl) {
+        function handleCardTap(moduleId, stableUrl, betaUrl, cardName, bgUrl) {
             if (selectedCard !== moduleId) {
                 document.querySelectorAll('.module-card').forEach(c => c.classList.remove('card-selected'));
                 document.getElementById(`card-${moduleId}`).classList.add('card-selected');
                 selectedCard = moduleId;
             } else {
-                // Second Tap
                 if (moduleId === 'admin') {
                     window.location.href = stableUrl;
                     return;
@@ -191,66 +202,66 @@
                 const hasVideo = !!videoUrl;
                 const bypassVideo = ['crypt', 'sportsbook', 'casino', 'bloodlord'].includes(moduleId) || !hasVideo;
 
-                if (bypassVideo) {
-                    let state = userProfile.permissions[moduleId];
-                    if (state === true) state = 'Enabled';
-                    const isEnabled = (state === 'Enabled');
+                let state = userProfile.permissions[moduleId];
+                if (state === true) state = 'Enabled';
+                const isEnabled = (state === 'Enabled');
 
-                    if (!isEnabled) {
-                        document.getElementById('lockout-modal').style.display = 'flex';
-                        return;
-                    }
-                    
-                    if (moduleId === 'sportsbook') {
-                        window.open(recommendations.sportsbookUrl || stableUrl, '_blank');
-                        return;
-                    }
-                    if (moduleId === 'casino') {
-                        window.open(recommendations.casinoUrl || stableUrl, '_blank');
-                        return;
-                    }
-                    if (moduleId === 'bloodlord') {
-                        window.open(recommendations.bloodlordUrl || '#', '_blank');
-                        return;
-                    }
+                if (!isEnabled) {
+                    document.getElementById('lockout-modal').style.display = 'flex';
+                    return;
+                }
+
+                if (bypassVideo) {
+                    if (moduleId === 'sportsbook') { window.open(recommendations.sportsbookUrl || stableUrl, '_blank'); return; }
+                    if (moduleId === 'casino') { window.open(recommendations.casinoUrl || stableUrl, '_blank'); return; }
+                    if (moduleId === 'bloodlord') { window.open(recommendations.bloodlordUrl || '#', '_blank'); return; }
                     
                     executeModuleAction(moduleId, stableUrl, betaUrl);
                 } else {
-                    openZombielordsPickModal(moduleId, stableUrl, betaUrl, videoUrl);
+                    openDynamicModal(moduleId, stableUrl, betaUrl, videoUrl, cardName, bgUrl);
                 }
             }
         }
 
-        function openZombielordsPickModal(moduleId, stableUrl, betaUrl, videoUrl) {
-            const modal = document.getElementById('zombielords-pick-modal');
-            const watchBtn = document.getElementById('btn-watch-tape');
-            const enterBtn = document.getElementById('btn-enter-module');
+        function openDynamicModal(moduleId, stableUrl, betaUrl, videoUrl, cardName, bgUrl) {
+            const modal = document.getElementById('dynamic-module-modal');
+            const bgContainer = document.getElementById('dynamic-modal-bg-container');
+            const title = document.getElementById('dynamic-modal-title');
+            const btnContainer = document.getElementById('dynamic-btn-container');
             
-            watchBtn.onclick = () => openViewingOrb(videoUrl);
+            bgContainer.style.backgroundImage = `url('${bgUrl}')`;
+            title.innerText = cardName;
 
-            let state = userProfile.permissions[moduleId];
-            if (state === true) state = 'Enabled';
-            const isEnabled = (state === 'Enabled');
+            btnContainer.innerHTML = `
+                <button id="btn-watch-video" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded"><i class="fa-solid fa-play mr-2"></i> Watch Video</button>
+                <button id="btn-open-module" class="wicked-btn w-full py-3 text-xs">Open ${cardName}</button>
+                <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
+            `;
 
-            if (!isEnabled) {
-                enterBtn.classList.add('ghosted-btn');
-                enterBtn.onclick = () => {
-                    modal.style.display = 'none';
-                    document.getElementById('lockout-modal').style.display = 'flex';
-                };
-            } else {
-                enterBtn.classList.remove('ghosted-btn');
-                enterBtn.onclick = () => {
-                    modal.style.display = 'none';
+            document.getElementById('btn-watch-video').onclick = () => openViewingOrb(videoUrl);
+            
+            document.getElementById('btn-open-module').onclick = () => {
+                const role = userProfile.role;
+                const canAccessBeta = (role === 'Beta User' || role === 'Admin' || role === 'Master Admin');
+
+                if (betaUrl && canAccessBeta) {
+                    btnContainer.innerHTML = `
+                        <button id="btn-stable" class="wicked-btn w-full py-3 text-xs">Stable</button>
+                        <button id="btn-beta" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Beta</button>
+                        <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
+                    `;
+                    document.getElementById('btn-stable').onclick = () => { window.location.href = stableUrl; };
+                    document.getElementById('btn-beta').onclick = () => { window.location.href = betaUrl; };
+                } else {
                     executeModuleAction(moduleId, stableUrl, betaUrl);
-                };
-            }
+                }
+            };
 
             modal.style.display = 'flex';
         }
 
         async function openViewingOrb(url) {
-            document.getElementById('zombielords-pick-modal').style.display = 'none';
+            document.getElementById('dynamic-module-modal').style.display = 'none';
             const orb = document.getElementById('viewing-orb-modal');
             const iframe = document.getElementById('orb-iframe');
             iframe.src = url;
@@ -290,9 +301,22 @@
             const canAccessBeta = (role === 'Beta User' || role === 'Admin' || role === 'Master Admin');
 
             if (betaUrl && canAccessBeta) {
-                document.getElementById('version-modal').style.display = 'flex';
+                const modal = document.getElementById('dynamic-module-modal');
+                const bgContainer = document.getElementById('dynamic-modal-bg-container');
+                const title = document.getElementById('dynamic-modal-title');
+                const btnContainer = document.getElementById('dynamic-btn-container');
+                
+                bgContainer.style.backgroundImage = `url('https://zomb13lord.github.io/zombielords-playhouse/${moduleId}-card.jpg')`;
+                title.innerText = moduleId.toUpperCase();
+
+                btnContainer.innerHTML = `
+                    <button id="btn-stable" class="wicked-btn w-full py-3 text-xs">Stable</button>
+                    <button id="btn-beta" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Beta</button>
+                    <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
+                `;
                 document.getElementById('btn-stable').onclick = () => { window.location.href = stableUrl; };
                 document.getElementById('btn-beta').onclick = () => { window.location.href = betaUrl; };
+                modal.style.display = 'flex';
             } else {
                 if (moduleId === 'poker') window.open(stableUrl, '_blank');
                 else window.location.href = stableUrl;
@@ -301,8 +325,7 @@
 
         function closeModals() {
             document.getElementById('lockout-modal').style.display = 'none';
-            document.getElementById('version-modal').style.display = 'none';
-            document.getElementById('zombielords-pick-modal').style.display = 'none';
+            document.getElementById('dynamic-module-modal').style.display = 'none';
         }
 
         function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
@@ -330,10 +353,10 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
             
             <!-- 1. CRYPT CARD -->
-            <div id="card-crypt" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('crypt', 'crypt.html', null)">
+            <div id="card-crypt" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('crypt', 'crypt.html', null, 'The Crypt', 'https://zomb13lord.github.io/zombielords-playhouse/crypt-card.jpg')">
                 <div id="lock-crypt" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/crypt-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Crypt</h3>
@@ -343,10 +366,10 @@
             </div>
 
             <!-- 2. BACCARAT CARD -->
-            <div id="card-baccarat" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('baccarat', 'baccarat.html', 'beta-baccarat.html')">
+            <div id="card-baccarat" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('baccarat', 'baccarat.html', 'beta-baccarat.html', 'Baccarat', 'https://zomb13lord.github.io/zombielords-playhouse/baccarat-card.jpg')">
                 <div id="lock-baccarat" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Baccarat</h3>
@@ -356,10 +379,10 @@
             </div>
 
             <!-- 3. DICE CARD -->
-            <div id="card-dice" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('dice', 'dice.html', 'beta-dice.html')">
+            <div id="card-dice" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('dice', 'dice.html', 'beta-dice.html', 'Dice Tracker', 'https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg')">
                 <div id="lock-dice" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Dice Tracker</h3>
@@ -369,10 +392,10 @@
             </div>
 
             <!-- 4. POKER CARD -->
-            <div id="card-poker" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('poker', 'https://www.playwsop.com/', null)">
+            <div id="card-poker" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('poker', 'https://www.playwsop.com/', null, 'Poker Room', 'https://zomb13lord.github.io/zombielords-playhouse/poker-card.jpg')">
                 <div id="lock-poker" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/poker-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Poker Room</h3>
@@ -382,10 +405,10 @@
             </div>
 
             <!-- 5. ROULETTE CARD -->
-            <div id="card-roulette" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('roulette', 'roulette.html', 'beta-roulette.html')">
+            <div id="card-roulette" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('roulette', 'roulette.html', 'beta-roulette.html', 'Roulette Tracker', 'https://zomb13lord.github.io/zombielords-playhouse/roulette-card.jpg')">
                 <div id="lock-roulette" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/roulette-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Roulette Tracker</h3>
@@ -395,10 +418,10 @@
             </div>
 
             <!-- 6. SPORTSBOOK CARD -->
-            <div id="card-sportsbook" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('sportsbook', '#', null)">
+            <div id="card-sportsbook" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex flex-col justify-end p-6" onclick="handleCardTap('sportsbook', '#', null, 'Sportsbook', 'https://zomb13lord.github.io/zombielords-playhouse/sportsbook-card.jpg')">
                 <div id="lock-sportsbook" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/sportsbook-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Sportsbook</h3>
@@ -408,10 +431,10 @@
             </div>
 
             <!-- 7. ONLINE CASINO CARD -->
-            <div id="card-casino" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('casino', '#', null)">
+            <div id="card-casino" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('casino', '#', null, 'Online Casino', 'https://zomb13lord.github.io/zombielords-playhouse/casino-card.jpg')">
                 <div id="lock-casino" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/casino-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">Online Casino</h3>
@@ -421,10 +444,10 @@
             </div>
 
             <!-- 8. BLOODLORD'S REVENGE CARD -->
-            <div id="card-bloodlord" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('bloodlord', '#', null)">
+            <div id="card-bloodlord" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('bloodlord', '#', null, 'BloodLord', 'https://zomb13lord.github.io/zombielords-playhouse/bloodlord-card.jpg')">
                 <div id="lock-bloodlord" class="absolute top-4 right-4 z-50 hidden"><i class="fa-solid fa-lock text-red-500 text-2xl glow-red"></i></div>
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/bloodlord-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-red-500 transition-colors text-shadow-heavy">BloodLord's Revenge</h3>
@@ -434,9 +457,9 @@
             </div>
 
             <!-- 9. ADMIN DASHBOARD CARD -->
-            <div id="card-admin" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('admin', 'admin.html', null)">
+            <div id="card-admin" class="relative overflow-hidden group rounded-sm module-card min-h-[280px] flex-col justify-end p-6 hidden" onclick="handleCardTap('admin', 'admin.html', null, 'Admin', 'https://zomb13lord.github.io/zombielords-playhouse/admin-card.jpg')">
                 <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/admin-card.jpg');"></div>
-                <div class="absolute inset-0 bg-slate-950/40 md:bg-slate-950/80 md:group-hover:bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
+                <div class="absolute inset-0 bg-slate-950/40 transition-colors duration-500 pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col h-full justify-between pointer-events-none">
                     <div class="mt-auto">
                         <h3 class="text-xl font-black mb-2 uppercase tracking-wider text-white group-hover:text-emerald-400 transition-colors text-shadow-heavy">The Underworld Ledger</h3>
@@ -450,16 +473,15 @@
 
     <!-- CUSTOM MODALS -->
     
-    <!-- ZombieLord's Pick Modal -->
-    <div id="zombielords-pick-modal" class="modal-mask">
-        <div class="modal-box border-amber-500">
-            <i class="fa-solid fa-video text-amber-500 text-4xl mb-4" style="filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.8));"></i>
-            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">ZombieLord's Pick</h2>
-            <p class="text-xs text-slate-400 font-serif italic mb-6">A recommendation from the Overlord.</p>
-            <div class="flex flex-col gap-4">
-                <button id="btn-watch-tape" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded"><i class="fa-solid fa-play mr-2"></i> Watch Tape</button>
-                <button id="btn-enter-module" class="wicked-btn w-full py-3 text-xs">Enter Module</button>
-                <button onclick="closeModals()" class="mt-2 text-[10px] text-slate-500 hover:text-slate-300 uppercase tracking-widest font-bold">Cancel</button>
+    <!-- Dynamic Module Modal -->
+    <div id="dynamic-module-modal" class="modal-mask">
+        <div id="dynamic-modal-bg-container" class="dynamic-modal-bg">
+            <div class="dynamic-modal-content">
+                <h2 id="dynamic-modal-title" class="text-xl font-black text-emerald-400 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">Module</h2>
+                <p class="text-xs text-slate-300 font-serif italic mb-6">Choose your path</p>
+                <div id="dynamic-btn-container" class="flex flex-col gap-4">
+                    <!-- Injected by JS -->
+                </div>
             </div>
         </div>
     </div>
@@ -480,20 +502,7 @@
             <i class="fa-solid fa-lock text-red-500 text-4xl mb-4 glow-red"></i>
             <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">Access Denied</h2>
             <p class="text-xs text-slate-400 font-mono mb-6">Contact developer for access.</p>
-            <button onclick="closeModals()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white w-full py-3 text-xs font-black uppercase tracking-widest transition-all">Retreat</button>
-        </div>
-    </div>
-
-    <!-- Version Selection Modal -->
-    <div id="version-modal" class="modal-mask">
-        <div class="modal-box">
-            <h2 class="text-xl font-black text-emerald-400 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">Select Version</h2>
-            <p class="text-xs text-slate-400 font-serif italic mb-6">Choose your path of execution.</p>
-            <div class="flex flex-col gap-4">
-                <button id="btn-stable" class="wicked-btn w-full py-3 text-xs">Invoke (Stable)</button>
-                <button id="btn-beta" class="bg-amber-950/60 hover:bg-amber-700/80 border border-amber-500/50 text-amber-100 w-full py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Conjure (Beta)</button>
-                <button onclick="closeModals()" class="mt-2 text-[10px] text-slate-500 hover:text-slate-300 uppercase tracking-widest font-bold">Cancel</button>
-            </div>
+            <button onclick="closeModals()" class="btn-cancel">Retreat</button>
         </div>
     </div>
 
@@ -503,7 +512,7 @@
             <i class="fa-solid fa-skull text-red-500 text-4xl mb-4 glow-red"></i>
             <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2" style="font-family: 'Cinzel', serif;">System Fault</h2>
             <p id="sys-msg-text" class="text-xs text-slate-400 font-mono mb-6"></p>
-            <button onclick="closeSystemMessage()" class="bg-slate-900 border border-slate-700 text-slate-400 hover:text-white w-full py-3 text-xs font-black uppercase tracking-widest transition-all">Acknowledge</button>
+            <button onclick="closeSystemMessage()" class="btn-cancel">Acknowledge</button>
         </div>
     </div>
 
