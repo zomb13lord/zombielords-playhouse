@@ -60,7 +60,6 @@
         .sdd-ribbon::-webkit-scrollbar { display: none; }
         .sdd-metric { color: #94a3b8; }
         .sdd-metric b { color: #ffffff; }
-        .sdd-metric .med { color: #64748b; font-weight: normal; }
 
         /* ROLL NODES (Scaled 1.2x) */
         .hist-node {
@@ -78,6 +77,8 @@
         .state-seven-out { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); color: #ffffff; border-color: #ef4444; box-shadow: 0 0 18px rgba(220, 38, 38, 0.6); }
         .state-invalid { border-color: #f59e0b; color: #f59e0b; background: transparent; cursor: pointer; }
         .state-invalid:hover { background: rgba(245, 158, 11, 0.1); }
+        .state-ns { border-color: #3b82f6; color: #3b82f6; background: transparent; cursor: pointer; font-size: 14px; }
+        .state-ns:hover { background: rgba(59, 130, 246, 0.1); }
         .state-standard { }
 
         .mod-hardway { border: 2px dashed #facc15 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(0,0,0,0.8) !important; }
@@ -171,7 +172,7 @@
         .pad-handle {
             display: flex; justify-content: center; align-items: center;
             padding: 12px 20px; background: rgba(2, 6, 23, 0.8); border-radius: 16px 16px 0 0;
-            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative; cursor: pointer;
         }
 
         #pad-content { transition: max-height 0.2s cubic-bezier(0.4, 0, 0.2, 1), padding 0.2s ease; overflow: hidden; padding: 12px 15px 20px 15px; }
@@ -208,7 +209,21 @@
 
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .modal-box { background: #020617; border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; padding: 20px; box-shadow: 0 0 40px rgba(0,0,0,1); max-height: 90vh; overflow-y: auto; }
+        
+        /* Universal Modal Background */
+        .modal-box { 
+            background-color: #020617; 
+            background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');
+            background-size: cover; background-position: center;
+            border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; 
+            box-shadow: 0 0 40px rgba(0,0,0,1); max-height: 90vh; overflow-y: auto; padding: 0;
+        }
+        
+        .modal-content-layer {
+            background: linear-gradient(to top, rgba(2,6,23,1) 10%, rgba(2,6,23,0.9) 60%, rgba(2,6,23,0.4) 100%);
+            padding: 20px; padding-top: 60px; width: 100%; min-height: 100%; display: flex; flex-direction: column;
+        }
+
         .modal-btn { background: #0f172a; border: 1px solid #334155; color: #fff; padding: 12px; border-radius: 4px; font-weight: bold; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; }
         .modal-btn:hover { background: #1e293b; border-color: #475569; }
         .modal-btn.selected { background: #1e3a8a; border-color: #3b82f6; color: #fff; }
@@ -225,59 +240,71 @@
         
         .btn-cancel { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 12px; border-radius: 4px; font-weight: 900; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; letter-spacing: 0.1em; }
         .btn-cancel:hover { background: #1e293b; color: #fff; border-color: #475569; }
+
+        /* CSS Toggles */
+        .toggle-checkbox:checked { right: 0; border-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #10b981; }
+        .toggle-checkbox:checked + .toggle-label:after { transform: translateX(100%); border-color: white; }
     </style>
 </head>
 <body class="flex flex-col">
 
     <!-- MODULE 1: ZOMBIELORD NAVBAR -->
     <nav class="zombie-navbar p-4 flex justify-between items-center border-b border-emerald-900/50 flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-        <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="window.location.assign('lobby.html')">
+        <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="promptLobbyReturn()">
             <h2 class="text-sm font-black emerald-text tracking-tighter uppercase leading-none">ZombieLord's</h2>
             <span class="text-[9px] text-white tracking-[0.4em] uppercase font-bold mt-1 playhouse-glow">Playhouse</span>
         </div>
         <div class="flex items-center gap-4 md:gap-6">
             <button onclick="openCryptOptions()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-floppy-disk"></i></button>
             <button onclick="openGlobalConfig()" class="text-slate-400 hover:text-emerald-400 transition-colors text-lg"><i class="fa-solid fa-gear"></i></button>
-            <button onclick="logout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
+            <button onclick="promptLogout()" class="text-[10px] border border-red-500/40 px-4 py-1.5 bg-red-950/30 hover:bg-red-600 hover:text-white transition-all uppercase font-black tracking-[0.2em]">Logout</button>
         </div>
     </nav>
 
-    <!-- STICKY ZONE (Holds HB and SDD) -->
+    <!-- STICKY ZONE (Holds HB, Bonus Trackers, and SDD) -->
     <div id="sticky-zone">
         <!-- MODULE 2: HISTORY BAR -->
         <div id="history-bar">
             <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
         </div>
 
+        <!-- BONUS TRACKERS -->
+        <div id="bonus-trackers" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner">
+            <div id="ats-smalls" class="flex gap-1 p-1 rounded"></div>
+            <div id="sharpshooter-stack" class="relative w-10 h-10 flex items-end justify-center"></div>
+            <div id="ats-talls" class="flex gap-1 p-1 rounded"></div>
+        </div>
+
         <!-- MODULE 6: SESSION DIAGNOSTIC DISPLAY (SDD) -->
         <div id="sdd-global" class="sdd-ribbon">
             <span class="text-emerald-400 font-black">GLB</span>
-            <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
             <span class="sdd-metric">CR: <b id="g-cr">0</b></span>
-            <span class="sdd-metric">SOR: <b id="g-sor-mean">0.0</b>|<span class="med" id="g-sor-med">0.0</span></span>
-            <span class="sdd-metric">SRR: <b id="g-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b id="g-psr-mean">0.0</b>|<span class="med" id="g-psr-med">0.0</span></span>
+            <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
+            <span class="sdd-metric">SOR: <b class="text-white" id="g-sor-med">0</b>|<b class="text-white" id="g-sor-mean">0.0</b></span>
+            <span class="sdd-metric">SRR: <b class="text-white" id="g-srr-med">0</b>|<b class="text-white" id="g-srr-mean">0.0</b></span>
+            <span class="sdd-metric">PSR: <b class="text-white" id="g-psr-med">0</b>|<b class="text-white" id="g-psr-mean">0.0</b></span>
+            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="g-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="g-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="g-ats-a">0</b></span>
         </div>
         <div id="sdd-shooter" class="sdd-ribbon" style="display: none;">
             <span class="text-amber-400 font-black" id="sdd-shooter-label">SHTR</span>
-            <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
             <span class="sdd-metric">CR: <b id="s-cr">0</b></span>
-            <span class="sdd-metric">SOR: <b id="s-sor-mean">0.0</b>|<span class="med" id="s-sor-med">0.0</span></span>
-            <span class="sdd-metric">SRR: <b id="s-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b id="s-psr-mean">0.0</b>|<span class="med" id="s-psr-med">0.0</span></span>
+            <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
+            <span class="sdd-metric">SOR: <b class="text-white" id="s-sor-med">0</b>|<b class="text-white" id="s-sor-mean">0.0</b></span>
+            <span class="sdd-metric">SRR: <b class="text-white" id="s-srr-med">0</b>|<b class="text-white" id="s-srr-mean">0.0</b></span>
+            <span class="sdd-metric">PSR: <b class="text-white" id="s-psr-med">0</b>|<b class="text-white" id="s-psr-mean">0.0</b></span>
+            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="s-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="s-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="s-ats-a">0</b></span>
         </div>
     </div>
 
     <!-- MAIN BODY SPACE -->
-    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto" onclick="setIpState('collapsed')">
+    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto">
         <!-- Future SDD expansion space -->
     </div>
 
     <!-- MODULE 4: EXPANDABLE INPUT PAD -->
     <div id="input-pad-wrapper" class="state-collapsed">
-        <div class="pad-handle relative">
-            <div class="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10" onclick="handleLeftClick()"></div>
-            <div class="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10" onclick="handleRightClick()"></div>
+        <div class="pad-handle" onclick="setIpState('natural')">
             <div class="text-[10px] font-bold text-slate-500 tracking-widest w-full text-center pointer-events-none">CLICK TO INPUT ROLL</div>
         </div>
         
@@ -292,150 +319,212 @@
                     </div>
                 </div>
 
-                <button id="btn-submit-roll" onclick="submitRoll()" class="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all mt-1">Next Roll</button>
+                <div id="btn-submit-container" class="mt-1">
+                    <button id="btn-submit-roll" onclick="submitRoll()" class="w-full bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 text-white font-black py-3 rounded uppercase tracking-widest shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">Next Roll</button>
+                    <div id="btn-split-roll" class="hidden flex gap-2 w-full">
+                        <button onclick="setIpState('collapsed')" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-black py-3 rounded uppercase tracking-widest transition-all">Hide Roll Input</button>
+                    </div>
+                </div>
                 
                 <div id="pad-extra" class="flex gap-2">
                     <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
                     <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
+                    <button onclick="handleNewShooter()" class="flex-1 border border-emerald-500 text-emerald-400 hover:bg-emerald-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">New Shooter</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- MODALS -->
+    <div id="modal-logout" class="modal-mask">
+        <div class="modal-box border-red-500">
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-skull text-red-500 text-4xl mb-4 glow-red"></i>
+                <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">Disconnect</h2>
+                <p class="text-xs text-slate-400 font-mono mb-6">Are you sure you want to disconnect from the underworld?</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeAllModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="executeLogout()" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Disconnect</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-lobby-return" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-door-open text-emerald-500 text-4xl mb-4 glow-green"></i>
+                <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Return to Lobby</h2>
+                <p class="text-xs text-slate-400 font-mono mb-6">Return to lobby?</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeAllModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="executeLobbyReturn()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Return</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-alert" class="modal-mask">
         <div class="modal-box border-red-500">
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
-            <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">System Notice</h2>
-            <p id="alert-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
-            <button onclick="closeModals()" class="btn-cancel">Acknowledge</button>
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
+                <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">System Notice</h2>
+                <p id="alert-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
+                <button onclick="closeModals()" class="btn-cancel">Acknowledge</button>
+            </div>
         </div>
     </div>
 
     <div id="modal-confirm" class="modal-mask">
         <div class="modal-box border-red-500">
-            <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
-            <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">Confirm Action</h2>
-            <p id="confirm-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
-            <div class="grid grid-cols-2 gap-3">
-                <button id="btn-confirm-no" class="btn-cancel">Cancel</button>
-                <button id="btn-confirm-yes" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Proceed</button>
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-triangle-exclamation text-red-500 text-4xl mb-4 glow-red"></i>
+                <h2 class="text-xl font-black text-red-500 uppercase tracking-widest mb-2 cinzel">Confirm Action</h2>
+                <p id="confirm-msg" class="text-xs text-slate-400 font-mono mb-6"></p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button id="btn-confirm-no" class="btn-cancel">Cancel</button>
+                    <button id="btn-confirm-yes" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Proceed</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-crypt-options" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
-            <p class="text-xs text-slate-400 font-serif italic mb-6">Manage archived souls in the Crypt.</p>
-            <div class="flex flex-col gap-3">
-                <button onclick="promptCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save & Enter Crypt</button>
-                <button onclick="enterCryptWithoutSaving()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
-                <button onclick="clearAndRestart()" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Clear & Restart</button>
-                <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
+            <div class="modal-content-layer text-center">
+                <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">The Crypt</h2>
+                <p class="text-xs text-slate-400 font-serif italic mb-6">Manage archived entities in the Crypt.</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="promptCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save & Enter Crypt</button>
+                    <button onclick="enterCryptWithoutSaving()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Enter Without Saving</button>
+                    <button onclick="clearAndRestart()" class="bg-red-950/60 border border-red-500/50 text-red-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Clear & Restart</button>
+                    <button onclick="closeModals()" class="btn-cancel mt-2">Cancel</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-crypt-save" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Archive Session</h2>
-            <p class="text-xs text-slate-400 font-mono mb-4">Enter session designation.</p>
-            <input type="text" id="crypt-save-name" class="input-wicked mb-4 text-center" placeholder="e.g. BELLAGIO" autocomplete="off">
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="executeCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Archive</button>
+            <div class="modal-content-layer text-center">
+                <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Archive Session</h2>
+                <p class="text-xs text-slate-400 font-mono mb-4">Enter session designation.</p>
+                <input type="text" id="crypt-save-name" class="input-wicked mb-4 text-center" placeholder="e.g. BELLAGIO" autocomplete="off">
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="executeCryptSave()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Archive</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-config-global" class="modal-mask">
         <div class="modal-box border-blue-500">
-            <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel">Global Configuration</h2>
-            <div class="flex flex-col text-left">
-                
-                <div class="cfg-row">
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
-                    <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                    <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                
-                <div class="cfg-row">
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleShooterSelect()"></select></div>
-                    <button onclick="editAsset('shooters')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                    <button onclick="deleteAsset('shooters')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                </div>
-                
-                <div class="cfg-row">
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
-                    <button onclick="editAsset('dice_sets')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                    <button onclick="deleteAsset('dice_sets')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                </div>
+            <div class="modal-content-layer">
+                <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel text-center">Global Configuration</h2>
+                <div class="flex flex-col text-left">
+                    
+                    <div class="cfg-row">
+                        <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
+                        <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    
+                    <div class="cfg-row">
+                        <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleShooterSelect()"></select></div>
+                        <button onclick="editAsset('shooters')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('shooters')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    
+                    <div class="cfg-row">
+                        <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
+                        <button onclick="editAsset('dice_sets')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('dice_sets')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
-                    <div class="flex gap-2">
-                        <select id="cfg-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updatePosChild('cfg')"></select>
-                        <select id="cfg-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updateShooterMemory()"></select>
+                    <div class="mb-3">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
+                        <div class="flex gap-2">
+                            <select id="cfg-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updatePosChild('cfg')"></select>
+                            <select id="cfg-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updateShooterMemory()"></select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
+                        <div class="grid grid-cols-4 gap-3" id="color-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-sdd" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">ATS</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-track-ats" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Sharpshooter</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-track-ss" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                        </label>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
-                    <div class="grid grid-cols-4 gap-3" id="color-grid">
-                        <!-- Injected by JS -->
-                    </div>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveGlobalConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
                 </div>
-
-                <div class="cfg-row mt-2">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Show Shooter SDD</label>
-                        <select id="cfg-show-sdd" class="select-wicked border-blue-500/50 focus:border-blue-400">
-                            <option value="true">Yes</option>
-                            <option value="false">No</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3 mt-4">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="saveGlobalConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
             </div>
         </div>
     </div>
 
     <div id="modal-config-hand" class="modal-mask">
         <div class="modal-box border-blue-500">
-            <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-2 cinzel">Roll Configuration</h2>
-            <p class="text-[10px] text-slate-400 font-mono mb-4">Retroactively update parameters for this specific hand.</p>
-            <input type="hidden" id="hcfg-index">
-            <div class="flex flex-col gap-3 text-left">
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
-                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
-                <div>
-                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
-                    <div class="flex gap-2">
-                        <select id="hcfg-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updatePosChild('hcfg')"></select>
-                        <select id="hcfg-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2"></select>
+            <div class="modal-content-layer">
+                <h2 class="text-lg font-black text-blue-400 uppercase tracking-widest mb-2 cinzel text-center">Roll Configuration</h2>
+                <p class="text-[10px] text-slate-400 font-mono mb-4 text-center">Retroactively update parameters for this segment.</p>
+                <input type="hidden" id="hcfg-start-idx">
+                <input type="hidden" id="hcfg-end-idx">
+                <input type="hidden" id="hcfg-is-forward">
+                <div class="flex flex-col gap-3 text-left">
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
+                        <div class="flex gap-2">
+                            <select id="hcfg-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updatePosChild('hcfg')"></select>
+                            <select id="hcfg-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2"></select>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="grid grid-cols-2 gap-3 mt-6">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Roll</button>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Segment</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-shooter-transition" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <i class="fa-solid fa-users text-emerald-500 text-4xl mb-4"></i>
-            <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Seven Out</h2>
-            <p class="text-xs text-slate-400 font-mono mb-6">Is the dice passing to a new shooter?</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModals()" class="btn-cancel">Same Shooter</button>
-                <button onclick="handleNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-users text-emerald-500 text-4xl mb-4"></i>
+                <h2 class="text-xl font-black text-emerald-500 uppercase tracking-widest mb-2 cinzel">Seven Out</h2>
+                <p class="text-xs text-slate-400 font-mono mb-6">Is the dice passing to a new shooter?</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="handleSameShooter()" class="btn-cancel">Same Shooter</button>
+                    <button onclick="handleNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
+                </div>
             </div>
         </div>
     </div>
@@ -443,59 +532,69 @@
     <!-- Metadata Creation Modal -->
     <div id="modal-metadata" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <h2 id="meta-title" class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Register Asset</h2>
-            <div id="meta-fields" class="flex flex-col gap-3 text-left"></div>
-            <div class="grid grid-cols-2 gap-3 mt-6">
-                <button onclick="closeMetadataModal()" class="btn-cancel">Cancel</button>
-                <button onclick="saveMetadata()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
+            <div class="modal-content-layer">
+                <h2 id="meta-title" class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel text-center">Register Asset</h2>
+                <div id="meta-fields" class="flex flex-col gap-3 text-left"></div>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="closeMetadataModal()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveMetadata()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-invalid" class="modal-mask">
         <div class="modal-box border-amber-500">
-            <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-4 cinzel">Invalid Roll</h2>
-            <div class="flex flex-col gap-2" id="invalid-options-container">
-                <button class="modal-btn" id="inv-opt-1" onclick="selectInvalidReason('Dice Off Table (One)', 1)">Dice Off Table (One)</button>
-                <button class="modal-btn" id="inv-opt-2" onclick="selectInvalidReason('Dice Off Table (Two)', 2)">Dice Off Table (Two)</button>
-                <button class="modal-btn" id="inv-opt-3" onclick="selectInvalidReason('Dice in the Dough', 3)">Dice in the Dough</button>
-                <button class="modal-btn" id="inv-opt-4" onclick="selectInvalidReason('Dice to Tall', 4)">Dice to Tall</button>
-                <button class="modal-btn" id="inv-opt-5" onclick="selectInvalidReason('Dice to Short', 5)">Dice to Short</button>
-                <button class="modal-btn border-emerald-500 text-emerald-400 hidden" id="inv-opt-wp" onclick="selectInvalidReason('Wrong Point', 'wp')">Wrong Point</button>
-            </div>
-            <div class="grid grid-cols-2 gap-3 mt-4">
-                <button onclick="cancelInvalid()" class="btn-cancel">Cancel</button>
-                <button onclick="acceptInvalid()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Accept</button>
+            <div class="modal-content-layer text-center">
+                <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-4 cinzel">Invalid Roll</h2>
+                <div class="flex flex-col gap-2" id="invalid-options-container">
+                    <button class="modal-btn" id="inv-opt-1" onclick="selectInvalidReason('Dice Off Table (One)', 1)">Dice Off Table (One)</button>
+                    <button class="modal-btn" id="inv-opt-2" onclick="selectInvalidReason('Dice Off Table (Two)', 2)">Dice Off Table (Two)</button>
+                    <button class="modal-btn" id="inv-opt-3" onclick="selectInvalidReason('Dice in the Dough', 3)">Dice in the Dough</button>
+                    <button class="modal-btn" id="inv-opt-4" onclick="selectInvalidReason('Dice to Tall', 4)">Dice to Tall</button>
+                    <button class="modal-btn" id="inv-opt-5" onclick="selectInvalidReason('Dice to Short', 5)">Dice to Short</button>
+                    <button class="modal-btn border-emerald-500 text-emerald-400 hidden" id="inv-opt-wp" onclick="selectInvalidReason('Wrong Point', 'wp')">Wrong Point</button>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <button onclick="cancelInvalid()" class="btn-cancel">Cancel</button>
+                    <button onclick="acceptInvalid()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Accept</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-incomplete-roll" class="modal-mask">
         <div class="modal-box border-amber-500">
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
-            <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Incomplete Roll</h2>
-            <p class="text-xs text-slate-400 font-mono mb-6">2 selections must be made to input roll. Would you like to edit the roll?</p>
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                <button onclick="editIncompleteRoll()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Edit Roll</button>
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
+                <h2 class="text-xl font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Incomplete Roll</h2>
+                <p class="text-xs text-slate-400 font-mono mb-6">2 selections must be made to input roll. Would you like to edit the roll?</p>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="editIncompleteRoll()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Edit Roll</button>
+                </div>
             </div>
         </div>
     </div>
 
     <div id="modal-wrong-point" class="modal-mask">
         <div class="modal-box border-emerald-500">
-            <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Select Correct Point</h2>
-            <div class="grid grid-cols-3 gap-2" id="wrong-point-grid"></div>
-            <button onclick="closeModals()" class="btn-cancel mt-4">Cancel</button>
+            <div class="modal-content-layer text-center">
+                <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Select Correct Point</h2>
+                <div class="grid grid-cols-3 gap-2" id="wrong-point-grid"></div>
+                <button onclick="closeModals()" class="btn-cancel mt-4">Cancel</button>
+            </div>
         </div>
     </div>
 
     <div id="modal-error-display" class="modal-mask">
         <div class="modal-box border-amber-500">
-            <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
-            <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Roll Exception</h2>
-            <p id="error-display-text" class="text-sm text-slate-300 font-mono mb-6"></p>
-            <button onclick="closeModals()" class="btn-cancel w-full">Acknowledge</button>
+            <div class="modal-content-layer text-center">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-4xl mb-4"></i>
+                <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-2 cinzel">Roll Exception</h2>
+                <p id="error-display-text" class="text-sm text-slate-300 font-mono mb-6"></p>
+                <button onclick="closeModals()" class="btn-cancel w-full">Acknowledge</button>
+            </div>
         </div>
     </div>
 
@@ -520,11 +619,20 @@
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
-        let globalConfig = { location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', showShooterSDD: 'false' };
+        
+        let globalConfig = { 
+            location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', 
+            showShooterSDD: localStorage.getItem('cfg_showShooterSDD') || 'false', 
+            trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
+            trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false' 
+        };
+        
         let masterData = { locations: [], shooters: [], sets: [] };
         let activeMetaType = null;
         let activeMetaId = null;
         let currentConfigShooter = 'ALL';
+        let preConfigShooter = 'ALL';
+        let forceNextSaveAsNS = false;
 
         let selectedLeft = null;
         let selectedRight = null;
@@ -605,7 +713,9 @@
                         globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
                         globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
-                        globalConfig.showShooterSDD = data.meta_tags.show_shooter_sdd !== undefined ? String(data.meta_tags.show_shooter_sdd) : 'false';
+                        if (data.meta_tags.show_shooter_sdd !== undefined) globalConfig.showShooterSDD = String(data.meta_tags.show_shooter_sdd);
+                        if (data.meta_tags.track_ats !== undefined) globalConfig.trackATS = String(data.meta_tags.track_ats);
+                        if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
@@ -624,7 +734,8 @@
                     location: globalConfig.location, shooter_or_dealer: globalConfig.shooter, 
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
-                    show_shooter_sdd: globalConfig.showShooterSDD, base_unit: 1 
+                    show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
+                    base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -655,16 +766,31 @@
 
         function calcStats(log) {
             let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
-            let handRolls = [], handPoints = [];
-            let currentHandRolls = 0, currentHandPoints = 0;
+            let handRolls = [], handPoints = [], srrRolls = [];
+            let currentHandRolls = 0, currentHandPoints = 0, currentSrrRolls = 0;
             let isComeout = true, currentPoint = null;
+            let atsS = 0, atsT = 0, atsA = 0;
 
             log.forEach(r => {
+                if (r.is_NS_Marker) return;
                 if (r.Invalid_Roll || r.invalidRoll) return;
+                
                 let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
                 
                 TR++;
                 currentHandRolls++;
+                currentSrrRolls++;
+
+                if (r.Notes) {
+                    if (r.Notes.includes("ATS Small Hit")) atsS++;
+                    if (r.Notes.includes("ATS Tall Hit")) atsT++;
+                    if (r.Notes.includes("ATS All Hit")) atsA++;
+                }
+
+                if (sum === 7) {
+                    srrRolls.push(currentSrrRolls);
+                    currentSrrRolls = 0;
+                }
 
                 if (isComeout) {
                     if (sum === 7 || sum === 11) {
@@ -694,10 +820,12 @@
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
             const srrMean = (SO + CS) > 0 ? (TR / (SO + CS)).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
-            const sorMed = getMedian(handRolls).toFixed(1);
-            const psrMed = getMedian(handPoints).toFixed(1);
+            
+            const sorMed = Math.round(getMedian(handRolls));
+            const srrMed = Math.round(getMedian(srrRolls));
+            const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, sorMean, sorMed, srrMean, psrMean, psrMed };
+            return { TR, CR: currentHandRolls, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
         }
 
         function updateSDD() {
@@ -707,8 +835,12 @@
             document.getElementById('g-sor-mean').innerText = gStats.sorMean;
             document.getElementById('g-sor-med').innerText = gStats.sorMed;
             document.getElementById('g-srr-mean').innerText = gStats.srrMean;
+            document.getElementById('g-srr-med').innerText = gStats.srrMed;
             document.getElementById('g-psr-mean').innerText = gStats.psrMean;
             document.getElementById('g-psr-med').innerText = gStats.psrMed;
+            document.getElementById('g-ats-s').innerText = gStats.atsS;
+            document.getElementById('g-ats-t').innerText = gStats.atsT;
+            document.getElementById('g-ats-a').innerText = gStats.atsA;
 
             let sLog = universalLog;
             let sLabel = "ALL";
@@ -727,10 +859,140 @@
             document.getElementById('s-sor-mean').innerText = sStats.sorMean;
             document.getElementById('s-sor-med').innerText = sStats.sorMed;
             document.getElementById('s-srr-mean').innerText = sStats.srrMean;
+            document.getElementById('s-srr-med').innerText = sStats.srrMed;
             document.getElementById('s-psr-mean').innerText = sStats.psrMean;
             document.getElementById('s-psr-med').innerText = sStats.psrMed;
+            document.getElementById('s-ats-s').innerText = sStats.atsS;
+            document.getElementById('s-ats-t').innerText = sStats.atsT;
+            document.getElementById('s-ats-a').innerText = sStats.atsA;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
+        }
+
+        function updateBonusTrackers() {
+            const container = document.getElementById('bonus-trackers');
+            if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
+                container.classList.add('hidden');
+                container.classList.remove('flex');
+                return;
+            }
+            container.classList.remove('hidden');
+            container.classList.add('flex');
+
+            // Calculate ATS (Resets on ANY 7)
+            let atsCounts = {2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0};
+            let lastAnySevenIndex = -1;
+            for(let i = universalLog.length - 1; i >= 0; i--) {
+                if(universalLog[i].is_NS_Marker) continue;
+                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7) {
+                    lastAnySevenIndex = i;
+                    break;
+                }
+            }
+            for(let i = lastAnySevenIndex + 1; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
+                let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(atsCounts[sum] !== undefined) atsCounts[sum]++;
+            }
+
+            // Calculate Sharpshooter (Resets on SEVEN OUT)
+            let pointsMade = 0;
+            let isComeout = true;
+            let currentPoint = null;
+            for(let i = 0; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
+                let sum = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(isComeout) {
+                    if(![2,3,7,11,12].includes(sum)) {
+                        isComeout = false;
+                        currentPoint = sum;
+                    }
+                } else {
+                    if(sum === 7) {
+                        pointsMade = 0; 
+                        isComeout = true;
+                        currentPoint = null;
+                    } else if(sum === currentPoint) {
+                        pointsMade++;
+                        isComeout = true;
+                        currentPoint = null;
+                    }
+                }
+            }
+
+            // Render ATS
+            const smalls = [2,3,4,5,6];
+            const talls = [8,9,10,11,12];
+            
+            const renderATSGroup = (group, id, themeColor) => {
+                const el = document.getElementById(id);
+                if (globalConfig.trackATS !== 'true') { el.innerHTML = ''; el.className = ''; return; }
+                
+                let allHit = true;
+                let html = '';
+                group.forEach(num => {
+                    const hits = atsCounts[num];
+                    if (hits === 0) allHit = false;
+                    
+                    let bgClass = '';
+                    if (themeColor === 'emerald') {
+                        bgClass = hits > 0 ? 'bg-emerald-500 text-black border-emerald-500' : 'bg-transparent text-emerald-500 border-emerald-500/50';
+                    } else {
+                        bgClass = hits > 0 ? 'bg-red-600 text-white border-red-600' : 'bg-transparent text-red-500 border-red-500/50';
+                    }
+
+                    const sup = hits > 1 ? `<span class="absolute -top-3 -right-3 text-amber-400 text-[11px] font-black drop-shadow-[0_2px_2px_rgba(0,0,0,1)]" style="text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 8px #f59e0b;">x${hits}</span>` : '';
+                    html += `<div class="relative w-7 h-7 md:w-9 md:h-9 rounded-full border-2 flex items-center justify-center font-black text-sm md:text-base ${bgClass}">${num}${sup}</div>`;
+                });
+                el.innerHTML = html;
+                
+                let glowClass = '';
+                if (allHit) {
+                    glowClass = themeColor === 'emerald' ? 'shadow-[0_0_15px_rgba(16,185,129,0.8)] bg-emerald-500/20 border border-emerald-500' : 'shadow-[0_0_15px_rgba(220,38,38,0.8)] bg-red-600/20 border border-red-600';
+                } else {
+                    glowClass = 'border border-transparent';
+                }
+                el.className = `flex gap-1 md:gap-2 p-1 rounded transition-all ${glowClass}`;
+            };
+
+            renderATSGroup(smalls, 'ats-smalls', 'emerald');
+            renderATSGroup(talls, 'ats-talls', 'red');
+
+            // Render Sharpshooter
+            const ssEl = document.getElementById('sharpshooter-stack');
+            if (globalConfig.trackSharpshooter !== 'true') {
+                ssEl.innerHTML = '';
+            } else {
+                let html = '';
+                if (pointsMade === 0) {
+                    html = `<div class="w-10 h-10 rounded-full border-2 border-slate-600 border-dashed flex items-center justify-center text-slate-600 text-sm font-black">0</div>`;
+                } else {
+                    const maxDisplay = Math.min(pointsMade, 11);
+                    const yOffset = 2; 
+                    const totalY = (maxDisplay - 1) * yOffset;
+                    const messyX = [0, -2, 2, -1, 1, -3, 3, -2, 2, -1, 1];
+                    
+                    html += `<div class="relative w-10 h-10" style="transform: translateY(-${totalY/2}px);">`;
+                    
+                    for(let i=0; i<maxDisplay; i++) {
+                        const tier = i + 1;
+                        const color = POINT_COLORS[tier] || '#fff';
+                        const isTop = (i === maxDisplay - 1);
+                        const text = isTop ? pointsMade : '';
+                        const textColor = [1, 11].includes(tier) ? '#fff' : '#000';
+                        const bottom = i * yOffset;
+                        const leftOffset = messyX[i] || 0;
+                        
+                        let styleClass = isTop 
+                            ? 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]' 
+                            : 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)] brightness-75';
+                            
+                        html += `<div class="absolute rounded-full border-2 flex items-center justify-center font-black text-lg ${styleClass}" style="width: 36px; height: 36px; bottom: ${bottom}px; left: calc(50% + ${leftOffset}px); transform: translateX(-50%); background-color: ${color}; color: ${textColor}; z-index: ${i};">${text}</div>`;
+                    }
+                    html += `</div>`;
+                }
+                ssEl.innerHTML = html;
+            }
         }
 
         // --- UI BUILDERS ---
@@ -801,7 +1063,7 @@
             const addNewOpt = `<option value="ADD_NEW" class="text-emerald-400 font-bold">[+ REGISTER NEW]</option>`;
             const locs = `<option value="ALL">ALL LOCATIONS</option>` + addNewOpt + masterData.locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
             const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
-            const sets = `<option value="ALL">NONE SELECTED</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            const sets = `<option value="ALL">NONE</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
@@ -816,7 +1078,10 @@
             document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
-            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
+            
+            document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
+            document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
+            document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -824,6 +1089,15 @@
         function updatePosChild(prefix, defaultChild = null) {
             const parentVal = document.getElementById(`${prefix}-pos-parent`).value;
             const childSelect = document.getElementById(`${prefix}-pos-child`);
+            childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
+            if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
+                childSelect.value = defaultChild;
+            }
+        }
+
+        function updateMetaPosChild(defaultChild = null) {
+            const parentVal = document.getElementById('meta-last-pos-parent').value;
+            const childSelect = document.getElementById('meta-last-pos-child');
             childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
             if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
                 childSelect.value = defaultChild;
@@ -887,22 +1161,41 @@
 
         // --- INPUT PAD LOGIC ---
         function handleLeftClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
-            else if (ipState === 'natural') setIpState('collapsed');
+            if (ipState === 'collapsed') setIpState('natural');
         }
 
         function handleRightClick() {
-            if (ipState === 'collapsed' || ipState === 'expanded') setIpState('natural');
-            else if (ipState === 'natural') setIpState('expanded');
+            if (ipState === 'collapsed') setIpState('natural');
         }
 
         function setIpState(state) {
             ipState = state;
             document.getElementById('input-pad-wrapper').className = `state-${state}`;
+            
+            const btnSubmit = document.getElementById('btn-submit-roll');
+            const btnSplit = document.getElementById('btn-split-roll');
+            
+            if (state === 'natural') {
+                btnSubmit.classList.remove('hidden');
+                btnSplit.classList.add('hidden');
+                btnSubmit.innerText = "NEXT ROLL";
+            } else if (state === 'expanded') {
+                if (!selectedLeft || !selectedRight) {
+                    btnSubmit.classList.add('hidden');
+                    btnSplit.classList.remove('hidden');
+                } else {
+                    btnSubmit.classList.remove('hidden');
+                    btnSplit.classList.add('hidden');
+                    btnSubmit.innerText = "NEXT ROLL";
+                }
+            } else if (state === 'collapsed') {
+                btnSubmit.classList.remove('hidden');
+                btnSplit.classList.add('hidden');
+                btnSubmit.innerText = "NEXT ROLL";
+            }
         }
 
         function selectDie(side, val) {
-            document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
             const colorClass = `die-${globalConfig.diceColor}`;
             if (side === 'left') {
                 selectedLeft = val;
@@ -915,6 +1208,10 @@
                     document.getElementById(`btn-r-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
                 }
             }
+
+            document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
+            document.getElementById('btn-submit-roll').classList.remove('hidden');
+            document.getElementById('btn-split-roll').classList.add('hidden');
         }
 
         function clearPad() {
@@ -955,35 +1252,66 @@
 
         async function submitRoll() {
             const btn = document.getElementById('btn-submit-roll');
+            const btnSplit = document.getElementById('btn-split-roll');
             
-            if (!selectedLeft && !selectedRight) {
-                if (ipState === 'expanded') {
-                    await customAlert("2 selections must be made to input roll.");
-                } else {
+            if (!selectedLeft || !selectedRight) {
+                if (ipState === 'natural') {
                     if (btn.innerText === "EDIT ROLL") {
                         setIpState('expanded');
-                        btn.innerText = "NEXT ROLL";
                     } else {
                         btn.innerText = "EDIT ROLL";
                     }
+                } else if (ipState === 'expanded') {
+                    btn.classList.add('hidden');
+                    btnSplit.classList.remove('hidden');
                 }
                 return;
             }
-            
-            if (!selectedLeft || !selectedRight) {
-                document.getElementById('modal-incomplete-roll').style.display = 'flex';
-                return;
+
+            // Calculate ATS Live State
+            let smalls = new Set();
+            let talls = new Set();
+            let last7Idx = -1;
+            for(let i = universalLog.length - 1; i >= 0; i--) {
+                if(universalLog[i].is_NS_Marker) continue;
+                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7) {
+                    last7Idx = i; break;
+                }
+            }
+            for(let i = last7Idx + 1; i < universalLog.length; i++) {
+                if(universalLog[i].Invalid_Roll || universalLog[i].is_NS_Marker) continue;
+                let s = universalLog[i].Corrected_Point || universalLog[i].Total_Sum;
+                if(s >= 2 && s <= 6) smalls.add(s);
+                if(s >= 8 && s <= 12) talls.add(s);
+            }
+
+            let newSum = selectedLeft + selectedRight;
+            let notesArr = [];
+            let smallHitNow = false;
+            let tallHitNow = false;
+
+            if(newSum >= 2 && newSum <= 6 && !smalls.has(newSum)) {
+                smalls.add(newSum);
+                if(smalls.size === 5) { notesArr.push("ATS Small Hit"); smallHitNow = true; }
+            }
+            if(newSum >= 8 && newSum <= 12 && !talls.has(newSum)) {
+                talls.add(newSum);
+                if(talls.size === 5) { notesArr.push("ATS Tall Hit"); tallHitNow = true; }
+            }
+            if((smallHitNow && talls.size === 5) || (tallHitNow && smalls.size === 5)) {
+                notesArr.push("ATS All Hit");
             }
 
             const r = {
-                Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: selectedLeft + selectedRight, Invalid_Roll: false,
+                Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: newSum, Invalid_Roll: false,
                 Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
+                Notes: notesArr.join(", "),
                 Time_Stamp: new Date().toISOString()
             };
+            
             universalLog.push(r);
             clearPad(); 
             setIpState('natural'); 
-            btn.innerText = "NEXT ROLL";
             renderHistoryBar(); 
             syncActiveSession();
 
@@ -1000,9 +1328,13 @@
             syncActiveSession();
         }
 
-        function handleNewShooter() {
+        function handleSameShooter() {
             closeModals();
-            globalConfig.shooter = 'ALL';
+        }
+
+        function handleNewShooter() {
+            forceNextSaveAsNS = true;
+            closeModals();
             openGlobalConfig();
         }
 
@@ -1062,7 +1394,7 @@
             
             for(let i=0; i<universalLog.length; i++) {
                 let r = universalLog[i];
-                if(r.Invalid_Roll) continue;
+                if(r.Invalid_Roll || r.is_NS_Marker) continue;
                 let sum = r.Corrected_Point || r.Total_Sum;
                 
                 if(tempIsComeout) {
@@ -1086,13 +1418,17 @@
 
         // --- CONFIGURATION LOGIC ---
         function openGlobalConfig() {
+            preConfigShooter = globalConfig.shooter;
             document.getElementById('cfg-loc').value = globalConfig.location;
             document.getElementById('cfg-shooter').value = globalConfig.shooter;
             document.getElementById('cfg-set').value = globalConfig.diceSet;
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
             updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
-            document.getElementById('cfg-show-sdd').value = String(globalConfig.showShooterSDD);
+            
+            document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
+            document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
+            document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             
             document.getElementById('modal-config-global').style.display = 'flex';
         }
@@ -1104,10 +1440,15 @@
             globalConfig.positionParent = document.getElementById('cfg-pos-parent').value;
             globalConfig.positionChild = document.getElementById('cfg-pos-child').value;
             globalConfig.diceSet = document.getElementById('cfg-set').value;
-            globalConfig.diceColor = document.getElementById('cfg-color').value;
-            globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').value;
             
-            // Push dirty shooters to Firestore
+            globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').checked ? 'true' : 'false';
+            globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
+            globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
+            
+            localStorage.setItem('cfg_showShooterSDD', globalConfig.showShooterSDD);
+            localStorage.setItem('cfg_trackATS', globalConfig.trackATS);
+            localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
+
             masterData.shooters.filter(s => s.isDirty).forEach(s => {
                 db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
                     last_positionParent: s.last_positionParent,
@@ -1117,17 +1458,33 @@
                 s.isDirty = false;
             });
 
+            if ((globalConfig.shooter !== preConfigShooter || forceNextSaveAsNS)) {
+                universalLog.push({
+                    is_NS_Marker: true,
+                    Shooter_ID: globalConfig.shooter,
+                    Location_ID: globalConfig.location,
+                    Table_Position: globalConfig.positionChild,
+                    Dice_Set: globalConfig.diceSet,
+                    Notes: "New Shooter",
+                    Time_Stamp: new Date().toISOString()
+                });
+                forceNextSaveAsNS = false;
+            }
+
             renderHistoryBar(); syncActiveSession();
         }
 
         function openHandConfig(sevenOutIndex) {
-            document.getElementById('hcfg-index').value = sevenOutIndex;
             let startIdx = 0;
             for(let i = sevenOutIndex - 1; i >= 0; i--) {
-                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7 && activeState.wasSevenOut[i]) {
+                if(universalLog[i].is_NS_Marker) {
                     startIdx = i + 1; break;
                 }
             }
+            document.getElementById('hcfg-start-idx').value = startIdx;
+            document.getElementById('hcfg-end-idx').value = sevenOutIndex;
+            document.getElementById('hcfg-is-forward').value = 'false';
+
             const refRoll = universalLog[startIdx] || {};
             document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
@@ -1143,14 +1500,37 @@
             document.getElementById('modal-config-hand').style.display = 'flex';
         }
 
-        function saveHandConfig() {
-            const sevenOutIndex = parseInt(document.getElementById('hcfg-index').value);
-            let startIdx = 0;
-            for(let i = sevenOutIndex - 1; i >= 0; i--) {
-                if(!universalLog[i].Invalid_Roll && (universalLog[i].Corrected_Point || universalLog[i].Total_Sum) === 7 && activeState.wasSevenOut[i]) {
-                    startIdx = i + 1; break;
+        function openForwardConfig(nsIndex) {
+            let startIdx = nsIndex + 1;
+            let endIdx = universalLog.length - 1;
+            for(let i = startIdx; i < universalLog.length; i++) {
+                if(universalLog[i].is_NS_Marker) {
+                    endIdx = i - 1; break;
                 }
             }
+            document.getElementById('hcfg-start-idx').value = startIdx;
+            document.getElementById('hcfg-end-idx').value = endIdx;
+            document.getElementById('hcfg-is-forward').value = 'true';
+
+            const refRoll = universalLog[startIdx] || universalLog[nsIndex] || {};
+            document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
+            document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
+            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
+            
+            let childPos = refRoll.Table_Position || 'All';
+            let parentPos = 'All';
+            for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
+            
+            document.getElementById('hcfg-pos-parent').value = parentPos;
+            updatePosChild('hcfg', childPos);
+            
+            document.getElementById('modal-config-hand').style.display = 'flex';
+        }
+
+        function saveHandConfig() {
+            const startIdx = parseInt(document.getElementById('hcfg-start-idx').value);
+            const endIdx = parseInt(document.getElementById('hcfg-end-idx').value);
+            const isForward = document.getElementById('hcfg-is-forward').value === 'true';
             
             const loc = document.getElementById('hcfg-loc').value;
             const shooter = document.getElementById('hcfg-shooter').value;
@@ -1158,13 +1538,21 @@
             const posChild = document.getElementById('hcfg-pos-child').value;
             const set = document.getElementById('hcfg-set').value;
 
-            for(let i = startIdx; i <= sevenOutIndex; i++) {
-                if(!universalLog[i].Invalid_Roll) {
+            for(let i = startIdx; i <= endIdx; i++) {
+                if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
                     universalLog[i].Location_ID = loc;
                     universalLog[i].Shooter_ID = shooter;
                     universalLog[i].Table_Position = posChild;
                     universalLog[i].Dice_Set = set;
                 }
+            }
+
+            if (isForward && endIdx === universalLog.length - 1) {
+                globalConfig.location = loc;
+                globalConfig.shooter = shooter;
+                globalConfig.positionParent = posParent;
+                globalConfig.positionChild = posChild;
+                globalConfig.diceSet = set;
             }
 
             if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
@@ -1237,10 +1625,22 @@
                 const t = existingAsset ? existingAsset.Type : 'Standard';
                 const h = existingAsset ? existingAsset.Handedness : 'Right';
                 const s = existingAsset ? existingAsset.Style : 'Controlled Set';
+                
+                let optsSets = `<option value="ALL">NONE</option>` + masterData.sets.map(set => `<option value="${set.name}" ${existingAsset && existingAsset.last_diceSet === set.name ? 'selected' : ''}>${set.name}</option>`).join('');
+                let optsParents = Object.keys(POS_MAP).map(p => `<option value="${p}" ${existingAsset && existingAsset.last_positionParent === p ? 'selected' : ''}>${p}</option>`).join('');
+
                 html += `
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Type</label><select id="meta-type" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Standard" ${t==='Standard'?'selected':''}>Standard</option><option value="Master" ${t==='Master'?'selected':''}>Master</option><option value="Favorite" ${t==='Favorite'?'selected':''}>Favorite</option><option value="Online" ${t==='Online'?'selected':''}>Online</option></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Handedness</label><select id="meta-hand" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Right" ${h==='Right'?'selected':''}>Right</option><option value="Left" ${h==='Left'?'selected':''}>Left</option><option value="Neither" ${h==='Neither'?'selected':''}>Neither</option></select></div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Style</label><select id="meta-style" class="select-wicked border-blue-500/50 focus:border-blue-400"><option value="Controlled Set" ${s==='Controlled Set'?'selected':''}>Controlled Set</option><option value="Random" ${s==='Random'?'selected':''}>Random</option><option value="Shake" ${s==='Shake'?'selected':''}>Shake</option><option value="Mechanical" ${s==='Mechanical'?'selected':''}>Mechanical</option></select></div>
+                <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Last Known Dice Set</label><select id="meta-last-set" class="select-wicked border-blue-500/50 focus:border-blue-400">${optsSets}</select></div>
+                <div>
+                    <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Last Known Position</label>
+                    <div class="flex gap-2">
+                        <select id="meta-last-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updateMetaPosChild()">${optsParents}</select>
+                        <select id="meta-last-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2"></select>
+                    </div>
+                </div>
                 <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Notes</label><input type="text" id="meta-notes" class="input-wicked border-blue-500/50 focus:border-blue-400" autocomplete="off" value="${existingAsset ? (existingAsset.Notes || '') : ''}"></div>`;
             } else if (type === 'locations') {
                 title.innerText = existingAsset ? "Edit Location" : "Register Location";
@@ -1277,6 +1677,9 @@
             }
 
             fields.innerHTML = html;
+            if (type === 'shooters') {
+                updateMetaPosChild(existingAsset ? existingAsset.last_positionChild : 'All');
+            }
             document.getElementById('modal-metadata').style.display = 'flex';
         }
 
@@ -1298,7 +1701,16 @@
             let payload = {};
 
             if (activeMetaType === 'shooters') {
-                payload = { name: nameVal, Type: document.getElementById('meta-type').value, Handedness: document.getElementById('meta-hand').value, Style: document.getElementById('meta-style').value, Notes: document.getElementById('meta-notes').value.trim().toUpperCase() };
+                payload = { 
+                    name: nameVal, 
+                    Type: document.getElementById('meta-type').value, 
+                    Handedness: document.getElementById('meta-hand').value, 
+                    Style: document.getElementById('meta-style').value, 
+                    Notes: document.getElementById('meta-notes').value.trim().toUpperCase(),
+                    last_diceSet: document.getElementById('meta-last-set').value,
+                    last_positionParent: document.getElementById('meta-last-pos-parent').value,
+                    last_positionChild: document.getElementById('meta-last-pos-child').value
+                };
             } else if (activeMetaType === 'locations') {
                 payload = { name: nameVal, Table_Length: document.getElementById('meta-len').value, Bouncy_Rating: document.getElementById('meta-bounce').value, Table_Surface: document.getElementById('meta-surf').value, LocType: document.getElementById('meta-ltype').value };
             } else if (activeMetaType === 'dice_sets') {
@@ -1391,6 +1803,22 @@
             }
         }
 
+        function promptLogout() {
+            document.getElementById('modal-logout').style.display = 'flex';
+        }
+
+        function executeLogout() {
+            auth.signOut().then(() => { window.location.href = "index.html"; });
+        }
+
+        function promptLobbyReturn() {
+            document.getElementById('modal-lobby-return').style.display = 'flex';
+        }
+
+        function executeLobbyReturn() {
+            window.location.href = "lobby.html";
+        }
+
         function closeModals() {
             document.getElementById('modal-alert').style.display = 'none';
             document.getElementById('modal-confirm').style.display = 'none';
@@ -1404,6 +1832,12 @@
             document.getElementById('modal-error-display').style.display = 'none';
             document.getElementById('modal-shooter-transition').style.display = 'none';
             document.getElementById('modal-incomplete-roll').style.display = 'none';
+        }
+
+        function closeAllModals() {
+            closeModals();
+            document.getElementById('modal-logout').style.display = 'none';
+            document.getElementById('modal-lobby-return').style.display = 'none';
         }
 
         // --- RENDERING ENGINE ---
@@ -1424,7 +1858,7 @@
                     <span class="text-slate-400">|</span>
                     <span><i class="fa-solid fa-bullseye"></i> ${points}</span>
                     <span class="text-slate-400">|</span>
-                    <span><i class="fa-solid fa-fire"></i> ${repeats}</span>
+                    <span>${repeats} <i class="fa-solid fa-fire"></i></span>
                 </div>
             `;
             return el;
@@ -1437,6 +1871,7 @@
                 historyBar.innerHTML = '<div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>';
                 activeState.currentPoint = null;
                 updateSDD();
+                updateBonusTrackers();
                 return;
             }
 
@@ -1452,6 +1887,15 @@
             let nodesToInject = [];
 
             universalLog.forEach((r, index) => {
+                if (r.is_NS_Marker) {
+                    const el = document.createElement('div');
+                    el.className = `hist-node state-ns`;
+                    el.innerHTML = `NS`;
+                    el.onclick = () => openForwardConfig(index);
+                    nodesToInject.push(el);
+                    return;
+                }
+
                 const isInvalid = r.Invalid_Roll || r.invalidRoll || false;
                 const die1 = parseInt(r.Left_Die || r.leftDie || 0);
                 const die2 = parseInt(r.Right_Die || r.rightDie || 0);
@@ -1509,7 +1953,7 @@
                     el.onclick = () => showErrorReason(r.Notes);
                 } else {
                     let superHTML = '';
-                    if (currentRepeats > 0) superHTML += `<span class="sup-text"><i class="fa-solid fa-fire text-[10px] mr-0.5"></i>${currentRepeats + 1}</span>`;
+                    if (currentRepeats > 0) superHTML += `<span class="sup-text">${currentRepeats + 1} <i class="fa-solid fa-fire text-[10px] ml-0.5"></i></span>`;
                     if (isHardway) superHTML += `<span class="sup-text text-yellow-400">(H)</span>`;
 
                     let displayNum = sum;
@@ -1540,6 +1984,27 @@
 
                 nodesToInject.push(el);
 
+                if (r.Notes) {
+                    if (r.Notes.includes("ATS Small Hit")) {
+                        const sNode = document.createElement('div');
+                        sNode.className = `hist-node bg-emerald-500 text-black border-emerald-400 text-[10px] px-2`;
+                        sNode.innerHTML = `ATS SMALL`;
+                        nodesToInject.push(sNode);
+                    }
+                    if (r.Notes.includes("ATS Tall Hit")) {
+                        const tNode = document.createElement('div');
+                        tNode.className = `hist-node bg-red-600 text-white border-red-500 text-[10px] px-2`;
+                        tNode.innerHTML = `ATS TALL`;
+                        nodesToInject.push(tNode);
+                    }
+                    if (r.Notes.includes("ATS All Hit")) {
+                        const aNode = document.createElement('div');
+                        aNode.className = `hist-node bg-yellow-400 text-black border-yellow-300 text-[10px] px-2 shadow-[0_0_10px_rgba(250,204,21,0.8)]`;
+                        aNode.innerHTML = `<i class="fa-solid fa-crown mr-1"></i> ATS ALL`;
+                        nodesToInject.push(aNode);
+                    }
+                }
+
                 if (isSevenOut) {
                     nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, totalRepeatsInHand, index));
                     rollsInHand = 0; pointsMadeInHand = 0; totalRepeatsInHand = 0; isComeout = true; currentPoint = null;
@@ -1552,9 +2017,8 @@
             historyBar.appendChild(fragment);
             
             updateSDD();
+            updateBonusTrackers();
         }
-
-        function logout() { auth.signOut().then(() => { window.location.href = "index.html"; }); }
     </script>
 </body>
 </html>
