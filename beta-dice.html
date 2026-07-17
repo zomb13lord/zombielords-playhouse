@@ -22,7 +22,7 @@
             background-size: cover; 
             background-position: center 146px; 
             background-attachment: fixed;
-            padding-bottom: 320px; 
+            padding-bottom: 180px; 
             user-select: none; -webkit-user-select: none;
         }
 
@@ -208,26 +208,54 @@
         .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
 
         /* NID Module CSS */
-        #nid-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
-        .nid-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .nid-grid-container {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: 1050px; margin: 0 auto; margin-top: 10px;
+        }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
-            width: 100%; max-width: 160px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            width: calc(50% - 6px); max-width: 160px; height: 190px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
         }
-        .nid-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #334155; }
+        .nid-box-7 { width: 100%; }
+        
+        /* Mobile Order */
+        .nid-box-7 { order: 1; }
+        .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
+        .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
+        .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
+        .nid-box-3 { order: 8; } .nid-box-11 { order: 9; }
+        .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
+
+        @media (min-width: 768px) {
+            .nid-box { width: 160px; }
+            .nid-box-7 { width: 160px; }
+            /* Desktop Order */
+            .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
+            .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
+            .nid-box-2 { order: 7; } .nid-box-3 { order: 8; } .nid-box-7 { order: 9; }
+            .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
+        }
+
+        .nid-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1px solid #334155; }
         .nid-header.hot-bg { background: rgba(153, 27, 27, 0.8); }
         .nid-header.cold-bg { background: rgba(30, 58, 138, 0.8); }
         .nid-header.neutral-bg { background: rgba(30, 41, 59, 0.8); }
         .nid-num { font-size: 28px; font-weight: 900; color: #ffffff; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .nid-icons { font-size: 20px; width: 24px; text-align: center; }
-        .nid-icons.cold { color: #93c5fd; }
-        .nid-icons.hot { color: #f59e0b; }
-        .nid-main { padding: 12px 8px; display: flex; flex-direction: column; align-items: center; flex-grow: 1; }
-        .nid-global-count { font-size: 42px; font-weight: 900; color: #ffffff; line-height: 1; margin-bottom: 12px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        .nid-icons { font-size: 14px; display: flex; gap: 2px; align-items: center; }
+        .nid-icons.cold { color: #93c5fd; justify-content: flex-start; flex: 1; }
+        .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
+        
+        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; }
         .nid-kinematic-row { display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 10px; font-family: monospace; color: #cbd5e1; margin-bottom: 4px; }
-        .nid-footer { display: flex; height: 36px; border-top: 1px solid #334155; }
-        .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; border-right: 1px solid #334155; }
-        .nid-footer-right { flex: 1; background: #1e293b; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; margin-top: auto; display: flex; justify-content: center; align-items: center; gap: 4px; }
+        
+        .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; mt-auto; }
+        .nid-footer-global { background: #475569; color: #cbd5e1; text-align: center; font-size: 11px; font-weight: 900; padding: 4px 0; border-bottom: 1px solid #334155; }
+        .nid-footer-global span { color: #10b981; margin-left: 4px; }
+        .nid-footer-split { display: flex; }
+        .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; padding: 4px 0; border-right: 1px solid #334155; }
+        .nid-footer-left span { color: #10b981; margin-left: 4px; }
+        .nid-footer-right { flex: 1; background: #1e293b; color: #94a3b8; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 11px; padding: 4px 0; }
+        .nid-footer-right span { color: #10b981; margin-left: 4px; }
 
         /* Micro Dice for Kinematic List */
         .micro-die { width: 14px; height: 14px; border-radius: 2px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 1px; gap: 1px; background: #ffffff; border: 1px solid #000000; }
@@ -1123,30 +1151,29 @@
                 }
 
                 return `
-                <div class="nid-box">
+                <div class="nid-box nid-box-${num}">
                     <div class="nid-header ${icons.status}-bg">
                         <div class="nid-icons cold text-left">${icons.cold}</div>
                         <div class="nid-num">${num}</div>
                         <div class="nid-icons hot text-right">${icons.hot}</div>
                     </div>
                     <div class="nid-main">
-                        <div class="nid-global-count">${counts.GLB[num]}</div>
                         <div class="w-full">${kinHtml}</div>
-                        ${indicatorHtml}
+                        <div class="nid-indicator">${indicatorHtml}</div>
                     </div>
                     <div class="nid-footer">
-                        <div class="nid-footer-left">${counts.HND[num]}</div>
-                        <div class="nid-footer-right">${counts.SHTR[num]}</div>
+                        <div class="nid-footer-global">G: <span>${counts.GLB[num]}</span></div>
+                        <div class="nid-footer-split">
+                            <div class="nid-footer-left">H: <span>${counts.HND[num]}</span></div>
+                            <div class="nid-footer-right">S: <span>${counts.SHTR[num]}</span></div>
+                        </div>
                     </div>
                 </div>`;
             };
 
             container.innerHTML = `
-                <div class="nid-row">
-                    ${[4,5,6,8,9,10].map(renderBox).join('')}
-                </div>
-                <div class="nid-row">
-                    ${[2,3,7,11,12].map(renderBox).join('')}
+                <div class="nid-grid-container">
+                    ${[2,3,4,5,6,7,8,9,10,11,12].map(renderBox).join('')}
                 </div>
             `;
         }
