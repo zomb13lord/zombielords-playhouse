@@ -90,7 +90,7 @@
             try {
                 await db.collection('users').doc(pendingUser.uid).set({
                     email: pendingUser.email, displayName: pendingUser.displayName, role: 'User',
-                    permissions: { crypt: true, baccarat: false, dice: false, poker: false, roulette: false, sportsbook: false },
+                    permissions: { crypt: true, baccarat: false, dice: false, poker: false, roulette: false, sportsbook: false, casino: false, bloodlord: false },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 window.location.href = "lobby.html";
@@ -120,7 +120,7 @@
                     await genesisRef.set({ used: true, consumedBy: pendingUser.uid, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
                     await db.collection('users').doc(pendingUser.uid).set({
                         email: pendingUser.email, displayName: pendingUser.displayName, role: 'Master Admin',
-                        permissions: { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true },
+                        permissions: { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true, casino: true, bloodlord: true },
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     window.location.href = "lobby.html"; return;
@@ -130,10 +130,15 @@
                 const codeDoc = await codeRef.get();
                 if (!codeDoc.exists || codeDoc.data().used) return showSystemMessage("Invalid or expired code. The shadows laugh at your attempt.");
                 
+                const codeData = codeDoc.data();
+                const forgedRole = codeData.role || 'Admin';
+                const forgedPerms = codeData.permissions || { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true, casino: false, bloodlord: false };
+
                 await codeRef.update({ used: true, consumedBy: pendingUser.uid, consumedAt: firebase.firestore.FieldValue.serverTimestamp() });
+                
                 await db.collection('users').doc(pendingUser.uid).set({
-                    email: pendingUser.email, displayName: pendingUser.displayName, role: 'Admin',
-                    permissions: { crypt: true, baccarat: true, dice: true, poker: true, roulette: true, sportsbook: true },
+                    email: pendingUser.email, displayName: pendingUser.displayName, role: forgedRole,
+                    permissions: forgedPerms,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 window.location.href = "lobby.html";
