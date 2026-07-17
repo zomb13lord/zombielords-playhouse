@@ -208,12 +208,26 @@
         .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
 
         /* NID Module CSS */
-        #nid-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        .nid-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        .nid-box { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 8px; padding: 10px; min-width: 80px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.5); }
-        .nid-num { font-size: 24px; font-weight: 900; color: #ffffff; margin-bottom: 5px; }
-        .nid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 8px; font-size: 10px; font-family: monospace; color: #94a3b8; text-align: left; }
-        .nid-stats span:nth-child(even) { color: #10b981; font-weight: bold; text-align: right; }
+        #nid-container { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        .nid-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .nid-box { 
+            background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(51, 65, 85, 0.8); border-radius: 8px; 
+            padding: 8px; width: 100%; max-width: 160px; display: flex; flex-direction: column; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6); position: relative;
+        }
+        .nid-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .nid-num { font-size: 28px; font-weight: 900; color: #ffffff; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .nid-icons { font-size: 10px; display: flex; gap: 2px; }
+        .nid-icons.cold { color: #60a5fa; }
+        .nid-icons.hot { color: #ef4444; }
+        .nid-global-count { font-size: 36px; font-weight: 900; color: #cbd5e1; text-align: center; line-height: 1; margin: 4px 0 8px 0; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        .nid-kinematic { font-size: 9px; font-family: monospace; color: #94a3b8; text-align: left; line-height: 1.3; margin-bottom: 8px; }
+        .nid-kinematic span.hot { color: #ef4444; }
+        .nid-kinematic span.cold { color: #60a5fa; }
+        .nid-indicator { font-size: 9px; font-weight: bold; color: #f59e0b; text-align: center; min-height: 12px; margin-bottom: 4px; text-transform: uppercase; }
+        .nid-footer { display: flex; gap: 4px; mt-auto; }
+        .nid-footer > div { flex: 1; background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 4px; text-align: center; font-size: 10px; font-weight: bold; padding: 4px 0; color: #cbd5e1; }
+        .nid-footer > div span { color: #10b981; }
 
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
@@ -634,6 +648,13 @@
             'Right': ['SR-1', 'SR-2', 'SR-3', 'SR-4', 'SR-5', 'HR-1', 'HR-2', 'HR-3', 'HR-4', 'HR-5']
         };
 
+        const PROB_MAP = { 2: 1/36, 3: 2/36, 4: 3/36, 5: 4/36, 6: 5/36, 7: 6/36, 8: 5/36, 9: 4/36, 10: 3/36, 11: 2/36, 12: 1/36 };
+        const CYCLE_MAP = { 2: [36, 72, 108], 3: [18, 36, 54], 4: [12, 24, 36], 5: [9, 18, 27], 6: [7, 14, 22], 7: [6, 12, 18], 8: [7, 14, 22], 9: [9, 18, 27], 10: [12, 24, 36], 11: [18, 36, 54], 12: [36, 72, 108] };
+        const SET_MAP = {
+            2: ["1-1"], 3: ["1-2"], 4: ["1-3", "2-2"], 5: ["1-4", "2-3"], 6: ["1-5", "2-4", "3-3"],
+            7: ["1-6", "2-5", "3-4"], 8: ["2-6", "3-5", "4-4"], 9: ["3-6", "4-5"], 10: ["4-6", "5-5"], 11: ["5-6"], 12: ["6-6"]
+        };
+
         let currentUid = null;
         let universalLog = []; 
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
@@ -890,6 +911,91 @@
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
 
+        function getHotColdIcons(num, validRolls) {
+            const cycles = CYCLE_MAP[num];
+            let hits = 0;
+            let rollsChecked = 0;
+            
+            for(let i = validRolls.length - 1; i >= 0; i--) {
+                rollsChecked++;
+                if (rollsChecked > cycles[2]) break;
+                let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                if (sum === num) hits++;
+            }
+
+            let hotHtml = '';
+            let coldHtml = '';
+
+            let hitsInC1 = 0;
+            for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[0]); i--) {
+                let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                if (sum === num) hitsInC1++;
+            }
+
+            if (hitsInC1 > 1) {
+                hotHtml = '🔥';
+            } else if (hitsInC1 === 0) {
+                let hitsInC2 = 0;
+                for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[1]); i--) {
+                    let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                    if (sum === num) hitsInC2++;
+                }
+                if (hitsInC2 === 0) {
+                    let hitsInC3 = 0;
+                    for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[2]); i--) {
+                        let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
+                        if (sum === num) hitsInC3++;
+                    }
+                    if (hitsInC3 === 0) coldHtml = '❄️❄️❄️';
+                    else coldHtml = '❄️❄️';
+                } else {
+                    coldHtml = '❄️';
+                }
+            }
+
+            return { hot: hotHtml, cold: coldHtml };
+        }
+
+        function getKinematicData(targetSetOrNum, validRolls) {
+            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
+            let totalNext = 0;
+
+            for(let i=0; i<validRolls.length - 1; i++) {
+                let r = validRolls[i];
+                let isMatch = false;
+                
+                if (typeof targetSetOrNum === 'number') {
+                    let sum = r.Corrected_Point || r.Total_Sum;
+                    if (sum === targetSetOrNum) isMatch = true;
+                } else {
+                    let d1 = r.Left_Die; let d2 = r.Right_Die;
+                    let setStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
+                    if (setStr === targetSetOrNum) isMatch = true;
+                }
+
+                if (isMatch) {
+                    let nextR = validRolls[i+1];
+                    let nextSum = nextR.Corrected_Point || nextR.Total_Sum;
+                    nextRolls[nextSum]++;
+                    totalNext++;
+                }
+            }
+
+            if (totalNext === 0) return { hot: '--', cold: '--' };
+
+            let maxDev = -999; let minDev = 999;
+            let hotNum = '--'; let coldNum = '--';
+
+            for(let s=2; s<=12; s++) {
+                let expected = totalNext * PROB_MAP[s];
+                let dev = nextRolls[s] - expected;
+                if (dev > maxDev) { maxDev = dev; hotNum = s; }
+                if (dev < minDev) { minDev = dev; coldNum = s; }
+            }
+
+            return { hot: hotNum, cold: coldNum };
+        }
+
         function updateNID() {
             const container = document.getElementById('nid-container');
             if (globalConfig.showNID !== 'true') {
@@ -897,6 +1003,12 @@
                 return;
             }
             container.style.display = 'flex';
+
+            let validRolls = universalLog.filter(r => !r.Invalid_Roll && !r.is_NS_Marker);
+            
+            let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
+            let sId = sObj ? sObj.id : globalConfig.shooter;
+            let shooterRolls = validRolls.filter(r => globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
 
             let counts = {
                 GLB: {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0},
@@ -926,8 +1038,6 @@
                 
                 counts.GLB[sum]++;
                 
-                let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
-                let sId = sObj ? sObj.id : globalConfig.shooter;
                 if (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId) {
                     counts.SHTR[sum]++;
                 }
@@ -937,14 +1047,58 @@
                 }
             });
 
+            let lastSetStr = null;
+            let targetHotG = null; let targetColdG = null;
+            let targetHotS = null; let targetColdS = null;
+
+            if (validRolls.length > 0) {
+                let lastR = validRolls[validRolls.length - 1];
+                let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
+                lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
+                
+                let kinG = getKinematicData(lastSetStr, validRolls);
+                targetHotG = kinG.hot; targetColdG = kinG.cold;
+
+                let kinS = getKinematicData(lastSetStr, shooterRolls);
+                targetHotS = kinS.hot; targetColdS = kinS.cold;
+            }
+
             const renderBox = (num) => {
+                const icons = getHotColdIcons(num, validRolls);
+                const sets = SET_MAP[num];
+                
+                let kinHtml = '';
+                sets.forEach(set => {
+                    let kG = getKinematicData(set, validRolls);
+                    let kS = getKinematicData(set, shooterRolls);
+                    kinHtml += `<div>${set} G: <span class="hot">${kG.hot}</span>🔥 <span class="cold">${kG.cold}</span>❄️ | S: <span class="hot">${kS.hot}</span>🔥 <span class="cold">${kS.cold}</span>❄️</div>`;
+                });
+                
+                let kAllG = getKinematicData(num, validRolls);
+                let kAllS = getKinematicData(num, shooterRolls);
+                kinHtml += `<div class="text-slate-300 mt-1">ALL G: <span class="hot">${kAllG.hot}</span>🔥 <span class="cold">${kAllG.cold}</span>❄️ | S: <span class="hot">${kAllS.hot}</span>🔥 <span class="cold">${kAllS.cold}</span>❄️</div>`;
+
+                let indicatorHtml = '';
+                if (lastSetStr) {
+                    if (num === targetHotG) indicatorHtml += `HOTTEST AFTER ${lastSetStr} (G)<br>`;
+                    if (num === targetColdG) indicatorHtml += `COLDEST AFTER ${lastSetStr} (G)<br>`;
+                    if (num === targetHotS) indicatorHtml += `HOTTEST AFTER ${lastSetStr} (S)<br>`;
+                    if (num === targetColdS) indicatorHtml += `COLDEST AFTER ${lastSetStr} (S)<br>`;
+                }
+
                 return `
                 <div class="nid-box">
-                    <div class="nid-num">${num}</div>
-                    <div class="nid-stats">
-                        <span>GLB</span><span>${counts.GLB[num]}</span>
-                        <span>SHTR</span><span>${counts.SHTR[num]}</span>
-                        <span>HND</span><span>${counts.HND[num]}</span>
+                    <div class="nid-header">
+                        <div class="nid-icons cold w-8 text-left">${icons.cold}</div>
+                        <div class="nid-num">${num}</div>
+                        <div class="nid-icons hot w-8 text-right">${icons.hot}</div>
+                    </div>
+                    <div class="nid-global-count">${counts.GLB[num]}</div>
+                    <div class="nid-kinematic">${kinHtml}</div>
+                    <div class="nid-indicator">${indicatorHtml}</div>
+                    <div class="nid-footer">
+                        <div>H: <span>${counts.HND[num]}</span></div>
+                        <div>S: <span>${counts.SHTR[num]}</span></div>
                     </div>
                 </div>`;
             };
