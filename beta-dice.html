@@ -22,12 +22,12 @@
             background-size: cover; 
             background-position: center 146px; 
             background-attachment: fixed;
-            padding-bottom: 420px; /* Mobile padding */
+            padding-bottom: 380px; /* Mobile padding */
             user-select: none; -webkit-user-select: none;
         }
 
         @media (min-width: 768px) {
-            body { padding-bottom: 280px; } /* Desktop padding */
+            body { padding-bottom: 240px; } /* Desktop padding */
             #nid-sticky-header { display: none !important; }
         }
 
@@ -214,15 +214,22 @@
 
         /* NID Module CSS */
         .nid-grid-container {
-            display: grid; grid-template-columns: repeat(2, 160px); justify-content: center; gap: 16px; max-width: 1050px; margin: 10px auto 0;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 1050px; margin: 10px auto 0;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
-            width: 160px; height: 210px; background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); 
+            height: 160px; width: 100%; transition: all 0.2s ease; cursor: pointer;
+        }
+        .nid-box.card-selected {
+            border-color: #34d399 !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6) !important;
+            transform: scale(1.02);
+            z-index: 10;
         }
         
         /* Mobile Order */
-        .nid-box-7 { grid-column: span 2; justify-self: center; order: 1; }
+        .nid-box-7 { grid-column: span 2; justify-self: center; width: calc(50% - 8px); order: 1; }
         .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
         .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
         .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
@@ -230,10 +237,8 @@
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
         @media (min-width: 768px) {
-            .nid-grid-container { 
-                display: flex; flex-wrap: wrap; 
-            }
-            .nid-box-7 { grid-column: auto; justify-self: auto; order: 9; }
+            .nid-grid-container { grid-template-columns: repeat(6, 1fr); }
+            .nid-box-7 { grid-column: span 1; width: 100%; order: 9; }
             /* Desktop Order */
             .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
             .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
@@ -250,12 +255,11 @@
         .nid-icons.cold { color: #93c5fd; justify-content: flex-start; flex: 1; }
         .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
         
-        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; }
-        .nid-kinematic-row { display: flex; align-items: center; justify-content: space-between; width: 100%; font-size: 10px; font-family: monospace; color: #cbd5e1; margin-bottom: 4px; }
-        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 4px; margin-bottom: 8px; }
+        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; }
+        .nid-global-count { font-size: 42px; font-weight: 900; color: #ffffff; line-height: 1; text-align: center; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 8px; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
-        .nid-footer-global { background: #475569; color: #ffffff; text-align: center; font-size: 14px; font-weight: 900; padding: 4px 0; border-bottom: 1px solid #334155; }
         .nid-footer-split { display: flex; }
         .nid-footer-left { flex: 1; background: #000000; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; border-right: 1px solid #334155; }
         .nid-footer-right { flex: 1; background: #1e293b; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; }
@@ -339,6 +343,9 @@
             <span class="text-emerald-400 font-black">GLB</span>
             <span class="sdd-metric">CR: <b id="g-cr">0</b></span>
             <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
+            <span class="sdd-metric">SO: <b id="g-so">0</b></span>
+            <span class="sdd-metric">CS: <b id="g-cs">0</b></span>
+            <span class="sdd-metric">TS: <b id="g-ts">0</b></span>
             <span class="sdd-metric">SOR: <b class="text-white" id="g-sor-med">0</b>|<b class="text-white" id="g-sor-mean">0.0</b></span>
             <span class="sdd-metric">SRR: <b class="text-white" id="g-srr-med">0</b>|<b class="text-white" id="g-srr-mean">0.0</b></span>
             <span class="sdd-metric">PSR: <b class="text-white" id="g-psr-med">0</b>|<b class="text-white" id="g-psr-mean">0.0</b></span>
@@ -348,6 +355,9 @@
             <span class="text-amber-400 font-black" id="sdd-shooter-label">SHTR</span>
             <span class="sdd-metric">CR: <b id="s-cr">0</b></span>
             <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
+            <span class="sdd-metric">SO: <b id="s-so">0</b></span>
+            <span class="sdd-metric">CS: <b id="s-cs">0</b></span>
+            <span class="sdd-metric">TS: <b id="s-ts">0</b></span>
             <span class="sdd-metric">SOR: <b class="text-white" id="s-sor-med">0</b>|<b class="text-white" id="s-sor-mean">0.0</b></span>
             <span class="sdd-metric">SRR: <b class="text-white" id="s-srr-med">0</b>|<b class="text-white" id="s-srr-mean">0.0</b></span>
             <span class="sdd-metric">PSR: <b class="text-white" id="s-psr-med">0</b>|<b class="text-white" id="s-psr-mean">0.0</b></span>
@@ -395,7 +405,7 @@
                 <div id="pad-extra" class="flex gap-2">
                     <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid</button>
                     <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
-                    <button onclick="handleNewShooter()" class="flex-1 border border-emerald-500 text-emerald-400 hover:bg-emerald-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">New Shooter</button>
+                    <button onclick="openNewShooterModal()" class="flex-1 border border-emerald-500 text-emerald-400 hover:bg-emerald-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">New Shooter</button>
                 </div>
             </div>
         </div>
@@ -576,6 +586,31 @@
         </div>
     </div>
 
+    <div id="modal-new-shooter" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <div class="modal-content-layer">
+                <h2 class="text-lg font-black text-emerald-400 uppercase tracking-widest mb-4 cinzel text-center">New Shooter</h2>
+                <div class="flex flex-col text-left gap-3">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label>
+                        <select id="ns-shooter" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="handleNewShooterSelectModal()"></select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
+                        <div class="flex gap-2">
+                            <select id="ns-pos-parent" class="select-wicked border-emerald-500/50 focus:border-emerald-400 w-1/2" onchange="updatePosChild('ns')"></select>
+                            <select id="ns-pos-child" class="select-wicked border-emerald-500/50 focus:border-emerald-400 w-1/2"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-6">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-config-hand" class="modal-mask">
         <div class="modal-box border-blue-500">
             <div class="modal-content-layer">
@@ -598,7 +633,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                    <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update Segment</button>
+                    <button onclick="saveHandConfig()" class="bg-blue-950/60 border border-blue-500/50 text-blue-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Update</button>
                 </div>
             </div>
         </div>
@@ -612,7 +647,7 @@
                 <p class="text-xs text-slate-400 font-mono mb-6">Is the dice passing to a new shooter?</p>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="handleSameShooter()" class="btn-cancel">Same Shooter</button>
-                    <button onclick="handleNewShooter()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
+                    <button onclick="openNewShooterModal()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">New Shooter</button>
                 </div>
             </div>
         </div>
@@ -687,6 +722,25 @@
         </div>
     </div>
 
+    <div id="modal-nid-fullscreen" class="modal-mask">
+        <div class="modal-box border-emerald-500" style="max-width: 600px;">
+            <div class="modal-content-layer">
+                <h2 id="fs-nid-title" class="text-4xl font-black text-white uppercase tracking-widest mb-2 cinzel text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"></h2>
+                <div class="flex justify-center gap-6 mb-6 text-xs font-mono text-slate-300">
+                    <div>GLB: <span id="fs-nid-glb" class="text-white font-bold">0</span></div>
+                    <div>SHTR: <span id="fs-nid-shtr" class="text-white font-bold">0</span></div>
+                    <div>HND: <span id="fs-nid-hnd" class="text-white font-bold">0</span></div>
+                </div>
+                <div id="fs-nid-kinematic" class="flex flex-col gap-3 w-full text-left bg-slate-900/80 p-4 rounded border border-slate-700 overflow-y-auto max-h-[50vh]">
+                    <!-- Injected by JS -->
+                </div>
+                <div class="mt-6">
+                    <button onclick="closeModals()" class="btn-cancel w-full">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = { apiKey: "AIzaSyBSUXdz7HqwkENhQqEJLItxYm-LAwkgbmY", authDomain: "zombielords-playhouse.firebaseapp.com", projectId: "zombielords-playhouse", storageBucket: "zombielords-playhouse.firebasestorage.app", messagingSenderId: "795162260246", appId: "1:795162260246:web:97f0361751ac1359b31637" };
         firebase.initializeApp(firebaseConfig);
@@ -738,6 +792,7 @@
         let selectedRight = null;
         let ipState = 'collapsed';
         let selectedInvalidReason = null;
+        let selectedNidCard = null;
 
         // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
@@ -920,21 +975,25 @@
                 }
             });
 
+            const TS = SO + CS;
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
-            const srrMean = (SO + CS) > 0 ? (TR / (SO + CS)).toFixed(1) : TR.toFixed(1);
+            const srrMean = TS > 0 ? (TR / TS).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
             
             const sorMed = Math.round(getMedian(handRolls));
             const srrMed = Math.round(getMedian(srrRolls));
             const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
+            return { TR, CR: currentHandRolls, SO, CS, TS, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
         }
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
             document.getElementById('g-tr').innerText = gStats.TR;
             document.getElementById('g-cr').innerText = gStats.CR;
+            document.getElementById('g-so').innerText = gStats.SO;
+            document.getElementById('g-cs').innerText = gStats.CS;
+            document.getElementById('g-ts').innerText = gStats.TS;
             document.getElementById('g-sor-mean').innerText = gStats.sorMean;
             document.getElementById('g-sor-med').innerText = gStats.sorMed;
             document.getElementById('g-srr-mean').innerText = gStats.srrMean;
@@ -959,6 +1018,9 @@
             document.getElementById('sdd-shooter-label').innerText = sLabel;
             document.getElementById('s-tr').innerText = sStats.TR;
             document.getElementById('s-cr').innerText = sStats.CR;
+            document.getElementById('s-so').innerText = sStats.SO;
+            document.getElementById('s-cs').innerText = sStats.CS;
+            document.getElementById('s-ts').innerText = sStats.TS;
             document.getElementById('s-sor-mean').innerText = sStats.sorMean;
             document.getElementById('s-sor-med').innerText = sStats.sorMed;
             document.getElementById('s-srr-mean').innerText = sStats.srrMean;
@@ -1085,7 +1147,77 @@
             return html;
         }
 
+        function handleNidClick(num) {
+            if (selectedNidCard === num) {
+                openNidFullscreen(num);
+            } else {
+                selectedNidCard = num;
+                document.querySelectorAll('.nid-box').forEach(b => b.classList.remove('card-selected'));
+                document.querySelector(`.nid-box-${num}`).classList.add('card-selected');
+            }
+        }
+
+        function openNidFullscreen(num) {
+            const modal = document.getElementById('modal-nid-fullscreen');
+            document.getElementById('fs-nid-title').innerText = num;
+            
+            let validRolls = universalLog.filter(r => !r.Invalid_Roll && !r.is_NS_Marker);
+            let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
+            let sId = sObj ? sObj.id : globalConfig.shooter;
+            let shooterRolls = validRolls.filter(r => globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
+            let kinematicRolls = globalConfig.kinematicSource === 'Shooter' ? shooterRolls : validRolls;
+
+            let glbCount = 0, shtrCount = 0, hndCount = 0;
+            let lastSevenOutIdx = -1;
+            for(let i=0; i<universalLog.length; i++) {
+                let r = universalLog[i];
+                if(r.Invalid_Roll || r.is_NS_Marker) continue;
+                let sum = r.Corrected_Point || r.Total_Sum;
+                if(sum === 7) lastSevenOutIdx = i;
+            }
+
+            universalLog.forEach((r, i) => {
+                if(r.Invalid_Roll || r.is_NS_Marker) return;
+                let sum = r.Corrected_Point || r.Total_Sum;
+                if (sum === num) {
+                    glbCount++;
+                    if (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId) shtrCount++;
+                    if (i > lastSevenOutIdx) hndCount++;
+                }
+            });
+
+            document.getElementById('fs-nid-glb').innerText = glbCount;
+            document.getElementById('fs-nid-shtr').innerText = shtrCount;
+            document.getElementById('fs-nid-hnd').innerText = hndCount;
+
+            const sets = SET_MAP[num];
+            let kinHtml = '';
+            sets.forEach(set => {
+                let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
+                if (kData.total > 0) {
+                    let [d1, d2] = set.split('-');
+                    let diceHtml = `<div class="flex gap-1">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
+                    kinHtml += `<div class="flex items-center justify-between w-full font-mono text-sm text-slate-300 border-b border-slate-700/50 pb-2">
+                        ${diceHtml}
+                        <div><span class="text-red-500 font-bold">${kData.hot}</span>🔥 <span class="text-blue-400 font-bold ml-2">${kData.cold}</span>❄️</div>
+                    </div>`;
+                }
+            });
+            
+            let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
+            if (kAll.total > 0) {
+                kinHtml += `<div class="flex items-center justify-between w-full font-mono text-sm text-slate-300 pt-2">
+                    <div class="font-bold">ALL</div>
+                    <div><span class="text-red-500 font-bold">${kAll.hot}</span>🔥 <span class="text-blue-400 font-bold ml-2">${kAll.cold}</span>❄️</div>
+                </div>`;
+            }
+
+            document.getElementById('fs-nid-kinematic').innerHTML = kinHtml || '<div class="text-center text-slate-500 italic text-xs">No kinematic data available.</div>';
+            modal.style.display = 'flex';
+        }
+
         function updateNID() {
+            selectedNidCard = null;
             const container = document.getElementById('nid-container');
             const nidHeader = document.getElementById('nid-sticky-header');
             
@@ -1172,29 +1304,7 @@
 
             const renderBox = (num) => {
                 const icons = getHotColdIcons(num, validRolls);
-                const sets = SET_MAP[num];
                 
-                let kinHtml = '';
-                sets.forEach(set => {
-                    let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
-                    if (kData.total > 0) {
-                        let [d1, d2] = set.split('-');
-                        let diceHtml = `<div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
-                        kinHtml += `<div class="nid-kinematic-row">
-                            ${diceHtml}
-                            <div><span class="text-red-500">${kData.hot}</span>🔥 <span class="text-blue-400">${kData.cold}</span>❄️</div>
-                        </div>`;
-                    }
-                });
-                
-                let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
-                if (kAll.total > 0) {
-                    kinHtml += `<div class="nid-kinematic-row mt-1 pt-1 border-t border-slate-700">
-                        <div class="font-bold">ALL</div>
-                        <div><span class="text-red-500">${kAll.hot}</span>🔥 <span class="text-blue-400">${kAll.cold}</span>❄️</div>
-                    </div>`;
-                }
-
                 let indicatorHtml = '';
                 if (lastSetStr) {
                     if (num === targetHot) {
@@ -1207,18 +1317,17 @@
                 }
 
                 return `
-                <div class="nid-box nid-box-${num}">
+                <div class="nid-box nid-box-${num}" onclick="handleNidClick(${num})">
                     <div class="nid-header ${icons.status}-bg">
                         <div class="nid-icons cold text-left">${icons.cold}</div>
                         <div class="nid-num">${num}</div>
                         <div class="nid-icons hot text-right">${icons.hot}</div>
                     </div>
                     <div class="nid-main">
-                        <div class="w-full">${kinHtml}</div>
+                        <div class="nid-global-count">${counts.GLB[num]}</div>
                         <div class="nid-indicator">${indicatorHtml}</div>
                     </div>
                     <div class="nid-footer">
-                        <div class="nid-footer-global">${counts.GLB[num]}</div>
                         <div class="nid-footer-split">
                             <div class="nid-footer-left">${counts.HND[num]}</div>
                             <div class="nid-footer-right">${counts.SHTR[num]}</div>
@@ -1720,10 +1829,54 @@
             closeModals();
         }
 
-        function handleNewShooter() {
-            forceNextSaveAsNS = true;
+        function openNewShooterModal() {
+            const shoots = masterData.shooters.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
+            
+            document.getElementById('ns-shooter').innerHTML = shoots;
+            document.getElementById('ns-pos-parent').innerHTML = parents;
+            
+            document.getElementById('ns-shooter').value = globalConfig.shooter !== 'ALL' ? globalConfig.shooter : masterData.shooters[0]?.name;
+            handleNewShooterSelectModal();
+            
+            document.getElementById('modal-shooter-transition').style.display = 'none';
+            document.getElementById('modal-new-shooter').style.display = 'flex';
+        }
+
+        function handleNewShooterSelectModal() {
+            const val = document.getElementById('ns-shooter').value;
+            const shooterObj = masterData.shooters.find(s => s.name === val);
+            if (shooterObj && shooterObj.last_positionParent) {
+                document.getElementById('ns-pos-parent').value = shooterObj.last_positionParent;
+                updatePosChild('ns', shooterObj.last_positionChild);
+            } else {
+                document.getElementById('ns-pos-parent').value = 'All';
+                updatePosChild('ns', 'All');
+            }
+        }
+
+        function saveNewShooter() {
+            const shooter = document.getElementById('ns-shooter').value;
+            const posParent = document.getElementById('ns-pos-parent').value;
+            const posChild = document.getElementById('ns-pos-child').value;
+
+            globalConfig.shooter = shooter;
+            globalConfig.positionParent = posParent;
+            globalConfig.positionChild = posChild;
+
+            universalLog.push({
+                is_NS_Marker: true,
+                Shooter_ID: globalConfig.shooter,
+                Location_ID: globalConfig.location,
+                Table_Position: globalConfig.positionChild,
+                Dice_Set: globalConfig.diceSet,
+                Notes: "New Shooter",
+                Time_Stamp: new Date().toISOString()
+            });
+
             closeModals();
-            openGlobalConfig();
+            renderHistoryBar();
+            syncActiveSession();
         }
 
         // --- INVALID & WRONG POINT LOGIC ---
@@ -2243,6 +2396,8 @@
             document.getElementById('modal-error-display').style.display = 'none';
             document.getElementById('modal-shooter-transition').style.display = 'none';
             document.getElementById('modal-incomplete-roll').style.display = 'none';
+            document.getElementById('modal-new-shooter').style.display = 'none';
+            document.getElementById('modal-nid-fullscreen').style.display = 'none';
         }
 
         function closeAllModals() {
