@@ -227,7 +227,7 @@
 
         /* NID Module CSS */
         #nid-container {
-            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; margin: 10px auto 0; width: 100%;
+            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; margin: 0 auto; width: 100%;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
@@ -251,6 +251,7 @@
 
         @media (min-width: 1024px) {
             #nid-container { grid-template-columns: repeat(11, 160px); gap: 8px; }
+            #nid-container.no-seven { grid-template-columns: repeat(10, 160px); }
             .nid-box-7 { grid-column: auto; justify-self: auto; width: 100%; order: 6; }
             /* Desktop Order */
             .nid-box-2 { order: 1; } .nid-box-3 { order: 2; } .nid-box-4 { order: 3; } .nid-box-5 { order: 4; } .nid-box-6 { order: 5; }
@@ -448,7 +449,7 @@
         </div>
     </div>
 
-    <div id="sdd-container" class="p-4 md:p-8 w-full mx-auto">
+    <div id="sdd-container" class="px-4 pb-4 pt-1 md:px-8 md:pb-8 md:pt-2 w-full mx-auto">
         <div id="nid-container" style="display: none;">
             <!-- Injected by JS -->
         </div>
@@ -760,7 +761,7 @@
     <div id="modal-correction" class="modal-mask">
         <div class="modal-box border-emerald-500">
             <div class="modal-content-layer text-center">
-                <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Correct Roll</h2>
+                <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Correct Active Point</h2>
                 <div class="flex flex-row gap-4 justify-center w-full max-w-[340px] mx-auto mb-4">
                     <div class="flex-1"><div class="grid grid-cols-2 grid-rows-3 gap-2" id="corr-left-grid"></div></div>
                     <div class="flex-1"><div class="grid grid-cols-2 grid-rows-3 gap-2" id="corr-right-grid"></div></div>
@@ -1550,6 +1551,9 @@
             let nidArray = [2,3,4,5,6,7,8,9,10,11,12];
             if (String(globalConfig.showNidSeven) === 'false') {
                 nidArray = [2,3,4,5,6,8,9,10,11,12];
+                container.classList.add('no-seven');
+            } else {
+                container.classList.remove('no-seven');
             }
             container.innerHTML = nidArray.map(renderBox).join('');
         }
@@ -2676,6 +2680,30 @@
                 return;
             }
 
+            let isComeoutScanner = true;
+            let currentPointScanner = null;
+            let activePointIndex = -1;
+            
+            for(let i=0; i<universalLog.length; i++) {
+                let r = universalLog[i];
+                if(r.Invalid_Roll || r.is_NS_Marker) continue;
+                let sum = r.Corrected_Point || r.Total_Sum;
+                
+                if(isComeoutScanner) {
+                    if(![2,3,7,11,12].includes(sum)) {
+                        isComeoutScanner = false;
+                        currentPointScanner = sum;
+                        activePointIndex = i;
+                    }
+                } else {
+                    if(sum === 7 || sum === currentPointScanner) {
+                        isComeoutScanner = true;
+                        currentPointScanner = null;
+                        activePointIndex = -1;
+                    }
+                }
+            }
+
             let isComeout = true;
             let currentPoint = null;
             let pointsMadeInHand = 0;
@@ -2749,9 +2777,10 @@
                 const el = document.createElement('div');
                 el.className = `hist-node ${nodeClass} ${inlineClass}`;
                 
-                if (nodeClass === 'state-point-made') {
+                if (index === activePointIndex && nodeClass === 'state-point-established') {
                     el.onclick = () => openCorrectionPad(index);
                     el.classList.add('cursor-pointer', 'hover:brightness-110');
+                    el.title = "Correct Active Point";
                 }
 
                 if (isInvalid) {
