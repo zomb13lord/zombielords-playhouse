@@ -226,13 +226,13 @@
         .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
 
         /* NID Module CSS */
-        #nid-container {
-            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; max-width: 1050px; margin: 10px auto 0; width: 100%;
+        .nid-grid-container {
+            display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 1fr; gap: 16px; max-width: 1050px; margin: 10px auto 0; width: 100%;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
             background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.2s ease; cursor: pointer;
-            width: 100%; height: 100%;
+            width: 100%;
         }
         .nid-box.card-selected {
             border-color: #34d399 !important;
@@ -249,14 +249,12 @@
         .nid-box-3 { order: 8; } .nid-box-11 { order: 9; }
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
-        @media (min-width: 768px) {
-            #nid-container { grid-template-columns: repeat(6, 160px); }
-            .nid-box-7 { grid-column: span 1; justify-self: stretch; width: 100%; order: 9; }
+        @media (min-width: 1024px) {
+            .nid-grid-container { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 8px; max-width: 100%; }
+            .nid-box-7 { grid-column: auto; justify-self: auto; width: 100%; order: 6; }
             /* Desktop Order */
-            .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
-            .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
-            .nid-box-2 { order: 7; } .nid-box-3 { order: 8; }
-            .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
+            .nid-box-2 { order: 1; } .nid-box-3 { order: 2; } .nid-box-4 { order: 3; } .nid-box-5 { order: 4; } .nid-box-6 { order: 5; }
+            .nid-box-8 { order: 7; } .nid-box-9 { order: 8; } .nid-box-10 { order: 9; } .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
         }
 
         .nid-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1px solid #334155; }
@@ -347,6 +345,12 @@
         </div>
 
         <div id="sdd-global" class="sdd-card-container">
+            <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
+                <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
+                <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
+                    <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
+                </div>
+            </div>
             <div class="sdd-card">
                 <div class="sdd-card-header">ROLLS</div>
                 <div class="sdd-card-body">
@@ -450,8 +454,8 @@
         </div>
     </div>
 
-    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-6xl mx-auto">
-        <div id="nid-container" style="display: none;">
+    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-[1400px] mx-auto">
+        <div id="nid-container" class="nid-grid-container" style="display: none;">
             <!-- Injected by JS -->
         </div>
     </div>
@@ -581,13 +585,6 @@
                         <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
                         <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
-                        <div class="grid grid-cols-4 gap-3" id="color-grid">
-                            <!-- Injected by JS -->
-                        </div>
                     </div>
 
                     <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
@@ -1078,6 +1075,12 @@
             }
 
             document.getElementById('sdd-global').innerHTML = `
+                <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
+                    <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
+                    <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
+                        <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
+                    </div>
+                </div>
                 <div class="sdd-card">
                     <div class="sdd-card-header">ROLLS</div>
                     <div class="sdd-card-body">
@@ -1745,16 +1748,17 @@
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
-            document.getElementById('cfg-loc').innerHTML = locs; 
-            document.getElementById('hcfg-shooter').innerHTML = shoots;
-            document.getElementById('hcfg-set').innerHTML = sets;
-            document.getElementById('hcfg-pos-parent').innerHTML = parents;
+            document.getElementById('cfg-loc').innerHTML = locs; document.getElementById('hcfg-loc').innerHTML = locs;
+            document.getElementById('cfg-shooter').innerHTML = shoots; document.getElementById('hcfg-shooter').innerHTML = shoots;
+            document.getElementById('cfg-set').innerHTML = sets; document.getElementById('hcfg-set').innerHTML = sets;
             
-            document.getElementById('ns-shooter').innerHTML = shoots;
-            document.getElementById('ns-set').innerHTML = sets;
-            document.getElementById('ns-pos-parent').innerHTML = parents;
+            document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
+            updatePosChild('cfg', globalConfig.positionChild);
 
             document.getElementById('cfg-loc').value = globalConfig.location || 'ALL';
+            document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
+            document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
+            document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
@@ -1792,6 +1796,36 @@
             childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
             if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
                 childSelect.value = defaultChild;
+            }
+        }
+
+        function handleShooterSelect() {
+            const val = document.getElementById('cfg-shooter').value;
+            checkMetadataTrigger('shooters', val);
+            
+            updateShooterMemory(); 
+            currentConfigShooter = val; 
+            
+            if (val !== 'ALL' && val !== 'ADD_NEW') {
+                const shooterObj = masterData.shooters.find(s => s.name === val);
+                if (shooterObj) {
+                    if (shooterObj.last_positionParent) {
+                        document.getElementById('cfg-pos-parent').value = shooterObj.last_positionParent;
+                        updatePosChild('cfg', shooterObj.last_positionChild);
+                    } else {
+                        document.getElementById('cfg-pos-parent').value = 'All';
+                        updatePosChild('cfg', 'All');
+                    }
+                    if (shooterObj.last_diceSet) {
+                        document.getElementById('cfg-set').value = shooterObj.last_diceSet;
+                    } else {
+                        document.getElementById('cfg-set').value = 'ALL';
+                    }
+                }
+            } else {
+                document.getElementById('cfg-pos-parent').value = 'All';
+                updatePosChild('cfg', 'All');
+                document.getElementById('cfg-set').value = 'ALL';
             }
         }
 
@@ -2160,7 +2194,6 @@
         function openGlobalConfig() {
             preConfigShooter = globalConfig.shooter;
             document.getElementById('cfg-loc').value = globalConfig.location;
-            selectConfigColor(globalConfig.diceColor);
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
@@ -2189,7 +2222,6 @@
         async function saveGlobalConfig() {
             closeModals(); 
             globalConfig.location = document.getElementById('cfg-loc').value;
-            globalConfig.diceColor = document.getElementById('cfg-color').value;
             
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').checked ? 'true' : 'false';
             globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
