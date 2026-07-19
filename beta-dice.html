@@ -1269,22 +1269,22 @@
                 <div class="sdd-card">
                     <div class="sdd-card-header">S.O.R.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.sorMed}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.sorMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">${sStats.sorMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">${sStats.sorMean}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card">
                     <div class="sdd-card-header">S.R.R.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.srrMed}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.srrMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-srr-med">${sStats.srrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-srr-mean">${sStats.srrMean}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card">
                     <div class="sdd-card-header">P.S.R.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.psrMed}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.psrMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">${sStats.psrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">${sStats.psrMean}</span></div>
                     </div>
                 </div>
                 ${atsHtmlS}
@@ -1602,7 +1602,7 @@
                 let hHtml = fires > 0 ? '🔥'.repeat(fires) : '';
                 let cHtml = flakes > 0 ? '❄️'.repeat(flakes) : '';
                 kinIndicators[outcomeNum].push(`
-                    <div class="flex justify-between items-center w-full px-0.5 py-0.5 bg-slate-800/40 rounded mt-0.5 border border-slate-700/30 shadow-inner">
+                    <div class="flex justify-between items-center w-full px-0.5 py-0.5 mt-0.5">
                         <div class="text-[8px] flex-1 text-left text-blue-400 tracking-tighter leading-none">${cHtml}</div>
                         <div class="text-[9px] font-black text-slate-400 flex items-center justify-center gap-1 flex-[2] uppercase leading-none">${centerHtml}</div>
                         <div class="text-[8px] flex-1 text-right text-red-500 tracking-tighter leading-none">${hHtml}</div>
@@ -1618,8 +1618,8 @@
                     
                     let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange);
                     
-                    kinData.hot.forEach(h => pushIndicator(h.num, 'ROLL', h.fires, 0));
-                    kinData.cold.forEach(c => pushIndicator(c.num, 'ROLL', 0, c.flakes));
+                    kinData.hot.forEach(h => pushIndicator(h.num, 'LAST ROLL', h.fires, 0));
+                    kinData.cold.forEach(c => pushIndicator(c.num, 'LAST ROLL', 0, c.flakes));
                     
                     let [ld1, ld2] = lastSetStr.split('-');
                     let topHotStr = kinData.hot.length > 0 ? kinData.hot[0].num : '--';
@@ -1652,7 +1652,7 @@
                     if(target.active) {
                         let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange);
                         if (kAll.total > 0) {
-                            let cAllHtml = `"<span class="text-white">${target.num}</span>"`;
+                            let cAllHtml = `NO <span class="text-white">${target.num}</span> ALL`;
                             kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
                             kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
                         }
