@@ -578,8 +578,8 @@
                     
                     <div class="cfg-row">
                         <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value)"></select></div>
-                        <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                        <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="editAsset('locations', 'cfg-loc')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('locations', 'cfg-loc')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
 
                     <div class="mb-3">
@@ -682,7 +682,7 @@
                     <div class="flex items-end gap-2">
                         <div class="flex-grow">
                             <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label>
-                            <select id="ns-shooter" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="handleNewShooterSelectModal()"></select>
+                            <select id="ns-shooter" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="handleNewShooterSelectModal(); checkMetadataTrigger('shooters', this.value)"></select>
                         </div>
                         <button onclick="editAsset('shooters', 'ns-shooter')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('shooters', 'ns-shooter')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
@@ -690,7 +690,7 @@
                     <div class="flex items-end gap-2">
                         <div class="flex-grow">
                             <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label>
-                            <select id="ns-set" class="select-wicked border-emerald-500/50 focus:border-emerald-400"></select>
+                            <select id="ns-set" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="checkMetadataTrigger('dice_sets', this.value)"></select>
                         </div>
                         <button onclick="editAsset('dice_sets', 'ns-set')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('dice_sets', 'ns-set')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
@@ -720,8 +720,22 @@
                 <input type="hidden" id="hcfg-end-idx">
                 <input type="hidden" id="hcfg-is-forward">
                 <div class="flex flex-col gap-3 text-left">
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-grow">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label>
+                            <select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect(); checkMetadataTrigger('shooters', this.value)"></select>
+                        </div>
+                        <button onclick="editAsset('shooters', 'hcfg-shooter')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('shooters', 'hcfg-shooter')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-grow">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label>
+                            <select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('dice_sets', this.value)"></select>
+                        </div>
+                        <button onclick="editAsset('dice_sets', 'hcfg-set')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('dice_sets', 'hcfg-set')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
                         <div class="flex gap-2">
@@ -953,12 +967,24 @@
             }
         });
 
-        function sortAssets(arr) {
+        const shooterTypeMap = { 'Master': 1, 'Favorite': 2, 'Standard': 3, 'Online': 4 };
+        function sortShooters(arr) {
             return arr.sort((a, b) => {
-                const aFav = a.Type === 'Favorite' ? 0 : 1;
-                const bFav = b.Type === 'Favorite' ? 0 : 1;
-                if (aFav !== bFav) return aFav - bFav;
+                let tA = shooterTypeMap[a.Type] || 5;
+                let tB = shooterTypeMap[b.Type] || 5;
+                if (tA !== tB) return tA - tB;
                 return (a.name || '').localeCompare(b.name || '');
+            });
+        }
+        function sortDiceSets(arr) {
+            return arr.sort((a, b) => {
+                let fA = a.Type === 'Favorite' ? 1 : 2;
+                let fB = b.Type === 'Favorite' ? 1 : 2;
+                if (fA !== fB) return fA - fB;
+                if (a.Left_Top !== b.Left_Top) return (a.Left_Top || 0) - (b.Left_Top || 0);
+                if (a.Left_Back !== b.Left_Back) return (a.Left_Back || 0) - (b.Left_Back || 0);
+                if (a.Right_Top !== b.Right_Top) return (a.Right_Top || 0) - (b.Right_Top || 0);
+                return (a.Right_Back || 0) - (b.Right_Back || 0);
             });
         }
 
@@ -974,8 +1000,8 @@
                 sSnap.forEach(doc => masterData.shooters.push({ id: doc.id, ...doc.data(), name: doc.data().name || doc.id }));
                 dSnap.forEach(doc => masterData.sets.push({ id: doc.id, ...doc.data(), name: doc.data().Set_Name || doc.id }));
                 
-                masterData.shooters = sortAssets(masterData.shooters);
-                masterData.sets = sortAssets(masterData.sets);
+                masterData.shooters = sortShooters(masterData.shooters);
+                masterData.sets = sortDiceSets(masterData.sets);
 
                 populateConfigDropdowns();
             } catch (e) { console.error("Master Data Fetch Error", e); }
@@ -1624,20 +1650,9 @@
 
                 layTargets.forEach(target => {
                     if(target.active) {
-                        const sets = SET_MAP[target.num];
-                        sets.forEach(set => {
-                            let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
-                            if (kData.total > 0) {
-                                let [d1, d2] = set.split('-');
-                                let cHtml = `<span class="text-white">${target.num}</span><div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
-                                kData.hot.forEach(h => pushIndicator(h.num, cHtml, h.fires, 0));
-                                kData.cold.forEach(c => pushIndicator(c.num, cHtml, 0, c.flakes));
-                            }
-                        });
-                        
                         let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange);
                         if (kAll.total > 0) {
-                            let cAllHtml = `<span class="text-white">${target.num}</span> ALL`;
+                            let cAllHtml = `"<span class="text-white">${target.num}</span>"`;
                             kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
                             kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
                         }
