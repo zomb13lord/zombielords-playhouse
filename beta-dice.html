@@ -227,12 +227,12 @@
 
         /* NID Module CSS */
         #nid-container {
-            display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 1fr; gap: 16px; max-width: 1050px; margin: 10px auto 0; width: 100%;
+            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; max-width: 1050px; margin: 10px auto 0; width: 100%;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
             background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.2s ease; cursor: pointer;
-            width: 100%;
+            width: 100%; height: 100%;
         }
         .nid-box.card-selected {
             border-color: #34d399 !important;
@@ -249,12 +249,14 @@
         .nid-box-3 { order: 8; } .nid-box-11 { order: 9; }
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
-        @media (min-width: 1024px) {
-            #nid-container { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 8px; }
-            .nid-box-7 { grid-column: auto; width: 100%; order: 6; }
+        @media (min-width: 768px) {
+            #nid-container { grid-template-columns: repeat(6, 160px); }
+            .nid-box-7 { grid-column: span 1; justify-self: stretch; width: 100%; order: 9; }
             /* Desktop Order */
-            .nid-box-2 { order: 1; } .nid-box-3 { order: 2; } .nid-box-4 { order: 3; } .nid-box-5 { order: 4; } .nid-box-6 { order: 5; }
-            .nid-box-8 { order: 7; } .nid-box-9 { order: 8; } .nid-box-10 { order: 9; } .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
+            .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
+            .nid-box-8 { order: 4; } .nid-box-9 { order: 5; } .nid-box-10 { order: 6; }
+            .nid-box-2 { order: 7; } .nid-box-3 { order: 8; }
+            .nid-box-11 { order: 10; } .nid-box-12 { order: 11; }
         }
 
         .nid-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-bottom: 1px solid #334155; }
@@ -345,12 +347,6 @@
         </div>
 
         <div id="sdd-global" class="sdd-card-container">
-            <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
-                <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
-                <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
-                    <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
-                </div>
-            </div>
             <div class="sdd-card">
                 <div class="sdd-card-header">ROLLS</div>
                 <div class="sdd-card-body">
@@ -598,28 +594,28 @@
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
                         <label for="cfg-show-sdd" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-sdd" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
                     <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">ATS</span>
                         <label for="cfg-track-ats" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ats" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
                     <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Sharpshooter</span>
                         <label for="cfg-track-ss" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ss" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
                     <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
                         <label for="cfg-show-nid" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
                     <div class="flex justify-between items-center mt-3" id="cfg-kinematic-container">
@@ -652,9 +648,21 @@
             <div class="modal-content-layer">
                 <h2 class="text-lg font-black text-emerald-400 uppercase tracking-widest mb-4 cinzel text-center">New Shooter</h2>
                 <div class="flex flex-col text-left gap-3">
-                    <div>
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label>
-                        <select id="ns-shooter" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="handleNewShooterSelectModal()"></select>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-grow">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label>
+                            <select id="ns-shooter" class="select-wicked border-emerald-500/50 focus:border-emerald-400" onchange="handleNewShooterSelectModal()"></select>
+                        </div>
+                        <button onclick="editAsset('shooters', 'ns-shooter')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('shooters', 'ns-shooter')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <div class="flex-grow">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label>
+                            <select id="ns-set" class="select-wicked border-emerald-500/50 focus:border-emerald-400"></select>
+                        </div>
+                        <button onclick="editAsset('dice_sets', 'ns-set')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
+                        <button onclick="deleteAsset('dice_sets', 'ns-set')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
                     <div>
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
@@ -682,6 +690,7 @@
                 <input type="hidden" id="hcfg-is-forward">
                 <div class="flex flex-col gap-3 text-left">
                     <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
+                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                     <div>
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
                         <div class="flex gap-2">
@@ -1063,18 +1072,12 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val">${gStats.atsS}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val">${gStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val">${gStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-crown text-yellow-400"></i></span><span class="sdd-val">${gStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
 
             document.getElementById('sdd-global').innerHTML = `
-                <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
-                    <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
-                    <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
-                        <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
-                    </div>
-                </div>
                 <div class="sdd-card">
                     <div class="sdd-card-header">ROLLS</div>
                     <div class="sdd-card-body">
@@ -1742,15 +1745,16 @@
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
-            document.getElementById('cfg-loc').innerHTML = locs; document.getElementById('hcfg-loc').innerHTML = locs;
-            document.getElementById('cfg-set').innerHTML = sets; document.getElementById('hcfg-set').innerHTML = sets;
+            document.getElementById('cfg-loc').innerHTML = locs; 
+            document.getElementById('hcfg-shooter').innerHTML = shoots;
+            document.getElementById('hcfg-set').innerHTML = sets;
+            document.getElementById('hcfg-pos-parent').innerHTML = parents;
             
-            document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
-            updatePosChild('cfg', globalConfig.positionChild);
+            document.getElementById('ns-shooter').innerHTML = shoots;
+            document.getElementById('ns-set').innerHTML = sets;
+            document.getElementById('ns-pos-parent').innerHTML = parents;
 
             document.getElementById('cfg-loc').value = globalConfig.location || 'ALL';
-            document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
-            document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
@@ -2217,6 +2221,7 @@
 
             const refRoll = universalLog[startIdx] || {};
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
+            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
             let childPos = refRoll.Table_Position || 'All';
             let parentPos = 'All';
@@ -2242,6 +2247,7 @@
 
             const refRoll = universalLog[startIdx] || universalLog[nsIndex] || {};
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
+            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
             let childPos = refRoll.Table_Position || 'All';
             let parentPos = 'All';
@@ -2261,11 +2267,13 @@
             const shooter = document.getElementById('hcfg-shooter').value;
             const posParent = document.getElementById('hcfg-pos-parent').value;
             const posChild = document.getElementById('hcfg-pos-child').value;
+            const set = document.getElementById('hcfg-set').value;
 
             for(let i = startIdx; i <= endIdx; i++) {
                 if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
                     universalLog[i].Shooter_ID = shooter;
                     universalLog[i].Table_Position = posChild;
+                    universalLog[i].Dice_Set = set;
                 }
             }
 
@@ -2273,6 +2281,7 @@
                 globalConfig.shooter = shooter;
                 globalConfig.positionParent = posParent;
                 globalConfig.positionChild = posChild;
+                globalConfig.diceSet = set;
             }
 
             if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
@@ -2280,10 +2289,12 @@
                 if (shooterObj) {
                     db.collection("users").doc(currentUid).collection("master_shooters").doc(shooterObj.id).set({
                         last_positionParent: posParent,
-                        last_positionChild: posChild
+                        last_positionChild: posChild,
+                        last_diceSet: set
                     }, { merge: true }).catch(e => console.error(e));
                     shooterObj.last_positionParent = posParent;
                     shooterObj.last_positionChild = posChild;
+                    shooterObj.last_diceSet = set;
                 }
             }
 
@@ -2297,8 +2308,7 @@
             if (val === 'ADD_NEW') openMetadataModal(type);
         }
 
-        async function editAsset(type) {
-            const selectId = type === 'locations' ? 'cfg-loc' : (type === 'shooters' ? 'cfg-shooter' : 'cfg-set');
+        async function editAsset(type, selectId) {
             const name = document.getElementById(selectId).value;
             if (name === 'ALL' || name === 'ADD_NEW') return await customAlert("Select a valid asset to edit.");
             
@@ -2307,12 +2317,12 @@
             if(asset) openMetadataModal(type, asset);
         }
 
-        async function deleteAsset(type) {
-            const selectId = type === 'locations' ? 'cfg-loc' : (type === 'shooters' ? 'cfg-shooter' : 'cfg-set');
+        async function deleteAsset(type, selectId) {
             const name = document.getElementById(selectId).value;
             if (name === 'ALL' || name === 'ADD_NEW') return await customAlert("Select a valid asset to delete.");
             
             document.getElementById('modal-config-global').style.display = 'none';
+            document.getElementById('modal-new-shooter').style.display = 'none';
             const confirmed = await customConfirm("Are you sure you want to delete this asset?");
             if (confirmed) {
                 try {
@@ -2332,6 +2342,7 @@
             activeMetaType = type;
             activeMetaId = existingAsset ? existingAsset.id : null;
             document.getElementById('modal-config-global').style.display = 'none';
+            document.getElementById('modal-new-shooter').style.display = 'none';
             
             const title = document.getElementById('meta-title');
             const fields = document.getElementById('meta-fields');
