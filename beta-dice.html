@@ -624,21 +624,46 @@
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center mt-3" id="cfg-kinematic-container">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
-                        <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                            <option value="Global">Global</option>
-                            <option value="Shooter">Shooter</option>
-                        </select>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Master Kinematics</span>
+                        <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
                     </div>
-                    <div class="flex justify-between items-center mt-3" id="cfg-kinematic-range-container">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
-                        <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                            <option value="ALL">All</option>
-                            <option value="50">Last 50</option>
-                            <option value="100">Last 100</option>
-                            <option value="200">Last 200</option>
-                        </select>
+                    <div id="cfg-kin-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-700 mt-2 mb-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
+                            <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="Global">Global</option>
+                                <option value="Shooter">Shooter</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
+                            <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="ALL">All</option>
+                                <option value="50">Last 50</option>
+                                <option value="100">Last 100</option>
+                                <option value="200">Last 200</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Track Last Roll</span>
+                            <label for="cfg-kin-last" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-last" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers (No X)</div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no4" class="accent-blue-500 w-3 h-3"> No 4</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no5" class="accent-blue-500 w-3 h-3"> No 5</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no6" class="accent-blue-500 w-3 h-3"> No 6</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no8" class="accent-blue-500 w-3 h-3"> No 8</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no9" class="accent-blue-500 w-3 h-3"> No 9</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no10" class="accent-blue-500 w-3 h-3"> No 10</label>
+                        </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
@@ -855,6 +880,8 @@
         
         let storedNID = localStorage.getItem('cfg_showNID');
         let storedNidSeven = localStorage.getItem('cfg_showNidSeven');
+        let storedKinEnabled = localStorage.getItem('cfg_kinematicEnabled');
+        let storedKinLast = localStorage.getItem('cfg_kinLastRoll');
         
         let globalConfig = { 
             location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: localStorage.getItem('cfg_diceColor') || 'ruby', 
@@ -863,6 +890,14 @@
             trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false',
             showNID: storedNID !== null ? storedNID : 'true',
             showNidSeven: storedNidSeven !== null ? storedNidSeven : 'true',
+            kinematicEnabled: storedKinEnabled !== null ? storedKinEnabled : 'true',
+            kinLastRoll: storedKinLast !== null ? storedKinLast : 'true',
+            kinNo4: localStorage.getItem('cfg_kinNo4') === 'true',
+            kinNo5: localStorage.getItem('cfg_kinNo5') === 'true',
+            kinNo6: localStorage.getItem('cfg_kinNo6') === 'true',
+            kinNo8: localStorage.getItem('cfg_kinNo8') === 'true',
+            kinNo9: localStorage.getItem('cfg_kinNo9') === 'true',
+            kinNo10: localStorage.getItem('cfg_kinNo10') === 'true',
             kinematicSource: localStorage.getItem('cfg_kinematicSource') || 'Global',
             kinematicRange: localStorage.getItem('cfg_kinematicRange') || 'ALL'
         };
@@ -963,6 +998,14 @@
                         if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
                         if (data.meta_tags.show_nid !== undefined) globalConfig.showNID = String(data.meta_tags.show_nid);
                         if (data.meta_tags.show_nid_seven !== undefined) globalConfig.showNidSeven = String(data.meta_tags.show_nid_seven);
+                        if (data.meta_tags.kinematic_enabled !== undefined) globalConfig.kinematicEnabled = String(data.meta_tags.kinematic_enabled);
+                        if (data.meta_tags.kin_last_roll !== undefined) globalConfig.kinLastRoll = String(data.meta_tags.kin_last_roll);
+                        if (data.meta_tags.kin_no_4 !== undefined) globalConfig.kinNo4 = data.meta_tags.kin_no_4;
+                        if (data.meta_tags.kin_no_5 !== undefined) globalConfig.kinNo5 = data.meta_tags.kin_no_5;
+                        if (data.meta_tags.kin_no_6 !== undefined) globalConfig.kinNo6 = data.meta_tags.kin_no_6;
+                        if (data.meta_tags.kin_no_8 !== undefined) globalConfig.kinNo8 = data.meta_tags.kin_no_8;
+                        if (data.meta_tags.kin_no_9 !== undefined) globalConfig.kinNo9 = data.meta_tags.kin_no_9;
+                        if (data.meta_tags.kin_no_10 !== undefined) globalConfig.kinNo10 = data.meta_tags.kin_no_10;
                         if (data.meta_tags.kinematic_source !== undefined) globalConfig.kinematicSource = String(data.meta_tags.kinematic_source);
                         if (data.meta_tags.kinematic_range !== undefined) globalConfig.kinematicRange = String(data.meta_tags.kinematic_range);
                     }
@@ -984,7 +1027,11 @@
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
-                    show_nid: globalConfig.showNID, show_nid_seven: globalConfig.showNidSeven, kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, base_unit: 1 
+                    show_nid: globalConfig.showNID, show_nid_seven: globalConfig.showNidSeven, 
+                    kinematic_enabled: globalConfig.kinematicEnabled, kin_last_roll: globalConfig.kinLastRoll,
+                    kin_no_4: globalConfig.kinNo4, kin_no_5: globalConfig.kinNo5, kin_no_6: globalConfig.kinNo6,
+                    kin_no_8: globalConfig.kinNo8, kin_no_9: globalConfig.kinNo9, kin_no_10: globalConfig.kinNo10,
+                    kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -1491,7 +1538,7 @@
             let lastSetStr = null;
             let targetHot = null; let targetCold = null;
 
-            if (kinematicRolls.length > 0) {
+            if (String(globalConfig.kinematicEnabled) === 'true' && String(globalConfig.kinLastRoll) === 'true' && kinematicRolls.length > 0) {
                 let lastR = kinematicRolls[kinematicRolls.length - 1];
                 let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
                 lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
@@ -1511,7 +1558,7 @@
                     </div>
                 `;
             } else {
-                nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING ROLL</div>`;
+                nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
             }
 
             const renderBox = (num) => {
@@ -1527,6 +1574,44 @@
                         indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-400">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
                     }
                 }
+                
+                let layTrackerHtml = '';
+                if (String(globalConfig.kinematicEnabled) === 'true') {
+                    let showLay = false;
+                    if (num === 4 && globalConfig.kinNo4) showLay = true;
+                    if (num === 5 && globalConfig.kinNo5) showLay = true;
+                    if (num === 6 && globalConfig.kinNo6) showLay = true;
+                    if (num === 8 && globalConfig.kinNo8) showLay = true;
+                    if (num === 9 && globalConfig.kinNo9) showLay = true;
+                    if (num === 10 && globalConfig.kinNo10) showLay = true;
+                    
+                    if (showLay) {
+                        const sets = SET_MAP[num];
+                        let listHtml = '';
+                        sets.forEach(set => {
+                            let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
+                            if (kData.total > 0) {
+                                let [d1, d2] = set.split('-');
+                                listHtml += `
+                                <div class="flex justify-between items-center w-full">
+                                    <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>
+                                    <div class="flex gap-1"><span class="text-red-500">${kData.hot}</span> <span class="text-blue-400">${kData.cold}</span></div>
+                                </div>`;
+                            }
+                        });
+                        let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
+                        if (kAll.total > 0) {
+                            listHtml += `
+                            <div class="flex justify-between items-center w-full mt-0.5 pt-0.5 border-t border-slate-700/50">
+                                <span class="font-bold text-[9px] text-slate-400">ALL</span>
+                                <div class="flex gap-1"><span class="text-red-500 font-bold">${kAll.hot}</span> <span class="text-blue-400 font-bold">${kAll.cold}</span></div>
+                            </div>`;
+                        }
+                        if (listHtml) {
+                            layTrackerHtml = `<div class="flex flex-col w-full px-2 text-[9px] gap-0.5 mt-2 border-t border-slate-600/50 pt-2 pb-2 font-mono">${listHtml}</div>`;
+                        }
+                    }
+                }
 
                 return `
                 <div class="nid-box nid-box-${num}" onclick="handleNidClick(${num})">
@@ -1536,7 +1621,8 @@
                         <div class="nid-icons hot text-right">${icons.hot}</div>
                     </div>
                     <div class="nid-main">
-                        <div class="nid-indicator">${indicatorHtml}</div>
+                        <div class="nid-indicator w-full">${indicatorHtml}</div>
+                        ${layTrackerHtml}
                     </div>
                     <div class="nid-footer">
                         <div class="nid-footer-cell nid-footer-global">${counts.GLB[num]}</div>
@@ -1775,22 +1861,31 @@
             document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             document.getElementById('cfg-show-nid').checked = (String(globalConfig.showNID) === 'true');
             document.getElementById('cfg-show-nid-seven').checked = (String(globalConfig.showNidSeven) !== 'false');
+            
+            document.getElementById('cfg-kin-enabled').checked = (String(globalConfig.kinematicEnabled) === 'true');
+            document.getElementById('cfg-kin-last').checked = (String(globalConfig.kinLastRoll) === 'true');
+            document.getElementById('cfg-kin-no4').checked = (String(globalConfig.kinNo4) === 'true');
+            document.getElementById('cfg-kin-no5').checked = (String(globalConfig.kinNo5) === 'true');
+            document.getElementById('cfg-kin-no6').checked = (String(globalConfig.kinNo6) === 'true');
+            document.getElementById('cfg-kin-no8').checked = (String(globalConfig.kinNo8) === 'true');
+            document.getElementById('cfg-kin-no9').checked = (String(globalConfig.kinNo9) === 'true');
+            document.getElementById('cfg-kin-no10').checked = (String(globalConfig.kinNo10) === 'true');
+            
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
             document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
             
-            const kinContainer = document.getElementById('cfg-kinematic-container');
-            const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
-            const nidSevenContainer = document.getElementById('cfg-nid-seven-container');
-            
             const isNidOn = (String(globalConfig.showNID) === 'true');
-            kinContainer.style.display = isNidOn ? 'flex' : 'none';
-            kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
-            nidSevenContainer.style.display = isNidOn ? 'flex' : 'none';
+            document.getElementById('cfg-nid-seven-container').style.display = isNidOn ? 'flex' : 'none';
+            
+            const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
+            kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
             document.getElementById('cfg-show-nid').onchange = (e) => {
-                kinContainer.style.display = e.target.checked ? 'flex' : 'none';
-                kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
-                nidSevenContainer.style.display = e.target.checked ? 'flex' : 'none';
+                document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
+            };
+            
+            document.getElementById('cfg-kin-enabled').onchange = (e) => {
+                kinSubContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             currentConfigShooter = globalConfig.shooter;
@@ -2237,22 +2332,30 @@
             nidToggle.checked = (String(globalConfig.showNID) === 'true');
             document.getElementById('cfg-show-nid-seven').checked = (String(globalConfig.showNidSeven) !== 'false');
             
-            const kinContainer = document.getElementById('cfg-kinematic-container');
-            const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
-            const nidSevenContainer = document.getElementById('cfg-nid-seven-container');
-            
-            const isNidOn = (String(globalConfig.showNID) === 'true');
-            kinContainer.style.display = isNidOn ? 'flex' : 'none';
-            kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
-            nidSevenContainer.style.display = isNidOn ? 'flex' : 'none';
+            document.getElementById('cfg-kin-enabled').checked = (String(globalConfig.kinematicEnabled) === 'true');
+            document.getElementById('cfg-kin-last').checked = (String(globalConfig.kinLastRoll) === 'true');
+            document.getElementById('cfg-kin-no4').checked = (String(globalConfig.kinNo4) === 'true');
+            document.getElementById('cfg-kin-no5').checked = (String(globalConfig.kinNo5) === 'true');
+            document.getElementById('cfg-kin-no6').checked = (String(globalConfig.kinNo6) === 'true');
+            document.getElementById('cfg-kin-no8').checked = (String(globalConfig.kinNo8) === 'true');
+            document.getElementById('cfg-kin-no9').checked = (String(globalConfig.kinNo9) === 'true');
+            document.getElementById('cfg-kin-no10').checked = (String(globalConfig.kinNo10) === 'true');
             
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
             document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
+            
+            const isNidOn = (String(globalConfig.showNID) === 'true');
+            document.getElementById('cfg-nid-seven-container').style.display = isNidOn ? 'flex' : 'none';
+            
+            const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
+            kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
             nidToggle.onchange = (e) => {
-                kinContainer.style.display = e.target.checked ? 'flex' : 'none';
-                kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
-                nidSevenContainer.style.display = e.target.checked ? 'flex' : 'none';
+                document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
+            };
+            
+            document.getElementById('cfg-kin-enabled').onchange = (e) => {
+                kinSubContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             document.getElementById('modal-config-global').style.display = 'flex';
@@ -2267,6 +2370,16 @@
             globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
             globalConfig.showNID = document.getElementById('cfg-show-nid').checked ? 'true' : 'false';
             globalConfig.showNidSeven = document.getElementById('cfg-show-nid-seven').checked ? 'true' : 'false';
+            
+            globalConfig.kinematicEnabled = document.getElementById('cfg-kin-enabled').checked ? 'true' : 'false';
+            globalConfig.kinLastRoll = document.getElementById('cfg-kin-last').checked ? 'true' : 'false';
+            globalConfig.kinNo4 = document.getElementById('cfg-kin-no4').checked;
+            globalConfig.kinNo5 = document.getElementById('cfg-kin-no5').checked;
+            globalConfig.kinNo6 = document.getElementById('cfg-kin-no6').checked;
+            globalConfig.kinNo8 = document.getElementById('cfg-kin-no8').checked;
+            globalConfig.kinNo9 = document.getElementById('cfg-kin-no9').checked;
+            globalConfig.kinNo10 = document.getElementById('cfg-kin-no10').checked;
+            
             globalConfig.kinematicSource = document.getElementById('cfg-kinematic-source').value;
             globalConfig.kinematicRange = document.getElementById('cfg-kinematic-range').value;
             
@@ -2275,6 +2388,14 @@
             localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
             localStorage.setItem('cfg_showNID', globalConfig.showNID);
             localStorage.setItem('cfg_showNidSeven', globalConfig.showNidSeven);
+            localStorage.setItem('cfg_kinematicEnabled', globalConfig.kinematicEnabled);
+            localStorage.setItem('cfg_kinLastRoll', globalConfig.kinLastRoll);
+            localStorage.setItem('cfg_kinNo4', globalConfig.kinNo4);
+            localStorage.setItem('cfg_kinNo5', globalConfig.kinNo5);
+            localStorage.setItem('cfg_kinNo6', globalConfig.kinNo6);
+            localStorage.setItem('cfg_kinNo8', globalConfig.kinNo8);
+            localStorage.setItem('cfg_kinNo9', globalConfig.kinNo9);
+            localStorage.setItem('cfg_kinNo10', globalConfig.kinNo10);
             localStorage.setItem('cfg_kinematicSource', globalConfig.kinematicSource);
             localStorage.setItem('cfg_kinematicRange', globalConfig.kinematicRange);
 
