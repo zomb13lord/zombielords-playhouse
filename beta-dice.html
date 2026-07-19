@@ -378,9 +378,9 @@
             <div class="sdd-card" id="g-ats-card">
                 <div class="sdd-card-header">A.T.S.</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-down text-amber-400"></i></span><span class="sdd-val" id="g-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-up text-amber-400"></i></span><span class="sdd-val" id="g-ats-t">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-star text-amber-400"></i></span><span class="sdd-val" id="g-ats-a">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="g-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="g-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="g-ats-a">0</span></div>
                 </div>
             </div>
         </div>
@@ -430,9 +430,9 @@
             <div class="sdd-card" id="s-ats-card">
                 <div class="sdd-card-header">A.T.S.</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-down text-amber-400"></i></span><span class="sdd-val" id="s-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-up text-amber-400"></i></span><span class="sdd-val" id="s-ats-t">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-star text-amber-400"></i></span><span class="sdd-val" id="s-ats-a">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="s-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="s-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="s-ats-a">0</span></div>
                 </div>
             </div>
         </div>
@@ -616,6 +616,13 @@
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
+                    <div class="flex justify-between items-center mt-3" id="cfg-nid-seven-container">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold pl-4 border-l-2 border-slate-700">Show Seven</span>
+                        <label for="cfg-show-nid-seven" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid-seven" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
                     <div class="flex justify-between items-center mt-3" id="cfg-kinematic-container">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
                         <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
@@ -738,16 +745,29 @@
             <div class="modal-content-layer text-center">
                 <h2 class="text-lg font-black text-amber-500 uppercase tracking-widest mb-4 cinzel">Invalid Roll</h2>
                 <div class="flex flex-col gap-2" id="invalid-options-container">
-                    <button class="modal-btn" id="inv-opt-1" onclick="selectInvalidReason('Dice Off Table (One)', 1)">Dice Off Table (One)</button>
-                    <button class="modal-btn" id="inv-opt-2" onclick="selectInvalidReason('Dice Off Table (Two)', 2)">Dice Off Table (Two)</button>
-                    <button class="modal-btn" id="inv-opt-3" onclick="selectInvalidReason('Dice in the Dough', 3)">Dice in the Dough</button>
-                    <button class="modal-btn" id="inv-opt-4" onclick="selectInvalidReason('Dice to Tall', 4)">Dice to Tall</button>
-                    <button class="modal-btn" id="inv-opt-5" onclick="selectInvalidReason('Dice to Short', 5)">Dice to Short</button>
-                    <button class="modal-btn border-emerald-500 text-emerald-400 hidden" id="inv-opt-wp" onclick="selectInvalidReason('Wrong Point', 'wp')">Wrong Point</button>
+                    <button class="modal-btn" id="inv-opt-1" onclick="selectInvalidReason('Dice off table (Same Dice)', 1)">Dice off table (Same Dice)</button>
+                    <button class="modal-btn" id="inv-opt-2" onclick="selectInvalidReason('Dice off table (New Dice)', 2)">Dice off table (New Dice)</button>
+                    <button class="modal-btn" id="inv-opt-3" onclick="selectInvalidReason('No Roll', 3)">No Roll</button>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-4">
                     <button onclick="cancelInvalid()" class="btn-cancel">Cancel</button>
                     <button onclick="acceptInvalid()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-correction" class="modal-mask">
+        <div class="modal-box border-emerald-500">
+            <div class="modal-content-layer text-center">
+                <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Correct Roll</h2>
+                <div class="flex flex-row gap-4 justify-center w-full max-w-[340px] mx-auto mb-4">
+                    <div class="flex-1"><div class="grid grid-cols-2 grid-rows-3 gap-2" id="corr-left-grid"></div></div>
+                    <div class="flex-1"><div class="grid grid-cols-2 grid-rows-3 gap-2" id="corr-right-grid"></div></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="submitCorrection()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded shadow-[0_0_15px_rgba(16,185,129,0.3)]">Update Roll</button>
                 </div>
             </div>
         </div>
@@ -763,16 +783,6 @@
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
                     <button onclick="editIncompleteRoll()" class="bg-amber-950/60 border border-amber-500/50 text-amber-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Edit Roll</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-wrong-point" class="modal-mask">
-        <div class="modal-box border-emerald-500">
-            <div class="modal-content-layer text-center">
-                <h2 class="text-lg font-black text-emerald-500 uppercase tracking-widest mb-4 cinzel">Select Correct Point</h2>
-                <div class="grid grid-cols-3 gap-2" id="wrong-point-grid"></div>
-                <button onclick="closeModals()" class="btn-cancel mt-4">Cancel</button>
             </div>
         </div>
     </div>
@@ -843,12 +853,15 @@
         let activeState = { currentPoint: null, wasSevenOut: {} }; 
         
         let storedNID = localStorage.getItem('cfg_showNID');
+        let storedNidSeven = localStorage.getItem('cfg_showNidSeven');
+        
         let globalConfig = { 
             location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: localStorage.getItem('cfg_diceColor') || 'ruby', 
             showShooterSDD: localStorage.getItem('cfg_showShooterSDD') || 'false', 
             trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
             trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false',
             showNID: storedNID !== null ? storedNID : 'true',
+            showNidSeven: storedNidSeven !== null ? storedNidSeven : 'true',
             kinematicSource: localStorage.getItem('cfg_kinematicSource') || 'Global',
             kinematicRange: localStorage.getItem('cfg_kinematicRange') || 'ALL'
         };
@@ -865,6 +878,10 @@
         let ipState = 'collapsed';
         let selectedInvalidReason = null;
         let selectedNidCard = null;
+        
+        let corrSelectedLeft = null;
+        let corrSelectedRight = null;
+        let corrTargetIndex = -1;
 
         // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
@@ -873,7 +890,7 @@
             await fetchMasterData();
             await fetchActiveSession();
             buildInputPad();
-            buildWrongPointGrid();
+            buildCorrectionPad();
             buildColorGrid();
             
             // Desktop Scroll Listener
@@ -944,6 +961,7 @@
                         if (data.meta_tags.track_ats !== undefined) globalConfig.trackATS = String(data.meta_tags.track_ats);
                         if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
                         if (data.meta_tags.show_nid !== undefined) globalConfig.showNID = String(data.meta_tags.show_nid);
+                        if (data.meta_tags.show_nid_seven !== undefined) globalConfig.showNidSeven = String(data.meta_tags.show_nid_seven);
                         if (data.meta_tags.kinematic_source !== undefined) globalConfig.kinematicSource = String(data.meta_tags.kinematic_source);
                         if (data.meta_tags.kinematic_range !== undefined) globalConfig.kinematicRange = String(data.meta_tags.kinematic_range);
                     }
@@ -965,7 +983,7 @@
                     positionParent: globalConfig.positionParent, positionChild: globalConfig.positionChild, 
                     dice_set: globalConfig.diceSet, dice_color: globalConfig.diceColor, 
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
-                    show_nid: globalConfig.showNID, kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, base_unit: 1 
+                    show_nid: globalConfig.showNID, show_nid_seven: globalConfig.showNidSeven, kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
             };
@@ -1068,9 +1086,9 @@
                 <div class="sdd-card" id="g-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-down text-amber-400"></i></span><span class="sdd-val">${gStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-up text-amber-400"></i></span><span class="sdd-val">${gStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-star text-amber-400"></i></span><span class="sdd-val">${gStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="g-ats-s">${gStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="g-ats-t">${gStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="g-ats-a">${gStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
@@ -1145,9 +1163,9 @@
                 <div class="sdd-card" id="s-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-down text-amber-400"></i></span><span class="sdd-val">${sStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-arrow-up text-amber-400"></i></span><span class="sdd-val">${sStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-star text-amber-400"></i></span><span class="sdd-val">${sStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="s-ats-s">${sStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="s-ats-t">${sStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="s-ats-a">${sStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
@@ -1529,9 +1547,11 @@
                 </div>`;
             };
 
-            container.innerHTML = `
-                ${[2,3,4,5,6,7,8,9,10,11,12].map(renderBox).join('')}
-            `;
+            let nidArray = [2,3,4,5,6,7,8,9,10,11,12];
+            if (String(globalConfig.showNidSeven) === 'false') {
+                nidArray = [2,3,4,5,6,8,9,10,11,12];
+            }
+            container.innerHTML = nidArray.map(renderBox).join('');
         }
 
         function updateBonusTrackers() {
@@ -1688,12 +1708,17 @@
                 rGrid.innerHTML += `<button onclick="selectDie('right', ${i})" id="btn-r-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
             });
         }
-
-        function buildWrongPointGrid() {
-            const grid = document.getElementById('wrong-point-grid');
-            grid.innerHTML = '';
-            [2,3,4,5,6,8,9,10,11].forEach(n => { grid.innerHTML += `<button class="modal-btn" onclick="submitWrongPoint(${n})">${n}</button>`; });
-            grid.innerHTML += `<button class="modal-btn col-span-3" onclick="submitWrongPoint(12)">12</button>`;
+        
+        function buildCorrectionPad() {
+            const lGrid = document.getElementById('corr-left-grid');
+            const rGrid = document.getElementById('corr-right-grid');
+            lGrid.innerHTML = ''; rGrid.innerHTML = '';
+            
+            const order = [1, 4, 2, 5, 3, 6];
+            order.forEach(i => {
+                lGrid.innerHTML += `<button onclick="selectCorrDie('left', ${i})" id="btn-corr-l-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
+                rGrid.innerHTML += `<button onclick="selectCorrDie('right', ${i})" id="btn-corr-r-${i}" class="pad-die-btn die-unselected">${getDicePipsHTML(i)}</button>`;
+            });
         }
 
         function buildColorGrid() {
@@ -1745,18 +1770,23 @@
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
             document.getElementById('cfg-track-ss').checked = (String(globalConfig.trackSharpshooter) === 'true');
             document.getElementById('cfg-show-nid').checked = (String(globalConfig.showNID) === 'true');
+            document.getElementById('cfg-show-nid-seven').checked = (String(globalConfig.showNidSeven) !== 'false');
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
             document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
             
             const kinContainer = document.getElementById('cfg-kinematic-container');
             const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
+            const nidSevenContainer = document.getElementById('cfg-nid-seven-container');
+            
             const isNidOn = (String(globalConfig.showNID) === 'true');
             kinContainer.style.display = isNidOn ? 'flex' : 'none';
             kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
+            nidSevenContainer.style.display = isNidOn ? 'flex' : 'none';
 
             document.getElementById('cfg-show-nid').onchange = (e) => {
                 kinContainer.style.display = e.target.checked ? 'flex' : 'none';
                 kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
+                nidSevenContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             currentConfigShooter = globalConfig.shooter;
@@ -1888,6 +1918,21 @@
             document.getElementById('btn-submit-roll').innerText = "NEXT ROLL";
             document.getElementById('btn-submit-roll').classList.remove('hidden');
             document.getElementById('btn-split-roll').classList.add('hidden');
+        }
+
+        function selectCorrDie(side, val) {
+            const colorClass = `die-${globalConfig.diceColor}`;
+            if (side === 'left') {
+                corrSelectedLeft = val;
+                for(let i=1; i<=6; i++) {
+                    document.getElementById(`btn-corr-l-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                }
+            } else {
+                corrSelectedRight = val;
+                for(let i=1; i<=6; i++) {
+                    document.getElementById(`btn-corr-r-${i}`).className = `pad-die-btn ${i === val ? colorClass : 'die-unselected'}`;
+                }
+            }
         }
 
         function clearPad() {
@@ -2078,6 +2123,20 @@
             globalConfig.positionChild = posChild;
             globalConfig.diceSet = set;
 
+            if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
+                const sObj = masterData.shooters.find(s => s.name === shooter);
+                if (sObj) {
+                    sObj.last_positionParent = posParent;
+                    sObj.last_positionChild = posChild;
+                    sObj.last_diceSet = set;
+                    db.collection("users").doc(currentUid).collection("master_shooters").doc(sObj.id).set({
+                        last_positionParent: posParent,
+                        last_positionChild: posChild,
+                        last_diceSet: set
+                    }, { merge: true }).catch(e => console.error(e));
+                }
+            }
+
             universalLog.push({
                 is_NS_Marker: true,
                 Shooter_ID: globalConfig.shooter,
@@ -2093,20 +2152,11 @@
             syncActiveSession();
         }
 
-        // --- INVALID & WRONG POINT LOGIC ---
+        // --- INVALID & CORRECTION LOGIC ---
         function openInvalidModal() {
             selectedInvalidReason = null;
-            const container = document.getElementById('invalid-options-container');
-            container.innerHTML = `
-                <button class="modal-btn" id="inv-opt-1" onclick="selectInvalidReason('Dice Off Table (One)', 1)">Dice Off Table (One)</button>
-                <button class="modal-btn" id="inv-opt-2" onclick="selectInvalidReason('Dice Off Table (Two)', 2)">Dice Off Table (Two)</button>
-                <button class="modal-btn" id="inv-opt-3" onclick="selectInvalidReason('Dice in the Dough', 3)">Dice in the Dough</button>
-                <button class="modal-btn" id="inv-opt-4" onclick="selectInvalidReason('Dice to Tall', 4)">Dice to Tall</button>
-                <button class="modal-btn" id="inv-opt-5" onclick="selectInvalidReason('Dice to Short', 5)">Dice to Short</button>
-            `;
-            if (activeState.currentPoint !== null) {
-                container.innerHTML += `<button class="modal-btn border-emerald-500 text-emerald-400 mt-2" id="inv-opt-wp" onclick="selectInvalidReason('Wrong Point', 'wp')">Wrong Point</button>`;
-            }
+            const btns = document.querySelectorAll('#invalid-options-container .modal-btn');
+            btns.forEach(b => b.classList.remove('selected'));
             document.getElementById('modal-invalid').style.display = 'flex';
         }
 
@@ -2119,51 +2169,49 @@
 
         async function acceptInvalid() {
             if (!selectedInvalidReason) return await customAlert("Select a reason.");
-            if (selectedInvalidReason === 'Wrong Point') {
-                openWrongPointModal();
-            } else {
-                universalLog.push({ Invalid_Roll: true, Notes: selectedInvalidReason, Time_Stamp: new Date().toISOString() });
-                closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
-            }
+            universalLog.push({ Invalid_Roll: true, Notes: selectedInvalidReason, Time_Stamp: new Date().toISOString() });
+            closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
         }
 
         function cancelInvalid() {
             closeModals();
             setIpState('natural');
         }
+        
+        function openCorrectionPad(index) {
+            corrTargetIndex = index;
+            corrSelectedLeft = null;
+            corrSelectedRight = null;
+            for(let i=1; i<=6; i++) {
+                document.getElementById(`btn-corr-l-${i}`).className = 'pad-die-btn die-unselected';
+                document.getElementById(`btn-corr-r-${i}`).className = 'pad-die-btn die-unselected';
+            }
+            document.getElementById('modal-correction').style.display = 'flex';
+        }
+
+        function submitCorrection() {
+            if(!corrSelectedLeft || !corrSelectedRight) return;
+            const r = universalLog[corrTargetIndex];
+            r.Original_Left = r.Left_Die;
+            r.Original_Right = r.Right_Die;
+            r.Original_Sum = r.Total_Sum;
+            
+            r.Left_Die = corrSelectedLeft;
+            r.Right_Die = corrSelectedRight;
+            r.Total_Sum = corrSelectedLeft + corrSelectedRight;
+            r.Corrected_Point = r.Total_Sum;
+            r.is_Corrected = true;
+            
+            r.Notes = r.Notes ? r.Notes + `, Corrected to ${r.Total_Sum}` : `Corrected to ${r.Total_Sum}`;
+            
+            closeModals();
+            renderHistoryBar();
+            syncActiveSession();
+        }
 
         function editIncompleteRoll() {
             closeModals();
             setIpState('expanded');
-        }
-
-        function openWrongPointModal() {
-            document.getElementById('modal-invalid').style.display = 'none';
-            document.getElementById('modal-wrong-point').style.display = 'flex';
-        }
-
-        function submitWrongPoint(newPoint) {
-            let pointRollIndex = -1;
-            let tempIsComeout = true;
-            let tempPoint = null;
-            
-            for(let i=0; i<universalLog.length; i++) {
-                let r = universalLog[i];
-                if(r.Invalid_Roll || r.is_NS_Marker) continue;
-                let sum = r.Corrected_Point || r.Total_Sum;
-                
-                if(tempIsComeout) {
-                    if(![2,3,7,11,12].includes(sum)) { tempIsComeout = false; tempPoint = sum; pointRollIndex = i; }
-                } else {
-                    if(sum === 7 || sum === tempPoint) { tempIsComeout = true; tempPoint = null; pointRollIndex = -1; }
-                }
-            }
-            
-            if(pointRollIndex !== -1) {
-                universalLog[pointRollIndex].Corrected_Point = newPoint;
-                universalLog.push({ Invalid_Roll: true, Notes: `Wrong Point Corrected to ${newPoint}`, Time_Stamp: new Date().toISOString() });
-                closeModals(); setIpState('natural'); renderHistoryBar(); syncActiveSession();
-            }
         }
 
         function showErrorReason(reason) {
@@ -2183,12 +2231,16 @@
             
             const nidToggle = document.getElementById('cfg-show-nid');
             nidToggle.checked = (String(globalConfig.showNID) === 'true');
+            document.getElementById('cfg-show-nid-seven').checked = (String(globalConfig.showNidSeven) !== 'false');
             
             const kinContainer = document.getElementById('cfg-kinematic-container');
             const kinRangeContainer = document.getElementById('cfg-kinematic-range-container');
+            const nidSevenContainer = document.getElementById('cfg-nid-seven-container');
+            
             const isNidOn = (String(globalConfig.showNID) === 'true');
             kinContainer.style.display = isNidOn ? 'flex' : 'none';
             kinRangeContainer.style.display = isNidOn ? 'flex' : 'none';
+            nidSevenContainer.style.display = isNidOn ? 'flex' : 'none';
             
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
             document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
@@ -2196,6 +2248,7 @@
             nidToggle.onchange = (e) => {
                 kinContainer.style.display = e.target.checked ? 'flex' : 'none';
                 kinRangeContainer.style.display = e.target.checked ? 'flex' : 'none';
+                nidSevenContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             document.getElementById('modal-config-global').style.display = 'flex';
@@ -2209,6 +2262,7 @@
             globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
             globalConfig.trackSharpshooter = document.getElementById('cfg-track-ss').checked ? 'true' : 'false';
             globalConfig.showNID = document.getElementById('cfg-show-nid').checked ? 'true' : 'false';
+            globalConfig.showNidSeven = document.getElementById('cfg-show-nid-seven').checked ? 'true' : 'false';
             globalConfig.kinematicSource = document.getElementById('cfg-kinematic-source').value;
             globalConfig.kinematicRange = document.getElementById('cfg-kinematic-range').value;
             
@@ -2216,6 +2270,7 @@
             localStorage.setItem('cfg_trackATS', globalConfig.trackATS);
             localStorage.setItem('cfg_trackSharpshooter', globalConfig.trackSharpshooter);
             localStorage.setItem('cfg_showNID', globalConfig.showNID);
+            localStorage.setItem('cfg_showNidSeven', globalConfig.showNidSeven);
             localStorage.setItem('cfg_kinematicSource', globalConfig.kinematicSource);
             localStorage.setItem('cfg_kinematicRange', globalConfig.kinematicRange);
 
@@ -2328,7 +2383,7 @@
             
             const assetArray = type === 'dice_sets' ? masterData.sets : masterData[type];
             const asset = assetArray.find(a => a.name === name);
-            if(asset) openMetadataModal(type, existingAsset);
+            if(asset) openMetadataModal(type, asset);
         }
 
         async function deleteAsset(type, selectId) {
@@ -2571,7 +2626,7 @@
             document.getElementById('modal-config-hand').style.display = 'none';
             document.getElementById('modal-metadata').style.display = 'none';
             document.getElementById('modal-invalid').style.display = 'none';
-            document.getElementById('modal-wrong-point').style.display = 'none';
+            document.getElementById('modal-correction').style.display = 'none';
             document.getElementById('modal-error-display').style.display = 'none';
             document.getElementById('modal-shooter-transition').style.display = 'none';
             document.getElementById('modal-incomplete-roll').style.display = 'none';
@@ -2650,7 +2705,7 @@
                 
                 const isHardway = (die1 === die2) && [4,6,8,10].includes(rawSum);
                 const isLastRoll = (index === universalLog.length - 1);
-                const hasCorrection = !!r.Corrected_Point;
+                const hasCorrection = !!r.Corrected_Point || !!r.is_Corrected;
 
                 let nodeClass = 'state-standard';
                 let inlineClass = '';
@@ -2693,6 +2748,11 @@
 
                 const el = document.createElement('div');
                 el.className = `hist-node ${nodeClass} ${inlineClass}`;
+                
+                if (nodeClass === 'state-point-made') {
+                    el.onclick = () => openCorrectionPad(index);
+                    el.classList.add('cursor-pointer', 'hover:brightness-110');
+                }
 
                 if (isInvalid) {
                     el.innerHTML = `Err`;
@@ -2703,12 +2763,12 @@
                     if (isHardway) superHTML += `<span class="sup-text ml-1 flex gap-0.5">${getMicroDieHTML(die1)}${getMicroDieHTML(die2)}</span>`;
 
                     let displayNum = sum;
-                    if (hasCorrection) displayNum += `<span class="text-emerald-400 ml-0.5">*</span>`;
+                    if (hasCorrection && !isLastRoll) displayNum += `<span class="text-emerald-400 ml-0.5 font-black">*</span>`;
 
                     if (isLastRoll) {
                         const colorClass = `die-${globalConfig.diceColor}`;
                         el.innerHTML = `
-                            <div class="content-wrapper">
+                            <div class="content-wrapper relative">
                                 <div class="main-val">
                                     <div class="dice-container">
                                         ${getMiniDieHTML(die1, colorClass)}
@@ -2716,6 +2776,7 @@
                                     </div>
                                 </div>
                                 ${superHTML ? `<div class="sup-container">${superHTML}</div>` : ''}
+                                ${hasCorrection ? '<span class="absolute -top-1 -right-2 text-emerald-400 text-sm font-black drop-shadow-[0_1px_1px_rgba(0,0,0,1)]">*</span>' : ''}
                             </div>
                         `;
                     } else {
