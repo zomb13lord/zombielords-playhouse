@@ -1616,20 +1616,6 @@
 
                 layTargets.forEach(target => {
                     if(target.active) {
-                        const sets = SET_MAP[target.num];
-                        sets.forEach(set => {
-                            let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
-                            if (kData.total > 0) {
-                                let [d1, d2] = set.split('-');
-                                kData.hot.forEach(h => {
-                                    kinIndicators[h.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-red-500 w-full text-left">${'🔥'.repeat(h.fires)} HOTTEST "${target.num}" <div class="flex gap-0.5 ml-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
-                                });
-                                kData.cold.forEach(c => {
-                                    kinIndicators[c.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-blue-400 w-full text-left">${'❄️'.repeat(c.flakes)} COLDEST "${target.num}" <div class="flex gap-0.5 ml-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
-                                });
-                            }
-                        });
-                        
                         let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange);
                         if (kAll.total > 0) {
                             kAll.hot.forEach(h => {
