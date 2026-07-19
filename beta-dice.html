@@ -267,8 +267,8 @@
         .nid-icons.cold { color: #93c5fd; justify-content: flex-start; flex: 1; }
         .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
         
-        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; align-items: center; }
-        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; width: 100%; }
+        .nid-main { padding: 6px 8px 8px 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-start; align-items: center; }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: left; min-height: 14px; display: flex; flex-direction: column; justify-content: flex-start; align-items: flex-start; gap: 2px; width: 100%; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
         .nid-footer-cell { display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; color: #ffffff; }
@@ -1269,9 +1269,10 @@
 
         function getHotColdIcons(num, validRolls) {
             const cycles = CYCLE_MAP[num];
+            const rollCount = validRolls.length;
             
             let hitsInC1 = 0;
-            for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[0]); i--) {
+            for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycles[0]); i--) {
                 let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                 if (sum === num) hitsInC1++;
             }
@@ -1285,7 +1286,7 @@
                 status = 'hot';
                 
                 let hitsInC2 = 0;
-                for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[1]); i--) {
+                for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycles[1]); i--) {
                     let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                     if (sum === num) hitsInC2++;
                 }
@@ -1293,7 +1294,7 @@
                     hotHtml = '🔥🔥';
                     
                     let hitsInC3 = 0;
-                    for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[2]); i--) {
+                    for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycles[2]); i--) {
                         let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                         if (sum === num) hitsInC3++;
                     }
@@ -1301,24 +1302,29 @@
                         hotHtml = '🔥🔥🔥';
                     }
                 }
-            } else if (hitsInC1 === 0) {
+            } else if (hitsInC1 === 0 && rollCount >= cycles[0]) {
+                status = 'cold';
+                coldHtml = '❄️';
+                
                 let hitsInC2 = 0;
-                for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[1]); i--) {
+                for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycles[1]); i--) {
                     let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                     if (sum === num) hitsInC2++;
                 }
-                if (hitsInC2 === 0) {
+                
+                if (hitsInC2 === 0 && rollCount >= cycles[1]) {
+                    coldHtml = '❄️❄️';
+                    
                     let hitsInC3 = 0;
-                    for(let i = validRolls.length - 1; i >= Math.max(0, validRolls.length - cycles[2]); i--) {
+                    for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycles[2]); i--) {
                         let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                         if (sum === num) hitsInC3++;
                     }
-                    if (hitsInC3 === 0) coldHtml = '❄️❄️❄️';
-                    else coldHtml = '❄️❄️';
-                } else {
-                    coldHtml = '❄️';
+                    
+                    if (hitsInC3 === 0 && rollCount >= cycles[2]) {
+                        coldHtml = '❄️❄️❄️';
+                    }
                 }
-                status = 'cold';
             }
 
             return { hot: hotHtml, cold: coldHtml, status: status };
@@ -1354,22 +1360,40 @@
             }
 
             let totalNext = occurrences.length;
-            if (totalNext === 0) return { total: 0, hot: '--', cold: '--' };
+            if (totalNext === 0) return { total: 0, hot: [], cold: [] };
 
             let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
             occurrences.forEach(sum => nextRolls[sum]++);
 
-            let maxDev = -999; let minDev = 999;
-            let hotNum = '--'; let coldNum = '--';
-
+            let devs = [];
             for(let s=2; s<=12; s++) {
                 let expected = totalNext * PROB_MAP[s];
                 let dev = nextRolls[s] - expected;
-                if (dev > maxDev) { maxDev = dev; hotNum = s; }
-                if (dev < minDev) { minDev = dev; coldNum = s; }
+                devs.push({ num: s, dev: dev });
             }
 
-            return { total: totalNext, hot: hotNum, cold: coldNum };
+            devs.sort((a, b) => b.dev - a.dev);
+
+            let hot = [];
+            let cold = [];
+            
+            let hotRank = 3;
+            for (let i = 0; i < devs.length && hot.length < 3; i++) {
+                if (devs[i].dev > 0) {
+                    hot.push({ num: devs[i].num, fires: hotRank });
+                    hotRank--;
+                }
+            }
+
+            let coldRank = 3;
+            for (let i = devs.length - 1; i >= 0 && cold.length < 3; i--) {
+                if (devs[i].dev < 0) {
+                    cold.push({ num: devs[i].num, flakes: coldRank });
+                    coldRank--;
+                }
+            }
+
+            return { total: totalNext, hot: hot, cold: cold };
         }
 
         function getMicroDieHTML(value) {
@@ -1445,18 +1469,29 @@
                 if (kData.total > 0) {
                     let [d1, d2] = set.split('-');
                     let diceHtml = `<div class="flex gap-1">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
+                    
+                    let hotStr = kData.hot.map(h => `${h.num}${'🔥'.repeat(h.fires)}`).join(' ');
+                    let coldStr = kData.cold.map(c => `${c.num}${'❄️'.repeat(c.flakes)}`).join(' ');
+                    if(!hotStr) hotStr = '--';
+                    if(!coldStr) coldStr = '--';
+                    
                     kinHtml += `<div class="flex items-center justify-between w-full font-mono text-sm text-slate-300 border-b border-slate-700/50 pb-2">
                         ${diceHtml}
-                        <div><span class="text-red-500 font-bold">${kData.hot}</span>🔥 <span class="text-blue-400 font-bold ml-2">${kData.cold}</span>❄️</div>
+                        <div class="flex gap-3"><span class="text-red-500 font-bold">${hotStr}</span> <span class="text-blue-400 font-bold">${coldStr}</span></div>
                     </div>`;
                 }
             });
             
             let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
             if (kAll.total > 0) {
+                let hotStr = kAll.hot.map(h => `${h.num}${'🔥'.repeat(h.fires)}`).join(' ');
+                let coldStr = kAll.cold.map(c => `${c.num}${'❄️'.repeat(c.flakes)}`).join(' ');
+                if(!hotStr) hotStr = '--';
+                if(!coldStr) coldStr = '--';
+                
                 kinHtml += `<div class="flex items-center justify-between w-full font-mono text-sm text-slate-300 pt-2">
                     <div class="font-bold">ALL</div>
-                    <div><span class="text-red-500 font-bold">${kAll.hot}</span>🔥 <span class="text-blue-400 font-bold ml-2">${kAll.cold}</span>❄️</div>
+                    <div class="flex gap-3"><span class="text-red-500 font-bold">${hotStr}</span> <span class="text-blue-400 font-bold">${coldStr}</span></div>
                 </div>`;
             }
 
@@ -1545,22 +1580,25 @@
                     
                     let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange);
                     
-                    if (kinData.hot !== '--' && kinIndicators[kinData.hot]) {
-                        kinIndicators[kinData.hot].push(`<div class="text-[9px] font-bold text-red-500">ROLL HOTTEST</div>`);
-                    }
-                    if (kinData.cold !== '--' && kinIndicators[kinData.cold]) {
-                        kinIndicators[kinData.cold].push(`<div class="text-[9px] font-bold text-blue-400">ROLL COLDEST</div>`);
-                    }
+                    kinData.hot.forEach(h => {
+                        kinIndicators[h.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-red-500 w-full text-left">${'🔥'.repeat(h.fires)} ROLL HOTTEST</div>`);
+                    });
+                    kinData.cold.forEach(c => {
+                        kinIndicators[c.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-blue-400 w-full text-left">${'❄️'.repeat(c.flakes)} ROLL COLDEST</div>`);
+                    });
                     
                     let [ld1, ld2] = lastSetStr.split('-');
+                    let topHotStr = kinData.hot.length > 0 ? kinData.hot[0].num : '--';
+                    let topColdStr = kinData.cold.length > 0 ? kinData.cold[0].num : '--';
+                    
                     nidHeader.innerHTML = `
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">LAST:</span>
                             <div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div>
                         </div>
                         <div class="flex items-center gap-4 font-black text-sm">
-                            <span class="text-red-500">🔥 ${kinData.hot}</span>
-                            <span class="text-blue-400">❄️ ${kinData.cold}</span>
+                            <span class="text-red-500">🔥 ${topHotStr}</span>
+                            <span class="text-blue-400">❄️ ${topColdStr}</span>
                         </div>
                     `;
                 } else {
@@ -1583,23 +1621,23 @@
                             let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
                             if (kData.total > 0) {
                                 let [d1, d2] = set.split('-');
-                                if (kData.hot !== '--' && kinIndicators[kData.hot]) {
-                                    kinIndicators[kData.hot].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-red-500">HOTTEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
-                                }
-                                if (kData.cold !== '--' && kinIndicators[kData.cold]) {
-                                    kinIndicators[kData.cold].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-blue-400">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
-                                }
+                                kData.hot.forEach(h => {
+                                    kinIndicators[h.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-red-500 w-full text-left">${'🔥'.repeat(h.fires)} HOTTEST "${target.num}" <div class="flex gap-0.5 ml-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
+                                });
+                                kData.cold.forEach(c => {
+                                    kinIndicators[c.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-blue-400 w-full text-left">${'❄️'.repeat(c.flakes)} COLDEST "${target.num}" <div class="flex gap-0.5 ml-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
+                                });
                             }
                         });
                         
                         let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange);
                         if (kAll.total > 0) {
-                            if (kAll.hot !== '--' && kinIndicators[kAll.hot]) {
-                                kinIndicators[kAll.hot].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-red-500">HOTTEST ALL ${target.num}</div>`);
-                            }
-                            if (kAll.cold !== '--' && kinIndicators[kAll.cold]) {
-                                kinIndicators[kAll.cold].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-blue-400">COLDEST ALL ${target.num}</div>`);
-                            }
+                            kAll.hot.forEach(h => {
+                                kinIndicators[h.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-red-500 w-full text-left">${'🔥'.repeat(h.fires)} HOTTEST "${target.num}" ALL</div>`);
+                            });
+                            kAll.cold.forEach(c => {
+                                kinIndicators[c.num].push(`<div class="flex items-center justify-start gap-1 text-[9px] font-bold text-blue-400 w-full text-left">${'❄️'.repeat(c.flakes)} COLDEST "${target.num}" ALL</div>`);
+                            });
                         }
                     }
                 });
