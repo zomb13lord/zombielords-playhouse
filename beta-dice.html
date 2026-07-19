@@ -55,16 +55,34 @@
         #history-bar:active { cursor: grabbing; }
         #history-bar::-webkit-scrollbar { display: none; }
 
-        /* SDD PANEL */
-        .sdd-ribbon {
+        /* SDD CARD PANEL */
+        .sdd-card-container {
             display: flex; flex-direction: row; align-items: center;
             overflow-x: auto; background: rgba(2, 6, 23, 0.95); border-top: 1px solid rgba(51, 65, 85, 0.4);
-            padding: 16px 20px; gap: 32px; font-family: monospace; font-size: 20px; letter-spacing: 1px;
-            white-space: nowrap;
+            padding: 12px 20px; gap: 16px;
         }
-        .sdd-ribbon::-webkit-scrollbar { display: none; }
-        .sdd-metric { color: #94a3b8; }
-        .sdd-metric b { color: #ffffff; }
+        .sdd-card-container::-webkit-scrollbar { display: none; }
+        
+        .sdd-card {
+            background: #0f172a; border: 1px solid #334155; border-radius: 6px; 
+            display: flex; flex-direction: column; min-width: 80px; flex-shrink: 0; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5); overflow: hidden;
+        }
+        .sdd-card-header {
+            background: #1e293b; color: #94a3b8; font-size: 10px; font-weight: 900; 
+            text-align: center; padding: 4px; border-bottom: 1px solid #334155; letter-spacing: 1px;
+        }
+        .sdd-card-body {
+            display: flex; flex-direction: row; justify-content: center; align-items: center; 
+            flex-grow: 1; background: #020617;
+        }
+        .sdd-card-col {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 6px 12px; border-right: 1px solid #334155;
+        }
+        .sdd-card-col:last-child { border-right: none; }
+        .sdd-val { font-size: 16px; font-weight: 900; color: #ffffff; font-family: monospace; }
+        .sdd-sub { font-size: 8px; color: #64748b; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; }
 
         /* ROLL NODES */
         .hist-node {
@@ -86,8 +104,6 @@
         .state-ns:hover { background: rgba(59, 130, 246, 0.1); }
         .state-standard { }
 
-        .mod-hardway { border: 2px dashed #facc15 !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.8), inset 0 0 0 2px rgba(0,0,0,0.8) !important; }
-
         /* Summary Node */
         .state-summary { font-family: monospace; font-size: 16px; letter-spacing: 1px; cursor: pointer; padding: 0 14px; min-width: auto; }
         .state-summary:hover { filter: brightness(1.2); }
@@ -98,17 +114,17 @@
 
         /* Point Made Dashed Borders */
         .state-point-made { background: #ffffff !important; color: #000000 !important; }
-        .point-tier-1 { border: 2px dashed #b87333 !important; }
-        .point-tier-2 { border: 2px dashed #94a3b8 !important; }
-        .point-tier-3 { border: 2px dashed #ca8a04 !important; }
-        .point-tier-4 { border: 2px dashed #059669 !important; }
-        .point-tier-5 { border: 2px dashed #2563eb !important; }
-        .point-tier-6 { border: 2px dashed #7e22ce !important; }
-        .point-tier-7 { border: 2px dashed #be123c !important; }
-        .point-tier-8 { border: 2px dashed #c2410c !important; }
-        .point-tier-9 { border: 2px dashed #db2777 !important; }
-        .point-tier-10 { border: 2px dashed #0891b2 !important; }
-        .point-tier-11 { border: 2px dashed #000000 !important; box-shadow: 0 0 15px #fff !important; }
+        .point-tier-1 { border: 2px dashed #000000 !important; }
+        .point-tier-2 { border: 2px dashed #000000 !important; }
+        .point-tier-3 { border: 2px dashed #f97316 !important; }
+        .point-tier-4 { border: 2px dashed #10b981 !important; }
+        .point-tier-5 { border: 2px dashed #8b5cf6 !important; }
+        .point-tier-6 { border: 2px dashed #3b82f6 !important; }
+        .point-tier-7 { border: 2px dashed #f59e0b !important; }
+        .point-tier-8 { border: 2px dashed #ef4444 !important; }
+        .point-tier-9 { border: 2px dashed #06b6d4 !important; }
+        .point-tier-10 { border: 2px dashed #ffffff !important; }
+        .point-tier-11 { border: 2px dashed #d946ef !important; box-shadow: 0 0 15px #fff !important; }
 
         /* Perfect Centering & Superscripts */
         .content-wrapper { display: flex; align-items: center; justify-content: center; }
@@ -211,7 +227,7 @@
 
         /* NID Module CSS */
         #nid-container {
-            display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 1fr; gap: 16px; max-width: 1050px; margin: 10px auto 0; width: 100%;
+            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; max-width: 1050px; margin: 10px auto 0; width: 100%;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
@@ -234,7 +250,7 @@
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
         @media (min-width: 768px) {
-            #nid-container { grid-template-columns: repeat(6, 1fr); }
+            #nid-container { grid-template-columns: repeat(6, 160px); }
             .nid-box-7 { grid-column: auto; justify-self: auto; width: 100%; order: 9; }
             /* Desktop Order */
             .nid-box-4 { order: 1; } .nid-box-5 { order: 2; } .nid-box-6 { order: 3; }
@@ -252,8 +268,8 @@
         .nid-icons.cold { color: #93c5fd; justify-content: flex-start; flex: 1; }
         .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
         
-        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-start; }
-        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; margin-top: 8px; }
+        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; align-items: center; }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
         .nid-footer-cell { display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; color: #ffffff; }
@@ -262,7 +278,7 @@
         .nid-footer-left { flex: 1; background: #000000; border-right: 1px solid #334155; }
         .nid-footer-right { flex: 1; background: #1e293b; }
 
-        /* Micro Dice for Kinematic List */
+        /* Micro Dice */
         .micro-die { width: 14px; height: 14px; border-radius: 2px; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 1px; gap: 1px; background: #ffffff; border: 1px solid #000000; }
         .micro-pip { background: #000000; border-radius: 50%; opacity: 0; }
         .micro-pip.active { opacity: 1; }
@@ -330,29 +346,103 @@
             <div id="ats-talls" class="flex gap-1 p-1 rounded"></div>
         </div>
 
-        <div id="sdd-global" class="sdd-ribbon">
-            <span class="text-emerald-400 font-black">GLB</span>
-            <span class="sdd-metric">CR: <b id="g-cr">0</b></span>
-            <span class="sdd-metric">TR: <b id="g-tr">0</b></span>
-            <span class="sdd-metric">SO: <b id="g-so">0</b></span>
-            <span class="sdd-metric">CS: <b id="g-cs">0</b></span>
-            <span class="sdd-metric">TS: <b id="g-ts">0</b></span>
-            <span class="sdd-metric">SOR: <b class="text-white" id="g-sor-med">0</b>|<b class="text-white" id="g-sor-mean">0.0</b></span>
-            <span class="sdd-metric">SRR: <b class="text-white" id="g-srr-med">0</b>|<b class="text-white" id="g-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b class="text-white" id="g-psr-med">0</b>|<b class="text-white" id="g-psr-mean">0.0</b></span>
-            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="g-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="g-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="g-ats-a">0</b></span>
+        <div id="sdd-global" class="sdd-card-container">
+            <div class="flex items-center justify-center pr-4 border-r border-slate-700/50 mr-2">
+                <span class="text-emerald-400 font-black tracking-widest text-xl">GLB</span>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">ROLLS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-tr">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val" id="g-cr">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-ts">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="g-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="g-so">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">S.O.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-sor-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-sor-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">S.R.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-srr-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-srr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">P.S.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-psr-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card" id="g-ats-card">
+                <div class="sdd-card-header">A.T.S.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val" id="g-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val" id="g-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val" id="g-ats-a">0</span></div>
+                </div>
+            </div>
         </div>
-        <div id="sdd-shooter" class="sdd-ribbon" style="display: none;">
-            <span class="text-amber-400 font-black" id="sdd-shooter-label">SHTR</span>
-            <span class="sdd-metric">CR: <b id="s-cr">0</b></span>
-            <span class="sdd-metric">TR: <b id="s-tr">0</b></span>
-            <span class="sdd-metric">SO: <b id="s-so">0</b></span>
-            <span class="sdd-metric">CS: <b id="s-cs">0</b></span>
-            <span class="sdd-metric">TS: <b id="s-ts">0</b></span>
-            <span class="sdd-metric">SOR: <b class="text-white" id="s-sor-med">0</b>|<b class="text-white" id="s-sor-mean">0.0</b></span>
-            <span class="sdd-metric">SRR: <b class="text-white" id="s-srr-med">0</b>|<b class="text-white" id="s-srr-mean">0.0</b></span>
-            <span class="sdd-metric">PSR: <b class="text-white" id="s-psr-med">0</b>|<b class="text-white" id="s-psr-mean">0.0</b></span>
-            <span class="sdd-metric">ATS: <i class="fa-solid fa-compress text-emerald-400"></i> <b id="s-ats-s">0</b> | <i class="fa-solid fa-expand text-red-400"></i> <b id="s-ats-t">0</b> | <i class="fa-solid fa-crown text-yellow-400"></i> <b id="s-ats-a">0</b></span>
+        <div id="sdd-shooter" class="sdd-card-container" style="display: none;">
+            <div class="flex items-center justify-center pr-4 border-r border-slate-700/50 mr-2">
+                <span class="text-amber-400 font-black tracking-widest text-xl" id="sdd-shooter-label">SHTR</span>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">ROLLS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-tr">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val" id="s-cr">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-ts">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="s-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="s-so">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">S.O.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">S.R.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-srr-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-srr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card">
+                <div class="sdd-card-header">P.S.R.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card" id="s-ats-card">
+                <div class="sdd-card-header">A.T.S.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val" id="s-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val" id="s-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val" id="s-ats-a">0</span></div>
+                </div>
+            </div>
         </div>
 
         <div id="nid-sticky-header" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner text-xs font-bold text-slate-300">
@@ -372,12 +462,12 @@
         </div>
         
         <div id="pad-content">
-            <div class="flex flex-col gap-3 max-w-4xl mx-auto">
-                <div class="flex flex-row gap-4 md:gap-8 justify-center">
-                    <div class="flex-1 max-w-[160px]">
+            <div class="flex flex-col gap-3 w-full max-w-[340px] mx-auto">
+                <div class="flex flex-row gap-4 justify-center">
+                    <div class="flex-1">
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-left-grid"></div>
                     </div>
-                    <div class="flex-1 max-w-[160px]">
+                    <div class="flex-1">
                         <div class="grid grid-cols-2 grid-rows-3 gap-2" id="pad-right-grid"></div>
                     </div>
                 </div>
@@ -492,26 +582,6 @@
                         <button onclick="editAsset('locations')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    
-                    <div class="cfg-row">
-                        <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="cfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleShooterSelect()"></select></div>
-                        <button onclick="editAsset('shooters')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                        <button onclick="deleteAsset('shooters')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                    
-                    <div class="cfg-row">
-                        <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="cfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('dice_sets', this.value)"></select></div>
-                        <button onclick="editAsset('dice_sets')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
-                        <button onclick="deleteAsset('dice_sets')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
-                        <div class="flex gap-2">
-                            <select id="cfg-pos-parent" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updatePosChild('cfg')"></select>
-                            <select id="cfg-pos-child" class="select-wicked border-blue-500/50 focus:border-blue-400 w-1/2" onchange="updateShooterMemory()"></select>
-                        </div>
-                    </div>
 
                     <div class="mb-3">
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
@@ -611,7 +681,6 @@
                 <input type="hidden" id="hcfg-end-idx">
                 <input type="hidden" id="hcfg-is-forward">
                 <div class="flex flex-col gap-3 text-left">
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="hcfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                     <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
                     <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                     <div>
@@ -740,7 +809,7 @@
         // Portrait Lock
         try { if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(e=>{}); } catch(e) {}
 
-        const POINT_COLORS = { 1: '#b87333', 2: '#e2e8f0', 3: '#fde047', 4: '#34d399', 5: '#60a5fa', 6: '#c084fc', 7: '#fb7185', 8: '#fb923c', 9: '#f472b6', 10: '#22d3ee', 11: '#000000' };
+        const POINT_COLORS = { 1: '#000000', 2: '#000000', 3: '#f97316', 4: '#10b981', 5: '#8b5cf6', 6: '#3b82f6', 7: '#f59e0b', 8: '#ef4444', 9: '#06b6d4', 10: '#ffffff', 11: '#d946ef' };
         const PIP_MAP = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
         const DICE_COLORS = ['ruby', 'sapphire', 'emerald', 'citrine', 'onyx', 'obsidian', 'amethyst', 'rosegold', 'topaz', 'aquamarine', 'jade', 'cobalt'];
         
@@ -980,20 +1049,62 @@
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
-            document.getElementById('g-tr').innerText = gStats.TR;
-            document.getElementById('g-cr').innerText = gStats.CR;
-            document.getElementById('g-so').innerText = gStats.SO;
-            document.getElementById('g-cs').innerText = gStats.CS;
-            document.getElementById('g-ts').innerText = gStats.TS;
-            document.getElementById('g-sor-mean').innerText = gStats.sorMean;
-            document.getElementById('g-sor-med').innerText = gStats.sorMed;
-            document.getElementById('g-srr-mean').innerText = gStats.srrMean;
-            document.getElementById('g-srr-med').innerText = gStats.srrMed;
-            document.getElementById('g-psr-mean').innerText = gStats.psrMean;
-            document.getElementById('g-psr-med').innerText = gStats.psrMed;
-            document.getElementById('g-ats-s').innerText = gStats.atsS;
-            document.getElementById('g-ats-t').innerText = gStats.atsT;
-            document.getElementById('g-ats-a').innerText = gStats.atsA;
+            
+            let atsHtmlG = '';
+            if (globalConfig.trackATS === 'true') {
+                atsHtmlG = `
+                <div class="sdd-card" id="g-ats-card">
+                    <div class="sdd-card-header">A.T.S.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val">${gStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val">${gStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val">${gStats.atsA}</span></div>
+                    </div>
+                </div>`;
+            }
+
+            document.getElementById('sdd-global').innerHTML = `
+                <div class="flex items-center justify-center pr-4 border-r border-slate-700/50 mr-2">
+                    <span class="text-emerald-400 font-black tracking-widest text-xl">GLB</span>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">ROLLS</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val">${gStats.CR}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${gStats.SO}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">S.O.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.sorMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.sorMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">S.R.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.srrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.srrMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">P.S.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.psrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.psrMean}</span></div>
+                    </div>
+                </div>
+                ${atsHtmlG}
+            `;
 
             let sLog = universalLog;
             let sLabel = "ALL";
@@ -1006,21 +1117,62 @@
             }
             
             const sStats = calcStats(sLog);
-            document.getElementById('sdd-shooter-label').innerText = sLabel;
-            document.getElementById('s-tr').innerText = sStats.TR;
-            document.getElementById('s-cr').innerText = sStats.CR;
-            document.getElementById('s-so').innerText = sStats.SO;
-            document.getElementById('s-cs').innerText = sStats.CS;
-            document.getElementById('s-ts').innerText = sStats.TS;
-            document.getElementById('s-sor-mean').innerText = sStats.sorMean;
-            document.getElementById('s-sor-med').innerText = sStats.sorMed;
-            document.getElementById('s-srr-mean').innerText = sStats.srrMean;
-            document.getElementById('s-srr-med').innerText = sStats.srrMed;
-            document.getElementById('s-psr-mean').innerText = sStats.psrMean;
-            document.getElementById('s-psr-med').innerText = sStats.psrMed;
-            document.getElementById('s-ats-s').innerText = sStats.atsS;
-            document.getElementById('s-ats-t').innerText = sStats.atsT;
-            document.getElementById('s-ats-a').innerText = sStats.atsA;
+            
+            let atsHtmlS = '';
+            if (globalConfig.trackATS === 'true') {
+                atsHtmlS = `
+                <div class="sdd-card" id="s-ats-card">
+                    <div class="sdd-card-header">A.T.S.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val">${sStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val">${sStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val">${sStats.atsA}</span></div>
+                    </div>
+                </div>`;
+            }
+
+            document.getElementById('sdd-shooter').innerHTML = `
+                <div class="flex items-center justify-center pr-4 border-r border-slate-700/50 mr-2">
+                    <span class="text-amber-400 font-black tracking-widest text-xl">${sLabel}</span>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">ROLLS</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val">${sStats.CR}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${sStats.SO}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">S.O.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.sorMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.sorMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">S.R.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.srrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.srrMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card">
+                    <div class="sdd-card-header">P.S.R.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${sStats.psrMed}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${sStats.psrMean}</span></div>
+                    </div>
+                </div>
+                ${atsHtmlS}
+            `;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
         }
@@ -1447,13 +1599,13 @@
                         let color, textColor, styleClass;
                         
                         if (tier === 1 || tier === 2) {
-                            color = '#ffffff';
-                            textColor = '#000000';
-                            styleClass = 'border-black shadow-[0_2px_4px_rgba(0,0,0,0.8)]';
+                            color = '#000000';
+                            textColor = '#ffffff';
+                            styleClass = 'border-white shadow-[0_2px_4px_rgba(0,0,0,0.8)]';
                             if (!isTop) styleClass += ' brightness-75';
                         } else {
                             color = POINT_COLORS[tier] || '#fff';
-                            textColor = [1, 11].includes(tier) ? '#fff' : '#000';
+                            textColor = [1, 2, 5, 6, 8, 9, 11].includes(tier) ? '#fff' : '#000';
                             if (isTop) {
                                 styleClass = 'border-yellow-400 shadow-[0_0_15px_rgba(250,204,21,1)]';
                             } else {
@@ -1542,14 +1694,13 @@
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
             document.getElementById('cfg-loc').innerHTML = locs; document.getElementById('hcfg-loc').innerHTML = locs;
-            document.getElementById('cfg-shooter').innerHTML = shoots; document.getElementById('hcfg-shooter').innerHTML = shoots;
+            document.getElementById('cfg-shooter').innerHTML = shoots;
             document.getElementById('cfg-set').innerHTML = sets; document.getElementById('hcfg-set').innerHTML = sets;
             
             document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
             updatePosChild('cfg', globalConfig.positionChild);
 
             document.getElementById('cfg-loc').value = globalConfig.location || 'ALL';
-            document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
             document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
             document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
             
@@ -1589,36 +1740,6 @@
             childSelect.innerHTML = POS_MAP[parentVal].map(c => `<option value="${c}">${c}</option>`).join('');
             if (defaultChild && POS_MAP[parentVal].includes(defaultChild)) {
                 childSelect.value = defaultChild;
-            }
-        }
-
-        function handleShooterSelect() {
-            const val = document.getElementById('cfg-shooter').value;
-            checkMetadataTrigger('shooters', val);
-            
-            updateShooterMemory(); 
-            currentConfigShooter = val; 
-            
-            if (val !== 'ALL' && val !== 'ADD_NEW') {
-                const shooterObj = masterData.shooters.find(s => s.name === val);
-                if (shooterObj) {
-                    if (shooterObj.last_positionParent) {
-                        document.getElementById('cfg-pos-parent').value = shooterObj.last_positionParent;
-                        updatePosChild('cfg', shooterObj.last_positionChild);
-                    } else {
-                        document.getElementById('cfg-pos-parent').value = 'All';
-                        updatePosChild('cfg', 'All');
-                    }
-                    if (shooterObj.last_diceSet) {
-                        document.getElementById('cfg-set').value = shooterObj.last_diceSet;
-                    } else {
-                        document.getElementById('cfg-set').value = 'ALL';
-                    }
-                }
-            } else {
-                document.getElementById('cfg-pos-parent').value = 'All';
-                updatePosChild('cfg', 'All');
-                document.getElementById('cfg-set').value = 'ALL';
             }
         }
 
@@ -1777,6 +1898,7 @@
             let notesArr = [];
             let smallHitNow = false;
             let tallHitNow = false;
+            let allHitNow = false;
 
             if(newSum >= 2 && newSum <= 6 && !smalls.has(newSum)) {
                 smalls.add(newSum);
@@ -1788,6 +1910,25 @@
             }
             if((smallHitNow && talls.size === 5) || (tallHitNow && smalls.size === 5)) {
                 notesArr.push("ATS All Hit");
+                allHitNow = true;
+            }
+
+            if (globalConfig.shooter !== 'ALL' && (smallHitNow || tallHitNow || allHitNow)) {
+                let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
+                let sId = sObj ? sObj.id : globalConfig.shooter;
+                let atsTypes = [];
+                if (smallHitNow) atsTypes.push("Small");
+                if (tallHitNow) atsTypes.push("Tall");
+                if (allHitNow) atsTypes.push("All");
+                
+                atsTypes.forEach(type => {
+                    db.collection("users").doc(currentUid).collection("master_shooters").doc(sId).collection("ats_logs").add({
+                        type: type,
+                        location: globalConfig.location,
+                        position: globalConfig.positionChild,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(e => console.error(e));
+                });
             }
 
             const r = {
@@ -1965,12 +2106,7 @@
 
         // --- CONFIGURATION LOGIC ---
         function openGlobalConfig() {
-            preConfigShooter = globalConfig.shooter;
             document.getElementById('cfg-loc').value = globalConfig.location;
-            document.getElementById('cfg-shooter').value = globalConfig.shooter;
-            document.getElementById('cfg-set').value = globalConfig.diceSet;
-            document.getElementById('cfg-pos-parent').value = globalConfig.positionParent;
-            updatePosChild('cfg', globalConfig.positionChild);
             selectConfigColor(globalConfig.diceColor);
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
@@ -2000,10 +2136,7 @@
         async function saveGlobalConfig() {
             closeModals(); 
             globalConfig.location = document.getElementById('cfg-loc').value;
-            globalConfig.shooter = document.getElementById('cfg-shooter').value;
-            globalConfig.positionParent = document.getElementById('cfg-pos-parent').value;
-            globalConfig.positionChild = document.getElementById('cfg-pos-child').value;
-            globalConfig.diceSet = document.getElementById('cfg-set').value;
+            globalConfig.diceColor = document.getElementById('cfg-color').value;
             
             globalConfig.showShooterSDD = document.getElementById('cfg-show-sdd').checked ? 'true' : 'false';
             globalConfig.trackATS = document.getElementById('cfg-track-ats').checked ? 'true' : 'false';
@@ -2018,28 +2151,6 @@
             localStorage.setItem('cfg_showNID', globalConfig.showNID);
             localStorage.setItem('cfg_kinematicSource', globalConfig.kinematicSource);
             localStorage.setItem('cfg_kinematicRange', globalConfig.kinematicRange);
-
-            masterData.shooters.filter(s => s.isDirty).forEach(s => {
-                db.collection("users").doc(currentUid).collection("master_shooters").doc(s.id).set({
-                    last_positionParent: s.last_positionParent,
-                    last_positionChild: s.last_positionChild,
-                    last_diceSet: s.last_diceSet
-                }, { merge: true }).catch(e => console.error(e));
-                s.isDirty = false;
-            });
-
-            if ((globalConfig.shooter !== preConfigShooter || forceNextSaveAsNS)) {
-                universalLog.push({
-                    is_NS_Marker: true,
-                    Shooter_ID: globalConfig.shooter,
-                    Location_ID: globalConfig.location,
-                    Table_Position: globalConfig.positionChild,
-                    Dice_Set: globalConfig.diceSet,
-                    Notes: "New Shooter",
-                    Time_Stamp: new Date().toISOString()
-                });
-                forceNextSaveAsNS = false;
-            }
 
             renderHistoryBar(); syncActiveSession();
         }
@@ -2056,7 +2167,6 @@
             document.getElementById('hcfg-is-forward').value = 'false';
 
             const refRoll = universalLog[startIdx] || {};
-            document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
             document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
@@ -2083,7 +2193,6 @@
             document.getElementById('hcfg-is-forward').value = 'true';
 
             const refRoll = universalLog[startIdx] || universalLog[nsIndex] || {};
-            document.getElementById('hcfg-loc').value = refRoll.Location_ID || 'ALL';
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
             document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
@@ -2102,7 +2211,6 @@
             const endIdx = parseInt(document.getElementById('hcfg-end-idx').value);
             const isForward = document.getElementById('hcfg-is-forward').value === 'true';
             
-            const loc = document.getElementById('hcfg-loc').value;
             const shooter = document.getElementById('hcfg-shooter').value;
             const posParent = document.getElementById('hcfg-pos-parent').value;
             const posChild = document.getElementById('hcfg-pos-child').value;
@@ -2110,7 +2218,6 @@
 
             for(let i = startIdx; i <= endIdx; i++) {
                 if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
-                    universalLog[i].Location_ID = loc;
                     universalLog[i].Shooter_ID = shooter;
                     universalLog[i].Table_Position = posChild;
                     universalLog[i].Dice_Set = set;
@@ -2118,7 +2225,6 @@
             }
 
             if (isForward && endIdx === universalLog.length - 1) {
-                globalConfig.location = loc;
                 globalConfig.shooter = shooter;
                 globalConfig.positionParent = posParent;
                 globalConfig.positionChild = posChild;
@@ -2519,7 +2625,7 @@
                 }
 
                 const el = document.createElement('div');
-                el.className = `hist-node ${nodeClass} ${inlineClass} ${isHardway && !isInvalid ? 'mod-hardway' : ''}`;
+                el.className = `hist-node ${nodeClass} ${inlineClass}`;
 
                 if (isInvalid) {
                     el.innerHTML = `Err`;
@@ -2527,7 +2633,7 @@
                 } else {
                     let superHTML = '';
                     if (currentRepeats > 0) superHTML += `<span class="sup-text">${currentRepeats + 1} <i class="fa-solid fa-fire text-[10px] ml-0.5"></i></span>`;
-                    if (isHardway) superHTML += `<span class="sup-text text-yellow-400">(H)</span>`;
+                    if (isHardway) superHTML += `<span class="sup-text ml-1 flex gap-0.5">${getMicroDieHTML(die1)}${getMicroDieHTML(die2)}</span>`;
 
                     let displayNum = sum;
                     if (hasCorrection) displayNum += `<span class="text-emerald-400 ml-0.5">*</span>`;
