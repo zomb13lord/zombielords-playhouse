@@ -268,7 +268,7 @@
         .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
         
         .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; align-items: center; }
-        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; }
+        .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 4px; width: 100%; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
         .nid-footer-cell { display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; padding: 4px 0; color: #ffffff; }
@@ -1535,83 +1535,81 @@
                 }
             });
 
-            let lastSetStr = null;
-            let targetHot = null; let targetCold = null;
+            let kinIndicators = {2:[], 3:[], 4:[], 5:[], 6:[], 7:[], 8:[], 9:[], 10:[], 11:[], 12:[]};
 
-            if (String(globalConfig.kinematicEnabled) === 'true' && String(globalConfig.kinLastRoll) === 'true' && kinematicRolls.length > 0) {
-                let lastR = kinematicRolls[kinematicRolls.length - 1];
-                let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
-                lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
-                
-                let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange);
-                targetHot = kinData.hot; targetCold = kinData.cold;
-                
-                let [ld1, ld2] = lastSetStr.split('-');
-                nidHeader.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">LAST:</span>
-                        <div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div>
-                    </div>
-                    <div class="flex items-center gap-4 font-black text-sm">
-                        <span class="text-red-500">🔥 ${targetHot}</span>
-                        <span class="text-blue-400">❄️ ${targetCold}</span>
-                    </div>
-                `;
+            if (String(globalConfig.kinematicEnabled) === 'true') {
+                if (String(globalConfig.kinLastRoll) === 'true' && kinematicRolls.length > 0) {
+                    let lastR = kinematicRolls[kinematicRolls.length - 1];
+                    let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
+                    let lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
+                    
+                    let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange);
+                    
+                    if (kinData.hot !== '--' && kinIndicators[kinData.hot]) {
+                        kinIndicators[kinData.hot].push(`<div class="text-[9px] font-bold text-red-500">ROLL HOTTEST</div>`);
+                    }
+                    if (kinData.cold !== '--' && kinIndicators[kinData.cold]) {
+                        kinIndicators[kinData.cold].push(`<div class="text-[9px] font-bold text-blue-400">ROLL COLDEST</div>`);
+                    }
+                    
+                    let [ld1, ld2] = lastSetStr.split('-');
+                    nidHeader.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">LAST:</span>
+                            <div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div>
+                        </div>
+                        <div class="flex items-center gap-4 font-black text-sm">
+                            <span class="text-red-500">🔥 ${kinData.hot}</span>
+                            <span class="text-blue-400">❄️ ${kinData.cold}</span>
+                        </div>
+                    `;
+                } else {
+                    nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
+                }
+
+                const layTargets = [
+                    { num: 4, active: globalConfig.kinNo4 },
+                    { num: 5, active: globalConfig.kinNo5 },
+                    { num: 6, active: globalConfig.kinNo6 },
+                    { num: 8, active: globalConfig.kinNo8 },
+                    { num: 9, active: globalConfig.kinNo9 },
+                    { num: 10, active: globalConfig.kinNo10 }
+                ];
+
+                layTargets.forEach(target => {
+                    if(target.active) {
+                        const sets = SET_MAP[target.num];
+                        sets.forEach(set => {
+                            let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
+                            if (kData.total > 0) {
+                                let [d1, d2] = set.split('-');
+                                if (kData.hot !== '--' && kinIndicators[kData.hot]) {
+                                    kinIndicators[kData.hot].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-red-500">HOTTEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
+                                }
+                                if (kData.cold !== '--' && kinIndicators[kData.cold]) {
+                                    kinIndicators[kData.cold].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-blue-400">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`);
+                                }
+                            }
+                        });
+                        
+                        let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange);
+                        if (kAll.total > 0) {
+                            if (kAll.hot !== '--' && kinIndicators[kAll.hot]) {
+                                kinIndicators[kAll.hot].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-red-500">HOTTEST ALL ${target.num}</div>`);
+                            }
+                            if (kAll.cold !== '--' && kinIndicators[kAll.cold]) {
+                                kinIndicators[kAll.cold].push(`<div class="flex items-center justify-center gap-1 text-[9px] font-bold text-blue-400">COLDEST ALL ${target.num}</div>`);
+                            }
+                        }
+                    }
+                });
             } else {
                 nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
             }
 
             const renderBox = (num) => {
                 const icons = getHotColdIcons(num, validRolls);
-                
-                let indicatorHtml = '';
-                if (lastSetStr) {
-                    if (num === targetHot) {
-                        let [d1, d2] = lastSetStr.split('-');
-                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-red-500">HOTTEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
-                    } else if (num === targetCold) {
-                        let [d1, d2] = lastSetStr.split('-');
-                        indicatorHtml = `<div class="flex items-center justify-center gap-1 text-[10px] font-bold text-blue-400">COLDEST <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div></div>`;
-                    }
-                }
-                
-                let layTrackerHtml = '';
-                if (String(globalConfig.kinematicEnabled) === 'true') {
-                    let showLay = false;
-                    if (num === 4 && globalConfig.kinNo4) showLay = true;
-                    if (num === 5 && globalConfig.kinNo5) showLay = true;
-                    if (num === 6 && globalConfig.kinNo6) showLay = true;
-                    if (num === 8 && globalConfig.kinNo8) showLay = true;
-                    if (num === 9 && globalConfig.kinNo9) showLay = true;
-                    if (num === 10 && globalConfig.kinNo10) showLay = true;
-                    
-                    if (showLay) {
-                        const sets = SET_MAP[num];
-                        let listHtml = '';
-                        sets.forEach(set => {
-                            let kData = getKinematicData(set, kinematicRolls, globalConfig.kinematicRange);
-                            if (kData.total > 0) {
-                                let [d1, d2] = set.split('-');
-                                listHtml += `
-                                <div class="flex justify-between items-center w-full">
-                                    <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>
-                                    <div class="flex gap-1"><span class="text-red-500">${kData.hot}</span> <span class="text-blue-400">${kData.cold}</span></div>
-                                </div>`;
-                            }
-                        });
-                        let kAll = getKinematicData(num, kinematicRolls, globalConfig.kinematicRange);
-                        if (kAll.total > 0) {
-                            listHtml += `
-                            <div class="flex justify-between items-center w-full mt-0.5 pt-0.5 border-t border-slate-700/50">
-                                <span class="font-bold text-[9px] text-slate-400">ALL</span>
-                                <div class="flex gap-1"><span class="text-red-500 font-bold">${kAll.hot}</span> <span class="text-blue-400 font-bold">${kAll.cold}</span></div>
-                            </div>`;
-                        }
-                        if (listHtml) {
-                            layTrackerHtml = `<div class="flex flex-col w-full px-2 text-[9px] gap-0.5 mt-2 border-t border-slate-600/50 pt-2 pb-2 font-mono">${listHtml}</div>`;
-                        }
-                    }
-                }
+                let indicatorHtml = kinIndicators[num].join('');
 
                 return `
                 <div class="nid-box nid-box-${num}" onclick="handleNidClick(${num})">
@@ -1622,7 +1620,6 @@
                     </div>
                     <div class="nid-main">
                         <div class="nid-indicator w-full">${indicatorHtml}</div>
-                        ${layTrackerHtml}
                     </div>
                     <div class="nid-footer">
                         <div class="nid-footer-cell nid-footer-global">${counts.GLB[num]}</div>
