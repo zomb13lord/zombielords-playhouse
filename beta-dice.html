@@ -226,13 +226,13 @@
         .die-unselected .pad-die-face .pip { background: #000000 !important; box-shadow: none !important; }
 
         /* NID Module CSS */
-        .nid-grid-container {
-            display: grid; grid-template-columns: repeat(2, 1fr); grid-auto-rows: 1fr; gap: 16px; max-width: 1050px; margin: 10px auto 0; width: 100%;
+        #nid-container {
+            display: grid; grid-template-columns: repeat(2, 160px); grid-auto-rows: 1fr; gap: 16px; justify-content: center; margin: 10px auto 0; width: 100%;
         }
         .nid-box { 
             border-radius: 0; border: 1px solid #334155; display: flex; flex-direction: column; 
             background: #0f172a; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.6); transition: all 0.2s ease; cursor: pointer;
-            width: 100%;
+            width: 100%; height: 100%;
         }
         .nid-box.card-selected {
             border-color: #34d399 !important;
@@ -242,7 +242,7 @@
         }
         
         /* Mobile Order */
-        .nid-box-7 { grid-column: span 2; justify-self: center; width: calc(50% - 8px); order: 1; }
+        .nid-box-7 { grid-column: span 2; justify-self: center; width: 160px; order: 1; }
         .nid-box-4 { order: 2; } .nid-box-10 { order: 3; }
         .nid-box-5 { order: 4; } .nid-box-9 { order: 5; }
         .nid-box-6 { order: 6; } .nid-box-8 { order: 7; }
@@ -250,7 +250,7 @@
         .nid-box-2 { order: 10; } .nid-box-12 { order: 11; }
 
         @media (min-width: 1024px) {
-            .nid-grid-container { grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 8px; max-width: 100%; }
+            #nid-container { grid-template-columns: repeat(11, 160px); }
             .nid-box-7 { grid-column: auto; justify-self: auto; width: 100%; order: 6; }
             /* Desktop Order */
             .nid-box-2 { order: 1; } .nid-box-3 { order: 2; } .nid-box-4 { order: 3; } .nid-box-5 { order: 4; } .nid-box-6 { order: 5; }
@@ -266,7 +266,7 @@
         .nid-icons.cold { color: #93c5fd; justify-content: flex-start; flex: 1; }
         .nid-icons.hot { color: #f59e0b; justify-content: flex-end; flex: 1; }
         
-        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: center; align-items: center; }
+        .nid-main { padding: 8px; display: flex; flex-direction: column; flex-grow: 1; justify-content: flex-start; align-items: center; }
         .nid-indicator { font-size: 9px; font-weight: bold; text-align: center; min-height: 14px; display: flex; justify-content: center; align-items: center; gap: 4px; margin-bottom: 8px; }
         
         .nid-footer { display: flex; flex-direction: column; border-top: 1px solid #334155; margin-top: auto; }
@@ -338,19 +338,7 @@
             <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST THROW...</div>
         </div>
 
-        <div id="bonus-trackers" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner">
-            <div id="ats-smalls" class="flex gap-1 p-1 rounded"></div>
-            <div id="sharpshooter-stack" class="relative w-10 h-10 flex items-end justify-center"></div>
-            <div id="ats-talls" class="flex gap-1 p-1 rounded"></div>
-        </div>
-
         <div id="sdd-global" class="sdd-card-container">
-            <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
-                <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
-                <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
-                    <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
-                </div>
-            </div>
             <div class="sdd-card">
                 <div class="sdd-card-header">ROLLS</div>
                 <div class="sdd-card-body">
@@ -390,8 +378,8 @@
             <div class="sdd-card" id="g-ats-card">
                 <div class="sdd-card-header">A.T.S.</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val" id="g-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val" id="g-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-compress text-emerald-400"></i></span><span class="sdd-val" id="g-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-expand text-red-400"></i></span><span class="sdd-val" id="g-ats-t">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-crown text-yellow-400"></i></span><span class="sdd-val" id="g-ats-a">0</span></div>
                 </div>
             </div>
@@ -442,11 +430,17 @@
             <div class="sdd-card" id="s-ats-card">
                 <div class="sdd-card-header">A.T.S.</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val" id="s-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val" id="s-ats-t">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val" id="s-ats-a">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-compress text-emerald-400"></i></span><span class="sdd-val" id="s-ats-s">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-expand text-red-400"></i></span><span class="sdd-val" id="s-ats-t">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-crown text-yellow-400"></i></span><span class="sdd-val" id="s-ats-a">0</span></div>
                 </div>
             </div>
+        </div>
+
+        <div id="bonus-trackers" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner">
+            <div id="ats-smalls" class="flex gap-1 p-1 rounded"></div>
+            <div id="sharpshooter-stack" class="relative w-10 h-10 flex items-end justify-center"></div>
+            <div id="ats-talls" class="flex gap-1 p-1 rounded"></div>
         </div>
 
         <div id="nid-sticky-header" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner text-xs font-bold text-slate-300">
@@ -454,8 +448,8 @@
         </div>
     </div>
 
-    <div id="sdd-container" class="p-4 md:p-8 w-full max-w-[1400px] mx-auto">
-        <div id="nid-container" class="nid-grid-container" style="display: none;">
+    <div id="sdd-container" class="p-4 md:p-8 w-full mx-auto">
+        <div id="nid-container" style="display: none;">
             <!-- Injected by JS -->
         </div>
     </div>
@@ -587,6 +581,13 @@
                         <button onclick="deleteAsset('locations')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
+                        <div class="grid grid-cols-4 gap-3" id="color-grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
                     <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
                         <label for="cfg-show-sdd" class="relative inline-flex items-center cursor-pointer">
@@ -687,7 +688,6 @@
                 <input type="hidden" id="hcfg-is-forward">
                 <div class="flex flex-col gap-3 text-left">
                     <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Shooter</label><select id="hcfg-shooter" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="handleHandShooterSelect()"></select></div>
-                    <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Dice Set</label><select id="hcfg-set" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                     <div>
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Position</label>
                         <div class="flex gap-2">
@@ -843,7 +843,7 @@
         
         let storedNID = localStorage.getItem('cfg_showNID');
         let globalConfig = { 
-            location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: 'ruby', 
+            location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: localStorage.getItem('cfg_diceColor') || 'ruby', 
             showShooterSDD: localStorage.getItem('cfg_showShooterSDD') || 'false', 
             trackATS: localStorage.getItem('cfg_trackATS') || 'false', 
             trackSharpshooter: localStorage.getItem('cfg_trackSharpshooter') || 'false',
@@ -938,7 +938,7 @@
                         globalConfig.positionParent = data.meta_tags.positionParent || 'All';
                         globalConfig.positionChild = data.meta_tags.positionChild || 'All';
                         globalConfig.diceSet = data.meta_tags.dice_set || 'ALL';
-                        globalConfig.diceColor = data.meta_tags.dice_color || 'ruby';
+                        if (data.meta_tags.dice_color !== undefined) globalConfig.diceColor = data.meta_tags.dice_color;
                         if (data.meta_tags.show_shooter_sdd !== undefined) globalConfig.showShooterSDD = String(data.meta_tags.show_shooter_sdd);
                         if (data.meta_tags.track_ats !== undefined) globalConfig.trackATS = String(data.meta_tags.track_ats);
                         if (data.meta_tags.track_sharpshooter !== undefined) globalConfig.trackSharpshooter = String(data.meta_tags.track_sharpshooter);
@@ -1067,20 +1067,14 @@
                 <div class="sdd-card" id="g-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val">${gStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val">${gStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-compress text-emerald-400"></i></span><span class="sdd-val">${gStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-expand text-red-400"></i></span><span class="sdd-val">${gStats.atsT}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-crown text-yellow-400"></i></span><span class="sdd-val">${gStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
 
             document.getElementById('sdd-global').innerHTML = `
-                <div class="sdd-card bg-emerald-900/20 border-emerald-500/50">
-                    <div class="sdd-card-header bg-emerald-900/50 text-emerald-400">GLOBAL</div>
-                    <div class="sdd-card-body px-4 py-2 flex items-center justify-center">
-                        <span class="font-black text-emerald-400 tracking-widest">SESSION</span>
-                    </div>
-                </div>
                 <div class="sdd-card">
                     <div class="sdd-card-header">ROLLS</div>
                     <div class="sdd-card-body">
@@ -1126,7 +1120,7 @@
             if (globalConfig.shooter !== 'ALL') {
                 const sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
                 let sId = sObj ? sObj.id : globalConfig.shooter;
-                sLabel = sObj ? sObj.name.substring(0, 8).toUpperCase() : globalConfig.shooter.substring(0, 8).toUpperCase();
+                sLabel = sObj ? sObj.name.toUpperCase() : globalConfig.shooter.toUpperCase();
                 
                 let targetPos = globalConfig.positionChild;
                 if (targetPos === 'All') {
@@ -1150,9 +1144,9 @@
                 <div class="sdd-card" id="s-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-down text-emerald-400"></i></span><span class="sdd-val">${sStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-caret-up text-red-400"></i></span><span class="sdd-val">${sStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-skull text-yellow-400"></i></span><span class="sdd-val">${sStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-compress text-emerald-400"></i></span><span class="sdd-val">${sStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-expand text-red-400"></i></span><span class="sdd-val">${sStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub"><i class="fa-solid fa-crown text-yellow-400"></i></span><span class="sdd-val">${sStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
@@ -1748,17 +1742,16 @@
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
 
-            document.getElementById('cfg-loc').innerHTML = locs; document.getElementById('hcfg-loc').innerHTML = locs;
-            document.getElementById('cfg-shooter').innerHTML = shoots; document.getElementById('hcfg-shooter').innerHTML = shoots;
-            document.getElementById('cfg-set').innerHTML = sets; document.getElementById('hcfg-set').innerHTML = sets;
+            document.getElementById('cfg-loc').innerHTML = locs; 
+            document.getElementById('hcfg-shooter').innerHTML = shoots;
+            document.getElementById('hcfg-set').innerHTML = sets;
+            document.getElementById('hcfg-pos-parent').innerHTML = parents;
             
-            document.getElementById('cfg-pos-parent').innerHTML = parents; document.getElementById('hcfg-pos-parent').innerHTML = parents;
-            updatePosChild('cfg', globalConfig.positionChild);
+            document.getElementById('ns-shooter').innerHTML = shoots;
+            document.getElementById('ns-set').innerHTML = sets;
+            document.getElementById('ns-pos-parent').innerHTML = parents;
 
             document.getElementById('cfg-loc').value = globalConfig.location || 'ALL';
-            document.getElementById('cfg-shooter').value = globalConfig.shooter || 'ALL';
-            document.getElementById('cfg-set').value = globalConfig.diceSet || 'ALL';
-            document.getElementById('cfg-pos-parent').value = globalConfig.positionParent || 'All';
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
@@ -2194,6 +2187,7 @@
         function openGlobalConfig() {
             preConfigShooter = globalConfig.shooter;
             document.getElementById('cfg-loc').value = globalConfig.location;
+            selectConfigColor(globalConfig.diceColor);
             
             document.getElementById('cfg-show-sdd').checked = (String(globalConfig.showShooterSDD) === 'true');
             document.getElementById('cfg-track-ats').checked = (String(globalConfig.trackATS) === 'true');
@@ -2253,7 +2247,6 @@
 
             const refRoll = universalLog[startIdx] || {};
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
-            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
             let childPos = refRoll.Table_Position || 'All';
             let parentPos = 'All';
@@ -2279,7 +2272,6 @@
 
             const refRoll = universalLog[startIdx] || universalLog[nsIndex] || {};
             document.getElementById('hcfg-shooter').value = refRoll.Shooter_ID || 'ALL';
-            document.getElementById('hcfg-set').value = refRoll.Dice_Set || 'ALL';
             
             let childPos = refRoll.Table_Position || 'All';
             let parentPos = 'All';
@@ -2299,13 +2291,11 @@
             const shooter = document.getElementById('hcfg-shooter').value;
             const posParent = document.getElementById('hcfg-pos-parent').value;
             const posChild = document.getElementById('hcfg-pos-child').value;
-            const set = document.getElementById('hcfg-set').value;
 
             for(let i = startIdx; i <= endIdx; i++) {
                 if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
                     universalLog[i].Shooter_ID = shooter;
                     universalLog[i].Table_Position = posChild;
-                    universalLog[i].Dice_Set = set;
                 }
             }
 
@@ -2313,7 +2303,6 @@
                 globalConfig.shooter = shooter;
                 globalConfig.positionParent = posParent;
                 globalConfig.positionChild = posChild;
-                globalConfig.diceSet = set;
             }
 
             if (shooter !== 'ALL' && shooter !== 'ADD_NEW') {
@@ -2321,12 +2310,10 @@
                 if (shooterObj) {
                     db.collection("users").doc(currentUid).collection("master_shooters").doc(shooterObj.id).set({
                         last_positionParent: posParent,
-                        last_positionChild: posChild,
-                        last_diceSet: set
+                        last_positionChild: posChild
                     }, { merge: true }).catch(e => console.error(e));
                     shooterObj.last_positionParent = posParent;
                     shooterObj.last_positionChild = posChild;
-                    shooterObj.last_diceSet = set;
                 }
             }
 
