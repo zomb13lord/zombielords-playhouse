@@ -928,7 +928,8 @@
             kinematicRange: localStorage.getItem('cfg_kinematicRange') || 'ALL',
             kinematicLimit: localStorage.getItem('cfg_kinematicLimit') || '3',
             sddShooter: localStorage.getItem('cfg_sddShooter') || 'CURRENT',
-            sddPosition: localStorage.getItem('cfg_sddPosition') || 'All',
+            sddPositionParent: localStorage.getItem('cfg_sddPositionParent') || 'All',
+            sddPositionChild: localStorage.getItem('cfg_sddPositionChild') || 'All',
             sddDiceSet: localStorage.getItem('cfg_sddDiceSet') || 'ALL'
         };
         
@@ -1008,6 +1009,13 @@
             });
         }
 
+        function getShooterIcon(type) {
+            if (type === 'Master') return '👑 ';
+            if (type === 'Favorite') return '❤️ ';
+            if (type === 'Online') return '🌐 ';
+            return '👤 ';
+        }
+
         async function fetchMasterData() {
             try {
                 const [lSnap, sSnap, dSnap] = await Promise.all([
@@ -1056,7 +1064,8 @@
                         if (data.meta_tags.kinematic_range !== undefined) globalConfig.kinematicRange = String(data.meta_tags.kinematic_range);
                         if (data.meta_tags.kinematic_limit !== undefined) globalConfig.kinematicLimit = String(data.meta_tags.kinematic_limit);
                         if (data.meta_tags.sdd_shooter !== undefined) globalConfig.sddShooter = String(data.meta_tags.sdd_shooter);
-                        if (data.meta_tags.sdd_position !== undefined) globalConfig.sddPosition = String(data.meta_tags.sdd_position);
+                        if (data.meta_tags.sdd_position_parent !== undefined) globalConfig.sddPositionParent = String(data.meta_tags.sdd_position_parent);
+                        if (data.meta_tags.sdd_position_child !== undefined) globalConfig.sddPositionChild = String(data.meta_tags.sdd_position_child);
                         if (data.meta_tags.sdd_dice_set !== undefined) globalConfig.sddDiceSet = String(data.meta_tags.sdd_dice_set);
                     }
                     let rawLog = data.payload_log || [];
@@ -1082,7 +1091,7 @@
                     kin_no_4: globalConfig.kinNo4, kin_no_5: globalConfig.kinNo5, kin_no_6: globalConfig.kinNo6,
                     kin_no_8: globalConfig.kinNo8, kin_no_9: globalConfig.kinNo9, kin_no_10: globalConfig.kinNo10,
                     kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, kinematic_limit: globalConfig.kinematicLimit,
-                    sdd_shooter: globalConfig.sddShooter, sdd_position: globalConfig.sddPosition, sdd_dice_set: globalConfig.sddDiceSet,
+                    sdd_shooter: globalConfig.sddShooter, sdd_position_parent: globalConfig.sddPositionParent, sdd_position_child: globalConfig.sddPositionChild, sdd_dice_set: globalConfig.sddDiceSet,
                     base_unit: 1 
                 },
                 payload_log: JSON.stringify(universalLog)
@@ -1244,10 +1253,18 @@
                 let sId = sObj ? sObj.id : activeSddShooter;
                 sLabel = sObj ? sObj.name.toUpperCase() : activeSddShooter.toUpperCase();
                 
-                let targetPos = globalConfig.sddPosition;
-                let validChildren = POS_MAP[targetPos] || [targetPos];
-                if (targetPos === 'All') posLabel = "ALL POSITIONS";
-                else posLabel = targetPos.toUpperCase();
+                let targetPosParent = globalConfig.sddPositionParent || 'All';
+                let targetPosChild = globalConfig.sddPositionChild || 'All';
+                
+                let validChildren;
+                if (targetPosChild === 'All') {
+                    validChildren = POS_MAP[targetPosParent] || ['All'];
+                    posLabel = targetPosParent.toUpperCase() + " POSITIONS";
+                    if (targetPosParent === 'All') posLabel = "ALL POSITIONS";
+                } else {
+                    validChildren = [targetPosChild];
+                    posLabel = targetPosChild.toUpperCase();
+                }
 
                 let targetSet = globalConfig.sddDiceSet;
                 if (targetSet === 'ALL') setLabel = "ALL SETS";
@@ -1255,7 +1272,7 @@
 
                 sLog = universalLog.filter(r => {
                     let isShooterMatch = (r.Shooter_ID === activeSddShooter || r.Shooter_ID === sId);
-                    let isPosMatch = (targetPos === 'All' || validChildren.includes(r.Table_Position));
+                    let isPosMatch = validChildren.includes(r.Table_Position);
                     let isSetMatch = (targetSet === 'ALL' || r.Dice_Set === targetSet);
                     return isShooterMatch && isPosMatch && isSetMatch;
                 });
@@ -1330,7 +1347,7 @@
             const cycle = CYCLE_MAP[num][0];
             const rollCount = validRolls.length;
             
-            let c1 = 0, c2 = 0, c3 = 0, c4 = 0;
+            let c1 = 0, c2 = 0, c3 = 0;
             
             for(let i = rollCount - 1; i >= Math.max(0, rollCount - cycle); i--) {
                 let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
@@ -1344,23 +1361,19 @@
                 let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
                 if (sum === num) c3++;
             }
-            for(let i = rollCount - (cycle * 3) - 1; i >= Math.max(0, rollCount - (cycle * 4)); i--) {
-                let sum = validRolls[i].Corrected_Point || validRolls[i].Total_Sum;
-                if (sum === num) c4++;
-            }
 
-            const score = (c1 * 4) + (c2 * 3) + (c3 * 2) + (c4 * 1);
+            const score = (c1 * 4) + (c2 * 2) + (c3 * 1);
 
             let hotHtml = '';
             let coldHtml = '';
             let status = 'neutral';
 
-            if (score >= 20) { hotHtml = '🔥🔥🔥'; status = 'hot'; }
-            else if (score >= 16) { hotHtml = '🔥🔥'; status = 'hot'; }
-            else if (score >= 12) { hotHtml = '🔥'; status = 'hot'; }
-            else if (rollCount >= cycle * 4 && score <= 2) { coldHtml = '❄️❄️❄️'; status = 'cold'; }
-            else if (rollCount >= cycle * 2 && score <= 5) { coldHtml = '❄️❄️'; status = 'cold'; }
-            else if (rollCount >= cycle && score <= 8) { coldHtml = '❄️'; status = 'cold'; }
+            if (score >= 16) { hotHtml = '🔥🔥🔥'; status = 'hot'; }
+            else if (score >= 12) { hotHtml = '🔥🔥'; status = 'hot'; }
+            else if (score >= 8) { hotHtml = '🔥'; status = 'hot'; }
+            else if (rollCount >= cycle * 3 && score === 0) { coldHtml = '❄️❄️❄️'; status = 'cold'; }
+            else if (rollCount >= cycle * 2 && score <= 2) { coldHtml = '❄️❄️'; status = 'cold'; }
+            else if (rollCount >= cycle && score <= 3) { coldHtml = '❄️'; status = 'cold'; }
 
             return { hot: hotHtml, cold: coldHtml, status: status };
         }
@@ -1907,7 +1920,7 @@
         function populateConfigDropdowns() {
             const addNewOpt = `<option value="ADD_NEW" class="text-emerald-400 font-bold">[+ REGISTER NEW]</option>`;
             const locs = `<option value="ALL">ALL LOCATIONS</option>` + addNewOpt + masterData.locations.map(l => `<option value="${l.name}">${l.name}</option>`).join('');
-            const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            const shoots = `<option value="ALL">ALL SHOOTERS</option>` + addNewOpt + masterData.shooters.map(s => `<option value="${s.name}">${getShooterIcon(s.Type)}${s.name}</option>`).join('');
             const sets = `<option value="ALL">NONE</option>` + addNewOpt + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
             
             const parents = Object.keys(POS_MAP).map(p => `<option value="${p}">${p}</option>`).join('');
@@ -1917,7 +1930,7 @@
             document.getElementById('scfg-set').innerHTML = sets;
             document.getElementById('scfg-pos-parent').innerHTML = parents;
 
-            const sddShoots = `<option value="CURRENT">CURRENT SHOOTER</option><option value="ALL">ALL SHOOTERS</option>` + masterData.shooters.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+            const sddShoots = `<option value="CURRENT">CURRENT SHOOTER</option><option value="ALL">ALL SHOOTERS</option>` + masterData.shooters.map(s => `<option value="${s.name}">${getShooterIcon(s.Type)}${s.name}</option>`).join('');
             const sddSets = `<option value="ALL">ALL SETS</option>` + masterData.sets.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
             document.getElementById('sddcfg-shooter').innerHTML = sddShoots;
             document.getElementById('sddcfg-set').innerHTML = sddSets;
@@ -2284,6 +2297,15 @@
             }
 
             if (mode === 'first') {
+                universalLog.push({
+                    is_NS_Marker: true,
+                    Shooter_ID: globalConfig.shooter,
+                    Location_ID: globalConfig.location,
+                    Table_Position: globalConfig.positionChild,
+                    Dice_Set: globalConfig.diceSet,
+                    Notes: "New Shooter",
+                    Time_Stamp: new Date().toISOString()
+                });
                 if (window.firstRollHeld) {
                     selectedLeft = window.firstRollHeld.left;
                     selectedRight = window.firstRollHeld.right;
@@ -2306,7 +2328,7 @@
                 const startIdx = parseInt(document.getElementById('scfg-start-idx').value);
                 const endIdx = parseInt(document.getElementById('scfg-end-idx').value);
                 for(let i = startIdx; i <= endIdx; i++) {
-                    if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
+                    if(!universalLog[i].Invalid_Roll) {
                         universalLog[i].Shooter_ID = shooter;
                         universalLog[i].Table_Position = posChild;
                         universalLog[i].Dice_Set = set;
@@ -2323,9 +2345,8 @@
             document.getElementById('sddcfg-shooter').value = globalConfig.sddShooter;
             document.getElementById('sddcfg-set').value = globalConfig.sddDiceSet;
             
-            let childPos = globalConfig.sddPosition;
-            let parentPos = 'All';
-            for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
+            let childPos = globalConfig.sddPositionChild || 'All';
+            let parentPos = globalConfig.sddPositionParent || 'All';
             
             document.getElementById('sddcfg-pos-parent').value = parentPos;
             updatePosChild('sddcfg', childPos);
@@ -2335,11 +2356,13 @@
 
         function saveSddConfig() {
             globalConfig.sddShooter = document.getElementById('sddcfg-shooter').value;
-            globalConfig.sddPosition = document.getElementById('sddcfg-pos-child').value;
+            globalConfig.sddPositionParent = document.getElementById('sddcfg-pos-parent').value;
+            globalConfig.sddPositionChild = document.getElementById('sddcfg-pos-child').value;
             globalConfig.sddDiceSet = document.getElementById('sddcfg-set').value;
             
             localStorage.setItem('cfg_sddShooter', globalConfig.sddShooter);
-            localStorage.setItem('cfg_sddPosition', globalConfig.sddPosition);
+            localStorage.setItem('cfg_sddPositionParent', globalConfig.sddPositionParent);
+            localStorage.setItem('cfg_sddPositionChild', globalConfig.sddPositionChild);
             localStorage.setItem('cfg_sddDiceSet', globalConfig.sddDiceSet);
             
             closeModals();
@@ -2505,7 +2528,7 @@
             let startIdx = 0;
             for(let i = sevenOutIndex - 1; i >= 0; i--) {
                 if(universalLog[i].is_NS_Marker) {
-                    startIdx = i + 1; break;
+                    startIdx = i; break;
                 }
             }
             openShooterConfig('retro-hand', startIdx, sevenOutIndex);
