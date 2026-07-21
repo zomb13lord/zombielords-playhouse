@@ -2276,7 +2276,7 @@
             const posChild = document.getElementById('scfg-pos-child').value;
             const set = document.getElementById('scfg-set').value;
 
-            if (mode === 'first' || mode === 'new' || mode === 'retro-forward' || mode === 'retro-hand') {
+            if (mode === 'first' || mode === 'new' || mode === 'retro-forward') {
                 globalConfig.shooter = shooter;
                 globalConfig.positionParent = posParent;
                 globalConfig.positionChild = posChild;
@@ -2311,18 +2311,9 @@
                     selectedLeft = window.firstRollHeld.left;
                     selectedRight = window.firstRollHeld.right;
                     window.firstRollHeld = null;
-                    
-                    let newSum = selectedLeft + selectedRight;
-                    const r = {
-                        Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: newSum, Invalid_Roll: false,
-                        Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
-                        Notes: "",
-                        Time_Stamp: new Date().toISOString()
-                    };
-                    
-                    universalLog.push(r);
-                    clearPad(); 
-                    setIpState('natural'); 
+                    closeModals();
+                    submitRoll();
+                    return;
                 }
             } else if (mode === 'new') {
                 universalLog.push({
@@ -2338,11 +2329,17 @@
                 const startIdx = parseInt(document.getElementById('scfg-start-idx').value);
                 const endIdx = parseInt(document.getElementById('scfg-end-idx').value);
                 for(let i = startIdx; i <= endIdx; i++) {
-                    if(!universalLog[i].Invalid_Roll) {
+                    if(!universalLog[i].Invalid_Roll && !universalLog[i].is_NS_Marker) {
                         universalLog[i].Shooter_ID = shooter;
                         universalLog[i].Table_Position = posChild;
                         universalLog[i].Dice_Set = set;
                     }
+                }
+                if (endIdx === universalLog.length - 1) {
+                    globalConfig.shooter = shooter;
+                    globalConfig.positionParent = posParent;
+                    globalConfig.positionChild = posChild;
+                    globalConfig.diceSet = set;
                 }
             }
 
@@ -2712,7 +2709,7 @@
                 const lt = parseInt(document.getElementById('meta-lt').value);
                 const lb = parseInt(document.getElementById('meta-lb').value);
                 const rt = parseInt(document.getElementById('meta-rt').value);
-                const rb = parseInt(document.getElementById('meta-rt').value);
+                const rb = parseInt(document.getElementById('meta-rb').value);
                 payload = { Set_Name: `${nameVal} [${lt}-${lb}] [${rt}-${rb}]`, Type: document.getElementById('meta-type').value, Left_Top: lt, Left_Back: lb, Right_Top: rt, Right_Back: rb };
             }
 
