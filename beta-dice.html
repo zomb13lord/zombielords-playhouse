@@ -2526,7 +2526,7 @@
 
         function openHandConfig(sevenOutIndex) {
             let startIdx = 0;
-            for(let i = sevenOutIndex - 1; i >= 0; i--) {
+            for(let i = sevenOutIndex; i >= 0; i--) {
                 if(universalLog[i].is_NS_Marker) {
                     startIdx = i; break;
                 }
@@ -2535,9 +2535,9 @@
         }
 
         function openForwardConfig(nsIndex) {
-            let startIdx = nsIndex + 1;
+            let startIdx = nsIndex;
             let endIdx = universalLog.length - 1;
-            for(let i = startIdx; i < universalLog.length; i++) {
+            for(let i = startIdx + 1; i < universalLog.length; i++) {
                 if(universalLog[i].is_NS_Marker) {
                     endIdx = i - 1; break;
                 }
@@ -2856,7 +2856,7 @@
             else if (rolls > 24) stateClass = 'sum-great';
 
             el.className = `hist-node state-summary ${stateClass}`;
-            el.onclick = () => openShooterConfig('retro-hand', index, index);
+            el.onclick = () => openHandConfig(index);
             
             el.innerHTML = `
                 <div class="flex gap-4 px-2 items-center">
