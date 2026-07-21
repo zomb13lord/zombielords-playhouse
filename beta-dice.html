@@ -231,6 +231,7 @@
                 position: sticky;
                 top: 240px;
                 z-index: 40;
+                align-self: start;
             }
         }
 
@@ -1630,10 +1631,10 @@
                 let hHtml = fires > 0 ? '🔥'.repeat(fires) : '';
                 let cHtml = flakes > 0 ? '❄️'.repeat(flakes) : '';
                 kinIndicators[outcomeNum].push(`
-                    <div class="flex justify-between items-center w-full px-1 py-0.5 mt-0.5 bg-slate-800/80 rounded shadow-inner">
-                        <div class="text-[10px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
-                        <div class="text-[10px] font-black text-slate-300 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                        <div class="text-[10px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
+                    <div class="flex justify-between items-center w-full px-1.5 py-1 mt-1 bg-slate-800/90 rounded shadow-inner border border-slate-700/50">
+                        <div class="text-[11px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
+                        <div class="text-[10px] font-black text-slate-200 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                        <div class="text-[11px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
                     </div>
                 `);
             };
@@ -1963,7 +1964,7 @@
             const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
             kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
-            document.getElementById('cfg-show-nid').onchange = (e) => {
+            nidToggle.onchange = (e) => {
                 document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
             };
             
@@ -2275,7 +2276,7 @@
             const posChild = document.getElementById('scfg-pos-child').value;
             const set = document.getElementById('scfg-set').value;
 
-            if (mode === 'first' || mode === 'new' || mode === 'retro-forward') {
+            if (mode === 'first' || mode === 'new' || mode === 'retro-forward' || mode === 'retro-hand') {
                 globalConfig.shooter = shooter;
                 globalConfig.positionParent = posParent;
                 globalConfig.positionChild = posChild;
@@ -2310,9 +2311,18 @@
                     selectedLeft = window.firstRollHeld.left;
                     selectedRight = window.firstRollHeld.right;
                     window.firstRollHeld = null;
-                    closeModals();
-                    submitRoll();
-                    return;
+                    
+                    let newSum = selectedLeft + selectedRight;
+                    const r = {
+                        Left_Die: selectedLeft, Right_Die: selectedRight, Total_Sum: newSum, Invalid_Roll: false,
+                        Location_ID: globalConfig.location, Shooter_ID: globalConfig.shooter, Table_Position: globalConfig.positionChild, Dice_Set: globalConfig.diceSet,
+                        Notes: "",
+                        Time_Stamp: new Date().toISOString()
+                    };
+                    
+                    universalLog.push(r);
+                    clearPad(); 
+                    setIpState('natural'); 
                 }
             } else if (mode === 'new') {
                 universalLog.push({
@@ -2847,7 +2857,7 @@
         }
 
         // --- RENDERING ENGINE ---
-        function createSummaryNode(rolls, points, repeats, index) {
+        function createSummaryNode(rolls, points, repeats, currentHandStartIdx, index) {
             const el = document.createElement('div');
             
             let stateClass = 'sum-bad';
@@ -2912,6 +2922,7 @@
             let rollsInHand = 0;
             let totalRepeatsInHand = 0;
             let repeatCounts = { 2:0, 3:0, 4:0, 5:0, 6:0, 8:0, 9:0, 10:0, 11:0, 12:0 };
+            let currentHandStartIdx = 0;
             activeState.wasSevenOut = {}; 
 
             const fragment = document.createDocumentFragment();
@@ -2919,6 +2930,7 @@
 
             universalLog.forEach((r, index) => {
                 if (r.is_NS_Marker) {
+                    currentHandStartIdx = index;
                     const el = document.createElement('div');
                     el.className = `hist-node state-ns`;
                     el.innerHTML = `NS`;
@@ -3044,7 +3056,7 @@
                 }
 
                 if (isSevenOut) {
-                    nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, totalRepeatsInHand, index));
+                    nodesToInject.push(createSummaryNode(rollsInHand, pointsMadeInHand, totalRepeatsInHand, currentHandStartIdx, index));
                     rollsInHand = 0; pointsMadeInHand = 0; totalRepeatsInHand = 0; isComeout = true; currentPoint = null;
                     for (let k in repeatCounts) repeatCounts[k] = 0;
                 }
