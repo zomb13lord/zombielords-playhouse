@@ -229,9 +229,10 @@
         @media (min-width: 1024px) {
             #sdd-container {
                 position: sticky;
-                top: 240px;
+                top: 240px; /* Overridden by JS dynamically */
                 z-index: 40;
                 align-self: start;
+                transition: top 0.2s ease;
             }
         }
 
@@ -673,6 +674,20 @@
                                 <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                             </label>
                         </div>
+                        <div class="flex justify-between items-center pl-4 border-l-2 border-slate-600">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Last Roll Combinations</span>
+                            <label for="cfg-kin-last-combo" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-last-combo" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Track After Invalid</span>
+                            <label for="cfg-kin-after-invalid" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-after-invalid" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
                         <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers (No X)</div>
                         <div class="grid grid-cols-3 gap-2">
                             <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no4" class="accent-blue-500 w-3 h-3"> No 4</label>
@@ -727,8 +742,8 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
-                    <button onclick="saveShooterConfig()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
+                    <button id="btn-scfg-cancel" onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveShooterConfig()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded col-span-2 md:col-span-1" style="grid-column: span 2;">Save</button>
                 </div>
             </div>
         </div>
@@ -909,6 +924,8 @@
         let storedNidSeven = localStorage.getItem('cfg_showNidSeven');
         let storedKinEnabled = localStorage.getItem('cfg_kinematicEnabled');
         let storedKinLast = localStorage.getItem('cfg_kinLastRoll');
+        let storedKinLastCombo = localStorage.getItem('cfg_kinLastCombo');
+        let storedKinAfterInvalid = localStorage.getItem('cfg_kinAfterInvalid');
         
         let globalConfig = { 
             location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: localStorage.getItem('cfg_diceColor') || 'ruby', 
@@ -919,6 +936,8 @@
             showNidSeven: storedNidSeven !== null ? storedNidSeven : 'true',
             kinematicEnabled: storedKinEnabled !== null ? storedKinEnabled : 'true',
             kinLastRoll: storedKinLast !== null ? storedKinLast : 'true',
+            kinLastCombo: storedKinLastCombo !== null ? storedKinLastCombo : 'false',
+            kinAfterInvalid: storedKinAfterInvalid !== null ? storedKinAfterInvalid : 'false',
             kinNo4: localStorage.getItem('cfg_kinNo4') === 'true',
             kinNo5: localStorage.getItem('cfg_kinNo5') === 'true',
             kinNo6: localStorage.getItem('cfg_kinNo6') === 'true',
@@ -989,6 +1008,21 @@
             }
         });
 
+        function updateStickyNid() {
+            if (window.innerWidth >= 1024) {
+                const stickyZone = document.getElementById('sticky-zone');
+                const sddContainer = document.getElementById('sdd-container');
+                if (stickyZone && sddContainer) {
+                    const h = stickyZone.offsetHeight;
+                    sddContainer.style.top = h + 'px';
+                }
+            } else {
+                const sddContainer = document.getElementById('sdd-container');
+                if (sddContainer) sddContainer.style.top = '';
+            }
+        }
+        window.addEventListener('resize', updateStickyNid);
+
         const shooterTypeMap = { 'Master': 1, 'Favorite': 2, 'Standard': 3, 'Online': 4 };
         function sortShooters(arr) {
             return arr.sort((a, b) => {
@@ -1055,6 +1089,8 @@
                         if (data.meta_tags.show_nid_seven !== undefined) globalConfig.showNidSeven = String(data.meta_tags.show_nid_seven);
                         if (data.meta_tags.kinematic_enabled !== undefined) globalConfig.kinematicEnabled = String(data.meta_tags.kinematic_enabled);
                         if (data.meta_tags.kin_last_roll !== undefined) globalConfig.kinLastRoll = String(data.meta_tags.kin_last_roll);
+                        if (data.meta_tags.kin_last_combo !== undefined) globalConfig.kinLastCombo = String(data.meta_tags.kin_last_combo);
+                        if (data.meta_tags.kin_after_invalid !== undefined) globalConfig.kinAfterInvalid = String(data.meta_tags.kin_after_invalid);
                         if (data.meta_tags.kin_no_4 !== undefined) globalConfig.kinNo4 = data.meta_tags.kin_no_4;
                         if (data.meta_tags.kin_no_5 !== undefined) globalConfig.kinNo5 = data.meta_tags.kin_no_5;
                         if (data.meta_tags.kin_no_6 !== undefined) globalConfig.kinNo6 = data.meta_tags.kin_no_6;
@@ -1089,6 +1125,7 @@
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
                     show_nid: globalConfig.showNID, show_nid_seven: globalConfig.showNidSeven, 
                     kinematic_enabled: globalConfig.kinematicEnabled, kin_last_roll: globalConfig.kinLastRoll,
+                    kin_last_combo: globalConfig.kinLastCombo, kin_after_invalid: globalConfig.kinAfterInvalid,
                     kin_no_4: globalConfig.kinNo4, kin_no_5: globalConfig.kinNo5, kin_no_6: globalConfig.kinNo6,
                     kin_no_8: globalConfig.kinNo8, kin_no_9: globalConfig.kinNo9, kin_no_10: globalConfig.kinNo10,
                     kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, kinematic_limit: globalConfig.kinematicLimit,
@@ -1342,6 +1379,7 @@
             `;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
+            updateStickyNid();
         }
 
         function getHotColdIcons(num, validRolls) {
@@ -1379,10 +1417,55 @@
             return { hot: hotHtml, cold: coldHtml, status: status };
         }
 
-        function getKinematicData(targetSetOrNum, validRolls, limitStr, direction = 'after') {
+        function calculateHotColdFromOutcomes(occurrences, limitStr) {
             let limit = parseInt(limitStr);
             if (isNaN(limit)) limit = 999999;
+            if (occurrences.length > limit) occurrences = occurrences.slice(-limit);
+            
+            let totalNext = occurrences.length;
+            if (totalNext === 0) return { total: 0, hot: [], cold: [] };
 
+            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
+            occurrences.forEach(sum => nextRolls[sum]++);
+
+            let devs = [];
+            for(let s=2; s<=12; s++) {
+                let expected = totalNext * PROB_MAP[s];
+                let dev = nextRolls[s] - expected;
+                
+                if (nextRolls[s] === 0 && totalNext < CYCLE_MAP[s][0]) {
+                    continue;
+                }
+                
+                devs.push({ num: s, dev: dev });
+            }
+
+            devs.sort((a, b) => b.dev - a.dev);
+
+            let hot = [];
+            let cold = [];
+            let displayLimit = parseInt(globalConfig.kinematicLimit) || 3;
+
+            let hotRank = 3;
+            for (let i = 0; i < devs.length && hot.length < displayLimit; i++) {
+                if (devs[i].dev > 0) {
+                    hot.push({ num: devs[i].num, fires: hotRank });
+                    hotRank--;
+                }
+            }
+
+            let coldRank = 3;
+            for (let i = devs.length - 1; i >= 0 && cold.length < displayLimit; i--) {
+                if (devs[i].dev < 0) {
+                    cold.push({ num: devs[i].num, flakes: coldRank });
+                    coldRank--;
+                }
+            }
+
+            return { total: totalNext, hot: hot, cold: cold };
+        }
+
+        function getKinematicData(targetSetOrNum, validRolls, limitStr, direction = 'after') {
             let occurrences = [];
             for(let i=0; i<validRolls.length; i++) {
                 let r = validRolls[i];
@@ -1407,48 +1490,7 @@
                     }
                 }
             }
-
-            if (occurrences.length > limit) {
-                occurrences = occurrences.slice(-limit);
-            }
-
-            let totalNext = occurrences.length;
-            if (totalNext === 0) return { total: 0, hot: [], cold: [] };
-
-            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
-            occurrences.forEach(sum => nextRolls[sum]++);
-
-            let devs = [];
-            for(let s=2; s<=12; s++) {
-                let expected = totalNext * PROB_MAP[s];
-                let dev = nextRolls[s] - expected;
-                devs.push({ num: s, dev: dev });
-            }
-
-            devs.sort((a, b) => b.dev - a.dev);
-
-            let hot = [];
-            let cold = [];
-            
-            let displayLimit = parseInt(globalConfig.kinematicLimit) || 3;
-
-            let hotRank = 3;
-            for (let i = 0; i < devs.length && hot.length < displayLimit; i++) {
-                if (devs[i].dev > 0) {
-                    hot.push({ num: devs[i].num, fires: hotRank });
-                    hotRank--;
-                }
-            }
-
-            let coldRank = 3;
-            for (let i = devs.length - 1; i >= 0 && cold.length < displayLimit; i--) {
-                if (devs[i].dev < 0) {
-                    cold.push({ num: devs[i].num, flakes: coldRank });
-                    coldRank--;
-                }
-            }
-
-            return { total: totalNext, hot: hot, cold: cold };
+            return calculateHotColdFromOutcomes(occurrences, limitStr);
         }
 
         function getMicroDieHTML(value) {
@@ -1563,6 +1605,7 @@
                 container.style.display = 'none';
                 nidHeader.classList.add('hidden');
                 nidHeader.classList.remove('flex');
+                updateStickyNid();
                 return;
             }
             container.style.display = 'grid';
@@ -1643,16 +1686,22 @@
                 if (String(globalConfig.kinLastRoll) === 'true' && kinematicRolls.length > 0) {
                     let lastR = kinematicRolls[kinematicRolls.length - 1];
                     let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
+                    let lastSum = lastR.Corrected_Point || lastR.Total_Sum;
                     let lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
                     
-                    let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
+                    let kinDataAll = getKinematicData(lastSum, kinematicRolls, globalConfig.kinematicRange, 'after');
+                    kinDataAll.hot.forEach(h => pushIndicator(h.num, 'LAST (ALL)', h.fires, 0));
+                    kinDataAll.cold.forEach(c => pushIndicator(c.num, 'LAST (ALL)', 0, c.flakes));
                     
-                    kinData.hot.forEach(h => pushIndicator(h.num, 'LAST ROLL', h.fires, 0));
-                    kinData.cold.forEach(c => pushIndicator(c.num, 'LAST ROLL', 0, c.flakes));
+                    if (String(globalConfig.kinLastCombo) === 'true') {
+                        let kinDataSet = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
+                        kinDataSet.hot.forEach(h => pushIndicator(h.num, `LAST (${lastSetStr})`, h.fires, 0));
+                        kinDataSet.cold.forEach(c => pushIndicator(c.num, `LAST (${lastSetStr})`, 0, c.flakes));
+                    }
                     
                     let [ld1, ld2] = lastSetStr.split('-');
-                    let topHotStr = kinData.hot.length > 0 ? kinData.hot[0].num : '--';
-                    let topColdStr = kinData.cold.length > 0 ? kinData.cold[0].num : '--';
+                    let topHotStr = kinDataAll.hot.length > 0 ? kinDataAll.hot[0].num : '--';
+                    let topColdStr = kinDataAll.cold.length > 0 ? kinDataAll.cold[0].num : '--';
                     
                     nidHeader.innerHTML = `
                         <div class="flex items-center gap-2">
@@ -1668,6 +1717,23 @@
                     nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
                 }
 
+                if (String(globalConfig.kinAfterInvalid) === 'true') {
+                    let afterInvOccurrences = [];
+                    for(let i=0; i<universalLog.length - 1; i++) {
+                        if (universalLog[i].Invalid_Roll || universalLog[i].invalidRoll) {
+                            for(let j=i+1; j<universalLog.length; j++) {
+                                if (!universalLog[j].Invalid_Roll && !universalLog[j].invalidRoll && !universalLog[j].is_NS_Marker) {
+                                    afterInvOccurrences.push(universalLog[j].Corrected_Point || universalLog[j].Total_Sum);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    let kInv = calculateHotColdFromOutcomes(afterInvOccurrences, globalConfig.kinematicRange);
+                    kInv.hot.forEach(h => pushIndicator(h.num, 'AFTER INVALID', h.fires, 0));
+                    kInv.cold.forEach(c => pushIndicator(c.num, 'AFTER INVALID', 0, c.flakes));
+                }
+
                 const layTargets = [
                     { num: 4, active: globalConfig.kinNo4 },
                     { num: 5, active: globalConfig.kinNo5 },
@@ -1679,7 +1745,7 @@
 
                 layTargets.forEach(target => {
                     if(target.active) {
-                        let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange, 'before');
+                        let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange, 'after');
                         if (kAll.total > 0) {
                             let cAllHtml = `NO <span class="text-white">${target.num}</span> ALL`;
                             kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
@@ -1723,6 +1789,7 @@
                 container.classList.remove('no-seven');
             }
             container.innerHTML = nidArray.map(renderBox).join('');
+            updateStickyNid();
         }
 
         function updateBonusTrackers() {
@@ -1730,6 +1797,7 @@
             if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
                 container.classList.add('hidden');
                 container.classList.remove('flex');
+                updateStickyNid();
                 return;
             }
             container.classList.remove('hidden');
@@ -1847,6 +1915,7 @@
                 html += `</div>`;
                 ssEl.innerHTML = html;
             }
+            updateStickyNid();
         }
 
         // --- UI BUILDERS ---
@@ -1947,6 +2016,8 @@
             
             document.getElementById('cfg-kin-enabled').checked = (String(globalConfig.kinematicEnabled) === 'true');
             document.getElementById('cfg-kin-last').checked = (String(globalConfig.kinLastRoll) === 'true');
+            document.getElementById('cfg-kin-last-combo').checked = (String(globalConfig.kinLastCombo) === 'true');
+            document.getElementById('cfg-kin-after-invalid').checked = (String(globalConfig.kinAfterInvalid) === 'true');
             document.getElementById('cfg-kin-no4').checked = (String(globalConfig.kinNo4) === 'true');
             document.getElementById('cfg-kin-no5').checked = (String(globalConfig.kinNo5) === 'true');
             document.getElementById('cfg-kin-no6').checked = (String(globalConfig.kinNo6) === 'true');
@@ -1964,6 +2035,7 @@
             const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
             kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
+            const nidToggle = document.getElementById('cfg-show-nid');
             nidToggle.onchange = (e) => {
                 document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
             };
@@ -2239,6 +2311,7 @@
             
             const title = document.getElementById('scfg-title');
             const desc = document.getElementById('scfg-desc');
+            const cancelBtn = document.getElementById('btn-scfg-cancel');
             
             if (mode === 'first') {
                 title.innerText = "First Shooter";
@@ -2247,22 +2320,26 @@
                 document.getElementById('scfg-set').value = 'ALL';
                 document.getElementById('scfg-pos-parent').value = 'All';
                 updatePosChild('scfg', 'All');
-            } else if (mode === 'new') {
-                title.innerText = "New Shooter";
-                desc.innerText = "Pass the dice to a new shooter.";
-                document.getElementById('scfg-shooter').value = globalConfig.shooter !== 'ALL' ? globalConfig.shooter : masterData.shooters[0]?.name;
-                handleShooterConfigSelect();
-            } else if (mode === 'retro-hand' || mode === 'retro-forward') {
-                title.innerText = "Roll Configuration";
-                desc.innerText = "Retroactively update parameters for this segment.";
-                const refRoll = universalLog[startIdx] || {};
-                document.getElementById('scfg-shooter').value = refRoll.Shooter_ID || 'ALL';
-                document.getElementById('scfg-set').value = refRoll.Dice_Set || 'ALL';
-                let childPos = refRoll.Table_Position || 'All';
-                let parentPos = 'All';
-                for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
-                document.getElementById('scfg-pos-parent').value = parentPos;
-                updatePosChild('scfg', childPos);
+                cancelBtn.style.display = 'none';
+            } else {
+                cancelBtn.style.display = 'block';
+                if (mode === 'new') {
+                    title.innerText = "New Shooter";
+                    desc.innerText = "Pass the dice to a new shooter.";
+                    document.getElementById('scfg-shooter').value = globalConfig.shooter !== 'ALL' ? globalConfig.shooter : masterData.shooters[0]?.name;
+                    handleShooterConfigSelect();
+                } else if (mode === 'retro-hand' || mode === 'retro-forward') {
+                    title.innerText = "Roll Configuration";
+                    desc.innerText = "Retroactively update parameters for this segment.";
+                    const refRoll = universalLog[startIdx] || {};
+                    document.getElementById('scfg-shooter').value = refRoll.Shooter_ID || 'ALL';
+                    document.getElementById('scfg-set').value = refRoll.Dice_Set || 'ALL';
+                    let childPos = refRoll.Table_Position || 'All';
+                    let parentPos = 'All';
+                    for (let p in POS_MAP) { if (POS_MAP[p].includes(childPos)) { parentPos = p; break; } }
+                    document.getElementById('scfg-pos-parent').value = parentPos;
+                    updatePosChild('scfg', childPos);
+                }
             }
 
             document.getElementById('modal-shooter-transition').style.display = 'none';
@@ -2460,6 +2537,8 @@
             
             document.getElementById('cfg-kin-enabled').checked = (String(globalConfig.kinematicEnabled) === 'true');
             document.getElementById('cfg-kin-last').checked = (String(globalConfig.kinLastRoll) === 'true');
+            document.getElementById('cfg-kin-last-combo').checked = (String(globalConfig.kinLastCombo) === 'true');
+            document.getElementById('cfg-kin-after-invalid').checked = (String(globalConfig.kinAfterInvalid) === 'true');
             document.getElementById('cfg-kin-no4').checked = (String(globalConfig.kinNo4) === 'true');
             document.getElementById('cfg-kin-no5').checked = (String(globalConfig.kinNo5) === 'true');
             document.getElementById('cfg-kin-no6').checked = (String(globalConfig.kinNo6) === 'true');
@@ -2500,6 +2579,8 @@
             
             globalConfig.kinematicEnabled = document.getElementById('cfg-kin-enabled').checked ? 'true' : 'false';
             globalConfig.kinLastRoll = document.getElementById('cfg-kin-last').checked ? 'true' : 'false';
+            globalConfig.kinLastCombo = document.getElementById('cfg-kin-last-combo').checked ? 'true' : 'false';
+            globalConfig.kinAfterInvalid = document.getElementById('cfg-kin-after-invalid').checked ? 'true' : 'false';
             globalConfig.kinNo4 = document.getElementById('cfg-kin-no4').checked;
             globalConfig.kinNo5 = document.getElementById('cfg-kin-no5').checked;
             globalConfig.kinNo6 = document.getElementById('cfg-kin-no6').checked;
@@ -2518,6 +2599,8 @@
             localStorage.setItem('cfg_showNidSeven', globalConfig.showNidSeven);
             localStorage.setItem('cfg_kinematicEnabled', globalConfig.kinematicEnabled);
             localStorage.setItem('cfg_kinLastRoll', globalConfig.kinLastRoll);
+            localStorage.setItem('cfg_kinLastCombo', globalConfig.kinLastCombo);
+            localStorage.setItem('cfg_kinAfterInvalid', globalConfig.kinAfterInvalid);
             localStorage.setItem('cfg_kinNo4', globalConfig.kinNo4);
             localStorage.setItem('cfg_kinNo5', globalConfig.kinNo5);
             localStorage.setItem('cfg_kinNo6', globalConfig.kinNo6);
@@ -2886,6 +2969,7 @@
                 updateSDD();
                 updateBonusTrackers();
                 updateNID();
+                updateStickyNid();
                 return;
             }
 
@@ -3068,6 +3152,7 @@
             updateSDD();
             updateBonusTrackers();
             updateNID();
+            updateStickyNid();
         }
     </script>
 </body>
