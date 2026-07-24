@@ -107,6 +107,7 @@
         .bacc-card.rotated { transform: rotate(90deg); margin: 0 12px; }
         .bacc-card.empty { background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png'); }
         .bacc-card.prompt { background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png'); box-shadow: 0 0 15px rgba(251,191,36,0.8); border-color: #fbbf24; animation: pulse 1.5s infinite; }
+        .bacc-card.hidden-card { visibility: hidden; }
         
         .hand-total { font-size: 24px; font-weight: 900; font-family: monospace; margin-top: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 
@@ -154,13 +155,19 @@
         /* Bead Plate Cells */
         .bp-cell {
             width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 14px; color: #fff; position: relative; box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
+            font-weight: 900; font-size: 22px; line-height: 1; color: #fff; position: relative; 
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+        }
+        .bp-natural {
+            border: 2px solid #fbbf24;
+            box-shadow: 0 0 8px #fbbf24, inset 0 2px 4px rgba(255,255,255,0.2);
         }
         .bp-P { background: #2563eb; }
         .bp-B { background: #dc2626; }
         .bp-T { background: #10b981; }
-        .bp-dot-pp { position: absolute; bottom: 2px; right: 2px; width: 6px; height: 6px; background: #60a5fa; border-radius: 50%; border: 1px solid #fff; z-index: 10; }
-        .bp-dot-bp { position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; background: #f87171; border-radius: 50%; border: 1px solid #fff; z-index: 10; }
+        .bp-dot-pp { position: absolute; bottom: 0px; right: 0px; width: 8px; height: 8px; background: #60a5fa; border-radius: 50%; border: 1px solid #fff; z-index: 10; }
+        .bp-dot-bp { position: absolute; top: 0px; left: 0px; width: 8px; height: 8px; background: #f87171; border-radius: 50%; border: 1px solid #fff; z-index: 10; }
 
         /* Big Road Cells */
         .br-cell { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
@@ -206,13 +213,18 @@
         .state-collapsed #pad-content { display: none; }
 
         .input-card-btn {
-            background-color: #0f172a; border-radius: 6px;
-            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.6);
-            height: 70px; border: 1px solid #334155;
-            background-size: cover; background-position: center; background-repeat: no-repeat;
-            transition: all 0.1s ease; cursor: pointer;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #f8fafc; border-radius: 6px; font-weight: 900; font-size: 24px;
+            font-family: 'Cinzel', serif;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -4px 0 rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.6);
+            display: flex; align-items: center; justify-content: center; height: 60px;
+            transition: all 0.1s ease; border: 1px solid #334155;
         }
-        .input-card-btn:active { transform: translateY(3px); box-shadow: inset 0 -1px 0 rgba(0,0,0,0.4), 0 2px 3px rgba(0,0,0,0.6); }
+        .input-card-btn:active { 
+            transform: translateY(3px); 
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4), 0 2px 3px rgba(0,0,0,0.6); 
+        }
+        .input-card-btn.red-suit { color: #ef4444; }
 
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
@@ -233,6 +245,24 @@
     </style>
 </head>
 <body class="flex flex-col">
+
+    <!-- IMAGE PRELOADER -->
+    <div id="preloader" style="display:none;">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-carda.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card2.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card3.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card4.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card5.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card6.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card7.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card8.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card9.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-card10.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardj.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardq.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardk.png">
+        <img src="https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png">
+    </div>
 
     <nav class="zombie-navbar p-4 flex justify-between items-center border-b border-emerald-900/50 flex-shrink-0 shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
         <div class="flex flex-col items-center cursor-pointer hover:opacity-80 transition-opacity" onclick="promptLobbyReturn()">
@@ -300,7 +330,7 @@
                     <div class="card-slots" id="ui-p-cards">
                         <div class="bacc-card empty" id="slot-p-0"></div>
                         <div class="bacc-card empty" id="slot-p-1"></div>
-                        <div class="bacc-card empty" id="slot-p-2"></div>
+                        <div class="bacc-card empty hidden-card" id="slot-p-2"></div>
                     </div>
                     <div class="hand-total text-P" id="ui-p-total">-</div>
                 </div>
@@ -310,7 +340,7 @@
                     <div class="card-slots" id="ui-b-cards">
                         <div class="bacc-card empty" id="slot-b-0"></div>
                         <div class="bacc-card empty" id="slot-b-1"></div>
-                        <div class="bacc-card empty" id="slot-b-2"></div>
+                        <div class="bacc-card empty hidden-card" id="slot-b-2"></div>
                     </div>
                     <div class="hand-total text-B" id="ui-b-total">-</div>
                 </div>
@@ -364,20 +394,20 @@
         <div id="pad-content">
             <div class="w-full max-w-[400px] mx-auto">
                 <div class="grid grid-cols-5 gap-3 mb-4">
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardA.png');" onclick="inputCard('A')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card2.png');" onclick="inputCard('2')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card3.png');" onclick="inputCard('3')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card4.png');" onclick="inputCard('4')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card5.png');" onclick="inputCard('5')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card6.png');" onclick="inputCard('6')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card7.png');" onclick="inputCard('7')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card8.png');" onclick="inputCard('8')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card9.png');" onclick="inputCard('9')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-card10.png');" onclick="inputCard('10')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardJ.png');" onclick="inputCard('J')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardQ.png');" onclick="inputCard('Q')"></button>
-                    <button class="input-card-btn" style="background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardK.png');" onclick="inputCard('K')"></button>
-                    <button class="input-card-btn col-span-2 bg-slate-800 border-slate-600 text-slate-300 shadow-none" style="background-image: none; color: #cbd5e1;" onclick="undoLastCard()"><i class="fa-solid fa-delete-left mr-2"></i> UNDO</button>
+                    <button class="input-card-btn" onclick="inputCard('A')">A</button>
+                    <button class="input-card-btn" onclick="inputCard('2')">2</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('3')">3</button>
+                    <button class="input-card-btn" onclick="inputCard('4')">4</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('5')">5</button>
+                    <button class="input-card-btn" onclick="inputCard('6')">6</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('7')">7</button>
+                    <button class="input-card-btn" onclick="inputCard('8')">8</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('9')">9</button>
+                    <button class="input-card-btn" onclick="inputCard('10')">10</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('J')">J</button>
+                    <button class="input-card-btn" onclick="inputCard('Q')">Q</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('K')">K</button>
+                    <button class="input-card-btn col-span-2" style="font-family: 'Montserrat', sans-serif; font-size: 14px; color: #cbd5e1;" onclick="undoLastCard()"><i class="fa-solid fa-delete-left mr-2"></i> UNDO</button>
                 </div>
 
                 <div class="flex gap-2">
@@ -791,13 +821,14 @@
             syncActiveSession();
         }
 
-        function getRealisticCardHTML(id, val, isRotated, isPrompt) {
+        function getRealisticCardHTML(id, val, isRotated, isPrompt, isHidden) {
             let classes = "bacc-card";
             if (isRotated) classes += " rotated";
             if (isPrompt) classes += " prompt";
             if (!val && !isPrompt) classes += " empty";
+            if (isHidden) classes += " hidden-card";
             
-            let bgUrl = val ? `https://zomb13lord.github.io/zombielords-playhouse/baccarat-card${val}.png` : `https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png`;
+            let bgUrl = val ? `https://zomb13lord.github.io/zombielords-playhouse/baccarat-card${val.toLowerCase()}.png` : `https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png`;
             
             return `<div id="${id}" class="${classes}" style="background-image: url('${bgUrl}');"></div>`;
         }
@@ -807,10 +838,12 @@
                 let isRotated = (i === 2);
                 
                 let pPrompt = (handState.step === 4 && i === 2);
-                document.getElementById(`slot-p-${i}`).outerHTML = getRealisticCardHTML(`slot-p-${i}`, handState.player[i], isRotated, pPrompt);
+                let pHidden = (i === 2 && !handState.player[2] && handState.step !== 4);
+                document.getElementById(`slot-p-${i}`).outerHTML = getRealisticCardHTML(`slot-p-${i}`, handState.player[i], isRotated, pPrompt, pHidden);
                 
                 let bPrompt = (handState.step === 5 && i === 2);
-                document.getElementById(`slot-b-${i}`).outerHTML = getRealisticCardHTML(`slot-b-${i}`, handState.banker[i], isRotated, bPrompt);
+                let bHidden = (i === 2 && !handState.banker[2] && handState.step !== 5);
+                document.getElementById(`slot-b-${i}`).outerHTML = getRealisticCardHTML(`slot-b-${i}`, handState.banker[i], isRotated, bPrompt, bHidden);
             }
 
             let pTotal = getHandTotal(handState.player);
@@ -950,11 +983,14 @@
                 let displayVal = h.outcome === 'T' ? h.pTotal : (h.outcome === 'P' ? h.pTotal : h.bTotal);
                 let innerHtml = displayVal;
                 
-                if (h.sideBets.includes('D7')) innerHtml = '<i class="fa-solid fa-dragon"></i>';
-                else if (h.sideBets.includes('P8')) innerHtml = '<i class="fa-solid fa-paw"></i>';
-                else if (h.sideBets.includes('LT') || h.sideBets.includes('BT')) innerHtml = '<i class="fa-solid fa-cat"></i>';
+                if (h.sideBets.includes('D7')) innerHtml = '<i class="fa-solid fa-dragon text-[16px]"></i>';
+                else if (h.sideBets.includes('P8')) innerHtml = '<i class="fa-solid fa-paw text-[16px]"></i>';
+                else if (h.sideBets.includes('LT') || h.sideBets.includes('BT')) innerHtml = '<i class="fa-solid fa-cat text-[16px]"></i>';
 
-                let html = `<div class="bp-cell bp-${h.outcome}">${innerHtml}`;
+                let classes = `bp-cell bp-${h.outcome}`;
+                if (h.sideBets.includes('Nat')) classes += ` bp-natural`;
+
+                let html = `<div class="${classes}">${innerHtml}`;
                 if (globalConfig.trackPairs) {
                     if (h.sideBets.includes('PP')) html += `<div class="bp-dot-pp"></div>`;
                     if (h.sideBets.includes('BP')) html += `<div class="bp-dot-bp"></div>`;
