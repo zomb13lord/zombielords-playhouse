@@ -28,6 +28,9 @@
 
         @media (min-width: 768px) {
             body { padding-bottom: 240px; } 
+            .card-slots { height: 135px !important; gap: 10px !important; }
+            .bacc-card { width: 90px !important; height: 127px !important; border-radius: 8px !important; }
+            .bacc-card.rotated { margin: 0 18px !important; }
         }
 
         /* NAVBAR */
@@ -90,12 +93,12 @@
             background: rgba(2, 6, 23, 0.6);
         }
         .hand-sides-container {
-            display: flex; justify-content: space-between; align-items: center; max-width: 400px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center; max-width: 500px; margin: 0 auto;
         }
         .hand-side { display: flex; flex-direction: column; align-items: center; width: 45%; }
         .hand-title { font-size: 12px; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .hand-title.p { color: #60a5fa; } .hand-title.b { color: #f87171; }
-        .card-slots { display: flex; gap: 6px; height: 90px; justify-content: center; align-items: center; }
+        .card-slots { display: flex; gap: 6px; height: 90px; justify-content: center; align-items: center; transition: all 0.2s ease; }
         
         /* REALISTIC CARDS */
         .bacc-card {
@@ -188,6 +191,18 @@
         .dr-R.dr-beb { border-color: #ef4444; } .dr-B.dr-beb { border-color: #3b82f6; }
         .dr-R.dr-sr { background: #ef4444; } .dr-B.dr-sr { background: #3b82f6; }
         .dr-R.dr-cp { background: #ef4444; } .dr-B.dr-cp { background: #3b82f6; }
+
+        /* Predictor Cells */
+        .pred-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+        .pred-beb { width: 14px; height: 14px; border-radius: 50%; border: 2px solid transparent; }
+        .pred-sr { width: 14px; height: 14px; border-radius: 50%; background: transparent; }
+        .pred-cp { width: 14px; height: 3px; background: transparent; transform: rotate(-45deg); }
+        
+        .pred-R.pred-beb { border-color: #ef4444; } .pred-B.pred-beb { border-color: #3b82f6; }
+        .pred-R.pred-sr { background: #ef4444; } .pred-B.pred-sr { background: #3b82f6; }
+        .pred-R.pred-cp { background: #ef4444; } .pred-B.pred-cp { background: #3b82f6; }
+        .pred-empty { border-color: #334155 !important; background: #334155 !important; }
+        .pred-empty.pred-beb { background: transparent !important; }
 
         /* INPUT PAD */
         #input-pad-wrapper {
@@ -328,9 +343,9 @@
                 <div class="hand-side">
                     <div class="hand-title p">PLAYER</div>
                     <div class="card-slots" id="ui-p-cards">
+                        <div class="bacc-card empty hidden-card" id="slot-p-2"></div>
                         <div class="bacc-card empty" id="slot-p-0"></div>
                         <div class="bacc-card empty" id="slot-p-1"></div>
-                        <div class="bacc-card empty hidden-card" id="slot-p-2"></div>
                     </div>
                     <div class="hand-total text-P" id="ui-p-total">-</div>
                 </div>
@@ -350,6 +365,30 @@
     </div>
 
     <div class="road-container">
+        
+        <div class="road-panel" id="panel-predictor">
+            <div class="road-header">Ask Road</div>
+            <div class="flex justify-around items-center p-3 bg-slate-900/80">
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-md border-2 border-blue-400">P</div>
+                    <div class="flex gap-3">
+                        <div class="pred-icon"><div id="pred-p-beb" class="pred-beb pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-p-sr" class="pred-sr pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-p-cp" class="pred-cp pred-empty"></div></div>
+                    </div>
+                </div>
+                <div class="w-px h-8 bg-slate-700"></div>
+                <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-black text-sm shadow-md border-2 border-red-400">B</div>
+                    <div class="flex gap-3">
+                        <div class="pred-icon"><div id="pred-b-beb" class="pred-beb pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-b-sr" class="pred-sr pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-b-cp" class="pred-cp pred-empty"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="road-panel" id="panel-bead-plate">
             <div class="road-header">Bead Plate</div>
             <div class="road-grid-wrapper" id="wrap-bead-plate">
@@ -912,6 +951,39 @@
             }
         }
 
+        function buildLogicalBR(hands) {
+            let logicalBR = [];
+            let lastMain = null;
+            let preTies = 0;
+            
+            hands.forEach(h => {
+                if (h.outcome === 'T') {
+                    if (logicalBR.length === 0) {
+                        preTies++;
+                    } else {
+                        let lastCol = logicalBR[logicalBR.length - 1];
+                        let lastItem = lastCol[lastCol.length - 1];
+                        lastItem.ties = (lastItem.ties || 0) + 1;
+                        if (h.sideBets.includes('PP')) lastItem.pp = true;
+                        if (h.sideBets.includes('BP')) lastItem.bp = true;
+                    }
+                } else {
+                    let item = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
+                    if (logicalBR.length === 0 && preTies > 0) {
+                        item.ties = preTies;
+                    }
+                    
+                    if (h.outcome !== lastMain) {
+                        logicalBR.push([item]);
+                        lastMain = h.outcome;
+                    } else {
+                        logicalBR[logicalBR.length - 1].push(item);
+                    }
+                }
+            });
+            return logicalBR;
+        }
+
         function placeLogicalIntoVisual(logicalCols, maxRows = 6) {
             let matrix = [];
             for(let i=0; i<200; i++) matrix.push(new Array(maxRows).fill(null));
@@ -967,6 +1039,21 @@
             return seq;
         }
 
+        function getPredictorColors(validHands, outcome) {
+            let simHands = [...validHands, { outcome: outcome, sideBets: [] }];
+            let logicalBR = buildLogicalBR(simHands);
+            
+            let bebSeq = getDerivedSequence(logicalBR, 1);
+            let srSeq = getDerivedSequence(logicalBR, 2);
+            let cpSeq = getDerivedSequence(logicalBR, 3);
+            
+            return {
+                beb: bebSeq.length > 0 ? bebSeq[bebSeq.length - 1] : null,
+                sr: srSeq.length > 0 ? srSeq[srSeq.length - 1] : null,
+                cp: cpSeq.length > 0 ? cpSeq[cpSeq.length - 1] : null
+            };
+        }
+
         function renderRoads() {
             document.getElementById('panel-bead-plate').style.display = globalConfig.showBeadPlate ? 'flex' : 'none';
             document.getElementById('panel-big-road').style.display = globalConfig.showBigRoad ? 'flex' : 'none';
@@ -1001,35 +1088,7 @@
             document.getElementById('wrap-bead-plate').scrollLeft = document.getElementById('wrap-bead-plate').scrollWidth;
 
             // Logical Big Road Generation
-            let logicalBR = [];
-            let lastMain = null;
-            let preTies = 0;
-            
-            validHands.forEach(h => {
-                if (h.outcome === 'T') {
-                    if (logicalBR.length === 0) {
-                        preTies++;
-                    } else {
-                        let lastCol = logicalBR[logicalBR.length - 1];
-                        let lastItem = lastCol[lastCol.length - 1];
-                        lastItem.ties = (lastItem.ties || 0) + 1;
-                        if (h.sideBets.includes('PP')) lastItem.pp = true;
-                        if (h.sideBets.includes('BP')) lastItem.bp = true;
-                    }
-                } else {
-                    let item = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                    if (logicalBR.length === 0 && preTies > 0) {
-                        item.ties = preTies;
-                    }
-                    
-                    if (h.outcome !== lastMain) {
-                        logicalBR.push([item]);
-                        lastMain = h.outcome;
-                    } else {
-                        logicalBR[logicalBR.length - 1].push(item);
-                    }
-                }
-            });
+            let logicalBR = buildLogicalBR(validHands);
 
             // Big Road Visual
             let brMatrix = placeLogicalIntoVisual(logicalBR);
@@ -1088,6 +1147,18 @@
             if (globalConfig.showBEB) renderDerived(1, 'grid-big-eye-boy', 'wrap-big-eye-boy', 'dr-beb');
             if (globalConfig.showSR) renderDerived(2, 'grid-small-road', 'wrap-small-road', 'dr-sr');
             if (globalConfig.showCP) renderDerived(3, 'grid-cockroach-pig', 'wrap-cockroach-pig', 'dr-cp');
+
+            // Predictor (Ask Road)
+            let pPredict = getPredictorColors(validHands, 'P');
+            let bPredict = getPredictorColors(validHands, 'B');
+            
+            document.getElementById('pred-p-beb').className = `pred-beb ${pPredict.beb ? 'pred-'+pPredict.beb : 'pred-empty'}`;
+            document.getElementById('pred-p-sr').className = `pred-sr ${pPredict.sr ? 'pred-'+pPredict.sr : 'pred-empty'}`;
+            document.getElementById('pred-p-cp').className = `pred-cp ${pPredict.cp ? 'pred-'+pPredict.cp : 'pred-empty'}`;
+            
+            document.getElementById('pred-b-beb').className = `pred-beb ${bPredict.beb ? 'pred-'+bPredict.beb : 'pred-empty'}`;
+            document.getElementById('pred-b-sr').className = `pred-sr ${bPredict.sr ? 'pred-'+bPredict.sr : 'pred-empty'}`;
+            document.getElementById('pred-b-cp').className = `pred-cp ${bPredict.cp ? 'pred-'+bPredict.cp : 'pred-empty'}`;
         }
 
         // --- MODALS & CONFIG ---
