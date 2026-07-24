@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,31 +40,84 @@
         /* STICKY ZONE */
         #sticky-zone {
             position: sticky; top: 0; z-index: 50;
-            background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(12px);
+            background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(51, 65, 85, 0.6);
             box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            display: flex; flex-direction: column;
         }
 
-        /* HISTORY BAR */
-        #history-bar {
-            display: flex; flex-direction: row; align-items: center;
-            overflow-x: auto; padding: 12px 10px; gap: 8px; min-height: 64px;
-            cursor: grab; scroll-behavior: smooth;
+        /* SDD CARD PANEL */
+        .sdd-card-container {
+            display: flex; flex-direction: row; align-items: stretch;
+            overflow-x: auto; padding: 12px 16px; gap: 10px;
+            scrollbar-width: none;
         }
-        #history-bar:active { cursor: grabbing; }
-        #history-bar::-webkit-scrollbar { display: none; }
+        .sdd-card-container::-webkit-scrollbar { display: none; }
+        
+        .sdd-card {
+            background: #0f172a; border: 1px solid #334155; border-radius: 6px; 
+            display: flex; flex-direction: column; min-width: 70px; flex-shrink: 0; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5); overflow: hidden;
+            border-top-width: 3px;
+        }
+        .sdd-rolls { border-top-color: #94a3b8; background: linear-gradient(to bottom, #1e293b, #020617); }
+        .sdd-player { border-top-color: #3b82f6; background: linear-gradient(to bottom, #0f172a, #020617); }
+        .sdd-banker { border-top-color: #ef4444; background: linear-gradient(to bottom, #1a0505, #020617); }
+        .sdd-tie { border-top-color: #10b981; background: linear-gradient(to bottom, #02120a, #020617); }
+        .sdd-pairs { border-top-color: #8b5cf6; background: linear-gradient(to bottom, #10051a, #020617); }
+        .sdd-nats { border-top-color: #f59e0b; background: linear-gradient(to bottom, #171003, #020617); }
 
-        .hist-node {
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; border-radius: 50%; flex-shrink: 0;
-            font-size: 14px; width: 36px; height: 36px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5); position: relative;
-            border: 2px solid transparent; color: #fff;
+        .sdd-card-header {
+            background: rgba(30, 41, 59, 0.5); color: #94a3b8; font-size: 9px; font-weight: 900; 
+            text-align: center; padding: 4px; border-bottom: 1px solid #334155; letter-spacing: 1px;
         }
-        .node-P { background: linear-gradient(135deg, #2563eb, #1e3a8a); border-color: #3b82f6; }
-        .node-B { background: linear-gradient(135deg, #dc2626, #7f1d1d); border-color: #ef4444; }
-        .node-T { background: linear-gradient(135deg, #10b981, #064e3b); border-color: #34d399; }
-        .node-Err { background: #f59e0b; color: #000; font-size: 10px; border-radius: 4px; width: auto; padding: 0 8px; }
+        .sdd-card-body {
+            display: flex; flex-direction: row; justify-content: center; align-items: stretch; 
+            flex-grow: 1;
+        }
+        .sdd-card-col {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 6px 10px; border-right: 1px solid #334155;
+        }
+        .sdd-card-col:last-child { border-right: none; }
+        .sdd-val { font-size: 16px; font-weight: 900; color: #ffffff; font-family: monospace; }
+        .sdd-sub { font-size: 8px; color: #64748b; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; }
+
+        /* LIVE HAND DISPLAY (STICKY) */
+        #live-hand-display {
+            padding: 10px 16px 16px 16px; border-top: 1px solid rgba(51, 65, 85, 0.4);
+            background: rgba(2, 6, 23, 0.6);
+        }
+        .hand-sides-container {
+            display: flex; justify-content: space-between; align-items: center; max-width: 400px; margin: 0 auto;
+        }
+        .hand-side { display: flex; flex-direction: column; align-items: center; width: 45%; }
+        .hand-title { font-size: 12px; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .hand-title.p { color: #60a5fa; } .hand-title.b { color: #f87171; }
+        .card-slots { display: flex; gap: 6px; height: 64px; justify-content: center; }
+        
+        /* REALISTIC CARDS */
+        .bacc-card {
+            width: 42px; height: 60px; background: #ffffff; border-radius: 4px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.6), inset 0 0 2px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; justify-content: space-between; padding: 4px; position: relative;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .bacc-card.empty { background: rgba(15, 23, 42, 0.5); border: 1px dashed #475569; box-shadow: none; }
+        .bacc-card.player-card { color: #2563eb; }
+        .bacc-card.banker-card { color: #dc2626; }
+        .card-val-top { font-size: 14px; font-weight: 900; line-height: 1; align-self: flex-start; }
+        .card-val-bot { font-size: 14px; font-weight: 900; line-height: 1; align-self: flex-end; transform: rotate(180deg); }
+        .card-suit { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; opacity: 0.15; }
+        
+        .hand-total { font-size: 24px; font-weight: 900; font-family: monospace; margin-top: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+
+        /* GLOWING PROMPT */
+        .prompt-text { 
+            text-align: center; font-size: 16px; font-weight: 900; color: #fbbf24; 
+            letter-spacing: 2px; margin-top: 16px; text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(251,191,36,0.8);
+        }
 
         /* BACCARAT ROADS */
         .road-container {
@@ -85,17 +137,20 @@
         }
         .road-grid-wrapper {
             overflow-x: auto; overflow-y: hidden; padding: 8px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none;
         }
         .road-grid-wrapper::-webkit-scrollbar { display: none; }
         
-        .grid-bead-plate {
-            display: grid; grid-template-rows: repeat(6, 32px); grid-auto-columns: 32px; grid-auto-flow: column; gap: 2px;
-        }
-        .grid-big-road {
+        .grid-bead-plate { display: grid; grid-template-rows: repeat(6, 32px); grid-auto-columns: 32px; grid-auto-flow: column; gap: 2px; }
+        .grid-big-road { 
             display: grid; grid-template-rows: repeat(6, 24px); grid-auto-columns: 24px; grid-auto-flow: column; gap: 1px;
             background-image: linear-gradient(to right, rgba(51,65,85,0.3) 1px, transparent 1px), linear-gradient(to bottom, rgba(51,65,85,0.3) 1px, transparent 1px);
             background-size: 25px 25px; border: 1px solid rgba(51,65,85,0.5);
+        }
+        .grid-derived {
+            display: grid; grid-template-rows: repeat(6, 12px); grid-auto-columns: 12px; grid-auto-flow: column; gap: 1px;
+            background-image: linear-gradient(to right, rgba(51,65,85,0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(51,65,85,0.2) 1px, transparent 1px);
+            background-size: 13px 13px; border: 1px solid rgba(51,65,85,0.5);
         }
 
         /* Bead Plate Cells */
@@ -110,31 +165,24 @@
         .bp-dot-bp { position: absolute; top: 2px; left: 2px; width: 6px; height: 6px; background: #f87171; border-radius: 50%; border: 1px solid #fff; }
 
         /* Big Road Cells */
-        .br-cell {
-            width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative;
-        }
-        .br-circle {
-            width: 20px; height: 20px; border-radius: 50%; border: 3px solid transparent; position: relative;
-        }
+        .br-cell { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .br-circle { width: 20px; height: 20px; border-radius: 50%; border: 3px solid transparent; position: relative; }
         .br-P { border-color: #3b82f6; }
         .br-B { border-color: #ef4444; }
-        .br-tie-line {
-            position: absolute; top: 50%; left: -2px; right: -2px; height: 3px; background: #10b981; transform: translateY(-50%) rotate(-45deg); z-index: 2;
-        }
-        .br-tie-text {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; font-weight: 900; color: #10b981; z-index: 3; text-shadow: 0 0 2px #000;
-        }
+        .br-tie-line { position: absolute; top: 50%; left: -2px; right: -2px; height: 3px; background: #10b981; transform: translateY(-50%) rotate(-45deg); z-index: 2; }
+        .br-tie-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; font-weight: 900; color: #10b981; z-index: 3; text-shadow: 0 0 2px #000; }
         .br-dot-pp { position: absolute; bottom: -2px; right: -2px; width: 6px; height: 6px; background: #3b82f6; border-radius: 50%; z-index: 4; }
         .br-dot-bp { position: absolute; top: -2px; left: -2px; width: 6px; height: 6px; background: #ef4444; border-radius: 50%; z-index: 4; }
 
-        /* STATS BAR */
-        .stats-bar {
-            display: flex; justify-content: space-around; background: #0f172a; border-top: 1px solid #334155; padding: 8px 16px;
-        }
-        .stat-item { display: flex; flex-direction: column; align-items: center; }
-        .stat-val { font-size: 16px; font-weight: 900; font-family: monospace; }
-        .stat-lbl { font-size: 8px; color: #64748b; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; }
-        .text-P { color: #60a5fa; } .text-B { color: #f87171; } .text-T { color: #34d399; }
+        /* Derived Road Cells */
+        .dr-cell { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .dr-beb { width: 10px; height: 10px; border-radius: 50%; border: 2px solid transparent; }
+        .dr-sr { width: 10px; height: 10px; border-radius: 50%; background: transparent; }
+        .dr-cp { width: 10px; height: 2px; background: transparent; transform: rotate(-45deg); }
+        
+        .dr-R.dr-beb { border-color: #ef4444; } .dr-B.dr-beb { border-color: #3b82f6; }
+        .dr-R.dr-sr { background: #ef4444; } .dr-B.dr-sr { background: #3b82f6; }
+        .dr-R.dr-cp { background: #ef4444; } .dr-B.dr-cp { background: #3b82f6; }
 
         /* INPUT PAD */
         #input-pad-wrapper {
@@ -151,7 +199,7 @@
             border-bottom: 1px solid rgba(51, 65, 85, 0.5); position: relative; cursor: pointer;
         }
 
-        #pad-content { padding: 12px 15px 20px 15px; }
+        #pad-content { padding: 16px 15px 24px 15px; }
         
         .state-collapsed { transform: translateY(calc(100% - 40px)); } 
         .state-natural { transform: translateY(0); }
@@ -159,29 +207,14 @@
         .state-natural .pad-handle { display: none; }
         .state-collapsed #pad-content { display: none; }
 
-        .card-btn {
-            background: #1e293b; border: 1px solid #334155; color: #f8fafc; font-weight: 900; font-size: 18px;
-            border-radius: 6px; padding: 12px 0; cursor: pointer; transition: all 0.1s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;
+        .input-card-btn {
+            background: #ffffff; color: #0f172a; border-radius: 6px; font-weight: 900; font-size: 22px;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center; height: 54px;
+            transition: all 0.1s ease; border: 1px solid #cbd5e1;
         }
-        .card-btn:active { transform: scale(0.95); background: #334155; }
-        .card-btn.red-suit { color: #ef4444; }
-        
-        .hand-display {
-            display: flex; justify-content: space-between; align-items: center; background: #020617; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 12px;
-        }
-        .hand-side { display: flex; flex-direction: column; align-items: center; width: 45%; }
-        .hand-title { font-size: 10px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px; }
-        .hand-title.p { color: #60a5fa; } .hand-title.b { color: #f87171; }
-        .card-slots { display: flex; gap: 4px; height: 40px; }
-        .card-slot { 
-            width: 28px; height: 38px; border: 1px dashed #475569; border-radius: 4px; 
-            display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; background: #0f172a;
-        }
-        .card-slot.filled { border-style: solid; background: #fff; color: #000; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-        .hand-total { font-size: 20px; font-weight: 900; font-family: monospace; margin-top: 4px; }
-
-        .prompt-text { text-align: center; font-size: 11px; font-weight: 900; color: #fbbf24; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase; }
+        .input-card-btn:active { transform: translateY(3px); box-shadow: inset 0 -1px 0 rgba(0,0,0,0.2), 0 2px 3px rgba(0,0,0,0.5); }
+        .input-card-btn.red-suit { color: #dc2626; }
 
         /* Modals */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
@@ -216,14 +249,69 @@
     </nav>
 
     <div id="sticky-zone">
-        <div id="history-bar">
-            <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST HAND...</div>
+        <div id="sdd-global" class="sdd-card-container">
+            <div class="sdd-card sdd-rolls">
+                <div class="sdd-card-header">HANDS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-val" id="stat-hands">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-player">
+                <div class="sdd-card-header">PLAYER</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-val text-blue-400" id="stat-player">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-banker">
+                <div class="sdd-card-header">BANKER</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-val text-red-400" id="stat-banker">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-tie">
+                <div class="sdd-card-header">TIE</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-val text-emerald-400" id="stat-tie">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-pairs">
+                <div class="sdd-card-header">PAIRS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">PLAYER</span><span class="sdd-val text-blue-300" id="stat-pp">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">BANKER</span><span class="sdd-val text-red-300" id="stat-bp">0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-nats">
+                <div class="sdd-card-header">NATURALS</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-val text-amber-400" id="stat-nat">0</span></div>
+                </div>
+            </div>
         </div>
-        <div class="stats-bar" id="main-stats-bar">
-            <div class="stat-item"><span class="stat-val text-white" id="stat-hands">0</span><span class="stat-lbl">Hands</span></div>
-            <div class="stat-item"><span class="stat-val text-P" id="stat-player">0</span><span class="stat-lbl">Player</span></div>
-            <div class="stat-item"><span class="stat-val text-B" id="stat-banker">0</span><span class="stat-lbl">Banker</span></div>
-            <div class="stat-item"><span class="stat-val text-T" id="stat-tie">0</span><span class="stat-lbl">Tie</span></div>
+
+        <div id="live-hand-display">
+            <div class="hand-sides-container">
+                <div class="hand-side">
+                    <div class="hand-title p">PLAYER</div>
+                    <div class="card-slots" id="ui-p-cards">
+                        <div class="bacc-card empty" id="slot-p-0"></div>
+                        <div class="bacc-card empty" id="slot-p-1"></div>
+                        <div class="bacc-card empty" id="slot-p-2"></div>
+                    </div>
+                    <div class="hand-total text-P" id="ui-p-total">-</div>
+                </div>
+                <div class="text-slate-600 font-black text-2xl drop-shadow-md">VS</div>
+                <div class="hand-side">
+                    <div class="hand-title b">BANKER</div>
+                    <div class="card-slots" id="ui-b-cards">
+                        <div class="bacc-card empty" id="slot-b-0"></div>
+                        <div class="bacc-card empty" id="slot-b-1"></div>
+                        <div class="bacc-card empty" id="slot-b-2"></div>
+                    </div>
+                    <div class="hand-total text-B" id="ui-b-total">-</div>
+                </div>
+            </div>
+            <div class="prompt-text animate-pulse" id="ui-prompt">AWAITING FIRST HAND...</div>
         </div>
     </div>
 
@@ -241,6 +329,27 @@
                 <div class="grid-big-road" id="grid-big-road"></div>
             </div>
         </div>
+
+        <div class="road-panel" id="panel-big-eye-boy" style="display: none;">
+            <div class="road-header">Big Eye Boy</div>
+            <div class="road-grid-wrapper" id="wrap-big-eye-boy">
+                <div class="grid-derived" id="grid-big-eye-boy"></div>
+            </div>
+        </div>
+
+        <div class="road-panel" id="panel-small-road" style="display: none;">
+            <div class="road-header">Small Road</div>
+            <div class="road-grid-wrapper" id="wrap-small-road">
+                <div class="grid-derived" id="grid-small-road"></div>
+            </div>
+        </div>
+
+        <div class="road-panel" id="panel-cockroach-pig" style="display: none;">
+            <div class="road-header">Cockroach Pig</div>
+            <div class="road-grid-wrapper" id="wrap-cockroach-pig">
+                <div class="grid-derived" id="grid-cockroach-pig"></div>
+            </div>
+        </div>
     </div>
 
     <div id="input-pad-wrapper" class="state-collapsed">
@@ -250,52 +359,27 @@
         
         <div id="pad-content">
             <div class="w-full max-w-[400px] mx-auto">
-                
-                <div class="hand-display">
-                    <div class="hand-side">
-                        <div class="hand-title p">PLAYER</div>
-                        <div class="card-slots" id="ui-p-cards">
-                            <div class="card-slot" id="slot-p-0"></div>
-                            <div class="card-slot" id="slot-p-1"></div>
-                            <div class="card-slot" id="slot-p-2"></div>
-                        </div>
-                        <div class="hand-total text-P" id="ui-p-total">-</div>
-                    </div>
-                    <div class="text-slate-600 font-black text-xl">VS</div>
-                    <div class="hand-side">
-                        <div class="hand-title b">BANKER</div>
-                        <div class="card-slots" id="ui-b-cards">
-                            <div class="card-slot" id="slot-b-0"></div>
-                            <div class="card-slot" id="slot-b-1"></div>
-                            <div class="card-slot" id="slot-b-2"></div>
-                        </div>
-                        <div class="hand-total text-B" id="ui-b-total">-</div>
-                    </div>
-                </div>
-
-                <div class="prompt-text" id="ui-prompt">ENTER PLAYER CARD 1</div>
-
-                <div class="grid grid-cols-5 gap-2 mb-3">
-                    <button class="card-btn" onclick="inputCard('A')">A</button>
-                    <button class="card-btn" onclick="inputCard('2')">2</button>
-                    <button class="card-btn" onclick="inputCard('3')">3</button>
-                    <button class="card-btn" onclick="inputCard('4')">4</button>
-                    <button class="card-btn" onclick="inputCard('5')">5</button>
-                    <button class="card-btn" onclick="inputCard('6')">6</button>
-                    <button class="card-btn" onclick="inputCard('7')">7</button>
-                    <button class="card-btn" onclick="inputCard('8')">8</button>
-                    <button class="card-btn" onclick="inputCard('9')">9</button>
-                    <button class="card-btn" onclick="inputCard('10')">10</button>
-                    <button class="card-btn" onclick="inputCard('J')">J</button>
-                    <button class="card-btn" onclick="inputCard('Q')">Q</button>
-                    <button class="card-btn" onclick="inputCard('K')">K</button>
-                    <button class="card-btn col-span-2 bg-slate-800 border-slate-600 text-slate-300" onclick="undoLastCard()"><i class="fa-solid fa-delete-left mr-2"></i> UNDO</button>
+                <div class="grid grid-cols-5 gap-3 mb-4">
+                    <button class="input-card-btn" onclick="inputCard('A')">A</button>
+                    <button class="input-card-btn" onclick="inputCard('2')">2</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('3')">3</button>
+                    <button class="input-card-btn" onclick="inputCard('4')">4</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('5')">5</button>
+                    <button class="input-card-btn" onclick="inputCard('6')">6</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('7')">7</button>
+                    <button class="input-card-btn" onclick="inputCard('8')">8</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('9')">9</button>
+                    <button class="input-card-btn" onclick="inputCard('10')">10</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('J')">J</button>
+                    <button class="input-card-btn" onclick="inputCard('Q')">Q</button>
+                    <button class="input-card-btn red-suit" onclick="inputCard('K')">K</button>
+                    <button class="input-card-btn col-span-2 bg-slate-800 border-slate-600 text-slate-300 shadow-none" onclick="undoLastCard()"><i class="fa-solid fa-delete-left mr-2"></i> UNDO</button>
                 </div>
 
                 <div class="flex gap-2">
-                    <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Invalid Hand</button>
-                    <button onclick="undoLastHand()" class="flex-1 border border-red-500 text-red-400 hover:bg-red-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo Hand</button>
-                    <button onclick="setIpState('collapsed')" class="flex-1 border border-slate-500 text-slate-400 hover:bg-slate-800 py-2.5 rounded font-bold text-xs uppercase transition-all">Hide</button>
+                    <button onclick="openInvalidModal()" class="flex-1 border border-amber-500 text-amber-500 hover:bg-amber-900/30 py-3 rounded font-bold text-xs uppercase transition-all">Invalid Hand</button>
+                    <button onclick="undoLastHand()" class="flex-1 border border-red-500 text-red-400 hover:bg-red-900/30 py-3 rounded font-bold text-xs uppercase transition-all">Undo Hand</button>
+                    <button onclick="setIpState('collapsed')" class="flex-1 border border-slate-500 text-slate-400 hover:bg-slate-800 py-3 rounded font-bold text-xs uppercase transition-all">Hide</button>
                 </div>
             </div>
         </div>
@@ -395,18 +479,39 @@
                         <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400"></select></div>
                     </div>
 
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Display</div>
+                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Roads Display</div>
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show Bead Plate</span>
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Bead Plate</span>
                         <label for="cfg-show-bead" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-bead" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show Big Road</span>
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Big Road</span>
                         <label for="cfg-show-big" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-big" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Big Eye Boy</span>
+                        <label for="cfg-show-beb" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-beb" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Small Road</span>
+                        <label for="cfg-show-sr" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-sr" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Cockroach Pig</span>
+                        <label for="cfg-show-cp" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-cp" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
@@ -473,6 +578,9 @@
             location: 'ALL',
             showBeadPlate: localStorage.getItem('bacc_showBeadPlate') !== 'false',
             showBigRoad: localStorage.getItem('bacc_showBigRoad') !== 'false',
+            showBEB: localStorage.getItem('bacc_showBEB') === 'true',
+            showSR: localStorage.getItem('bacc_showSR') === 'true',
+            showCP: localStorage.getItem('bacc_showCP') === 'true',
             trackPairs: localStorage.getItem('bacc_trackPairs') !== 'false',
             trackD7: localStorage.getItem('bacc_trackD7') !== 'false',
             trackP8: localStorage.getItem('bacc_trackP8') !== 'false'
@@ -666,15 +774,24 @@
             syncActiveSession();
         }
 
+        function getRealisticCardHTML(val, side) {
+            if (!val) return `<div class="bacc-card empty"></div>`;
+            const isRed = ['3','5','7','9','J','K'].includes(val); // Arbitrary color assignment for visual flair
+            const colorClass = side === 'P' ? 'player-card' : 'banker-card';
+            const suitColor = isRed ? 'text-red-500' : 'text-slate-800';
+            return `
+                <div class="bacc-card ${colorClass}">
+                    <div class="card-val-top">${val}</div>
+                    <div class="card-suit ${suitColor}"><i class="fa-solid fa-skull"></i></div>
+                    <div class="card-val-bot">${val}</div>
+                </div>
+            `;
+        }
+
         function updateInputUI() {
             for(let i=0; i<3; i++) {
-                let pSlot = document.getElementById(`slot-p-${i}`);
-                if (handState.player[i]) { pSlot.innerText = handState.player[i]; pSlot.classList.add('filled'); }
-                else { pSlot.innerText = ''; pSlot.classList.remove('filled'); }
-                
-                let bSlot = document.getElementById(`slot-b-${i}`);
-                if (handState.banker[i]) { bSlot.innerText = handState.banker[i]; bSlot.classList.add('filled'); }
-                else { bSlot.innerText = ''; bSlot.classList.remove('filled'); }
+                document.getElementById(`slot-p-${i}`).outerHTML = getRealisticCardHTML(handState.player[i], 'P').replace('class="bacc-card', `id="slot-p-${i}" class="bacc-card`);
+                document.getElementById(`slot-b-${i}`).outerHTML = getRealisticCardHTML(handState.banker[i], 'B').replace('class="bacc-card', `id="slot-b-${i}" class="bacc-card`);
             }
 
             let pTotal = getHandTotal(handState.player);
@@ -687,66 +804,100 @@
             else if (handState.step === 1) prompt.innerText = "ENTER PLAYER CARD 2";
             else if (handState.step === 2) prompt.innerText = "ENTER BANKER CARD 1";
             else if (handState.step === 3) prompt.innerText = "ENTER BANKER CARD 2";
-            else if (handState.step === 4) prompt.innerText = "ENTER PLAYER 3RD CARD";
-            else if (handState.step === 5) prompt.innerText = "ENTER BANKER 3RD CARD";
+            else if (handState.step === 4) prompt.innerText = "PLAYER: DRAW 3RD CARD";
+            else if (handState.step === 5) prompt.innerText = "BANKER: DRAW 3RD CARD";
         }
 
         // --- RENDERING ---
         function renderAll() {
-            renderHistoryBar();
             renderStats();
             renderRoads();
         }
 
-        function renderHistoryBar() {
-            const hb = document.getElementById('history-bar');
-            hb.innerHTML = '';
-            if (universalLog.length === 0) {
-                hb.innerHTML = '<div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST HAND...</div>';
-                return;
-            }
-
-            const frag = document.createDocumentFragment();
-            universalLog.forEach(r => {
-                const el = document.createElement('div');
-                if (r.Invalid_Roll) {
-                    el.className = 'hist-node node-Err';
-                    el.innerText = 'ERR';
-                } else {
-                    el.className = `hist-node node-${r.outcome}`;
-                    el.innerText = r.outcome;
-                    if (r.sideBets.includes('PP') || r.sideBets.includes('BP')) {
-                        let dots = '';
-                        if (r.sideBets.includes('PP')) dots += `<div class="absolute bottom-0 right-0 w-2 h-2 bg-blue-400 rounded-full border border-white"></div>`;
-                        if (r.sideBets.includes('BP')) dots += `<div class="absolute top-0 left-0 w-2 h-2 bg-red-400 rounded-full border border-white"></div>`;
-                        el.innerHTML += dots;
-                    }
-                }
-                frag.appendChild(el);
-            });
-            hb.appendChild(frag);
-            hb.scrollLeft = hb.scrollWidth;
-        }
-
         function renderStats() {
-            let p = 0, b = 0, t = 0, valid = 0;
+            let p = 0, b = 0, t = 0, pp = 0, bp = 0, nat = 0, valid = 0;
             universalLog.forEach(r => {
                 if (!r.Invalid_Roll) {
                     valid++;
                     if (r.outcome === 'P') p++;
                     else if (r.outcome === 'B') b++;
                     else if (r.outcome === 'T') t++;
+                    
+                    if (r.sideBets.includes('PP')) pp++;
+                    if (r.sideBets.includes('BP')) bp++;
+                    if (r.sideBets.includes('Nat')) nat++;
                 }
             });
             document.getElementById('stat-hands').innerText = valid;
             document.getElementById('stat-player').innerText = p;
             document.getElementById('stat-banker').innerText = b;
             document.getElementById('stat-tie').innerText = t;
+            document.getElementById('stat-pp').innerText = pp;
+            document.getElementById('stat-bp').innerText = bp;
+            document.getElementById('stat-nat').innerText = nat;
+        }
+
+        function placeLogicalIntoVisual(logicalCols, maxRows = 6) {
+            let matrix = [];
+            for(let i=0; i<200; i++) matrix.push(new Array(maxRows).fill(null));
+            
+            let startCol = 0;
+            logicalCols.forEach(col => {
+                while(matrix[startCol][0] !== null) startCol++;
+                
+                let currC = startCol;
+                let currR = 0;
+                let tailing = false;
+                
+                col.forEach((item, idx) => {
+                    if (idx === 0) {
+                        matrix[currC][currR] = item;
+                    } else {
+                        if (!tailing && currR + 1 < maxRows && matrix[currC][currR + 1] === null) {
+                            currR++;
+                        } else {
+                            tailing = true;
+                            currC++;
+                        }
+                        if (!matrix[currC]) matrix.push(new Array(maxRows).fill(null));
+                        matrix[currC][currR] = item;
+                    }
+                });
+            });
+            return matrix;
+        }
+
+        function getDerivedSequence(logicalBR, offset) {
+            let seq = [];
+            for (let c = 0; c < logicalBR.length; c++) {
+                for (let r = 0; r < logicalBR[c].length; r++) {
+                    if (c < offset) continue;
+                    if (c === offset && r === 0) continue;
+
+                    let color = 'B';
+                    if (r === 0) {
+                        let len1 = logicalBR[c - 1].length;
+                        let len2 = logicalBR[c - (offset + 1)].length;
+                        if (len1 === len2) color = 'R';
+                    } else {
+                        let cellExists = logicalBR[c - offset].length > r;
+                        let cellAboveExists = logicalBR[c - offset].length > (r - 1);
+                        if (cellExists) color = 'R';
+                        else if (cellAboveExists) color = 'B';
+                        else color = 'R';
+                    }
+                    seq.push(color);
+                }
+            }
+            return seq;
         }
 
         function renderRoads() {
             document.getElementById('panel-bead-plate').style.display = globalConfig.showBeadPlate ? 'flex' : 'none';
             document.getElementById('panel-big-road').style.display = globalConfig.showBigRoad ? 'flex' : 'none';
+            document.getElementById('panel-big-eye-boy').style.display = globalConfig.showBEB ? 'flex' : 'none';
+            document.getElementById('panel-small-road').style.display = globalConfig.showSR ? 'flex' : 'none';
+            document.getElementById('panel-cockroach-pig').style.display = globalConfig.showCP ? 'flex' : 'none';
 
             let validHands = universalLog.filter(r => !r.Invalid_Roll);
 
@@ -764,88 +915,46 @@
             });
             document.getElementById('wrap-bead-plate').scrollLeft = document.getElementById('wrap-bead-plate').scrollWidth;
 
-            // Big Road
-            const brGrid = document.getElementById('grid-big-road');
-            brGrid.innerHTML = '';
+            // Logical Big Road Generation
+            let logicalBR = [];
+            let lastMain = null;
+            let preTies = 0;
             
-            let matrix = []; // matrix[col][row]
-            for(let i=0; i<100; i++) matrix.push(new Array(6).fill(null));
-
-            let currentCol = 0;
-            let currentRow = 0;
-            let lastMainOutcome = null;
-            let tieCount = 0;
-
             validHands.forEach(h => {
                 if (h.outcome === 'T') {
-                    if (lastMainOutcome === null) {
-                        // First hand is a tie
-                        if (!matrix[0][0]) matrix[0][0] = { outcome: 'T', ties: 1, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                        else matrix[0][0].ties++;
+                    if (logicalBR.length === 0) {
+                        preTies++;
                     } else {
-                        // Add tie to the last placed item
-                        let targetCol = currentCol;
-                        let targetRow = currentRow > 0 ? currentRow - 1 : 0;
-                        // Find the actual last placed item in this streak (handling dragon tails)
-                        // For simplicity in this beta, we just attach it to the last recorded cell
-                        let found = false;
-                        for(let c = currentCol; c >= 0; c--) {
-                            for(let r = 5; r >= 0; r--) {
-                                if (matrix[c][r] && matrix[c][r].outcome === lastMainOutcome) {
-                                    matrix[c][r].ties = (matrix[c][r].ties || 0) + 1;
-                                    if (h.sideBets.includes('PP')) matrix[c][r].pp = true;
-                                    if (h.sideBets.includes('BP')) matrix[c][r].bp = true;
-                                    found = true; break;
-                                }
-                            }
-                            if(found) break;
-                        }
+                        let lastCol = logicalBR[logicalBR.length - 1];
+                        let lastItem = lastCol[lastCol.length - 1];
+                        lastItem.ties = (lastItem.ties || 0) + 1;
+                        if (h.sideBets.includes('PP')) lastItem.pp = true;
+                        if (h.sideBets.includes('BP')) lastItem.bp = true;
                     }
                 } else {
-                    if (lastMainOutcome === null) {
-                        lastMainOutcome = h.outcome;
-                        if (matrix[0][0] && matrix[0][0].outcome === 'T') {
-                            matrix[0][0].outcome = h.outcome;
-                            if (h.sideBets.includes('PP')) matrix[0][0].pp = true;
-                            if (h.sideBets.includes('BP')) matrix[0][0].bp = true;
-                        } else {
-                            matrix[0][0] = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                        }
-                        currentRow = 1;
-                    } else if (h.outcome === lastMainOutcome) {
-                        // Same outcome, go down or right (dragon tail)
-                        if (currentRow < 6 && !matrix[currentCol][currentRow]) {
-                            matrix[currentCol][currentRow] = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                            currentRow++;
-                        } else {
-                            // Dragon tail: move right
-                            currentCol++;
-                            matrix[currentCol][currentRow - 1] = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                        }
+                    let item = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
+                    if (logicalBR.length === 0 && preTies > 0) {
+                        item.ties = preTies;
+                    }
+                    
+                    if (h.outcome !== lastMain) {
+                        logicalBR.push([item]);
+                        lastMain = h.outcome;
                     } else {
-                        // Different outcome, new column
-                        lastMainOutcome = h.outcome;
-                        // Find next empty column at row 0
-                        let nextCol = 0;
-                        while(matrix[nextCol][0] !== null) nextCol++;
-                        currentCol = nextCol;
-                        currentRow = 0;
-                        matrix[currentCol][currentRow] = { outcome: h.outcome, ties: 0, pp: h.sideBets.includes('PP'), bp: h.sideBets.includes('BP') };
-                        currentRow++;
+                        logicalBR[logicalBR.length - 1].push(item);
                     }
                 }
             });
 
-            // Render Matrix
-            let maxCol = 30; // Minimum columns to show
-            for(let c=0; c<matrix.length; c++) {
-                if (matrix[c][0] !== null) maxCol = Math.max(maxCol, c + 2);
-            }
+            // Big Road Visual
+            let brMatrix = placeLogicalIntoVisual(logicalBR);
+            let maxColBR = 30;
+            for(let c=0; c<brMatrix.length; c++) if (brMatrix[c][0] !== null) maxColBR = Math.max(maxColBR, c + 2);
 
             let brHtml = '';
             for(let r=0; r<6; r++) {
-                for(let c=0; c<maxCol; c++) {
-                    let cell = matrix[c][r];
+                for(let c=0; c<maxColBR; c++) {
+                    let cell = brMatrix[c][r];
                     if (cell) {
                         let inner = `<div class="br-circle br-${cell.outcome}">`;
                         if (cell.ties > 0) {
@@ -861,8 +970,39 @@
                     }
                 }
             }
-            brGrid.innerHTML = brHtml;
+            document.getElementById('grid-big-road').innerHTML = brHtml;
             document.getElementById('wrap-big-road').scrollLeft = document.getElementById('wrap-big-road').scrollWidth;
+
+            // Derived Roads Helper
+            const renderDerived = (offset, gridId, wrapId, cellClass) => {
+                let seq = getDerivedSequence(logicalBR, offset);
+                let logicalDerived = [];
+                let lastColor = null;
+                seq.forEach(color => {
+                    if (color !== lastColor) { logicalDerived.push([color]); lastColor = color; } 
+                    else { logicalDerived[logicalDerived.length - 1].push(color); }
+                });
+                
+                let matrix = placeLogicalIntoVisual(logicalDerived);
+                let maxCol = 40;
+                for(let c=0; c<matrix.length; c++) if (matrix[c][0] !== null) maxCol = Math.max(maxCol, c + 2);
+
+                let html = '';
+                for(let r=0; r<6; r++) {
+                    for(let c=0; c<maxCol; c++) {
+                        let color = matrix[c][r];
+                        if (color) {
+                            html += `<div class="dr-cell" style="grid-row: ${r+1}; grid-column: ${c+1};"><div class="${cellClass} dr-${color}"></div></div>`;
+                        }
+                    }
+                }
+                document.getElementById(gridId).innerHTML = html;
+                document.getElementById(wrapId).scrollLeft = document.getElementById(wrapId).scrollWidth;
+            };
+
+            if (globalConfig.showBEB) renderDerived(1, 'grid-big-eye-boy', 'wrap-big-eye-boy', 'dr-beb');
+            if (globalConfig.showSR) renderDerived(2, 'grid-small-road', 'wrap-small-road', 'dr-sr');
+            if (globalConfig.showCP) renderDerived(3, 'grid-cockroach-pig', 'wrap-cockroach-pig', 'dr-cp');
         }
 
         // --- MODALS & CONFIG ---
@@ -870,6 +1010,9 @@
             document.getElementById('cfg-loc').value = globalConfig.location;
             document.getElementById('cfg-show-bead').checked = globalConfig.showBeadPlate;
             document.getElementById('cfg-show-big').checked = globalConfig.showBigRoad;
+            document.getElementById('cfg-show-beb').checked = globalConfig.showBEB;
+            document.getElementById('cfg-show-sr').checked = globalConfig.showSR;
+            document.getElementById('cfg-show-cp').checked = globalConfig.showCP;
             document.getElementById('cfg-track-pairs').checked = globalConfig.trackPairs;
             document.getElementById('cfg-track-d7').checked = globalConfig.trackD7;
             document.getElementById('cfg-track-p8').checked = globalConfig.trackP8;
@@ -880,12 +1023,18 @@
             globalConfig.location = document.getElementById('cfg-loc').value;
             globalConfig.showBeadPlate = document.getElementById('cfg-show-bead').checked;
             globalConfig.showBigRoad = document.getElementById('cfg-show-big').checked;
+            globalConfig.showBEB = document.getElementById('cfg-show-beb').checked;
+            globalConfig.showSR = document.getElementById('cfg-show-sr').checked;
+            globalConfig.showCP = document.getElementById('cfg-show-cp').checked;
             globalConfig.trackPairs = document.getElementById('cfg-track-pairs').checked;
             globalConfig.trackD7 = document.getElementById('cfg-track-d7').checked;
             globalConfig.trackP8 = document.getElementById('cfg-track-p8').checked;
             
             localStorage.setItem('bacc_showBeadPlate', globalConfig.showBeadPlate);
             localStorage.setItem('bacc_showBigRoad', globalConfig.showBigRoad);
+            localStorage.setItem('bacc_showBEB', globalConfig.showBEB);
+            localStorage.setItem('bacc_showSR', globalConfig.showSR);
+            localStorage.setItem('bacc_showCP', globalConfig.showCP);
             localStorage.setItem('bacc_trackPairs', globalConfig.trackPairs);
             localStorage.setItem('bacc_trackD7', globalConfig.trackD7);
             localStorage.setItem('bacc_trackP8', globalConfig.trackP8);
