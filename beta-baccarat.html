@@ -99,16 +99,16 @@
         .hand-side { display: flex; flex-direction: column; align-items: center; width: 45%; }
         .hand-title { font-size: 12px; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
         .hand-title.p { color: #60a5fa; } .hand-title.b { color: #f87171; }
-        .card-slots { display: flex; gap: 6px; height: 90px; justify-content: center; align-items: center; transition: all 0.2s ease; }
+        .card-slots { display: flex; gap: 4px; height: 70px; justify-content: center; align-items: center; transition: all 0.2s ease; }
         
         /* REALISTIC CARDS */
         .bacc-card {
-            width: 60px; height: 85px; background-color: #0f172a; border-radius: 6px;
+            width: 44px; height: 64px; background-color: #0f172a; border-radius: 4px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.6), inset 0 0 2px rgba(255,255,255,0.2);
             background-size: cover; background-position: center; background-repeat: no-repeat;
             border: 1px solid #334155; transition: all 0.2s ease;
         }
-        .bacc-card.rotated { transform: rotate(90deg); margin: 0 12px; }
+        .bacc-card.rotated { transform: rotate(90deg); margin: 0 8px; }
         .bacc-card.empty { background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png?v=2'); }
         .bacc-card.prompt { background-image: url('https://zomb13lord.github.io/zombielords-playhouse/baccarat-cardb.png?v=2'); box-shadow: 0 0 15px rgba(251,191,36,0.8); border-color: #fbbf24; animation: pulse 1.5s infinite; }
         .bacc-card.hidden-card { visibility: hidden; }
@@ -156,7 +156,7 @@
             width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-weight: 900; font-size: 26px; line-height: 1; color: #fff; position: relative; 
             box-shadow: inset 0 2px 4px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            box-sizing: border-box; padding-top: 2px;
         }
         .bp-natural {
             border: 2px solid #fbbf24;
@@ -226,7 +226,7 @@
         .input-card-btn {
             background-color: #0f172a; border-radius: 6px;
             box-shadow: inset 0 -4px 0 rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.6);
-            height: 60px; border: 1px solid #334155;
+            width: 100%; height: auto; aspect-ratio: 2 / 3; border: 1px solid #334155;
             background-size: cover; background-position: center; background-repeat: no-repeat;
             transition: all 0.1s ease; cursor: pointer;
         }
@@ -360,20 +360,28 @@
 
     <div class="road-container">
         
-        <div class="flex flex-row gap-4 w-full" id="panel-ask-bead">
-            <div class="road-panel flex flex-col justify-around p-2 bg-slate-900/80 w-16 flex-shrink-0" id="panel-predictor">
-                <div class="flex flex-col items-center gap-2 py-2">
-                    <div class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-xs shadow-md border border-blue-400">P</div>
-                    <div class="pred-icon"><div id="pred-p-beb" class="pred-beb pred-empty"></div></div>
-                    <div class="pred-icon"><div id="pred-p-sr" class="pred-sr pred-empty"></div></div>
-                    <div class="pred-icon"><div id="pred-p-cp" class="pred-cp pred-empty"></div></div>
+        <div class="flex flex-row gap-4 w-full items-start" id="panel-ask-bead">
+            <div class="road-panel flex flex-col p-0 bg-slate-900/80 flex-shrink-0" id="panel-predictor" style="min-width: 140px;">
+                <div class="flex flex-row justify-around p-2 border-b border-slate-700/50">
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-[22px] shadow-md border-2 border-blue-400 leading-none pt-0.5">P</div>
+                        <div class="pred-icon"><div id="pred-p-beb" class="pred-beb pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-p-sr" class="pred-sr pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-p-cp" class="pred-cp pred-empty"></div></div>
+                    </div>
+                    <div class="w-px bg-slate-700"></div>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-black text-[22px] shadow-md border-2 border-red-400 leading-none pt-0.5">B</div>
+                        <div class="pred-icon"><div id="pred-b-beb" class="pred-beb pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-b-sr" class="pred-sr pred-empty"></div></div>
+                        <div class="pred-icon"><div id="pred-b-cp" class="pred-cp pred-empty"></div></div>
+                    </div>
                 </div>
-                <div class="w-full h-px bg-slate-700"></div>
-                <div class="flex flex-col items-center gap-2 py-2">
-                    <div class="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center font-black text-xs shadow-md border border-red-400">B</div>
-                    <div class="pred-icon"><div id="pred-b-beb" class="pred-beb pred-empty"></div></div>
-                    <div class="pred-icon"><div id="pred-b-sr" class="pred-sr pred-empty"></div></div>
-                    <div class="pred-icon"><div id="pred-b-cp" class="pred-cp pred-empty"></div></div>
+                <div class="flex flex-col items-center p-2 bg-slate-950/50">
+                    <div class="text-[8px] text-slate-400 font-black tracking-widest uppercase mb-1">System Target</div>
+                    <div id="bet-target-chip" class="w-8 h-8 rounded-full bg-slate-700 text-white flex items-center justify-center font-black text-[22px] shadow-[0_0_10px_rgba(0,0,0,0.8)] border-2 border-slate-500 leading-none pt-0.5 mb-1">-</div>
+                    <div class="text-[9px] font-bold text-slate-300">STEP <span id="bet-step" class="text-white">1</span></div>
+                    <div class="text-[9px] font-bold text-slate-400 mt-1">W: <span id="bet-wins" class="text-emerald-400">0</span> | L: <span id="bet-losses" class="text-red-400">0</span></div>
                 </div>
             </div>
 
@@ -887,6 +895,7 @@
         function renderAll() {
             renderStats();
             renderRoads();
+            renderBetIndicator();
         }
 
         function renderStats() {
@@ -1143,6 +1152,43 @@
             document.getElementById('pred-b-beb').className = `pred-beb ${bPredict.beb ? 'pred-'+bPredict.beb : 'pred-empty'}`;
             document.getElementById('pred-b-sr').className = `pred-sr ${bPredict.sr ? 'pred-'+bPredict.sr : 'pred-empty'}`;
             document.getElementById('pred-b-cp').className = `pred-cp ${bPredict.cp ? 'pred-'+bPredict.cp : 'pred-empty'}`;
+        }
+
+        function renderBetIndicator() {
+            const pattern = ['P', 'P', 'B', 'P', 'B', 'B'];
+            let step = 0;
+            let wins = 0;
+            let losses = 0;
+
+            let validHands = universalLog.filter(r => !r.Invalid_Roll);
+            
+            validHands.forEach(h => {
+                if (h.outcome === 'T') return; // Ignore ties
+                
+                let target = pattern[step];
+                if (h.outcome === target) {
+                    wins++;
+                    step = 0; // Reset on win
+                } else {
+                    losses++;
+                    step = (step + 1) % pattern.length; // Advance on loss
+                }
+            });
+
+            let currentTarget = pattern[step];
+            let chipEl = document.getElementById('bet-target-chip');
+            
+            if (currentTarget === 'P') {
+                chipEl.className = "w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-black text-[22px] shadow-[0_0_15px_rgba(37,99,235,0.6)] border-2 border-blue-400 leading-none pt-0.5 mb-1";
+                chipEl.innerText = "P";
+            } else {
+                chipEl.className = "w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center font-black text-[22px] shadow-[0_0_15px_rgba(220,38,38,0.6)] border-2 border-red-400 leading-none pt-0.5 mb-1";
+                chipEl.innerText = "B";
+            }
+
+            document.getElementById('bet-step').innerText = step + 1;
+            document.getElementById('bet-wins').innerText = wins;
+            document.getElementById('bet-losses').innerText = losses;
         }
 
         // --- MODALS & CONFIG ---
