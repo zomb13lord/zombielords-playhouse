@@ -1051,6 +1051,19 @@
             return '👤 ';
         }
 
+        function isPositionMatch(rollPos, targetParent, targetChild) {
+            if (targetParent === 'All' && targetChild === 'All') return true;
+            let validChildren = [];
+            if (targetChild === 'All') {
+                validChildren = POS_MAP[targetParent] || [];
+            } else if (POS_MAP[targetChild]) {
+                validChildren = POS_MAP[targetChild];
+            } else {
+                validChildren = [targetChild];
+            }
+            return validChildren.includes(rollPos);
+        }
+
         async function fetchMasterData() {
             try {
                 const [lSnap, sSnap, dSnap] = await Promise.all([
@@ -1294,15 +1307,7 @@
                 let targetPosParent = globalConfig.sddPositionParent || 'All';
                 let targetPosChild = globalConfig.sddPositionChild || 'All';
                 
-                let validChildren;
-                if (targetPosChild === 'All') {
-                    validChildren = POS_MAP[targetPosParent] || ['All'];
-                    posLabel = targetPosParent.toUpperCase() + " POSITIONS";
-                    if (targetPosParent === 'All') posLabel = "ALL POSITIONS";
-                } else {
-                    validChildren = [targetPosChild];
-                    posLabel = targetPosChild.toUpperCase();
-                }
+                posLabel = targetPosChild === 'All' ? (targetPosParent === 'All' ? "ALL POSITIONS" : targetPosParent.toUpperCase() + " POSITIONS") : targetPosChild.toUpperCase();
 
                 let targetSet = globalConfig.sddDiceSet;
                 if (targetSet === 'ALL') setLabel = "ALL SETS";
@@ -1310,7 +1315,7 @@
 
                 sLog = universalLog.filter(r => {
                     let isShooterMatch = (r.Shooter_ID === activeSddShooter || r.Shooter_ID === sId);
-                    let isPosMatch = validChildren.includes(r.Table_Position);
+                    let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
                     let isSetMatch = (targetSet === 'ALL' || r.Dice_Set === targetSet);
                     return isShooterMatch && isPosMatch && isSetMatch;
                 });
@@ -1519,15 +1524,14 @@
             let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
             let sId = sObj ? sObj.id : globalConfig.shooter;
             
-            let targetPos = globalConfig.positionChild;
-            let validChildren = POS_MAP[targetPos] || [targetPos];
+            let targetPosParent = globalConfig.positionParent || 'All';
+            let targetPosChild = globalConfig.positionChild || 'All';
 
             let shooterRolls = validRolls.filter(r => {
                 if (globalConfig.shooter === 'ALL') return true;
                 let isShooterMatch = (r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
                 if (!isShooterMatch) return false;
-                if (targetPos === 'All') return true;
-                return validChildren.includes(r.Table_Position);
+                return isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
             });
 
             let kinematicRolls = globalConfig.kinematicSource === 'Shooter' ? shooterRolls : validRolls;
@@ -1548,7 +1552,7 @@
                     glbCount++;
                     
                     let isShooterMatch = (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
-                    let isPosMatch = (targetPos === 'All' || validChildren.includes(r.Table_Position));
+                    let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
                     if (isShooterMatch && isPosMatch) shtrCount++;
                     
                     if (i > lastSevenOutIdx) hndCount++;
@@ -1616,15 +1620,14 @@
             
             let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
             let sId = sObj ? sObj.id : globalConfig.shooter;
-            let targetPos = globalConfig.positionChild;
-            let validChildren = POS_MAP[targetPos] || [targetPos];
+            let targetPosParent = globalConfig.positionParent || 'All';
+            let targetPosChild = globalConfig.positionChild || 'All';
 
             let shooterRolls = validRolls.filter(r => {
                 if (globalConfig.shooter === 'ALL') return true;
                 let isShooterMatch = (r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
                 if (!isShooterMatch) return false;
-                if (targetPos === 'All') return true;
-                return validChildren.includes(r.Table_Position);
+                return isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
             });
 
             let kinematicRolls = globalConfig.kinematicSource === 'Shooter' ? shooterRolls : validRolls;
@@ -1658,7 +1661,7 @@
                 counts.GLB[sum]++;
                 
                 let isShooterMatch = (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
-                let isPosMatch = (targetPos === 'All' || validChildren.includes(r.Table_Position));
+                let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
                 if (isShooterMatch && isPosMatch) {
                     counts.SHTR[sum]++;
                 }
@@ -1673,11 +1676,17 @@
             const pushIndicator = (outcomeNum, centerHtml, fires, flakes) => {
                 let hHtml = fires > 0 ? '🔥'.repeat(fires) : '';
                 let cHtml = flakes > 0 ? '❄️'.repeat(flakes) : '';
+                
+                let bgClass = 'bg-slate-800/90';
+                if (fires > 0 && flakes === 0) bgClass = 'bg-gradient-to-r from-slate-800 to-red-900/80';
+                else if (flakes > 0 && fires === 0) bgClass = 'bg-gradient-to-r from-blue-900/80 to-slate-800';
+                else if (fires > 0 && flakes > 0) bgClass = 'bg-gradient-to-r from-blue-900/60 via-slate-800 to-red-900/60';
+
                 kinIndicators[outcomeNum].push(`
-                    <div class="flex justify-between items-center w-full px-1.5 py-1 mt-1 bg-slate-800/90 rounded shadow-inner border border-slate-700/50">
-                        <div class="text-[11px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
-                        <div class="text-[10px] font-black text-slate-200 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                        <div class="text-[11px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
+                    <div class="flex justify-between items-center w-full px-1 py-0.5 mt-1 ${bgClass} rounded shadow-inner border border-slate-700/50">
+                        <div class="text-[9px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
+                        <div class="text-[8px] font-black text-slate-200 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                        <div class="text-[9px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
                     </div>
                 `);
             };
@@ -1689,19 +1698,28 @@
                     let lastSum = lastR.Corrected_Point || lastR.Total_Sum;
                     let lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
                     
-                    let kinDataAll = getKinematicData(lastSum, kinematicRolls, globalConfig.kinematicRange, 'after');
-                    kinDataAll.hot.forEach(h => pushIndicator(h.num, 'LAST (ALL)', h.fires, 0));
-                    kinDataAll.cold.forEach(c => pushIndicator(c.num, 'LAST (ALL)', 0, c.flakes));
-                    
+                    let topHotStr = '--';
+                    let topColdStr = '--';
+
                     if (String(globalConfig.kinLastCombo) === 'true') {
                         let kinDataSet = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
-                        kinDataSet.hot.forEach(h => pushIndicator(h.num, `LAST (${lastSetStr})`, h.fires, 0));
-                        kinDataSet.cold.forEach(c => pushIndicator(c.num, `LAST (${lastSetStr})`, 0, c.flakes));
+                        if (kinDataSet.total > 0) {
+                            kinDataSet.hot.forEach(h => pushIndicator(h.num, `LAST (${lastSetStr})`, h.fires, 0));
+                            kinDataSet.cold.forEach(c => pushIndicator(c.num, `LAST (${lastSetStr})`, 0, c.flakes));
+                            if (kinDataSet.hot.length > 0) topHotStr = kinDataSet.hot[0].num;
+                            if (kinDataSet.cold.length > 0) topColdStr = kinDataSet.cold[0].num;
+                        }
+                    } else {
+                        let kinDataAll = getKinematicData(lastSum, kinematicRolls, globalConfig.kinematicRange, 'after');
+                        if (kinDataAll.total > 0) {
+                            kinDataAll.hot.forEach(h => pushIndicator(h.num, 'LAST (ALL)', h.fires, 0));
+                            kinDataAll.cold.forEach(c => pushIndicator(c.num, 'LAST (ALL)', 0, c.flakes));
+                            if (kinDataAll.hot.length > 0) topHotStr = kinDataAll.hot[0].num;
+                            if (kinDataAll.cold.length > 0) topColdStr = kinDataAll.cold[0].num;
+                        }
                     }
                     
                     let [ld1, ld2] = lastSetStr.split('-');
-                    let topHotStr = kinDataAll.hot.length > 0 ? kinDataAll.hot[0].num : '--';
-                    let topColdStr = kinDataAll.cold.length > 0 ? kinDataAll.cold[0].num : '--';
                     
                     nidHeader.innerHTML = `
                         <div class="flex items-center gap-2">
@@ -1717,21 +1735,26 @@
                     nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
                 }
 
-                if (String(globalConfig.kinAfterInvalid) === 'true') {
-                    let afterInvOccurrences = [];
-                    for(let i=0; i<universalLog.length - 1; i++) {
-                        if (universalLog[i].Invalid_Roll || universalLog[i].invalidRoll) {
-                            for(let j=i+1; j<universalLog.length; j++) {
-                                if (!universalLog[j].Invalid_Roll && !universalLog[j].invalidRoll && !universalLog[j].is_NS_Marker) {
-                                    afterInvOccurrences.push(universalLog[j].Corrected_Point || universalLog[j].Total_Sum);
-                                    break;
+                if (String(globalConfig.kinAfterInvalid) === 'true' && universalLog.length > 0) {
+                    let veryLastRoll = universalLog[universalLog.length - 1];
+                    if (veryLastRoll.Invalid_Roll || veryLastRoll.invalidRoll) {
+                        let afterInvOccurrences = [];
+                        for(let i=0; i<universalLog.length - 1; i++) {
+                            if (universalLog[i].Invalid_Roll || universalLog[i].invalidRoll) {
+                                for(let j=i+1; j<universalLog.length; j++) {
+                                    if (!universalLog[j].Invalid_Roll && !universalLog[j].invalidRoll && !universalLog[j].is_NS_Marker) {
+                                        afterInvOccurrences.push(universalLog[j].Corrected_Point || universalLog[j].Total_Sum);
+                                        break;
+                                    }
                                 }
                             }
                         }
+                        let kInv = calculateHotColdFromOutcomes(afterInvOccurrences, globalConfig.kinematicRange);
+                        if (kInv.total > 0) {
+                            kInv.hot.forEach(h => pushIndicator(h.num, 'AFTER INVALID', h.fires, 0));
+                            kInv.cold.forEach(c => pushIndicator(c.num, 'AFTER INVALID', 0, c.flakes));
+                        }
                     }
-                    let kInv = calculateHotColdFromOutcomes(afterInvOccurrences, globalConfig.kinematicRange);
-                    kInv.hot.forEach(h => pushIndicator(h.num, 'AFTER INVALID', h.fires, 0));
-                    kInv.cold.forEach(c => pushIndicator(c.num, 'AFTER INVALID', 0, c.flakes));
                 }
 
                 const layTargets = [
@@ -1747,7 +1770,7 @@
                     if(target.active) {
                         let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange, 'after');
                         if (kAll.total > 0) {
-                            let cAllHtml = `NO <span class="text-white">${target.num}</span> ALL`;
+                            let cAllHtml = `<span class="text-white">${target.num}</span> ALL`;
                             kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
                             kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
                         }
