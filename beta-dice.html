@@ -634,7 +634,7 @@
                             </label>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">Master Kinematics</span>
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematics</span>
                             <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
                                 <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
                                 <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
@@ -1683,15 +1683,32 @@
                 let cHtml = flakes > 0 ? '❄️'.repeat(flakes) : '';
                 
                 let bgClass = 'bg-slate-800/90';
-                if (fires > 0 && flakes === 0) bgClass = 'bg-gradient-to-r from-slate-800 to-red-900/80';
-                else if (flakes > 0 && fires === 0) bgClass = 'bg-gradient-to-r from-blue-900/80 to-slate-800';
-                else if (fires > 0 && flakes > 0) bgClass = 'bg-gradient-to-r from-blue-900/60 via-slate-800 to-red-900/60';
+                let contentHtml = '';
+
+                if (fires > 0 && flakes === 0) {
+                    bgClass = 'bg-gradient-to-r from-slate-800 to-red-900/80';
+                    contentHtml = `
+                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                        <div class="text-[10px] text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
+                    `;
+                } else if (flakes > 0 && fires === 0) {
+                    bgClass = 'bg-gradient-to-r from-blue-900/80 to-slate-800';
+                    contentHtml = `
+                        <div class="text-[10px] text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
+                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                    `;
+                } else if (fires > 0 && flakes > 0) {
+                    bgClass = 'bg-gradient-to-r from-blue-900/60 via-slate-800 to-red-900/60';
+                    contentHtml = `
+                        <div class="text-[10px] text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
+                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                        <div class="text-[10px] text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
+                    `;
+                }
 
                 kinIndicators[outcomeNum].push(`
-                    <div class="flex justify-between items-center w-full px-1 py-0.5 mt-1 ${bgClass} rounded shadow-inner border border-slate-700/50">
-                        <div class="text-[9px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
-                        <div class="text-[8px] font-black text-slate-200 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                        <div class="text-[9px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
+                    <div class="flex justify-between items-center w-full px-1.5 py-1 mt-1 ${bgClass} rounded shadow-inner border border-slate-700/50">
+                        ${contentHtml}
                     </div>
                 `);
             };
@@ -1709,16 +1726,19 @@
                     if (String(globalConfig.kinLastCombo) === 'true') {
                         let kinDataSet = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
                         if (kinDataSet.total > 0) {
-                            kinDataSet.hot.forEach(h => pushIndicator(h.num, `LAST (${lastSetStr})`, h.fires, 0));
-                            kinDataSet.cold.forEach(c => pushIndicator(c.num, `LAST (${lastSetStr})`, 0, c.flakes));
+                            let [ld1, ld2] = lastSetStr.split('-');
+                            let diceHtml = `<div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div> LAST`;
+                            kinDataSet.hot.forEach(h => pushIndicator(h.num, diceHtml, h.fires, 0));
+                            kinDataSet.cold.forEach(c => pushIndicator(c.num, diceHtml, 0, c.flakes));
                             if (kinDataSet.hot.length > 0) topHotStr = kinDataSet.hot[0].num;
                             if (kinDataSet.cold.length > 0) topColdStr = kinDataSet.cold[0].num;
                         }
                     } else {
                         let kinDataAll = getKinematicData(lastSum, kinematicRolls, globalConfig.kinematicRange, 'after');
                         if (kinDataAll.total > 0) {
-                            kinDataAll.hot.forEach(h => pushIndicator(h.num, 'LAST (ALL)', h.fires, 0));
-                            kinDataAll.cold.forEach(c => pushIndicator(c.num, 'LAST (ALL)', 0, c.flakes));
+                            let sumHtml = `<span class="text-white">${lastSum}</span> LAST`;
+                            kinDataAll.hot.forEach(h => pushIndicator(h.num, sumHtml, h.fires, 0));
+                            kinDataAll.cold.forEach(c => pushIndicator(c.num, sumHtml, 0, c.flakes));
                             if (kinDataAll.hot.length > 0) topHotStr = kinDataAll.hot[0].num;
                             if (kinDataAll.cold.length > 0) topColdStr = kinDataAll.cold[0].num;
                         }
@@ -1767,12 +1787,12 @@
                     if (val.includes('_ALL')) {
                         num = parseInt(val.split('_')[0]);
                         target = num;
-                        cAllHtml = `<span class="text-white">${num}</span> ALL`;
+                        cAllHtml = `LAY <span class="text-white">${num}</span>`;
                     } else {
                         let [d1, d2] = val.split('-');
                         num = parseInt(d1) + parseInt(d2);
                         target = val;
-                        cAllHtml = `<span class="text-white">${num}</span> (${val})`;
+                        cAllHtml = `LAY <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
                     }
                     
                     let kAll = getKinematicData(target, kinematicRolls, globalConfig.kinematicRange, 'after');
