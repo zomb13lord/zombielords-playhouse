@@ -74,6 +74,7 @@
         .sdd-sor { border-top-color: #f59e0b; background: linear-gradient(to bottom, #171003, #020617); }
         .sdd-srr { border-top-color: #10b981; background: linear-gradient(to bottom, #02120a, #020617); }
         .sdd-psr { border-top-color: #8b5cf6; background: linear-gradient(to bottom, #10051a, #020617); }
+        .sdd-pso { border-top-color: #06b6d4; background: linear-gradient(to bottom, #041a24, #020617); }
         .sdd-ats { border-top-color: #d946ef; background: linear-gradient(to bottom, #1a0516, #020617); }
         .sdd-shtr { border-top-color: #f59e0b; background: linear-gradient(to bottom, rgba(120,53,15,0.4), rgba(2,6,23,1)); }
 
@@ -238,10 +239,9 @@
         @media (min-width: 1024px) {
             #sdd-container {
                 position: sticky;
-                top: 240px; /* Overridden by JS dynamically */
+                top: 240px;
                 z-index: 40;
                 align-self: start;
-                transition: top 0.2s ease;
             }
         }
 
@@ -367,10 +367,11 @@
                 </div>
             </div>
             <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-header">OUTS</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="g-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="g-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val" id="g-so">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val" id="g-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val" id="g-co11">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-ts">0</span></div>
                 </div>
             </div>
@@ -379,6 +380,7 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-sor-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-sor-mean">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MAX</span><span class="sdd-val" id="g-sor-max">0</span><span class="text-[6px] text-slate-400 mt-0.5 leading-none tracking-tighter" id="g-sor-max-shtr">N/A</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-srr">
@@ -393,6 +395,14 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-psr-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-pso">
+                <div class="sdd-card-header">P.S.O.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val" id="g-pso">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="g-pso-r">1:0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val" id="g-pso2">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="g-pso2-r">1:0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val" id="g-pso3">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="g-pso3-r">1:0.0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-ats" id="g-ats-card">
@@ -420,10 +430,11 @@
                 </div>
             </div>
             <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-header">OUTS</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="s-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="s-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val" id="s-so">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val" id="s-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val" id="s-co11">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-ts">0</span></div>
                 </div>
             </div>
@@ -432,6 +443,7 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">MAX</span><span class="sdd-val" id="s-sor-max">0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-srr">
@@ -446,6 +458,14 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-pso">
+                <div class="sdd-card-header">P.S.O.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val" id="s-pso">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="s-pso-r">1:0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val" id="s-pso2">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="s-pso2-r">1:0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val" id="s-pso3">0</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold" id="s-pso3-r">1:0.0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-ats" id="s-ats-card">
@@ -593,125 +613,106 @@
     <div id="modal-config-global" class="modal-mask">
         <div class="modal-box border-blue-500">
             <div class="modal-content-layer">
-                <h2 class="text-lg font-black text-white uppercase tracking-widest mb-2 cinzel text-center">Global Configuration</h2>
-                
+                <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel text-center">Global Configuration</h2>
                 <div class="flex flex-col text-left">
                     
-                    <!-- GENERAL SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-2 tracking-widest">General</div>
                     <div class="cfg-row">
                         <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value, 'global')"></select></div>
                         <button onclick="editAsset('locations', 'cfg-loc', 'global')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('locations', 'cfg-loc', 'global')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    <div class="mb-2">
+
+                    <div class="mb-3">
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
-                        <div class="grid grid-cols-4 gap-3" id="color-grid"></div>
+                        <div class="grid grid-cols-4 gap-3" id="color-grid">
+                            <!-- Injected by JS -->
+                        </div>
                     </div>
 
-                    <!-- DISPLAY SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Display</div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
                         <label for="cfg-show-sdd" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-sdd" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
-                        <label for="cfg-show-nid" class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                        </label>
-                    </div>
-                    <div id="cfg-nid-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-700 mb-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">Show Seven</span>
-                            <label for="cfg-show-nid-seven" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="cfg-show-nid-seven" class="sr-only peer toggle-checkbox">
-                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                            </label>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematics</span>
-                            <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
-                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                            </label>
-                        </div>
-                        
-                        <!-- KINEMATICS SUB-SECTION -->
-                        <div id="cfg-kin-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-600 mt-1 mb-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
-                                <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="Global">Global</option>
-                                    <option value="Shooter">Shooter</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
-                                <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="ALL">All</option>
-                                    <option value="50">Last 50</option>
-                                    <option value="100">Last 100</option>
-                                    <option value="200">Last 200</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Display Limit</span>
-                                <select id="cfg-kinematic-limit" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="3">Top 3</option>
-                                    <option value="2">Top 2</option>
-                                    <option value="1">Top 1</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Track Last Roll</span>
-                                <label for="cfg-kin-last" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-last" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="flex justify-between items-center pl-4 border-l-2 border-slate-500" id="cfg-kin-last-combo-container">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Last Roll Combinations</span>
-                                <label for="cfg-kin-last-combo" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-last-combo" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Track After Invalid</span>
-                                <label for="cfg-kin-after-invalid" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-after-invalid" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers</div>
-                            <div id="cfg-lay-trackers-grid" class="flex flex-col gap-2 mt-1">
-                                <!-- Injected by JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BONUSES SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Bonuses</div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">ATS</span>
                         <label for="cfg-track-ats" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ats" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Sharpshooter</span>
                         <label for="cfg-track-ss" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ss" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
+                        <label for="cfg-show-nid" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3" id="cfg-nid-seven-container">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold pl-4 border-l-2 border-slate-700">Show Seven</span>
+                        <label for="cfg-show-nid-seven" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid-seven" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Master Kinematics</span>
+                        <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div id="cfg-kin-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-700 mt-2 mb-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
+                            <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="Global">Global</option>
+                                <option value="Shooter">Shooter</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
+                            <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="ALL">All</option>
+                                <option value="50">Last 50</option>
+                                <option value="100">Last 100</option>
+                                <option value="200">Last 200</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Display Limit</span>
+                            <select id="cfg-kinematic-limit" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="3">Top 3</option>
+                                <option value="2">Top 2</option>
+                                <option value="1">Top 1</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Track Last Roll</span>
+                            <label for="cfg-kin-last" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-last" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers (No X)</div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no4" class="accent-blue-500 w-3 h-3"> No 4</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no5" class="accent-blue-500 w-3 h-3"> No 5</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no6" class="accent-blue-500 w-3 h-3"> No 6</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no8" class="accent-blue-500 w-3 h-3"> No 8</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no9" class="accent-blue-500 w-3 h-3"> No 9</label>
+                            <label class="flex items-center gap-1.5 text-[10px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" id="cfg-kin-no10" class="accent-blue-500 w-3 h-3"> No 10</label>
+                        </div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
@@ -756,8 +757,8 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button id="btn-scfg-cancel" onclick="closeModals()" class="btn-cancel">Cancel</button>
-                    <button onclick="saveShooterConfig()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded col-span-2 md:col-span-1" style="grid-column: span 2;">Save</button>
+                    <button onclick="closeModals()" class="btn-cancel">Cancel</button>
+                    <button onclick="saveShooterConfig()" class="bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 hover:text-white py-3 text-xs font-black uppercase tracking-widest transition-all rounded">Save</button>
                 </div>
             </div>
         </div>
@@ -938,9 +939,6 @@
         let storedNidSeven = localStorage.getItem('cfg_showNidSeven');
         let storedKinEnabled = localStorage.getItem('cfg_kinematicEnabled');
         let storedKinLast = localStorage.getItem('cfg_kinLastRoll');
-        let storedKinLastCombo = localStorage.getItem('cfg_kinLastCombo');
-        let storedKinAfterInvalid = localStorage.getItem('cfg_kinAfterInvalid');
-        let storedLayTrackers = localStorage.getItem('cfg_layTrackers');
         
         let globalConfig = { 
             location: 'ALL', shooter: 'ALL', positionParent: 'All', positionChild: 'All', diceSet: 'ALL', diceColor: localStorage.getItem('cfg_diceColor') || 'ruby', 
@@ -951,9 +949,12 @@
             showNidSeven: storedNidSeven !== null ? storedNidSeven : 'true',
             kinematicEnabled: storedKinEnabled !== null ? storedKinEnabled : 'true',
             kinLastRoll: storedKinLast !== null ? storedKinLast : 'true',
-            kinLastCombo: storedKinLastCombo !== null ? storedKinLastCombo : 'false',
-            kinAfterInvalid: storedKinAfterInvalid !== null ? storedKinAfterInvalid : 'false',
-            layTrackers: storedLayTrackers ? JSON.parse(storedLayTrackers) : [],
+            kinNo4: localStorage.getItem('cfg_kinNo4') === 'true',
+            kinNo5: localStorage.getItem('cfg_kinNo5') === 'true',
+            kinNo6: localStorage.getItem('cfg_kinNo6') === 'true',
+            kinNo8: localStorage.getItem('cfg_kinNo8') === 'true',
+            kinNo9: localStorage.getItem('cfg_kinNo9') === 'true',
+            kinNo10: localStorage.getItem('cfg_kinNo10') === 'true',
             kinematicSource: localStorage.getItem('cfg_kinematicSource') || 'Global',
             kinematicRange: localStorage.getItem('cfg_kinematicRange') || 'ALL',
             kinematicLimit: localStorage.getItem('cfg_kinematicLimit') || '3',
@@ -993,7 +994,6 @@
             buildInputPad();
             buildCorrectionPad();
             buildColorGrid();
-            buildLayTrackersConfig();
             
             // Desktop Scroll Listener
             const hb = document.getElementById('history-bar');
@@ -1018,21 +1018,6 @@
                 });
             }
         });
-
-        function updateStickyNid() {
-            if (window.innerWidth >= 1024) {
-                const stickyZone = document.getElementById('sticky-zone');
-                const sddContainer = document.getElementById('sdd-container');
-                if (stickyZone && sddContainer) {
-                    const h = stickyZone.offsetHeight;
-                    sddContainer.style.top = h + 'px';
-                }
-            } else {
-                const sddContainer = document.getElementById('sdd-container');
-                if (sddContainer) sddContainer.style.top = '';
-            }
-        }
-        window.addEventListener('resize', updateStickyNid);
 
         const shooterTypeMap = { 'Master': 1, 'Favorite': 2, 'Standard': 3, 'Online': 4 };
         function sortShooters(arr) {
@@ -1060,19 +1045,6 @@
             if (type === 'Favorite') return '❤️ ';
             if (type === 'Online') return '🌐 ';
             return '👤 ';
-        }
-
-        function isPositionMatch(rollPos, targetParent, targetChild) {
-            if (targetParent === 'All' && targetChild === 'All') return true;
-            let validChildren = [];
-            if (targetChild === 'All') {
-                validChildren = POS_MAP[targetParent] || [];
-            } else if (POS_MAP[targetChild]) {
-                validChildren = POS_MAP[targetChild];
-            } else {
-                validChildren = [targetChild];
-            }
-            return validChildren.includes(rollPos);
         }
 
         async function fetchMasterData() {
@@ -1113,9 +1085,12 @@
                         if (data.meta_tags.show_nid_seven !== undefined) globalConfig.showNidSeven = String(data.meta_tags.show_nid_seven);
                         if (data.meta_tags.kinematic_enabled !== undefined) globalConfig.kinematicEnabled = String(data.meta_tags.kinematic_enabled);
                         if (data.meta_tags.kin_last_roll !== undefined) globalConfig.kinLastRoll = String(data.meta_tags.kin_last_roll);
-                        if (data.meta_tags.kin_last_combo !== undefined) globalConfig.kinLastCombo = String(data.meta_tags.kin_last_combo);
-                        if (data.meta_tags.kin_after_invalid !== undefined) globalConfig.kinAfterInvalid = String(data.meta_tags.kin_after_invalid);
-                        if (data.meta_tags.lay_trackers !== undefined) globalConfig.layTrackers = typeof data.meta_tags.lay_trackers === 'string' ? JSON.parse(data.meta_tags.lay_trackers) : data.meta_tags.lay_trackers;
+                        if (data.meta_tags.kin_no_4 !== undefined) globalConfig.kinNo4 = data.meta_tags.kin_no_4;
+                        if (data.meta_tags.kin_no_5 !== undefined) globalConfig.kinNo5 = data.meta_tags.kin_no_5;
+                        if (data.meta_tags.kin_no_6 !== undefined) globalConfig.kinNo6 = data.meta_tags.kin_no_6;
+                        if (data.meta_tags.kin_no_8 !== undefined) globalConfig.kinNo8 = data.meta_tags.kin_no_8;
+                        if (data.meta_tags.kin_no_9 !== undefined) globalConfig.kinNo9 = data.meta_tags.kin_no_9;
+                        if (data.meta_tags.kin_no_10 !== undefined) globalConfig.kinNo10 = data.meta_tags.kin_no_10;
                         if (data.meta_tags.kinematic_source !== undefined) globalConfig.kinematicSource = String(data.meta_tags.kinematic_source);
                         if (data.meta_tags.kinematic_range !== undefined) globalConfig.kinematicRange = String(data.meta_tags.kinematic_range);
                         if (data.meta_tags.kinematic_limit !== undefined) globalConfig.kinematicLimit = String(data.meta_tags.kinematic_limit);
@@ -1144,8 +1119,8 @@
                     show_shooter_sdd: globalConfig.showShooterSDD, track_ats: globalConfig.trackATS, track_sharpshooter: globalConfig.trackSharpshooter,
                     show_nid: globalConfig.showNID, show_nid_seven: globalConfig.showNidSeven, 
                     kinematic_enabled: globalConfig.kinematicEnabled, kin_last_roll: globalConfig.kinLastRoll,
-                    kin_last_combo: globalConfig.kinLastCombo, kin_after_invalid: globalConfig.kinAfterInvalid,
-                    lay_trackers: JSON.stringify(globalConfig.layTrackers),
+                    kin_no_4: globalConfig.kinNo4, kin_no_5: globalConfig.kinNo5, kin_no_6: globalConfig.kinNo6,
+                    kin_no_8: globalConfig.kinNo8, kin_no_9: globalConfig.kinNo9, kin_no_10: globalConfig.kinNo10,
                     kinematic_source: globalConfig.kinematicSource, kinematic_range: globalConfig.kinematicRange, kinematic_limit: globalConfig.kinematicLimit,
                     sdd_shooter: globalConfig.sddShooter, sdd_position_parent: globalConfig.sddPositionParent, sdd_position_child: globalConfig.sddPositionChild, sdd_dice_set: globalConfig.sddDiceSet,
                     base_unit: 1 
@@ -1178,16 +1153,38 @@
         }
 
         function calcStats(log) {
-            let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
+            let TR = 0, SO = 0, CS = 0, CO11 = 0, TotalPointsMade = 0;
             let handRolls = [], handPoints = [], srrRolls = [];
             let currentHandRolls = 0, currentHandPoints = 0, currentSrrRolls = 0;
             let isComeout = true, currentPoint = null;
             let atsS = 0, atsT = 0, atsA = 0;
+            
+            let maxRolls = 0;
+            let maxShooter = "N/A";
+            let currentShooter = "N/A";
+
+            let pso = 0, pso2 = 0, pso3 = 0;
+            let currentBoxCount = 0;
 
             log.forEach(r => {
-                if (r.is_NS_Marker) return;
+                if (r.is_NS_Marker) {
+                    if (currentHandRolls > 0) {
+                        handRolls.push(currentHandRolls);
+                        handPoints.push(currentHandPoints);
+                        if (currentHandRolls > maxRolls) {
+                            maxRolls = currentHandRolls;
+                            maxShooter = currentShooter;
+                        }
+                    }
+                    currentShooter = r.Shooter_ID || "N/A";
+                    currentHandRolls = 0; currentHandPoints = 0; currentBoxCount = 0;
+                    isComeout = true; currentPoint = null;
+                    return;
+                }
                 if (r.Invalid_Roll || r.invalidRoll) return;
                 
+                if (currentShooter === "N/A" && r.Shooter_ID) currentShooter = r.Shooter_ID;
+
                 let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
                 
                 TR++;
@@ -1208,6 +1205,7 @@
                 if (isComeout) {
                     if (sum === 7 || sum === 11) {
                         if (sum === 7) CS++;
+                        if (sum === 11) CO11++;
                     } else if (sum === 2 || sum === 3 || sum === 12) {
                         // Crap
                     } else {
@@ -1219,18 +1217,38 @@
                         SO++;
                         handRolls.push(currentHandRolls);
                         handPoints.push(currentHandPoints);
-                        currentHandRolls = 0; currentHandPoints = 0;
+                        
+                        if (currentHandRolls > maxRolls) {
+                            maxRolls = currentHandRolls;
+                            maxShooter = currentShooter;
+                        }
+
+                        if (currentBoxCount === 0) pso++;
+                        else if (currentBoxCount === 1) pso2++;
+                        else if (currentBoxCount === 2) pso3++;
+
+                        currentHandRolls = 0; currentHandPoints = 0; currentBoxCount = 0;
                         isComeout = true; currentPoint = null;
-                    } else if (sum === currentPoint) {
-                        TotalPointsMade++;
-                        currentHandPoints++;
-                        isComeout = true;
-                        currentPoint = null;
+                    } else {
+                        if ([4, 5, 6, 8, 9, 10].includes(sum)) {
+                            currentBoxCount++;
+                        }
+                        if (sum === currentPoint) {
+                            TotalPointsMade++;
+                            currentHandPoints++;
+                            isComeout = true;
+                            currentPoint = null;
+                        }
                     }
                 }
             });
 
-            const TS = SO + CS;
+            if (currentHandRolls > maxRolls) {
+                maxRolls = currentHandRolls;
+                maxShooter = currentShooter;
+            }
+
+            const TS = SO + CS + CO11;
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
             const srrMean = TS > 0 ? (TR / TS).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
@@ -1239,12 +1257,30 @@
             const srrMed = Math.round(getMedian(srrRolls));
             const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, SO, CS, TS, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
+            const psoR = pso > 0 ? (SO / pso).toFixed(1) : "0.0";
+            const pso2R = (pso + pso2) > 0 ? (SO / (pso + pso2)).toFixed(1) : "0.0";
+            const pso3R = (pso + pso2 + pso3) > 0 ? (SO / (pso + pso2 + pso3)).toFixed(1) : "0.0";
+
+            return { 
+                TR, CR: currentHandRolls, SO, CS, CO11, TS, 
+                sorMean, sorMed, maxRolls, maxShooter,
+                srrMean, srrMed, 
+                psrMean, psrMed, 
+                pso, pso2, pso3, psoR, pso2R, pso3R,
+                atsS, atsT, atsA 
+            };
         }
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
             
+            let maxShooterName = gStats.maxShooter;
+            if (maxShooterName !== "N/A") {
+                const sObj = masterData.shooters.find(s => s.id === maxShooterName || s.name === maxShooterName);
+                if (sObj) maxShooterName = sObj.name.toUpperCase();
+            }
+            if (maxShooterName.length > 10) maxShooterName = maxShooterName.substring(0, 8) + '..';
+
             let atsHtmlG = '';
             if (globalConfig.trackATS === 'true') {
                 atsHtmlG = `
@@ -1267,10 +1303,11 @@
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${gStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${gStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${gStats.CO11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TS}</span></div>
                     </div>
                 </div>
@@ -1279,6 +1316,7 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.sorMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.sorMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MAX</span><span class="sdd-val">${gStats.maxRolls}</span><span class="text-[6px] text-slate-400 mt-0.5 leading-none tracking-tighter">${maxShooterName}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-srr">
@@ -1293,6 +1331,14 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.psrMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.psrMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card sdd-pso">
+                    <div class="sdd-card-header">P.S.O.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val">${gStats.pso}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${gStats.psoR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val">${gStats.pso2}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${gStats.pso2R}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val">${gStats.pso3}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${gStats.pso3R}</span></div>
                     </div>
                 </div>
                 ${atsHtmlG}
@@ -1312,7 +1358,15 @@
                 let targetPosParent = globalConfig.sddPositionParent || 'All';
                 let targetPosChild = globalConfig.sddPositionChild || 'All';
                 
-                posLabel = targetPosChild === 'All' ? (targetPosParent === 'All' ? "ALL POSITIONS" : targetPosParent.toUpperCase() + " POSITIONS") : targetPosChild.toUpperCase();
+                let validChildren;
+                if (targetPosChild === 'All') {
+                    validChildren = POS_MAP[targetPosParent] || ['All'];
+                    posLabel = targetPosParent.toUpperCase() + " POSITIONS";
+                    if (targetPosParent === 'All') posLabel = "ALL POSITIONS";
+                } else {
+                    validChildren = [targetPosChild];
+                    posLabel = targetPosChild.toUpperCase();
+                }
 
                 let targetSet = globalConfig.sddDiceSet;
                 if (targetSet === 'ALL') setLabel = "ALL SETS";
@@ -1320,7 +1374,7 @@
 
                 sLog = universalLog.filter(r => {
                     let isShooterMatch = (r.Shooter_ID === activeSddShooter || r.Shooter_ID === sId);
-                    let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
+                    let isPosMatch = validChildren.includes(r.Table_Position);
                     let isSetMatch = (targetSet === 'ALL' || r.Dice_Set === targetSet);
                     return isShooterMatch && isPosMatch && isSetMatch;
                 });
@@ -1357,10 +1411,11 @@
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${sStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${sStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${sStats.CO11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TS}</span></div>
                     </div>
                 </div>
@@ -1369,6 +1424,7 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">${sStats.sorMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">${sStats.sorMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">MAX</span><span class="sdd-val" id="s-sor-max">${sStats.maxRolls}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-srr">
@@ -1385,11 +1441,18 @@
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">${sStats.psrMean}</span></div>
                     </div>
                 </div>
+                <div class="sdd-card sdd-pso">
+                    <div class="sdd-card-header">P.S.O.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val">${sStats.pso}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${sStats.psoR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val">${sStats.pso2}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${sStats.pso2R}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val">${sStats.pso3}</span><span class="text-[7px] text-slate-400 mt-0.5 font-bold">1:${sStats.pso3R}</span></div>
+                    </div>
+                </div>
                 ${atsHtmlS}
             `;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
-            updateStickyNid();
         }
 
         function getHotColdIcons(num, validRolls) {
@@ -1427,55 +1490,10 @@
             return { hot: hotHtml, cold: coldHtml, status: status };
         }
 
-        function calculateHotColdFromOutcomes(occurrences, limitStr) {
+        function getKinematicData(targetSetOrNum, validRolls, limitStr, direction = 'after') {
             let limit = parseInt(limitStr);
             if (isNaN(limit)) limit = 999999;
-            if (occurrences.length > limit) occurrences = occurrences.slice(-limit);
-            
-            let totalNext = occurrences.length;
-            if (totalNext === 0) return { total: 0, hot: [], cold: [] };
 
-            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
-            occurrences.forEach(sum => nextRolls[sum]++);
-
-            let devs = [];
-            for(let s=2; s<=12; s++) {
-                let expected = totalNext * PROB_MAP[s];
-                let dev = nextRolls[s] - expected;
-                
-                if (nextRolls[s] === 0 && totalNext < CYCLE_MAP[s][0]) {
-                    continue;
-                }
-                
-                devs.push({ num: s, dev: dev });
-            }
-
-            devs.sort((a, b) => b.dev - a.dev);
-
-            let hot = [];
-            let cold = [];
-            let displayLimit = parseInt(globalConfig.kinematicLimit) || 3;
-
-            let hotRank = 3;
-            for (let i = 0; i < devs.length && hot.length < displayLimit; i++) {
-                if (devs[i].dev > 0) {
-                    hot.push({ num: devs[i].num, fires: hotRank });
-                    hotRank--;
-                }
-            }
-
-            let coldRank = 3;
-            for (let i = devs.length - 1; i >= 0 && cold.length < displayLimit; i--) {
-                if (devs[i].dev < 0) {
-                    cold.push({ num: devs[i].num, flakes: coldRank });
-                    coldRank--;
-                }
-            }
-
-            return { total: totalNext, hot: hot, cold: cold };
-        }
-
-        function getKinematicData(targetSetOrNum, validRolls, limitStr, direction = 'after') {
             let occurrences = [];
             for(let i=0; i<validRolls.length; i++) {
                 let r = validRolls[i];
@@ -1500,7 +1518,48 @@
                     }
                 }
             }
-            return calculateHotColdFromOutcomes(occurrences, limitStr);
+
+            if (occurrences.length > limit) {
+                occurrences = occurrences.slice(-limit);
+            }
+
+            let totalNext = occurrences.length;
+            if (totalNext === 0) return { total: 0, hot: [], cold: [] };
+
+            let nextRolls = {2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0};
+            occurrences.forEach(sum => nextRolls[sum]++);
+
+            let devs = [];
+            for(let s=2; s<=12; s++) {
+                let expected = totalNext * PROB_MAP[s];
+                let dev = nextRolls[s] - expected;
+                devs.push({ num: s, dev: dev });
+            }
+
+            devs.sort((a, b) => b.dev - a.dev);
+
+            let hot = [];
+            let cold = [];
+            
+            let displayLimit = parseInt(globalConfig.kinematicLimit) || 3;
+
+            let hotRank = 3;
+            for (let i = 0; i < devs.length && hot.length < displayLimit; i++) {
+                if (devs[i].dev > 0) {
+                    hot.push({ num: devs[i].num, fires: hotRank });
+                    hotRank--;
+                }
+            }
+
+            let coldRank = 3;
+            for (let i = devs.length - 1; i >= 0 && cold.length < displayLimit; i--) {
+                if (devs[i].dev < 0) {
+                    cold.push({ num: devs[i].num, flakes: coldRank });
+                    coldRank--;
+                }
+            }
+
+            return { total: totalNext, hot: hot, cold: cold };
         }
 
         function getMicroDieHTML(value) {
@@ -1529,14 +1588,15 @@
             let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
             let sId = sObj ? sObj.id : globalConfig.shooter;
             
-            let targetPosParent = globalConfig.positionParent || 'All';
-            let targetPosChild = globalConfig.positionChild || 'All';
+            let targetPos = globalConfig.positionChild;
+            let validChildren = POS_MAP[targetPos] || [targetPos];
 
             let shooterRolls = validRolls.filter(r => {
                 if (globalConfig.shooter === 'ALL') return true;
                 let isShooterMatch = (r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
                 if (!isShooterMatch) return false;
-                return isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
+                if (targetPos === 'All') return true;
+                return validChildren.includes(r.Table_Position);
             });
 
             let kinematicRolls = globalConfig.kinematicSource === 'Shooter' ? shooterRolls : validRolls;
@@ -1557,7 +1617,7 @@
                     glbCount++;
                     
                     let isShooterMatch = (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
-                    let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
+                    let isPosMatch = (targetPos === 'All' || validChildren.includes(r.Table_Position));
                     if (isShooterMatch && isPosMatch) shtrCount++;
                     
                     if (i > lastSevenOutIdx) hndCount++;
@@ -1614,7 +1674,6 @@
                 container.style.display = 'none';
                 nidHeader.classList.add('hidden');
                 nidHeader.classList.remove('flex');
-                updateStickyNid();
                 return;
             }
             container.style.display = 'grid';
@@ -1625,14 +1684,15 @@
             
             let sObj = masterData.shooters.find(s => s.name === globalConfig.shooter);
             let sId = sObj ? sObj.id : globalConfig.shooter;
-            let targetPosParent = globalConfig.positionParent || 'All';
-            let targetPosChild = globalConfig.positionChild || 'All';
+            let targetPos = globalConfig.positionChild;
+            let validChildren = POS_MAP[targetPos] || [targetPos];
 
             let shooterRolls = validRolls.filter(r => {
                 if (globalConfig.shooter === 'ALL') return true;
                 let isShooterMatch = (r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
                 if (!isShooterMatch) return false;
-                return isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
+                if (targetPos === 'All') return true;
+                return validChildren.includes(r.Table_Position);
             });
 
             let kinematicRolls = globalConfig.kinematicSource === 'Shooter' ? shooterRolls : validRolls;
@@ -1666,7 +1726,7 @@
                 counts.GLB[sum]++;
                 
                 let isShooterMatch = (globalConfig.shooter === 'ALL' || r.Shooter_ID === globalConfig.shooter || r.Shooter_ID === sId);
-                let isPosMatch = isPositionMatch(r.Table_Position, targetPosParent, targetPosChild);
+                let isPosMatch = (targetPos === 'All' || validChildren.includes(r.Table_Position));
                 if (isShooterMatch && isPosMatch) {
                     counts.SHTR[sum]++;
                 }
@@ -1681,34 +1741,11 @@
             const pushIndicator = (outcomeNum, centerHtml, fires, flakes) => {
                 let hHtml = fires > 0 ? '🔥'.repeat(fires) : '';
                 let cHtml = flakes > 0 ? '❄️'.repeat(flakes) : '';
-                
-                let bgClass = 'bg-slate-800/90';
-                let contentHtml = '';
-
-                if (fires > 0 && flakes === 0) {
-                    bgClass = 'bg-gradient-to-r from-slate-800 to-red-900/80';
-                    contentHtml = `
-                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                        <div class="text-[10px] text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
-                    `;
-                } else if (flakes > 0 && fires === 0) {
-                    bgClass = 'bg-gradient-to-r from-blue-900/80 to-slate-800';
-                    contentHtml = `
-                        <div class="text-[10px] text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
-                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                    `;
-                } else if (fires > 0 && flakes > 0) {
-                    bgClass = 'bg-gradient-to-r from-blue-900/60 via-slate-800 to-red-900/60';
-                    contentHtml = `
-                        <div class="text-[10px] text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
-                        <div class="text-[10px] font-black text-slate-200 flex items-center gap-1 uppercase leading-none drop-shadow-md">${centerHtml}</div>
-                        <div class="text-[10px] text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
-                    `;
-                }
-
                 kinIndicators[outcomeNum].push(`
-                    <div class="flex justify-between items-center w-full px-1.5 py-1 mt-1 ${bgClass} rounded shadow-inner border border-slate-700/50">
-                        ${contentHtml}
+                    <div class="flex justify-between items-center w-full px-1.5 py-1 mt-1 bg-slate-800/90 rounded shadow-inner border border-slate-700/50">
+                        <div class="text-[11px] flex-1 text-left text-blue-400 tracking-tighter leading-none drop-shadow-md">${cHtml}</div>
+                        <div class="text-[10px] font-black text-slate-200 flex items-center justify-center gap-1 flex-[2] uppercase leading-none drop-shadow-md">${centerHtml}</div>
+                        <div class="text-[11px] flex-1 text-right text-red-500 tracking-tighter leading-none drop-shadow-md">${hHtml}</div>
                     </div>
                 `);
             };
@@ -1717,34 +1754,16 @@
                 if (String(globalConfig.kinLastRoll) === 'true' && kinematicRolls.length > 0) {
                     let lastR = kinematicRolls[kinematicRolls.length - 1];
                     let d1 = lastR.Left_Die; let d2 = lastR.Right_Die;
-                    let lastSum = lastR.Corrected_Point || lastR.Total_Sum;
                     let lastSetStr = d1 <= d2 ? `${d1}-${d2}` : `${d2}-${d1}`;
                     
-                    let topHotStr = '--';
-                    let topColdStr = '--';
-
-                    if (String(globalConfig.kinLastCombo) === 'true') {
-                        let kinDataSet = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
-                        if (kinDataSet.total > 0) {
-                            let [ld1, ld2] = lastSetStr.split('-');
-                            let diceHtml = `<div class="flex gap-0.5">${getMicroDieHTML(ld1)}${getMicroDieHTML(ld2)}</div> LAST`;
-                            kinDataSet.hot.forEach(h => pushIndicator(h.num, diceHtml, h.fires, 0));
-                            kinDataSet.cold.forEach(c => pushIndicator(c.num, diceHtml, 0, c.flakes));
-                            if (kinDataSet.hot.length > 0) topHotStr = kinDataSet.hot[0].num;
-                            if (kinDataSet.cold.length > 0) topColdStr = kinDataSet.cold[0].num;
-                        }
-                    } else {
-                        let kinDataAll = getKinematicData(lastSum, kinematicRolls, globalConfig.kinematicRange, 'after');
-                        if (kinDataAll.total > 0) {
-                            let sumHtml = `<span class="text-white">${lastSum}</span> LAST`;
-                            kinDataAll.hot.forEach(h => pushIndicator(h.num, sumHtml, h.fires, 0));
-                            kinDataAll.cold.forEach(c => pushIndicator(c.num, sumHtml, 0, c.flakes));
-                            if (kinDataAll.hot.length > 0) topHotStr = kinDataAll.hot[0].num;
-                            if (kinDataAll.cold.length > 0) topColdStr = kinDataAll.cold[0].num;
-                        }
-                    }
+                    let kinData = getKinematicData(lastSetStr, kinematicRolls, globalConfig.kinematicRange, 'after');
+                    
+                    kinData.hot.forEach(h => pushIndicator(h.num, 'LAST ROLL', h.fires, 0));
+                    kinData.cold.forEach(c => pushIndicator(c.num, 'LAST ROLL', 0, c.flakes));
                     
                     let [ld1, ld2] = lastSetStr.split('-');
+                    let topHotStr = kinData.hot.length > 0 ? kinData.hot[0].num : '--';
+                    let topColdStr = kinData.cold.length > 0 ? kinData.cold[0].num : '--';
                     
                     nidHeader.innerHTML = `
                         <div class="flex items-center gap-2">
@@ -1760,48 +1779,25 @@
                     nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
                 }
 
-                if (String(globalConfig.kinAfterInvalid) === 'true' && universalLog.length > 0) {
-                    let veryLastRoll = universalLog[universalLog.length - 1];
-                    if (veryLastRoll.Invalid_Roll || veryLastRoll.invalidRoll) {
-                        let afterInvOccurrences = [];
-                        for(let i=0; i<universalLog.length - 1; i++) {
-                            if (universalLog[i].Invalid_Roll || universalLog[i].invalidRoll) {
-                                for(let j=i+1; j<universalLog.length; j++) {
-                                    if (!universalLog[j].Invalid_Roll && !universalLog[j].invalidRoll && !universalLog[j].is_NS_Marker) {
-                                        afterInvOccurrences.push(universalLog[j].Corrected_Point || universalLog[j].Total_Sum);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        let kInv = calculateHotColdFromOutcomes(afterInvOccurrences, globalConfig.kinematicRange);
-                        if (kInv.total > 0) {
-                            kInv.hot.forEach(h => pushIndicator(h.num, 'AFTER INVALID', h.fires, 0));
-                            kInv.cold.forEach(c => pushIndicator(c.num, 'AFTER INVALID', 0, c.flakes));
-                        }
-                    }
-                }
+                const layTargets = [
+                    { num: 4, active: globalConfig.kinNo4 },
+                    { num: 5, active: globalConfig.kinNo5 },
+                    { num: 6, active: globalConfig.kinNo6 },
+                    { num: 8, active: globalConfig.kinNo8 },
+                    { num: 9, active: globalConfig.kinNo9 },
+                    { num: 10, active: globalConfig.kinNo10 }
+                ];
 
-                globalConfig.layTrackers.forEach(val => {
-                    let num, target, cAllHtml;
-                    if (val.includes('_ALL')) {
-                        num = parseInt(val.split('_')[0]);
-                        target = num;
-                        cAllHtml = `LAY <span class="text-white">${num}</span>`;
-                    } else {
-                        let [d1, d2] = val.split('-');
-                        num = parseInt(d1) + parseInt(d2);
-                        target = val;
-                        cAllHtml = `LAY <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
-                    }
-                    
-                    let kAll = getKinematicData(target, kinematicRolls, globalConfig.kinematicRange, 'after');
-                    if (kAll.total > 0) {
-                        kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
-                        kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
+                layTargets.forEach(target => {
+                    if(target.active) {
+                        let kAll = getKinematicData(target.num, kinematicRolls, globalConfig.kinematicRange, 'before');
+                        if (kAll.total > 0) {
+                            let cAllHtml = `NO <span class="text-white">${target.num}</span> ALL`;
+                            kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
+                            kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
+                        }
                     }
                 });
-
             } else {
                 nidHeader.innerHTML = `<div class="text-[10px] uppercase tracking-widest text-slate-500 font-bold w-full text-center">AWAITING THROW / KINEMATICS OFF</div>`;
             }
@@ -1838,7 +1834,6 @@
                 container.classList.remove('no-seven');
             }
             container.innerHTML = nidArray.map(renderBox).join('');
-            updateStickyNid();
         }
 
         function updateBonusTrackers() {
@@ -1846,7 +1841,6 @@
             if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
                 container.classList.add('hidden');
                 container.classList.remove('flex');
-                updateStickyNid();
                 return;
             }
             container.classList.remove('hidden');
@@ -1964,7 +1958,6 @@
                 html += `</div>`;
                 ssEl.innerHTML = html;
             }
-            updateStickyNid();
         }
 
         // --- UI BUILDERS ---
@@ -2022,23 +2015,6 @@
             });
         }
 
-        function buildLayTrackersConfig() {
-            const container = document.getElementById('cfg-lay-trackers-grid');
-            const nums = [4, 5, 6, 7, 8, 9, 10];
-            let html = '';
-            nums.forEach(n => {
-                const sets = SET_MAP[n];
-                let rowHtml = `<div class="flex items-center gap-3 border-b border-slate-700/50 pb-1"><div class="text-[10px] font-black text-white w-4">${n}</div>`;
-                rowHtml += `<label class="flex items-center gap-1 text-[9px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" class="lay-cb accent-blue-500 w-3 h-3" value="${n}_ALL"> ALL</label>`;
-                sets.forEach(s => {
-                    rowHtml += `<label class="flex items-center gap-1 text-[9px] text-slate-300 font-bold uppercase cursor-pointer"><input type="checkbox" class="lay-cb accent-blue-500 w-3 h-3" value="${s}"> ${s}</label>`;
-                });
-                rowHtml += `</div>`;
-                html += rowHtml;
-            });
-            container.innerHTML = html;
-        }
-
         function selectConfigColor(color) {
             globalConfig.diceColor = color;
             DICE_COLORS.forEach(c => {
@@ -2082,33 +2058,29 @@
             
             document.getElementById('cfg-kin-enabled').checked = (String(globalConfig.kinematicEnabled) === 'true');
             document.getElementById('cfg-kin-last').checked = (String(globalConfig.kinLastRoll) === 'true');
-            document.getElementById('cfg-kin-last-combo').checked = (String(globalConfig.kinLastCombo) === 'true');
-            document.getElementById('cfg-kin-after-invalid').checked = (String(globalConfig.kinAfterInvalid) === 'true');
+            document.getElementById('cfg-kin-no4').checked = (String(globalConfig.kinNo4) === 'true');
+            document.getElementById('cfg-kin-no5').checked = (String(globalConfig.kinNo5) === 'true');
+            document.getElementById('cfg-kin-no6').checked = (String(globalConfig.kinNo6) === 'true');
+            document.getElementById('cfg-kin-no8').checked = (String(globalConfig.kinNo8) === 'true');
+            document.getElementById('cfg-kin-no9').checked = (String(globalConfig.kinNo9) === 'true');
+            document.getElementById('cfg-kin-no10').checked = (String(globalConfig.kinNo10) === 'true');
             
             document.getElementById('cfg-kinematic-source').value = globalConfig.kinematicSource;
             document.getElementById('cfg-kinematic-range').value = globalConfig.kinematicRange;
             document.getElementById('cfg-kinematic-limit').value = globalConfig.kinematicLimit;
             
             const isNidOn = (String(globalConfig.showNID) === 'true');
-            document.getElementById('cfg-nid-subcontainer').style.display = isNidOn ? 'flex' : 'none';
+            document.getElementById('cfg-nid-seven-container').style.display = isNidOn ? 'flex' : 'none';
             
             const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
             kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
-            const nidToggle = document.getElementById('cfg-show-nid');
             nidToggle.onchange = (e) => {
-                document.getElementById('cfg-nid-subcontainer').style.display = e.target.checked ? 'flex' : 'none';
+                document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
             };
             
             document.getElementById('cfg-kin-enabled').onchange = (e) => {
                 kinSubContainer.style.display = e.target.checked ? 'flex' : 'none';
-            };
-
-            const kinLastToggle = document.getElementById('cfg-kin-last');
-            const kinLastComboContainer = document.getElementById('cfg-kin-last-combo-container');
-            kinLastComboContainer.style.display = (String(globalConfig.kinLastRoll) === 'true') ? 'flex' : 'none';
-            kinLastToggle.onchange = (e) => {
-                kinLastComboContainer.style.display = e.target.checked ? 'flex' : 'none';
             };
             
             currentConfigShooter = globalConfig.shooter;
@@ -3020,7 +2992,6 @@
                 updateSDD();
                 updateBonusTrackers();
                 updateNID();
-                updateStickyNid();
                 return;
             }
 
@@ -3203,7 +3174,6 @@
             updateSDD();
             updateBonusTrackers();
             updateNID();
-            updateStickyNid();
         }
     </script>
 </body>
