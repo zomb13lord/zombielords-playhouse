@@ -74,6 +74,7 @@
         .sdd-sor { border-top-color: #f59e0b; background: linear-gradient(to bottom, #171003, #020617); }
         .sdd-srr { border-top-color: #10b981; background: linear-gradient(to bottom, #02120a, #020617); }
         .sdd-psr { border-top-color: #8b5cf6; background: linear-gradient(to bottom, #10051a, #020617); }
+        .sdd-pso { border-top-color: #06b6d4; background: linear-gradient(to bottom, #041a24, #020617); }
         .sdd-ats { border-top-color: #d946ef; background: linear-gradient(to bottom, #1a0516, #020617); }
         .sdd-shtr { border-top-color: #f59e0b; background: linear-gradient(to bottom, rgba(120,53,15,0.4), rgba(2,6,23,1)); }
 
@@ -367,10 +368,11 @@
                 </div>
             </div>
             <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-header">OUTS</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="g-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="g-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val" id="g-so">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val" id="g-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val" id="g-co11">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-ts">0</span></div>
                 </div>
             </div>
@@ -379,6 +381,7 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-sor-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-sor-mean">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">LONGEST ROLL</span><span class="sdd-val" id="g-sor-max">0</span><span class="text-[10px] font-bold text-slate-300 mt-0.5 leading-none tracking-tighter" id="g-sor-max-shtr">N/A</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-srr">
@@ -393,6 +396,17 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-psr-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-pso">
+                <div class="sdd-card-header">P.S.O.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val" id="g-pso">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="g-pso-r">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val" id="g-pso2">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="g-pso2-r">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val" id="g-pso3">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="g-pso3-r">0.0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-ats" id="g-ats-card">
@@ -420,10 +434,11 @@
                 </div>
             </div>
             <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
+                <div class="sdd-card-header">OUTS</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="s-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="s-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val" id="s-so">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val" id="s-cs">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val" id="s-co11">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-ts">0</span></div>
                 </div>
             </div>
@@ -432,6 +447,7 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">LONGEST ROLL</span><span class="sdd-val" id="s-sor-max">0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-srr">
@@ -446,6 +462,17 @@
                 <div class="sdd-card-body">
                     <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">0</span></div>
                     <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">0.0</span></div>
+                </div>
+            </div>
+            <div class="sdd-card sdd-pso">
+                <div class="sdd-card-header">P.S.O.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val" id="s-pso">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="s-pso-r">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val" id="s-pso2">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="s-pso2-r">0.0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val" id="s-pso3">0</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm" id="s-pso3-r">0.0</span></div>
                 </div>
             </div>
             <div class="sdd-card sdd-ats" id="s-ats-card">
@@ -593,125 +620,115 @@
     <div id="modal-config-global" class="modal-mask">
         <div class="modal-box border-blue-500">
             <div class="modal-content-layer">
-                <h2 class="text-lg font-black text-white uppercase tracking-widest mb-2 cinzel text-center">Global Configuration</h2>
-                
+                <h2 class="text-lg font-black text-white uppercase tracking-widest mb-4 cinzel text-center">Global Configuration</h2>
                 <div class="flex flex-col text-left">
                     
-                    <!-- GENERAL SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-2 tracking-widest">General</div>
                     <div class="cfg-row">
                         <div><label class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Location</label><select id="cfg-loc" class="select-wicked border-blue-500/50 focus:border-blue-400" onchange="checkMetadataTrigger('locations', this.value, 'global')"></select></div>
                         <button onclick="editAsset('locations', 'cfg-loc', 'global')" class="cfg-action-btn"><i class="fa-solid fa-edit"></i></button>
                         <button onclick="deleteAsset('locations', 'cfg-loc', 'global')" class="cfg-action-btn del"><i class="fa-solid fa-trash"></i></button>
                     </div>
-                    <div class="mb-2">
+
+                    <div class="mb-3">
                         <label class="block text-[10px] text-slate-400 uppercase font-bold mb-2 text-center">Dice Color</label>
-                        <div class="grid grid-cols-4 gap-3" id="color-grid"></div>
+                        <div class="grid grid-cols-4 gap-3" id="color-grid">
+                            <!-- Injected by JS -->
+                        </div>
                     </div>
 
-                    <!-- DISPLAY SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Display</div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-4 border-t border-blue-900/50 pt-4">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Shooter SDD</span>
                         <label for="cfg-show-sdd" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-show-sdd" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
-                        <label for="cfg-show-nid" class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
-                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                        </label>
-                    </div>
-                    <div id="cfg-nid-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-700 mb-2">
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">Show Seven</span>
-                            <label for="cfg-show-nid-seven" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="cfg-show-nid-seven" class="sr-only peer toggle-checkbox">
-                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                            </label>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematics</span>
-                            <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
-                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                            </label>
-                        </div>
-                        
-                        <!-- KINEMATICS SUB-SECTION -->
-                        <div id="cfg-kin-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-600 mt-1 mb-1">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
-                                <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="Global">Global</option>
-                                    <option value="Shooter">Shooter</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
-                                <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="ALL">All</option>
-                                    <option value="50">Last 50</option>
-                                    <option value="100">Last 100</option>
-                                    <option value="200">Last 200</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Display Limit</span>
-                                <select id="cfg-kinematic-limit" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
-                                    <option value="3">Top 3</option>
-                                    <option value="2">Top 2</option>
-                                    <option value="1">Top 1</option>
-                                </select>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Track Last Roll</span>
-                                <label for="cfg-kin-last" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-last" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="flex justify-between items-center pl-4 border-l-2 border-slate-500" id="cfg-kin-last-combo-container">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Last Roll Combinations</span>
-                                <label for="cfg-kin-last-combo" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-last-combo" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[10px] text-slate-400 uppercase font-bold">Track After Invalid</span>
-                                <label for="cfg-kin-after-invalid" class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" id="cfg-kin-after-invalid" class="sr-only peer toggle-checkbox">
-                                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
-                                </label>
-                            </div>
-                            <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers</div>
-                            <div id="cfg-lay-trackers-grid" class="flex flex-col gap-2 mt-1">
-                                <!-- Injected by JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- BONUSES SECTION -->
-                    <div class="text-[10px] text-blue-400 uppercase font-black border-b border-blue-900/50 pb-1 mb-3 mt-4 tracking-widest">Bonuses</div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">ATS</span>
                         <label for="cfg-track-ats" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ats" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-                    <div class="flex justify-between items-center mb-3">
+                    <div class="flex justify-between items-center mt-3">
                         <span class="text-[10px] text-slate-400 uppercase font-bold">Sharpshooter</span>
                         <label for="cfg-track-ss" class="relative inline-flex items-center cursor-pointer">
                             <input type="checkbox" id="cfg-track-ss" class="sr-only peer toggle-checkbox">
                             <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
                         </label>
                     </div>
-
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Show NID</span>
+                        <label for="cfg-show-nid" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3" id="cfg-nid-seven-container">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold pl-4 border-l-2 border-slate-700">Show Seven</span>
+                        <label for="cfg-show-nid-seven" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-show-nid-seven" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-[10px] text-slate-400 uppercase font-bold">Master Kinematics</span>
+                        <label for="cfg-kin-enabled" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="cfg-kin-enabled" class="sr-only peer toggle-checkbox">
+                            <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                        </label>
+                    </div>
+                    <div id="cfg-kin-subcontainer" class="flex flex-col gap-3 pl-4 border-l-2 border-slate-700 mt-2 mb-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Source</span>
+                            <select id="cfg-kinematic-source" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="Global">Global</option>
+                                <option value="Shooter">Shooter</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Kinematic Range</span>
+                            <select id="cfg-kinematic-range" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="ALL">All</option>
+                                <option value="50">Last 50</option>
+                                <option value="100">Last 100</option>
+                                <option value="200">Last 200</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Display Limit</span>
+                            <select id="cfg-kinematic-limit" class="select-wicked border-blue-500/50 focus:border-blue-400 w-24">
+                                <option value="3">Top 3</option>
+                                <option value="2">Top 2</option>
+                                <option value="1">Top 1</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Track Last Roll</span>
+                            <label for="cfg-kin-last" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-last" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center pl-4 border-l-2 border-slate-500" id="cfg-kin-last-combo-container">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Last Roll Combinations</span>
+                            <label for="cfg-kin-last-combo" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-last-combo" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-400 uppercase font-bold">Track After Invalid</span>
+                            <label for="cfg-kin-after-invalid" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="cfg-kin-after-invalid" class="sr-only peer toggle-checkbox">
+                                <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer toggle-label after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all pointer-events-none"></div>
+                            </label>
+                        </div>
+                        <div class="text-[10px] text-blue-400 uppercase font-bold mt-2">Lay Trackers</div>
+                        <div id="cfg-lay-trackers-grid" class="flex flex-col gap-2 mt-1">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-3 mt-6">
                     <button onclick="closeModals()" class="btn-cancel">Cancel</button>
@@ -1019,20 +1036,18 @@
             }
         });
 
-        function updateStickyNid() {
-            if (window.innerWidth >= 1024) {
-                const stickyZone = document.getElementById('sticky-zone');
-                const sddContainer = document.getElementById('sdd-container');
-                if (stickyZone && sddContainer) {
-                    const h = stickyZone.offsetHeight;
-                    sddContainer.style.top = h + 'px';
-                }
+        function isPositionMatch(rollPos, targetParent, targetChild) {
+            if (targetParent === 'All' && targetChild === 'All') return true;
+            let validChildren = [];
+            if (targetChild === 'All') {
+                validChildren = POS_MAP[targetParent] || [];
+            } else if (POS_MAP[targetChild]) {
+                validChildren = POS_MAP[targetChild];
             } else {
-                const sddContainer = document.getElementById('sdd-container');
-                if (sddContainer) sddContainer.style.top = '';
+                validChildren = [targetChild];
             }
+            return validChildren.includes(rollPos);
         }
-        window.addEventListener('resize', updateStickyNid);
 
         const shooterTypeMap = { 'Master': 1, 'Favorite': 2, 'Standard': 3, 'Online': 4 };
         function sortShooters(arr) {
@@ -1060,19 +1075,6 @@
             if (type === 'Favorite') return '❤️ ';
             if (type === 'Online') return '🌐 ';
             return '👤 ';
-        }
-
-        function isPositionMatch(rollPos, targetParent, targetChild) {
-            if (targetParent === 'All' && targetChild === 'All') return true;
-            let validChildren = [];
-            if (targetChild === 'All') {
-                validChildren = POS_MAP[targetParent] || [];
-            } else if (POS_MAP[targetChild]) {
-                validChildren = POS_MAP[targetChild];
-            } else {
-                validChildren = [targetChild];
-            }
-            return validChildren.includes(rollPos);
         }
 
         async function fetchMasterData() {
@@ -1178,16 +1180,34 @@
         }
 
         function calcStats(log) {
-            let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
+            let TR = 0, SO = 0, CS = 0, CO11 = 0, TotalPointsMade = 0;
             let handRolls = [], handPoints = [], srrRolls = [];
             let currentHandRolls = 0, currentHandPoints = 0, currentSrrRolls = 0;
             let isComeout = true, currentPoint = null;
             let atsS = 0, atsT = 0, atsA = 0;
+            
+            let maxRolls = 0;
+            let maxShooter = "N/A";
+            let currentShooter = "N/A";
+
+            let pso = 0, pso2 = 0, pso3 = 0;
+            let currentBoxCount = 0;
 
             log.forEach(r => {
-                if (r.is_NS_Marker) return;
+                if (r.is_NS_Marker) {
+                    if (currentHandRolls > maxRolls) {
+                        maxRolls = currentHandRolls;
+                        maxShooter = currentShooter;
+                    }
+                    currentShooter = r.Shooter_ID || "N/A";
+                    currentHandRolls = 0; currentHandPoints = 0; currentBoxCount = 0;
+                    isComeout = true; currentPoint = null;
+                    return;
+                }
                 if (r.Invalid_Roll || r.invalidRoll) return;
                 
+                if (currentShooter === "N/A" && r.Shooter_ID) currentShooter = r.Shooter_ID;
+
                 let sum = parseInt(r.Corrected_Point || r.Total_Sum || r.sum);
                 
                 TR++;
@@ -1208,6 +1228,7 @@
                 if (isComeout) {
                     if (sum === 7 || sum === 11) {
                         if (sum === 7) CS++;
+                        if (sum === 11) CO11++;
                     } else if (sum === 2 || sum === 3 || sum === 12) {
                         // Crap
                     } else {
@@ -1219,18 +1240,38 @@
                         SO++;
                         handRolls.push(currentHandRolls);
                         handPoints.push(currentHandPoints);
-                        currentHandRolls = 0; currentHandPoints = 0;
+                        
+                        if (currentHandRolls > maxRolls) {
+                            maxRolls = currentHandRolls;
+                            maxShooter = currentShooter;
+                        }
+
+                        if (currentBoxCount === 0) { pso++; pso2++; pso3++; }
+                        else if (currentBoxCount === 1) { pso2++; pso3++; }
+                        else if (currentBoxCount === 2) { pso3++; }
+
+                        currentHandRolls = 0; currentHandPoints = 0; currentBoxCount = 0;
                         isComeout = true; currentPoint = null;
-                    } else if (sum === currentPoint) {
-                        TotalPointsMade++;
-                        currentHandPoints++;
-                        isComeout = true;
-                        currentPoint = null;
+                    } else {
+                        if ([4, 5, 6, 8, 9, 10].includes(sum)) {
+                            currentBoxCount++;
+                        }
+                        if (sum === currentPoint) {
+                            TotalPointsMade++;
+                            currentHandPoints++;
+                            isComeout = true;
+                            currentPoint = null;
+                        }
                     }
                 }
             });
 
-            const TS = SO + CS;
+            if (currentHandRolls > maxRolls) {
+                maxRolls = currentHandRolls;
+                maxShooter = currentShooter;
+            }
+
+            const TS = SO + CS + CO11;
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
             const srrMean = TS > 0 ? (TR / TS).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
@@ -1239,12 +1280,29 @@
             const srrMed = Math.round(getMedian(srrRolls));
             const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, SO, CS, TS, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
+            const psoR = pso > 0 ? (SO / pso).toFixed(1) : "0.0";
+            const pso2R = pso2 > 0 ? (SO / pso2).toFixed(1) : "0.0";
+            const pso3R = pso3 > 0 ? (SO / pso3).toFixed(1) : "0.0";
+
+            return { 
+                TR, CR: currentHandRolls, SO, CS, CO11, TS, 
+                sorMean, sorMed, maxRolls, maxShooter,
+                srrMean, srrMed, 
+                psrMean, psrMed, 
+                pso, pso2, pso3, psoR, pso2R, pso3R,
+                atsS, atsT, atsA 
+            };
         }
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
             
+            let maxShooterName = gStats.maxShooter;
+            if (maxShooterName !== "N/A") {
+                const sObj = masterData.shooters.find(s => s.id === maxShooterName || s.name === maxShooterName);
+                if (sObj) maxShooterName = sObj.name.toUpperCase();
+            }
+
             let atsHtmlG = '';
             if (globalConfig.trackATS === 'true') {
                 atsHtmlG = `
@@ -1267,10 +1325,11 @@
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${gStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${gStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${gStats.CO11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TS}</span></div>
                     </div>
                 </div>
@@ -1279,6 +1338,7 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.sorMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.sorMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">LONGEST ROLL</span><span class="sdd-val">${gStats.maxRolls}</span><span class="text-[10px] font-bold text-slate-300 mt-0.5 leading-none tracking-tighter">${maxShooterName}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-srr">
@@ -1293,6 +1353,17 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.psrMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.psrMean}</span></div>
+                    </div>
+                </div>
+                <div class="sdd-card sdd-pso">
+                    <div class="sdd-card-header">P.S.O.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val">${gStats.pso}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${gStats.psoR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val">${gStats.pso2}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${gStats.pso2R}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val">${gStats.pso3}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${gStats.pso3R}</span></div>
                     </div>
                 </div>
                 ${atsHtmlG}
@@ -1357,10 +1428,11 @@
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${sStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${sStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${sStats.CO11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TS}</span></div>
                     </div>
                 </div>
@@ -1369,6 +1441,7 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">${sStats.sorMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">${sStats.sorMean}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">LONGEST ROLL</span><span class="sdd-val" id="s-sor-max">${sStats.maxRolls}</span></div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-srr">
@@ -1385,11 +1458,21 @@
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">${sStats.psrMean}</span></div>
                     </div>
                 </div>
+                <div class="sdd-card sdd-pso">
+                    <div class="sdd-card-header">P.S.O.</div>
+                    <div class="sdd-card-body">
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val">${sStats.pso}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${sStats.psoR}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 2</span><span class="sdd-val">${sStats.pso2}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${sStats.pso2R}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">PSO 3</span><span class="sdd-val">${sStats.pso3}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">RATIO</span><span class="sdd-val text-slate-300 text-sm">${sStats.pso3R}</span></div>
+                    </div>
+                </div>
                 ${atsHtmlS}
             `;
 
             document.getElementById('sdd-shooter').style.display = String(globalConfig.showShooterSDD) === 'true' ? 'flex' : 'none';
-            updateStickyNid();
         }
 
         function getHotColdIcons(num, validRolls) {
@@ -1614,7 +1697,6 @@
                 container.style.display = 'none';
                 nidHeader.classList.add('hidden');
                 nidHeader.classList.remove('flex');
-                updateStickyNid();
                 return;
             }
             container.style.display = 'grid';
@@ -1838,7 +1920,6 @@
                 container.classList.remove('no-seven');
             }
             container.innerHTML = nidArray.map(renderBox).join('');
-            updateStickyNid();
         }
 
         function updateBonusTrackers() {
@@ -1846,7 +1927,6 @@
             if (globalConfig.trackATS !== 'true' && globalConfig.trackSharpshooter !== 'true') {
                 container.classList.add('hidden');
                 container.classList.remove('flex');
-                updateStickyNid();
                 return;
             }
             container.classList.remove('hidden');
@@ -1964,7 +2044,6 @@
                 html += `</div>`;
                 ssEl.innerHTML = html;
             }
-            updateStickyNid();
         }
 
         // --- UI BUILDERS ---
@@ -2090,26 +2169,31 @@
             document.getElementById('cfg-kinematic-limit').value = globalConfig.kinematicLimit;
             
             const isNidOn = (String(globalConfig.showNID) === 'true');
-            document.getElementById('cfg-nid-subcontainer').style.display = isNidOn ? 'flex' : 'none';
+            document.getElementById('cfg-nid-seven-container').style.display = isNidOn ? 'flex' : 'none';
             
             const kinSubContainer = document.getElementById('cfg-kin-subcontainer');
             kinSubContainer.style.display = (String(globalConfig.kinematicEnabled) === 'true') ? 'flex' : 'none';
 
             const nidToggle = document.getElementById('cfg-show-nid');
             nidToggle.onchange = (e) => {
-                document.getElementById('cfg-nid-subcontainer').style.display = e.target.checked ? 'flex' : 'none';
+                document.getElementById('cfg-nid-seven-container').style.display = e.target.checked ? 'flex' : 'none';
             };
             
-            document.getElementById('cfg-kin-enabled').onchange = (e) => {
-                kinSubContainer.style.display = e.target.checked ? 'flex' : 'none';
-            };
-
+            const kinToggle = document.getElementById('cfg-kin-enabled');
+            if(kinToggle) {
+                kinToggle.onchange = (e) => {
+                    kinSubContainer.style.display = e.target.checked ? 'flex' : 'none';
+                };
+            }
+            
             const kinLastToggle = document.getElementById('cfg-kin-last');
             const kinLastComboContainer = document.getElementById('cfg-kin-last-combo-container');
             kinLastComboContainer.style.display = (String(globalConfig.kinLastRoll) === 'true') ? 'flex' : 'none';
-            kinLastToggle.onchange = (e) => {
-                kinLastComboContainer.style.display = e.target.checked ? 'flex' : 'none';
-            };
+            if(kinLastToggle) {
+                kinLastToggle.onchange = (e) => {
+                    kinLastComboContainer.style.display = e.target.checked ? 'flex' : 'none';
+                };
+            }
             
             currentConfigShooter = globalConfig.shooter;
         }
@@ -2387,9 +2471,9 @@
                 document.getElementById('scfg-set').value = 'ALL';
                 document.getElementById('scfg-pos-parent').value = 'All';
                 updatePosChild('scfg', 'All');
-                cancelBtn.style.display = 'none';
+                if(cancelBtn) cancelBtn.style.display = 'none';
             } else {
-                cancelBtn.style.display = 'block';
+                if(cancelBtn) cancelBtn.style.display = 'block';
                 if (mode === 'new') {
                     title.innerText = "New Shooter";
                     desc.innerText = "Pass the dice to a new shooter.";
@@ -3020,7 +3104,6 @@
                 updateSDD();
                 updateBonusTrackers();
                 updateNID();
-                updateStickyNid();
                 return;
             }
 
@@ -3203,7 +3286,6 @@
             updateSDD();
             updateBonusTrackers();
             updateNID();
-            updateStickyNid();
         }
     </script>
 </body>
