@@ -1093,10 +1093,13 @@
             let atsS = 0, atsT = 0, atsA = 0;
             
             let maxRolls = 0;
-            let maxRollsShooter = "N/A";
+            let maxRollsShooterId = "N/A";
+            
+            let maxPoints = 0;
+            let maxPointsShooterId = "N/A";
             
             let handBoxCount = 0;
-            let pso0=0, pso1=0, pso2=0, pso3=0, pso4=0, pso5=0, pso6=0, pso7=0;
+            let pso=0, p1so=0, p2so=0, p3so=0, p4so=0, p5so=0, p6so=0, p7pso=0;
 
             log.forEach(r => {
                 if (r.is_NS_Marker) return;
@@ -1110,7 +1113,7 @@
                 
                 if (currentHandRolls >= maxRolls && currentHandRolls > 0) {
                     maxRolls = currentHandRolls;
-                    maxRollsShooter = r.Shooter_ID || "UNKNOWN";
+                    maxRollsShooterId = r.Shooter_ID || "UNKNOWN";
                 }
 
                 if (r.Notes) {
@@ -1144,21 +1147,29 @@
                         handRolls.push(currentHandRolls);
                         handPoints.push(currentHandPoints);
                         
-                        pso7++;
-                        if (handBoxCount < 1) pso0++;
-                        if (handBoxCount < 2) pso1++;
-                        if (handBoxCount < 3) pso2++;
-                        if (handBoxCount < 4) pso3++;
-                        if (handBoxCount < 5) pso4++;
-                        if (handBoxCount < 6) pso5++;
-                        if (handBoxCount < 7) pso6++;
+                        if (handBoxCount < 1) pso++;
+                        if (handBoxCount < 2) p1so++;
+                        if (handBoxCount < 3) p2so++;
+                        if (handBoxCount < 4) p3so++;
+                        if (handBoxCount < 5) p4so++;
+                        if (handBoxCount < 6) p5so++;
+                        if (handBoxCount < 7) p6so++;
+                        if (handBoxCount >= 7) p7pso++;
 
                         handBoxCount = 0;
-                        currentHandRolls = 0; currentHandPoints = 0;
-                        isComeout = true; currentPoint = null;
+                        currentHandRolls = 0; 
+                        currentHandPoints = 0;
+                        isComeout = true; 
+                        currentPoint = null;
                     } else if (sum === currentPoint) {
                         TotalPointsMade++;
                         currentHandPoints++;
+                        
+                        if (currentHandPoints >= maxPoints && currentHandPoints > 0) {
+                            maxPoints = currentHandPoints;
+                            maxPointsShooterId = r.Shooter_ID || "UNKNOWN";
+                        }
+                        
                         isComeout = true;
                         currentPoint = null;
                     }
@@ -1178,8 +1189,9 @@
                 TR, CR: currentHandRolls, SO, CS, co11, TS, 
                 sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, 
                 atsS, atsT, atsA, 
-                maxRolls, maxRollsShooter, 
-                pso0, pso1, pso2, pso3, pso4, pso5, pso6, pso7 
+                maxRolls, maxRollsShooterId,
+                maxPoints, maxPointsShooterId,
+                pso, p1so, p2so, p3so, p4so, p5so, p6so, p7pso 
             };
         }
         
@@ -1190,50 +1202,42 @@
         }
 
         function renderPsoCard(stats) {
-            const getRatio = (count) => count > 0 ? (stats.SO / count).toFixed(1) : '0.0';
+            const getPct = (count) => stats.SO > 0 ? ((count / stats.SO) * 100).toFixed(1) + '%' : '0.0%';
             return `
             <div class="sdd-card sdd-pso">
                 <div class="sdd-card-header text-sky-400">P.S.O.</div>
                 <div class="sdd-card-body">
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO</span><span class="sdd-val">${stats.pso0}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso0)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 1</span><span class="sdd-val">${stats.pso1}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso1)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 2</span><span class="sdd-val">${stats.pso2}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso2)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 3</span><span class="sdd-val">${stats.pso3}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso3)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 4</span><span class="sdd-val">${stats.pso4}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso4)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 5</span><span class="sdd-val">${stats.pso5}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso5)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 6</span><span class="sdd-val">${stats.pso6}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso6)}</span>
-                    </div>
-                    <div class="sdd-card-col">
-                        <span class="sdd-sub">PSO 7+</span><span class="sdd-val">${stats.pso7}</span>
-                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso7)}</span>
-                    </div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO</span><span class="sdd-val">${stats.pso}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">PSO %</span><span class="sdd-val">${getPct(stats.pso)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P1SO</span><span class="sdd-val">${stats.p1so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P1SO %</span><span class="sdd-val">${getPct(stats.p1so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P2SO</span><span class="sdd-val">${stats.p2so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P2SO %</span><span class="sdd-val">${getPct(stats.p2so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P3SO</span><span class="sdd-val">${stats.p3so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P3SO %</span><span class="sdd-val">${getPct(stats.p3so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P4SO</span><span class="sdd-val">${stats.p4so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P4SO %</span><span class="sdd-val">${getPct(stats.p4so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P5SO</span><span class="sdd-val">${stats.p5so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P5SO %</span><span class="sdd-val">${getPct(stats.p5so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P6SO</span><span class="sdd-val">${stats.p6so}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P6SO %</span><span class="sdd-val">${getPct(stats.p6so)}</span></div>
+                    
+                    <div class="sdd-card-col"><span class="sdd-sub">P7+SO</span><span class="sdd-val">${stats.p7pso}</span></div>
+                    <div class="sdd-card-col"><span class="sdd-sub">P7+SO %</span><span class="sdd-val">${getPct(stats.p7pso)}</span></div>
                 </div>
             </div>`;
         }
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
-            const gLongestName = resolveShooterName(gStats.maxRollsShooter);
+            const gLongestName = resolveShooterName(gStats.maxRollsShooterId);
+            const gMostPointsName = resolveShooterName(gStats.maxPointsShooterId);
             
             let atsHtmlG = '';
             if (globalConfig.trackATS === 'true') {
@@ -1291,6 +1295,11 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val">${gStats.psrMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.psrMean}</span></div>
+                        <div class="sdd-card-col max-w-[120px]">
+                            <span class="sdd-sub">MOST</span>
+                            <span class="sdd-val">${gStats.maxPoints}</span>
+                            <span class="text-[8px] text-amber-400 font-black tracking-widest uppercase mt-1 text-center leading-tight whitespace-normal break-words w-full">${gMostPointsName}</span>
+                        </div>
                     </div>
                 </div>
                 ${psoHtmlG}
@@ -1326,7 +1335,8 @@
             }
             
             const sStats = calcStats(sLog);
-            const sLongestName = resolveShooterName(sStats.maxRollsShooter);
+            const sLongestName = resolveShooterName(sStats.maxRollsShooterId);
+            const sMostPointsName = resolveShooterName(sStats.maxPointsShooterId);
             
             let atsHtmlS = '';
             if (globalConfig.trackATS === 'true') {
@@ -1391,6 +1401,11 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">${sStats.psrMed}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">${sStats.psrMean}</span></div>
+                        <div class="sdd-card-col max-w-[120px]">
+                            <span class="sdd-sub">MOST</span>
+                            <span class="sdd-val">${sStats.maxPoints}</span>
+                            <span class="text-[8px] text-amber-400 font-black tracking-widest uppercase mt-1 text-center leading-tight whitespace-normal break-words w-full">${sMostPointsName}</span>
+                        </div>
                     </div>
                 </div>
                 ${psoHtmlS}
@@ -3216,4 +3231,4 @@
         }
     </script>
 </body>
-</html>
+</html>```
