@@ -76,6 +76,7 @@
         .sdd-psr { border-top-color: #8b5cf6; background: linear-gradient(to bottom, #10051a, #020617); }
         .sdd-ats { border-top-color: #d946ef; background: linear-gradient(to bottom, #1a0516, #020617); }
         .sdd-shtr { border-top-color: #f59e0b; background: linear-gradient(to bottom, rgba(120,53,15,0.4), rgba(2,6,23,1)); }
+        .sdd-pso { border-top-color: #0ea5e9; background: linear-gradient(to bottom, #082f49, #020617); }
 
         .sdd-card-header {
             background: rgba(30, 41, 59, 0.5); color: #94a3b8; font-size: 10px; font-weight: 900; 
@@ -91,7 +92,7 @@
         }
         .sdd-card-col:last-child { border-right: none; }
         .sdd-val { font-size: 16px; font-weight: 900; color: #ffffff; font-family: monospace; }
-        .sdd-sub { font-size: 8px; color: #64748b; margin-bottom: 2px; font-weight: bold; letter-spacing: 0.5px; }
+        .sdd-sub { font-size: 9px; color: #ffffff; margin-bottom: 2px; font-weight: 900; letter-spacing: 0.5px; }
 
         /* ROLL NODES */
         .hist-node {
@@ -359,103 +360,10 @@
         </div>
 
         <div id="sdd-global" class="sdd-card-container">
-            <div class="sdd-card sdd-rolls">
-                <div class="sdd-card-header">ROLLS</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val" id="g-cr">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-tr">0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="g-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="g-cs">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="g-ts">0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-sor">
-                <div class="sdd-card-header">S.O.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-sor-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-sor-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-srr">
-                <div class="sdd-card-header">S.R.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-srr-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-srr-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-psr">
-                <div class="sdd-card-header">P.S.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="g-psr-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="g-psr-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-ats" id="g-ats-card">
-                <div class="sdd-card-header">A.T.S.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="g-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="g-ats-t">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="g-ats-a">0</span></div>
-                </div>
-            </div>
+            <!-- Rendered via JS -->
         </div>
         <div id="sdd-shooter" class="sdd-card-container" style="display: none;">
-            <div class="sdd-card sdd-shtr cursor-pointer hover:brightness-110 transition-all" onclick="openSddConfig()">
-                <div class="sdd-card-header bg-amber-900/50 text-amber-400" id="sdd-shooter-label">SHTR</div>
-                <div class="sdd-card-body px-4 py-2 flex flex-col items-center justify-center gap-1">
-                    <span class="font-black text-amber-400 tracking-widest text-[10px]" id="sdd-pos-label">ALL POSITIONS</span>
-                    <span class="font-bold text-amber-500/70 tracking-widest text-[8px]" id="sdd-set-label">ALL SETS</span>
-                </div>
-            </div>
-            <div class="sdd-card sdd-rolls">
-                <div class="sdd-card-header">ROLLS</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val" id="s-cr">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-tr">0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-sevens">
-                <div class="sdd-card-header">SEVENS</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val" id="s-so">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val" id="s-cs">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val" id="s-ts">0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-sor">
-                <div class="sdd-card-header">S.O.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-sor-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-sor-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-srr">
-                <div class="sdd-card-header">S.R.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-srr-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-srr-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-psr">
-                <div class="sdd-card-header">P.S.R.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub">MEDIAN</span><span class="sdd-val" id="s-psr-med">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">0.0</span></div>
-                </div>
-            </div>
-            <div class="sdd-card sdd-ats" id="s-ats-card">
-                <div class="sdd-card-header">A.T.S.</div>
-                <div class="sdd-card-body">
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="s-ats-s">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="s-ats-t">0</span></div>
-                    <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="s-ats-a">0</span></div>
-                </div>
-            </div>
+            <!-- Rendered via JS -->
         </div>
 
         <div id="bonus-trackers" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner">
@@ -1178,11 +1086,17 @@
         }
 
         function calcStats(log) {
-            let TR = 0, SO = 0, CS = 0, TotalPointsMade = 0;
+            let TR = 0, SO = 0, CS = 0, co11 = 0, TotalPointsMade = 0;
             let handRolls = [], handPoints = [], srrRolls = [];
             let currentHandRolls = 0, currentHandPoints = 0, currentSrrRolls = 0;
             let isComeout = true, currentPoint = null;
             let atsS = 0, atsT = 0, atsA = 0;
+            
+            let maxRolls = 0;
+            let maxRollsShooter = "N/A";
+            
+            let handBoxCount = 0;
+            let pso0=0, pso1=0, pso2=0, pso3=0, pso4=0, pso5=0, pso6=0, pso7=0;
 
             log.forEach(r => {
                 if (r.is_NS_Marker) return;
@@ -1193,6 +1107,11 @@
                 TR++;
                 currentHandRolls++;
                 currentSrrRolls++;
+                
+                if (currentHandRolls >= maxRolls && currentHandRolls > 0) {
+                    maxRolls = currentHandRolls;
+                    maxRollsShooter = r.Shooter_ID || "UNKNOWN";
+                }
 
                 if (r.Notes) {
                     if (r.Notes.includes("ATS Small Hit")) atsS++;
@@ -1208,6 +1127,7 @@
                 if (isComeout) {
                     if (sum === 7 || sum === 11) {
                         if (sum === 7) CS++;
+                        if (sum === 11) co11++;
                     } else if (sum === 2 || sum === 3 || sum === 12) {
                         // Crap
                     } else {
@@ -1215,10 +1135,25 @@
                         currentPoint = sum;
                     }
                 } else {
+                    if ([4,5,6,8,9,10].includes(sum)) {
+                        handBoxCount++;
+                    }
+                    
                     if (sum === 7) {
                         SO++;
                         handRolls.push(currentHandRolls);
                         handPoints.push(currentHandPoints);
+                        
+                        pso7++;
+                        if (handBoxCount < 1) pso0++;
+                        if (handBoxCount < 2) pso1++;
+                        if (handBoxCount < 3) pso2++;
+                        if (handBoxCount < 4) pso3++;
+                        if (handBoxCount < 5) pso4++;
+                        if (handBoxCount < 6) pso5++;
+                        if (handBoxCount < 7) pso6++;
+
+                        handBoxCount = 0;
                         currentHandRolls = 0; currentHandPoints = 0;
                         isComeout = true; currentPoint = null;
                     } else if (sum === currentPoint) {
@@ -1230,7 +1165,7 @@
                 }
             });
 
-            const TS = SO + CS;
+            const TS = SO + CS + co11;
             const sorMean = SO > 0 ? (TR / SO).toFixed(1) : TR.toFixed(1);
             const srrMean = TS > 0 ? (TR / TS).toFixed(1) : TR.toFixed(1);
             const psrMean = SO > 0 ? (TotalPointsMade / SO).toFixed(1) : TotalPointsMade.toFixed(1);
@@ -1239,11 +1174,66 @@
             const srrMed = Math.round(getMedian(srrRolls));
             const psrMed = Math.round(getMedian(handPoints));
 
-            return { TR, CR: currentHandRolls, SO, CS, TS, sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, atsS, atsT, atsA };
+            return { 
+                TR, CR: currentHandRolls, SO, CS, co11, TS, 
+                sorMean, sorMed, srrMean, srrMed, psrMean, psrMed, 
+                atsS, atsT, atsA, 
+                maxRolls, maxRollsShooter, 
+                pso0, pso1, pso2, pso3, pso4, pso5, pso6, pso7 
+            };
+        }
+        
+        function resolveShooterName(idOrName) {
+            if (!idOrName || idOrName === "UNKNOWN" || idOrName === "N/A") return "N/A";
+            const sObj = masterData.shooters.find(s => s.id === idOrName || s.name === idOrName);
+            return sObj ? sObj.name : idOrName;
+        }
+
+        function renderPsoCard(stats) {
+            const getRatio = (count) => count > 0 ? (stats.SO / count).toFixed(1) : '0.0';
+            return `
+            <div class="sdd-card sdd-pso">
+                <div class="sdd-card-header text-sky-400">P.S.O.</div>
+                <div class="sdd-card-body">
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO</span><span class="sdd-val">${stats.pso0}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso0)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 1</span><span class="sdd-val">${stats.pso1}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso1)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 2</span><span class="sdd-val">${stats.pso2}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso2)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 3</span><span class="sdd-val">${stats.pso3}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso3)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 4</span><span class="sdd-val">${stats.pso4}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso4)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 5</span><span class="sdd-val">${stats.pso5}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso5)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 6</span><span class="sdd-val">${stats.pso6}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso6)}</span>
+                    </div>
+                    <div class="sdd-card-col">
+                        <span class="sdd-sub">PSO 7+</span><span class="sdd-val">${stats.pso7}</span>
+                        <span class="sdd-sub mt-1 text-[7px] text-sky-400/80">RATIO</span><span class="text-[10px] font-mono font-bold text-sky-300">${getRatio(stats.pso7)}</span>
+                    </div>
+                </div>
+            </div>`;
         }
 
         function updateSDD() {
             const gStats = calcStats(universalLog);
+            const gLongestName = resolveShooterName(gStats.maxRollsShooter);
             
             let atsHtmlG = '';
             if (globalConfig.trackATS === 'true') {
@@ -1251,12 +1241,14 @@
                 <div class="sdd-card sdd-ats" id="g-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="g-ats-s">${gStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="g-ats-t">${gStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="g-ats-a">${gStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">SML</span><span class="sdd-val" id="g-ats-s">${gStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">TAL</span><span class="sdd-val" id="g-ats-t">${gStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">ALL</span><span class="sdd-val" id="g-ats-a">${gStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
+            
+            const psoHtmlG = renderPsoCard(gStats);
 
             document.getElementById('sdd-global').innerHTML = `
                 <div class="sdd-card sdd-rolls">
@@ -1264,13 +1256,19 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val">${gStats.CR}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TR}</span></div>
+                        <div class="sdd-card-col max-w-[120px]">
+                            <span class="sdd-sub">LONGEST</span>
+                            <span class="sdd-val">${gStats.maxRolls}</span>
+                            <span class="text-[8px] text-amber-400 font-black tracking-widest uppercase mt-1 text-center leading-tight whitespace-normal break-words w-full">${gLongestName}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${gStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${gStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${gStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${gStats.co11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${gStats.TS}</span></div>
                     </div>
                 </div>
@@ -1295,6 +1293,7 @@
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val">${gStats.psrMean}</span></div>
                     </div>
                 </div>
+                ${psoHtmlG}
                 ${atsHtmlG}
             `;
 
@@ -1327,6 +1326,7 @@
             }
             
             const sStats = calcStats(sLog);
+            const sLongestName = resolveShooterName(sStats.maxRollsShooter);
             
             let atsHtmlS = '';
             if (globalConfig.trackATS === 'true') {
@@ -1334,12 +1334,14 @@
                 <div class="sdd-card sdd-ats" id="s-ats-card">
                     <div class="sdd-card-header">A.T.S.</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">SML</span><span class="sdd-val" id="s-ats-s">${sStats.atsS}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">TAL</span><span class="sdd-val" id="s-ats-t">${sStats.atsT}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub font-bold text-slate-300">ALL</span><span class="sdd-val" id="s-ats-a">${sStats.atsA}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">SML</span><span class="sdd-val" id="s-ats-s">${sStats.atsS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">TAL</span><span class="sdd-val" id="s-ats-t">${sStats.atsT}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">ALL</span><span class="sdd-val" id="s-ats-a">${sStats.atsA}</span></div>
                     </div>
                 </div>`;
             }
+            
+            const psoHtmlS = renderPsoCard(sStats);
 
             document.getElementById('sdd-shooter').innerHTML = `
                 <div class="sdd-card sdd-shtr cursor-pointer hover:brightness-110 transition-all" onclick="openSddConfig()">
@@ -1354,13 +1356,19 @@
                     <div class="sdd-card-body">
                         <div class="sdd-card-col"><span class="sdd-sub">CURRENT</span><span class="sdd-val">${sStats.CR}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TR}</span></div>
+                        <div class="sdd-card-col max-w-[120px]">
+                            <span class="sdd-sub">LONGEST</span>
+                            <span class="sdd-val">${sStats.maxRolls}</span>
+                            <span class="text-[8px] text-amber-400 font-black tracking-widest uppercase mt-1 text-center leading-tight whitespace-normal break-words w-full">${sLongestName}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="sdd-card sdd-sevens">
-                    <div class="sdd-card-header">SEVENS</div>
+                    <div class="sdd-card-header">OUTS</div>
                     <div class="sdd-card-body">
-                        <div class="sdd-card-col"><span class="sdd-sub">OUT</span><span class="sdd-val">${sStats.SO}</span></div>
-                        <div class="sdd-card-col"><span class="sdd-sub">C.O.</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">BIG RED</span><span class="sdd-val">${sStats.SO}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 7</span><span class="sdd-val">${sStats.CS}</span></div>
+                        <div class="sdd-card-col"><span class="sdd-sub">C.O. 11</span><span class="sdd-val">${sStats.co11}</span></div>
                         <div class="sdd-card-col"><span class="sdd-sub">TOTAL</span><span class="sdd-val">${sStats.TS}</span></div>
                     </div>
                 </div>
@@ -1385,6 +1393,7 @@
                         <div class="sdd-card-col"><span class="sdd-sub">MEAN</span><span class="sdd-val" id="s-psr-mean">${sStats.psrMean}</span></div>
                     </div>
                 </div>
+                ${psoHtmlS}
                 ${atsHtmlS}
             `;
 
