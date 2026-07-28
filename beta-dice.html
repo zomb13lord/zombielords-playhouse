@@ -60,7 +60,9 @@
             display: flex; flex-direction: row; align-items: stretch;
             overflow-x: auto; background: rgba(2, 6, 23, 0.95); border-top: 1px solid rgba(51, 65, 85, 0.4);
             padding: 12px 20px; gap: 12px;
+            cursor: grab; scroll-behavior: smooth;
         }
+        .sdd-card-container:active { cursor: grabbing; }
         .sdd-card-container::-webkit-scrollbar { display: none; }
         
         .sdd-card {
@@ -892,6 +894,29 @@
         window.activeConfigModal = null;
         window.cryptSaveRedirect = false;
 
+        function attachDragScroll(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            el.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - el.offsetLeft;
+                scrollLeft = el.scrollLeft;
+            });
+            el.addEventListener('mouseleave', () => { isDown = false; });
+            el.addEventListener('mouseup', () => { isDown = false; });
+            el.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - el.offsetLeft;
+                const walk = (x - startX) * 2; 
+                el.scrollLeft = scrollLeft - walk;
+            });
+        }
+
         // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
             if (!user) { window.location.href = "index.html"; return; }
@@ -903,28 +928,9 @@
             buildColorGrid();
             buildLayTrackersConfig();
             
-            // Desktop Scroll Listener
-            const hb = document.getElementById('history-bar');
-            if(hb) {
-                let isDown = false;
-                let startX;
-                let scrollLeft;
-
-                hb.addEventListener('mousedown', (e) => {
-                    isDown = true;
-                    startX = e.pageX - hb.offsetLeft;
-                    scrollLeft = hb.scrollLeft;
-                });
-                hb.addEventListener('mouseleave', () => { isDown = false; });
-                hb.addEventListener('mouseup', () => { isDown = false; });
-                hb.addEventListener('mousemove', (e) => {
-                    if (!isDown) return;
-                    e.preventDefault();
-                    const x = e.pageX - hb.offsetLeft;
-                    const walk = (x - startX) * 2; 
-                    hb.scrollLeft = scrollLeft - walk;
-                });
-            }
+            attachDragScroll('history-bar');
+            attachDragScroll('sdd-global');
+            attachDragScroll('sdd-shooter');
         });
 
         function updateStickyNid() {
@@ -1147,14 +1153,14 @@
                         handRolls.push(currentHandRolls);
                         handPoints.push(currentHandPoints);
                         
-                        if (handBoxCount < 1) pso++;
-                        if (handBoxCount < 2) p1so++;
-                        if (handBoxCount < 3) p2so++;
-                        if (handBoxCount < 4) p3so++;
-                        if (handBoxCount < 5) p4so++;
-                        if (handBoxCount < 6) p5so++;
-                        if (handBoxCount < 7) p6so++;
-                        if (handBoxCount >= 7) p7pso++;
+                        if (handBoxCount === 0) pso++;
+                        else if (handBoxCount === 1) p1so++;
+                        else if (handBoxCount === 2) p2so++;
+                        else if (handBoxCount === 3) p3so++;
+                        else if (handBoxCount === 4) p4so++;
+                        else if (handBoxCount === 5) p5so++;
+                        else if (handBoxCount === 6) p6so++;
+                        else if (handBoxCount >= 7) p7pso++;
 
                         handBoxCount = 0;
                         currentHandRolls = 0; 
@@ -3231,4 +3237,4 @@
         }
     </script>
 </body>
-</html>```
+</html>
