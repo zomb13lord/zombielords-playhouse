@@ -1825,7 +1825,7 @@
                         cAllHtml = `LAY <div class="flex gap-0.5">${getMicroDieHTML(d1)}${getMicroDieHTML(d2)}</div>`;
                     }
                     
-                    let kAll = getKinematicData(target, kinematicRolls, globalConfig.kinematicRange, 'after');
+                    let kAll = getKinematicData(target, kinematicRolls, globalConfig.kinematicRange, 'before');
                     if (kAll.total > 0) {
                         kAll.hot.forEach(h => pushIndicator(h.num, cAllHtml, h.fires, 0));
                         kAll.cold.forEach(c => pushIndicator(c.num, cAllHtml, 0, c.flakes));
