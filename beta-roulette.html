@@ -14,6 +14,8 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;700;900&display=swap');
         
+        :root { --emerald: #10b981; --gold: #fde047; }
+        
         body {
             margin: 0; padding: 0; background-color: #020617; color: #f8fafc;
             font-family: 'Montserrat', sans-serif; 
@@ -42,26 +44,26 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.8);
         }
         #history-bar {
-            display: flex; flex-direction: row; align-items: center;
-            overflow-x: auto; padding: 12px 10px; gap: 10px; min-height: 76px;
+            display: flex; flex-direction: row; align-items: flex-end;
+            overflow-x: auto; padding: 12px 10px; gap: 15px; min-height: 76px;
             cursor: grab; scroll-behavior: smooth;
         }
         #history-bar:active { cursor: grabbing; }
         #history-bar::-webkit-scrollbar { display: none; }
 
-        .hist-node {
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 900; border-radius: 5px; flex-shrink: 0;
-            font-size: 19px; min-width: 48px; height: 48px; padding: 0 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5); position: relative;
-            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: #f8fafc;
-            box-sizing: border-box;
+        /* ROULETTE CHIP STYLES */
+        .chip-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+        .chip { 
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; font-weight: 900; font-size: 0.9rem; border: 2px solid rgba(255,255,255,0.2); 
+            color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.5);
         }
-
-        .node-red { background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%); border-color: #ef4444; box-shadow: 0 0 18px rgba(220, 38, 38, 0.6); }
-        .node-black { background: #ffffff; color: #000000; border-color: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.5); }
-        .node-green { border-color: #10b981; color: #10b981; background: transparent; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
-        .latest-node { border: 2px dashed #f59e0b !important; transform: scale(1.05); }
+        @media (min-width: 768px) { .chip { width: 48px; height: 48px; font-size: 1.2rem; } }
+        .chip-red { background-color: #ef4444; }
+        .chip-black { background-color: #1e293b; }
+        .chip-green { background-color: #10b981; }
+        .latest-chip { border: 3px solid var(--gold) !important; box-shadow: 0 0 15px rgba(253, 224, 71, 0.6); transform: scale(1.05); }
+        .chip-label { font-size: 9px; font-weight: bold; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
 
         /* EXPANDABLE INPUT PAD */
         #input-pad-wrapper {
@@ -86,16 +88,16 @@
         .state-natural .pad-handle { display: none; }
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; opacity: 0; pointer-events: none; }
 
+        /* ORIGINAL NUMPAD STYLES */
         .numpad-btn { 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: flex; 
             align-items: center; justify-content: center; user-select: none; font-weight: 900; 
             border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); width: 100%; height: 50px; 
             font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); outline: none;
         }
-        @media (min-width: 768px) { .numpad-btn { height: 70px; font-size: 1.4rem; } }
-        .numpad-btn:active { transform: translateY(2px) scale(0.95); filter: brightness(1.2); }
-        .selection-pulse { border-color: #f59e0b !important; box-shadow: 0 0 25px #f59e0b !important; }
-        
+        @media (min-width: 768px) { .numpad-btn { width: 85px; height: 70px; font-size: 1.4rem; } }
+        .numpad-btn:hover { transform: translateY(-3px) scale(1.05); z-index: 10; filter: brightness(1.2); border-color: rgba(255,255,255,0.4); }
+        .selection-pulse { border-color: var(--gold) !important; box-shadow: 0 0 25px var(--gold) !important; transform: scale(0.95) !important; }
         .btn-red { background-color: #ef4444; color: white; }
         .btn-black { background-color: #000000; color: white; }
         .btn-green { background-color: #10b981; color: white; }
@@ -163,16 +165,14 @@
         </div>
         
         <div id="pad-content">
-            <div class="flex flex-col gap-2 w-full max-w-[340px] md:max-w-[420px] mx-auto">
+            <div class="flex flex-col gap-2 w-full max-w-[800px] mx-auto items-center">
                 
-                <div id="numpad-container">
+                <div id="numpad-container" class="w-full">
                     <!-- Rendered via JS -->
                 </div>
                 
-                <div id="pad-extra" class="flex gap-2 mt-2">
-                    <button onclick="resetRolls()" class="flex-1 border border-red-500 text-red-500 hover:bg-red-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Reset</button>
-                    <button onclick="undoRoll()" class="flex-1 border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Undo</button>
-                    <button onclick="setIpState('collapsed')" class="flex-1 border border-slate-500 text-slate-400 hover:bg-slate-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all">Hide Pad</button>
+                <div id="pad-extra" class="flex gap-2 w-full max-w-[340px] mt-2">
+                    <button onclick="undoRoll()" class="w-full border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all shadow-[0_4px_6px_rgba(0,0,0,0.3)]">Undo Last Spin</button>
                 </div>
             </div>
         </div>
@@ -377,6 +377,8 @@
             let html = '';
             
             if (window.innerWidth < 768) {
+                // Mobile layout
+                html += `<div class="max-w-[340px] mx-auto w-full">`;
                 html += `<div class="grid grid-cols-${zeroes.length} gap-1 mb-1">`;
                 zeroes.forEach(z => html += `<button onclick="processInput(this, '${z}')" class="numpad-btn btn-green">${z}</button>`);
                 html += `</div><div class="grid grid-cols-3 gap-1">`;
@@ -384,9 +386,10 @@
                     const colorClass = redNums.includes(i) ? 'btn-red' : 'btn-black';
                     html += `<button onclick="processInput(this, '${i}')" class="numpad-btn ${colorClass}">${i}</button>`;
                 }
-                html += `</div>`;
+                html += `</div></div>`;
             } else {
-                html = `<div class="flex gap-1.5 items-start justify-center"><div class="flex flex-col gap-1.5">`;
+                // Desktop layout mapping exact original styling
+                html += `<div class="flex gap-1.5 items-start justify-center"><div class="flex flex-col gap-1.5">`;
                 zeroes.forEach(z => html += `<button onclick="processInput(this, '${z}')" class="numpad-btn btn-green" style="height:${zeroes.length==1?'213px':zeroes.length==2?'105px':'68px'}">${z}</button>`);
                 html += `</div>`;
                 for(let col=0; col<12; col++) {
@@ -433,16 +436,6 @@
             syncActiveSession();
         }
 
-        async function resetRolls() {
-            const confirmed = await customConfirm("Are you sure you want to clear the active rolls without saving?");
-            if (confirmed) {
-                universalLog = [];
-                setIpState('collapsed');
-                renderHistoryBar();
-                syncActiveSession();
-            }
-        }
-
         // --- RENDER HISTORY ---
         function renderHistoryBar() {
             const historyBar = document.getElementById('history-bar');
@@ -455,21 +448,25 @@
 
             const fragment = document.createDocumentFragment();
 
-            universalLog.forEach((r, index) => {
+            universalLog.forEach((r, i) => {
                 const el = document.createElement('div');
                 const isZero = r.n === '0' || r.n === '00' || r.n === '000';
                 const isRed = redNums.includes(parseInt(r.n));
                 
-                let nodeClass = isZero ? 'node-green' : (isRed ? 'node-red' : 'node-black');
-                let inlineClass = index === 0 ? 'latest-node' : 'opacity-80 scale-95';
+                const colorClass = isZero ? 'chip-green' : (isRed ? 'chip-red' : 'chip-black');
+                const latestClass = i === 0 ? 'latest-chip' : '';
 
-                el.className = `hist-node ${nodeClass} ${inlineClass}`;
-                el.innerHTML = `<div>${r.n}</div>`;
+                el.className = `chip-stack ${i === 0 ? '' : 'opacity-60'}`;
+                el.innerHTML = `
+                    <div class="chip ${colorClass} ${latestClass}">${r.n}</div>
+                    <span class="chip-label">#${universalLog.length - i}</span>
+                `;
                 
                 fragment.appendChild(el);
             });
 
             historyBar.appendChild(fragment);
+            // Snap to newest chip
             historyBar.scrollLeft = 0;
         }
 
