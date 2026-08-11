@@ -339,7 +339,7 @@
 
         async function fetchActiveSession() {
             try {
-                const doc = await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").get();
+                const doc = await db.collection("users").doc(currentUid).collection("crypt").doc("active_roulette_session").get();
                 if (doc.exists) {
                     const data = doc.data();
                     if (data.meta_tags && data.meta_tags.wheel) {
@@ -347,7 +347,9 @@
                     }
                     let rawLog = data.payload_log || [];
                     if (typeof rawLog === 'string') rawLog = JSON.parse(rawLog);
-                    universalLog = rawLog;
+                    
+                    // Validate data: ignore corrupt cross-module data lacking the roulette 'n' value
+                    universalLog = rawLog.filter(r => r && r.n !== undefined && r.n !== null);
                 }
             } catch (e) { console.error("Failed to fetch active session", e); }
             renderHistoryBar();
@@ -364,7 +366,7 @@
                 },
                 payload_log: JSON.stringify(universalLog)
             };
-            try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").set(payload, { merge: true }); } 
+            try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_roulette_session").set(payload, { merge: true }); } 
             catch (e) { console.error("Auto-save failed", e); }
         }
 
@@ -565,7 +567,7 @@
 
             try {
                 await db.collection("users").doc(currentUid).collection("crypt").doc("archive_" + Date.now()).set(payload);
-                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
+                await db.collection("users").doc(currentUid).collection("crypt").doc("active_roulette_session").delete();
                 
                 if (window.cryptSaveRedirect) {
                     window.location.href = "crypt.html";
@@ -581,7 +583,7 @@
 
         async function enterCryptWithoutSaving() {
             try {
-                await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete();
+                await db.collection("users").doc(currentUid).collection("crypt").doc("active_roulette_session").delete();
                 window.location.href = "crypt.html";
             } catch (e) { console.error(e); }
         }
@@ -591,7 +593,7 @@
             const confirmed = await customConfirm("Are you sure you want to clear the active session?");
             if (confirmed) {
                 universalLog = [];
-                try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_session").delete(); } catch(e){}
+                try { await db.collection("users").doc(currentUid).collection("crypt").doc("active_roulette_session").delete(); } catch(e){}
                 closeAllModals(); 
                 setIpState('collapsed');
                 renderHistoryBar();
