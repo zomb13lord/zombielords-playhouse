@@ -112,15 +112,14 @@
             border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.5); flex-shrink: 0;
         }
-        .nid-val { font-weight: 900; font-size: 14px; line-height: 1.2; color: #ffffff; }
-        .nid-count { font-size: 10px; font-family: monospace; font-weight: bold; color: var(--gold); }
+        .nid-val { font-weight: 900; font-size: 14px; line-height: 1.2; color: #ffffff; text-align: center; }
         
         .nid-red { background: linear-gradient(to bottom, #7f1d1d, #450a0a); }
         .nid-black { background: linear-gradient(to bottom, #334155, #0f172a); }
         .nid-green { background: linear-gradient(to bottom, #065f46, #022c22); }
         .nid-outside { background: linear-gradient(to bottom, #1e293b, #0f172a); border-color: rgba(255,255,255,0.3); }
 
-        .rt-cell { position: absolute; width: 32px; height: 42px; transform: translate(-50%, -50%); }
+        .rt-cell { position: absolute; width: 32px; height: 42px; transform-origin: center center; }
 
         /* MODALS */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
@@ -164,7 +163,7 @@
     <main class="flex-grow flex flex-col items-center p-4">
         <div class="w-full flex flex-col items-center justify-center mt-4">
             <div class="font-black text-emerald-500 tracking-[0.3em] uppercase text-sm cinzel mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">NID Matrix</div>
-            <div id="nid-matrix" class="w-full text-white overflow-x-auto no-scrollbar pb-4 max-w-[1000px]">
+            <div id="nid-matrix" class="w-full text-white overflow-x-auto no-scrollbar pb-4 max-w-[1000px] flex justify-center">
                 <!-- Injected via updateNID() -->
             </div>
         </div>
@@ -401,30 +400,33 @@
             const container = document.getElementById('numpad-container');
             const w = globalConfig.wheel;
             
-            let html = `<div class="flex gap-1 w-max mx-auto items-stretch justify-center">`;
+            let html = `<div class="flex gap-1.5 w-max mx-auto items-stretch justify-center px-4">`;
             
-            // ZERO BLOCK (Far Left)
-            html += `<div class="flex flex-col gap-1 w-[42px] md:w-[50px]">`;
+            // HORIZONTAL ZERO BLOCK
             if (w === 'TZ') {
                 html += `
-                    <button onclick="processInput(this, '000')" class="numpad-btn btn-green w-full" style="height: 50px; md:height: 60px;">000</button>
-                    <div class="flex gap-1 h-full">
-                        <button onclick="processInput(this, '0')" class="numpad-btn btn-green h-full" style="width: 20px; md:width: 24px;">0</button>
-                        <button onclick="processInput(this, '00')" class="numpad-btn btn-green h-full" style="width: 20px; md:width: 24px;">00</button>
+                <div class="flex flex-row gap-1.5 h-[216px]">
+                    <button onclick="processInput(this, '000')" class="numpad-btn btn-green h-full">000</button>
+                    <div class="flex flex-col gap-1.5 h-full">
+                        <button onclick="processInput(this, '00')" class="numpad-btn btn-green flex-1">00</button>
+                        <button onclick="processInput(this, '0')" class="numpad-btn btn-green flex-1">0</button>
                     </div>
-                `;
+                </div>`;
             } else if (w === 'US') {
                 html += `
-                    <button onclick="processInput(this, '00')" class="numpad-btn btn-green w-full h-1/2">00</button>
-                    <button onclick="processInput(this, '0')" class="numpad-btn btn-green w-full h-1/2">0</button>
-                `;
+                <div class="flex flex-col gap-1.5 h-[216px]">
+                    <button onclick="processInput(this, '00')" class="numpad-btn btn-green flex-1">00</button>
+                    <button onclick="processInput(this, '0')" class="numpad-btn btn-green flex-1">0</button>
+                </div>`;
             } else {
-                html += `<button onclick="processInput(this, '0')" class="numpad-btn btn-green w-full h-full">0</button>`;
+                html += `
+                <div class="flex flex-col h-[216px]">
+                    <button onclick="processInput(this, '0')" class="numpad-btn btn-green h-full">0</button>
+                </div>`;
             }
-            html += `</div>`;
 
             // MAIN NUMBERS GRID
-            html += `<div class="flex flex-col gap-1">`;
+            html += `<div class="flex flex-col gap-1.5">`;
             const layout = [
                 [3,6,9,12,15,18,21,24,27,30,33,36],
                 [2,5,8,11,14,17,20,23,26,29,32,35],
@@ -432,7 +434,7 @@
             ];
             
             for(let row=0; row<3; row++) {
-                html += `<div class="flex gap-1">`;
+                html += `<div class="flex gap-1.5">`;
                 for(let col=0; col<12; col++) {
                     const n = layout[row][col];
                     const colorClass = redNums.includes(n) ? 'btn-red' : 'btn-black';
@@ -444,6 +446,8 @@
             
             container.innerHTML = html;
         }
+
+        window.addEventListener('resize', renderNumpad);
 
         // --- INPUT LOGIC ---
         function setIpState(state) {
@@ -457,6 +461,7 @@
             
             const r = { n: n.toString(), Time_Stamp: new Date().toISOString() };
             
+            // Push to end for chronological order (fixes Crypt dates)
             universalLog.push(r); 
             setIpState('collapsed');
             renderHistoryBar(); 
@@ -511,21 +516,15 @@
             }
 
             historyBar.appendChild(fragment);
-            historyBar.scrollLeft = 0; // Snap to newest (left)
+            // Snap scroll to the far left (where newest chip is)
+            historyBar.scrollLeft = 0;
         }
 
         // --- NID MATRIX RENDERING ---
-        function getHitCount(conditionFn) {
-            return universalLog.filter(r => conditionFn(r.n)).length;
-        }
-
         function updateNID() {
             const matrix = document.getElementById('nid-matrix');
-            
-            let counts = {};
-            universalLog.forEach(r => { counts[r.n] = (counts[r.n] || 0) + 1; });
 
-            const getCellHtml = (num, wClass, hClass, customLabel = null) => {
+            const getCellHtml = (num, wClass = '', hClass = '', customLabel = null) => {
                 const isZero = num === '0' || num === '00' || num === '000';
                 const isRed = redNums.includes(parseInt(num));
                 
@@ -535,58 +534,42 @@
                 }
 
                 let displayVal = customLabel || num;
-                let countVal = 0;
                 
-                if (num === 'empty') {
-                    return `<div class="${wClass} ${hClass}"></div>`;
-                }
-                
-                if (!customLabel && !num.includes(':')) {
-                    countVal = counts[num] || 0;
-                } else if (num === '1st12') countVal = getHitCount(n => parseInt(n) >= 1 && parseInt(n) <= 12);
-                else if (num === '2nd12') countVal = getHitCount(n => parseInt(n) >= 13 && parseInt(n) <= 24);
-                else if (num === '3rd12') countVal = getHitCount(n => parseInt(n) >= 25 && parseInt(n) <= 36);
-                else if (num === '1-18') countVal = getHitCount(n => parseInt(n) >= 1 && parseInt(n) <= 18);
-                else if (num === '19-36') countVal = getHitCount(n => parseInt(n) >= 19 && parseInt(n) <= 36);
-                else if (num === 'Even') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 2 === 0);
-                else if (num === 'Odd') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 2 !== 0);
-                else if (num === 'Red') countVal = getHitCount(n => redNums.includes(parseInt(n)));
-                else if (num === 'Black') countVal = getHitCount(n => !redNums.includes(parseInt(n)) && n !== '0' && n !== '00' && n !== '000');
-                else if (num === 'Col3') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 0);
-                else if (num === 'Col2') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 2);
-                else if (num === 'Col1') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 1);
+                if (num === 'empty') return `<div class="${wClass} ${hClass}"></div>`;
 
                 return `
                     <div class="nid-cell ${colorClass} ${wClass} ${hClass}">
-                        <div class="nid-val">${displayVal}</div>
-                        <div class="nid-count">${countVal > 0 ? countVal : '-'}</div>
+                        <div class="nid-val text-center">${displayVal}</div>
                     </div>
                 `;
             };
 
             if (globalConfig.nidFormat === 'Standard') {
                 const w = globalConfig.wheel;
-                let html = `<div class="flex gap-1 mx-auto w-max items-stretch">`;
+                let html = `<div class="flex gap-1 mx-auto w-max items-stretch px-4">`;
                 
-                // ZEROS BLOCK
-                html += `<div class="flex flex-col gap-1 w-[42px]">`;
+                // HORIZONTAL ZERO BLOCK FOR NID
                 if (w === 'TZ') {
                     html += `
-                        ${getCellHtml('000', 'w-full', 'h-[42px]')}
-                        <div class="flex gap-1 h-full">
-                            ${getCellHtml('0', 'w-[19px]', 'h-full')}
-                            ${getCellHtml('00', 'w-[19px]', 'h-full')}
+                    <div class="flex flex-row gap-1 w-[84px]">
+                        ${getCellHtml('000', 'flex-1', 'h-full')}
+                        <div class="flex flex-col gap-1 flex-1 h-full">
+                            ${getCellHtml('00', 'w-full', 'h-[46px]')}
+                            ${getCellHtml('0', 'w-full', 'h-[46px]')}
                         </div>
-                    `;
+                    </div>`;
                 } else if (w === 'US') {
                     html += `
-                        ${getCellHtml('00', 'w-full', 'h-1/2')}
-                        ${getCellHtml('0', 'w-full', 'h-1/2')}
-                    `;
+                    <div class="flex flex-col gap-1 w-[42px] h-[96px]">
+                        ${getCellHtml('00', 'w-full', 'flex-1')}
+                        ${getCellHtml('0', 'w-full', 'flex-1')}
+                    </div>`;
                 } else {
-                    html += getCellHtml('0', 'w-full', 'h-full');
+                    html += `
+                    <div class="flex flex-col w-[42px] h-[96px]">
+                        ${getCellHtml('0', 'w-full', 'h-full')}
+                    </div>`;
                 }
-                html += `</div>`;
                 
                 // MAIN FELT BLOCK
                 html += `<div class="flex flex-col gap-1">`;
@@ -596,29 +579,29 @@
                 for(let row=0; row<3; row++) {
                     html += `<div class="flex gap-1">`;
                     for(let col=0; col<12; col++) {
-                        html += getCellHtml(layout[row][col].toString(), 'w-[42px]', 'h-[42px]');
+                        html += getCellHtml(layout[row][col].toString(), 'w-[42px]', 'h-[30px]');
                     }
-                    html += getCellHtml(`Col${3-row}`, 'w-[50px]', 'h-[42px]', '2:1');
+                    html += getCellHtml(`Col${3-row}`, 'w-[50px]', 'h-[30px]', '2:1');
                     html += `</div>`;
                 }
                 
-                // Dozens Row
+                // Dozens Row (Spans exactly 4 columns = 168px + 12px gaps = 180px)
                 html += `<div class="flex gap-1">`;
-                html += getCellHtml('1st12', 'w-[180px]', 'h-[36px]', '1st 12');
-                html += getCellHtml('2nd12', 'w-[180px]', 'h-[36px]', '2nd 12');
-                html += getCellHtml('3rd12', 'w-[180px]', 'h-[36px]', '3rd 12');
-                html += getCellHtml('empty', 'w-[50px]', 'h-[36px]');
+                html += getCellHtml('1st12', 'w-[180px]', 'h-[28px]', '1st 12');
+                html += getCellHtml('2nd12', 'w-[180px]', 'h-[28px]', '2nd 12');
+                html += getCellHtml('3rd12', 'w-[180px]', 'h-[28px]', '3rd 12');
+                html += getCellHtml('empty', 'w-[50px]', 'h-[28px]');
                 html += `</div>`;
                 
-                // Outside Row
+                // Outside Row (Spans exactly 2 columns = 84px + 4px gap = 88px)
                 html += `<div class="flex gap-1">`;
-                html += getCellHtml('1-18', 'w-[88px]', 'h-[36px]');
-                html += getCellHtml('Even', 'w-[88px]', 'h-[36px]');
-                html += getCellHtml('Red', 'w-[88px]', 'h-[36px]', '<div class="w-4 h-4 bg-red-600 rotate-45 transform border border-white mt-1"></div>');
-                html += getCellHtml('Black', 'w-[88px]', 'h-[36px]', '<div class="w-4 h-4 bg-black rotate-45 transform border border-white mt-1"></div>');
-                html += getCellHtml('Odd', 'w-[88px]', 'h-[36px]');
-                html += getCellHtml('19-36', 'w-[88px]', 'h-[36px]');
-                html += getCellHtml('empty', 'w-[50px]', 'h-[36px]');
+                html += getCellHtml('1-18', 'w-[88px]', 'h-[28px]', '1-18');
+                html += getCellHtml('Even', 'w-[88px]', 'h-[28px]', 'Even');
+                html += getCellHtml('Red', 'w-[88px]', 'h-[28px]', '<div class="w-4 h-4 bg-red-600 rotate-45 transform border border-white"></div>');
+                html += getCellHtml('Black', 'w-[88px]', 'h-[28px]', '<div class="w-4 h-4 bg-black rotate-45 transform border border-white"></div>');
+                html += getCellHtml('Odd', 'w-[88px]', 'h-[28px]', 'Odd');
+                html += getCellHtml('19-36', 'w-[88px]', 'h-[28px]', '19-36');
+                html += getCellHtml('empty', 'w-[50px]', 'h-[28px]');
                 html += `</div>`;
                 
                 html += `</div></div>`;
@@ -635,50 +618,64 @@
                     else seq = WHEEL_TZ_SANDS;
                 }
 
-                const trackW = 740;
-                const trackH = 220;
-                const r = trackH / 2; // 110
-                const straight = trackW - (2 * r); // 520
-                const perimeter = (2 * straight) + (2 * Math.PI * r);
-                const step = perimeter / seq.length;
+                const N = seq.length;
+                const cellSpacing = 36;
+                const perimeter = N * cellSpacing;
+                
+                const R = 55; // Radius of outer curves
+                const curveLen = Math.PI * R; // 180 deg curve length
+                const straightLen = (perimeter - 2 * curveLen) / 2;
+
+                const trackW = straightLen + 2 * R + 60; // plus padding
+                const trackH = 2 * R + 60; // plus padding
 
                 let html = `<div class="relative mx-auto" style="width: ${trackW}px; height: ${trackH}px;">`;
                 
-                // Draw inner track line
-                html += `<div class="absolute border border-slate-700/50 rounded-full pointer-events-none" style="top: 25px; left: 25px; right: 25px; bottom: 25px;"></div>`;
+                // Inner Track Line
+                html += `<div class="absolute border border-slate-700/50 rounded-full pointer-events-none" style="top: 30px; left: 30px; width: ${straightLen + 2*R}px; height: ${2*R}px;"></div>`;
                 
                 seq.forEach((num, i) => {
-                    let d = i * step;
-                    let x, y;
+                    let d = i * cellSpacing;
+                    let x = 0, y = 0, rot = 0;
                     
-                    if (d < straight) {
-                        x = (r + straight) - d;
+                    if (d < straightLen) {
+                        // Top straight
+                        x = R + d;
                         y = 0;
-                    } else if (d < straight + Math.PI * r) {
-                        let a = d - straight;
-                        let theta = -Math.PI/2 + (a / r);
-                        x = r + r * Math.cos(theta);
-                        y = r + r * Math.sin(theta);
-                    } else if (d < (2 * straight) + Math.PI * r) {
-                        let s = d - (straight + Math.PI * r);
-                        x = r + s;
-                        y = trackH;
+                        rot = 0;
+                    } else if (d < straightLen + curveLen) {
+                        // Right curve
+                        let s = d - straightLen;
+                        let theta = -Math.PI/2 + (s / R);
+                        x = R + straightLen + R * Math.cos(theta);
+                        y = R + R * Math.sin(theta);
+                        rot = theta * (180/Math.PI) + 90;
+                    } else if (d < 2 * straightLen + curveLen) {
+                        // Bottom straight
+                        let s = d - (straightLen + curveLen);
+                        x = R + straightLen - s;
+                        y = 2 * R;
+                        rot = 180;
                     } else {
-                        let a = d - ((2 * straight) + Math.PI * r);
-                        let theta = Math.PI/2 + (a / r);
-                        x = (r + straight) + r * Math.cos(theta);
-                        y = r + r * Math.sin(theta);
+                        // Left curve
+                        let s = d - (2 * straightLen + curveLen);
+                        let theta = Math.PI/2 + (s / R);
+                        x = R + R * Math.cos(theta);
+                        y = R + R * Math.sin(theta);
+                        rot = theta * (180/Math.PI) + 90;
                     }
+                    
+                    // Add padding offsets
+                    x += 30;
+                    y += 30;
                     
                     const isZero = num === '0' || num === '00' || num === '000';
                     const isRed = redNums.includes(parseInt(num));
                     const colorClass = isZero ? 'nid-green' : (isRed ? 'nid-red' : 'nid-black');
-                    const c = counts[num] || 0;
 
                     html += `
-                        <div class="rt-cell nid-cell ${colorClass}" style="left: ${x}px; top: ${y}px;">
+                        <div class="rt-cell nid-cell ${colorClass}" style="left: ${x}px; top: ${y}px; transform: translate(-50%, -50%) rotate(${rot}deg);">
                             <div class="nid-val">${num}</div>
-                            <div class="nid-count text-[9px]">${c > 0 ? c : '-'}</div>
                         </div>
                     `;
                 });
@@ -800,7 +797,7 @@
                 module_id: "ROULETTE_TRACKER", 
                 name: finalName, 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                date: new Date().toISOString(), // explicitly add date fallback
+                date: new Date().toISOString(),
                 is_favorite: false, 
                 meta_tags: { 
                     wheel: globalConfig.wheel, 
