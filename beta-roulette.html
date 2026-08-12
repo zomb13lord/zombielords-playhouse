@@ -50,6 +50,8 @@
         }
         #history-bar:active { cursor: grabbing; }
         #history-bar::-webkit-scrollbar { display: none; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* ROULETTE CHIP STYLES */
         .chip-stack { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
@@ -88,52 +90,52 @@
         .state-natural .pad-handle { display: none; }
         .state-collapsed #pad-content { max-height: 0; padding-top: 0; padding-bottom: 0; border: none; opacity: 0; pointer-events: none; }
 
-        /* ORIGINAL NUMPAD STYLES */
+        /* NUMPAD STYLES */
         .numpad-btn { 
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; display: flex; 
             align-items: center; justify-content: center; user-select: none; font-weight: 900; 
-            border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); width: 100%; height: 50px; 
-            font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3); outline: none;
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); font-size: 1.1rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); outline: none;
+            width: 42px; height: 50px; flex-shrink: 0;
         }
-        @media (min-width: 768px) { .numpad-btn { width: 85px; height: 70px; font-size: 1.4rem; } }
+        @media (min-width: 768px) { .numpad-btn { width: 50px; height: 60px; font-size: 1.4rem; } }
+        
         .numpad-btn:hover { transform: translateY(-3px) scale(1.05); z-index: 10; filter: brightness(1.2); border-color: rgba(255,255,255,0.4); }
         .selection-pulse { border-color: var(--gold) !important; box-shadow: 0 0 25px var(--gold) !important; transform: scale(0.95) !important; }
         .btn-red { background-color: #ef4444; color: white; }
         .btn-black { background-color: #000000; color: white; }
         .btn-green { background-color: #10b981; color: white; }
 
-        /* NID STYLES */
+        /* NID MATRIX STYLES */
         .nid-cell { 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 4px 0;
-            min-width: 38px; flex-shrink: 0;
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5); flex-shrink: 0;
         }
-        .nid-val { font-weight: 900; font-size: 14px; }
+        .nid-val { font-weight: 900; font-size: 14px; line-height: 1.2; color: #ffffff; }
         .nid-count { font-size: 10px; font-family: monospace; font-weight: bold; color: var(--gold); }
+        
         .nid-red { background: linear-gradient(to bottom, #7f1d1d, #450a0a); }
         .nid-black { background: linear-gradient(to bottom, #334155, #0f172a); }
         .nid-green { background: linear-gradient(to bottom, #065f46, #022c22); }
-        
+        .nid-outside { background: linear-gradient(to bottom, #1e293b, #0f172a); border-color: rgba(255,255,255,0.3); }
+
+        .rt-cell { position: absolute; width: 32px; height: 42px; transform: translate(-50%, -50%); }
+
         /* MODALS */
         .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
-        
         .modal-box { 
-            background-color: #020617; 
-            background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');
-            background-size: cover; background-position: center;
-            border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; 
+            background-color: #020617; background-image: url('https://zomb13lord.github.io/zombielords-playhouse/dice-card.jpg');
+            background-size: cover; background-position: center; border: 1px solid #334155; border-radius: 8px; width: 100%; max-width: 400px; 
             box-shadow: 0 0 40px rgba(0,0,0,1); max-height: 90vh; overflow-y: auto; padding: 0;
         }
-        
         .modal-content-layer {
             background: linear-gradient(to top, rgba(2,6,23,1) 10%, rgba(2,6,23,0.9) 60%, rgba(2,6,23,0.4) 100%);
             padding: 20px; padding-top: 60px; width: 100%; min-height: 100%; display: flex; flex-direction: column;
         }
-
         .select-wicked { background: #0f172a; border: 1px solid #334155; color: #fff; font-family: monospace; padding: 10px; border-radius: 4px; width: 100%; font-size: 12px; outline: none; text-transform: uppercase; }
         .select-wicked:focus { border-color: #10b981; }
         .input-wicked { background: #0f172a; border: 1px solid #10b981; color: #fff; font-family: monospace; padding: 12px; border-radius: 4px; width: 100%; text-align: left; font-size: 12px; outline: none; text-transform: uppercase; letter-spacing: 1px; }
-        
         .btn-cancel { background: #0f172a; border: 1px solid #334155; color: #94a3b8; padding: 12px; border-radius: 4px; font-weight: 900; text-transform: uppercase; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; letter-spacing: 0.1em; }
         .btn-cancel:hover { background: #1e293b; color: #fff; border-color: #475569; }
     </style>
@@ -154,18 +156,15 @@
 
     <div id="sticky-zone">
         <div id="history-bar">
-            <div class="text-slate-600 text-xs italic font-bold tracking-widest px-4">AWAITING FIRST SPIN...</div>
-        </div>
-        <div id="stats-placeholder" class="hidden flex-row justify-between items-center px-4 py-2 bg-slate-900/90 border-b border-slate-700/50 shadow-inner text-xs font-bold text-slate-300">
-            <!-- Reserved for generic SDD later -->
+            <!-- Injected by JS -->
         </div>
     </div>
 
     <!-- MAIN DASHBOARD -->
     <main class="flex-grow flex flex-col items-center p-4">
-        <div class="w-full max-w-[1000px] flex flex-col items-center justify-center mt-4">
-            <div class="font-black text-slate-500 tracking-[0.3em] uppercase text-sm cinzel mb-4">NID Matrix</div>
-            <div id="nid-matrix" class="w-full text-white">
+        <div class="w-full flex flex-col items-center justify-center mt-4">
+            <div class="font-black text-emerald-500 tracking-[0.3em] uppercase text-sm cinzel mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">NID Matrix</div>
+            <div id="nid-matrix" class="w-full text-white overflow-x-auto no-scrollbar pb-4 max-w-[1000px]">
                 <!-- Injected via updateNID() -->
             </div>
         </div>
@@ -178,12 +177,12 @@
         </div>
         
         <div id="pad-content">
-            <div class="flex flex-col gap-2 w-full max-w-[800px] mx-auto items-center">
-                <div id="numpad-container" class="w-full">
+            <div class="flex flex-col gap-2 w-full mx-auto items-center">
+                <div id="numpad-container" class="w-full overflow-x-auto no-scrollbar pb-2">
                     <!-- Rendered via JS -->
                 </div>
                 
-                <div id="pad-extra" class="flex gap-2 w-full max-w-[340px] mt-2">
+                <div id="pad-extra" class="flex gap-2 w-full max-w-[340px] mt-1">
                     <button onclick="undoRoll()" class="w-full border border-blue-500 text-blue-400 hover:bg-blue-900/30 py-2.5 rounded font-bold text-xs uppercase transition-all shadow-[0_4px_6px_rgba(0,0,0,0.3)]">Undo Last Spin</button>
                 </div>
             </div>
@@ -320,7 +319,7 @@
 
         const redNums = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
         
-        // Physical Wheel Sequences (Strings)
+        // Physical Wheel Sequences
         const WHEEL_EU = ['0','32','15','19','4','21','2','25','17','34','6','27','13','36','11','30','8','23','10','5','24','16','33','1','20','14','31','9','22','18','29','7','28','12','35','3','26'];
         const WHEEL_US = ['0','28','9','26','30','11','7','20','32','17','5','22','34','15','3','24','36','13','1','00','27','10','25','29','12','8','19','31','18','6','21','33','16','4','23','35','14','2'];
         const WHEEL_TZ_SANDS = ['0','000','00','28','9','26','30','11','7','20','32','17','5','22','34','15','3','24','36','13','1','27','10','25','29','12','8','19','31','18','6','21','33','16','4','23','35','14','2'];
@@ -352,7 +351,6 @@
             });
         }
 
-        // --- INIT & DATA FETCHING ---
         auth.onAuthStateChanged(async user => {
             if (!user) { window.location.href = "index.html"; return; }
             currentUid = user.uid;
@@ -402,68 +400,50 @@
         function renderNumpad() {
             const container = document.getElementById('numpad-container');
             const w = globalConfig.wheel;
-            const layout = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
             
-            let html = '';
+            let html = `<div class="flex gap-1 w-max mx-auto items-stretch justify-center">`;
             
-            if (window.innerWidth < 768) {
-                // Mobile layout
-                html += `<div class="max-w-[340px] mx-auto w-full">`;
-                
-                if (w === 'TZ') {
-                    html += `
-                    <div class="flex flex-col gap-1 w-full mb-1">
-                        <div class="w-full flex justify-center">
-                            <button onclick="processInput(this, '000')" class="numpad-btn btn-green w-1/3">000</button>
-                        </div>
-                        <div class="flex gap-1 w-full">
-                            <button onclick="processInput(this, '0')" class="numpad-btn btn-green w-1/2">0</button>
-                            <button onclick="processInput(this, '00')" class="numpad-btn btn-green w-1/2">00</button>
-                        </div>
-                    </div>`;
-                } else if (w === 'US') {
-                    html += `<div class="grid grid-cols-2 gap-1 mb-1"><button onclick="processInput(this, '0')" class="numpad-btn btn-green">0</button><button onclick="processInput(this, '00')" class="numpad-btn btn-green">00</button></div>`;
-                } else {
-                    html += `<div class="grid grid-cols-1 gap-1 mb-1"><button onclick="processInput(this, '0')" class="numpad-btn btn-green">0</button></div>`;
-                }
-
-                html += `<div class="grid grid-cols-3 gap-1">`;
-                for(let i=1; i<=36; i++) {
-                    const colorClass = redNums.includes(i) ? 'btn-red' : 'btn-black';
-                    html += `<button onclick="processInput(this, '${i}')" class="numpad-btn ${colorClass}">${i}</button>`;
-                }
-                html += `</div></div>`;
+            // ZERO BLOCK (Far Left)
+            html += `<div class="flex flex-col gap-1 w-[42px] md:w-[50px]">`;
+            if (w === 'TZ') {
+                html += `
+                    <button onclick="processInput(this, '000')" class="numpad-btn btn-green w-full" style="height: 50px; md:height: 60px;">000</button>
+                    <div class="flex gap-1 h-full">
+                        <button onclick="processInput(this, '0')" class="numpad-btn btn-green h-full" style="width: 20px; md:width: 24px;">0</button>
+                        <button onclick="processInput(this, '00')" class="numpad-btn btn-green h-full" style="width: 20px; md:width: 24px;">00</button>
+                    </div>
+                `;
+            } else if (w === 'US') {
+                html += `
+                    <button onclick="processInput(this, '00')" class="numpad-btn btn-green w-full h-1/2">00</button>
+                    <button onclick="processInput(this, '0')" class="numpad-btn btn-green w-full h-1/2">0</button>
+                `;
             } else {
-                // Desktop layout
-                html += `<div class="flex gap-1.5 items-start justify-center"><div class="flex flex-col gap-1.5 min-w-[85px]">`;
-                
-                if (w === 'TZ') {
-                    html += `
-                    <button onclick="processInput(this, '000')" class="numpad-btn btn-green" style="height:70px;">000</button>
-                    <button onclick="processInput(this, '0')" class="numpad-btn btn-green" style="height:70px;">0</button>
-                    <button onclick="processInput(this, '00')" class="numpad-btn btn-green" style="height:70px;">00</button>`;
-                } else if (w === 'US') {
-                    html += `<button onclick="processInput(this, '0')" class="numpad-btn btn-green" style="height:105px;">0</button><button onclick="processInput(this, '00')" class="numpad-btn btn-green" style="height:105px;">00</button>`;
-                } else {
-                    html += `<button onclick="processInput(this, '0')" class="numpad-btn btn-green" style="height:213px;">0</button>`;
-                }
-                
-                html += `</div>`;
+                html += `<button onclick="processInput(this, '0')" class="numpad-btn btn-green w-full h-full">0</button>`;
+            }
+            html += `</div>`;
+
+            // MAIN NUMBERS GRID
+            html += `<div class="flex flex-col gap-1">`;
+            const layout = [
+                [3,6,9,12,15,18,21,24,27,30,33,36],
+                [2,5,8,11,14,17,20,23,26,29,32,35],
+                [1,4,7,10,13,16,19,22,25,28,31,34]
+            ];
+            
+            for(let row=0; row<3; row++) {
+                html += `<div class="flex gap-1">`;
                 for(let col=0; col<12; col++) {
-                    html += `<div class="flex flex-col gap-1.5">`;
-                    for(let row=0; row<3; row++) {
-                        const n = layout[row][col];
-                        const colorClass = redNums.includes(n) ? 'btn-red' : 'btn-black';
-                        html += `<button onclick="processInput(this, '${n}')" class="numpad-btn ${colorClass}">${n}</button>`;
-                    }
-                    html += `</div>`;
+                    const n = layout[row][col];
+                    const colorClass = redNums.includes(n) ? 'btn-red' : 'btn-black';
+                    html += `<button onclick="processInput(this, '${n}')" class="numpad-btn ${colorClass}">${n}</button>`;
                 }
                 html += `</div>`;
             }
+            html += `</div></div>`;
+            
             container.innerHTML = html;
         }
-
-        window.addEventListener('resize', renderNumpad);
 
         // --- INPUT LOGIC ---
         function setIpState(state) {
@@ -475,12 +455,8 @@
             btn.classList.add('selection-pulse'); 
             setTimeout(() => btn.classList.remove('selection-pulse'), 200);
             
-            const r = {
-                n: n.toString(),
-                Time_Stamp: new Date().toISOString()
-            };
+            const r = { n: n.toString(), Time_Stamp: new Date().toISOString() };
             
-            // Push to end for chronological order (fixes Crypt dates)
             universalLog.push(r); 
             setIpState('collapsed');
             renderHistoryBar(); 
@@ -515,7 +491,9 @@
 
             const fragment = document.createDocumentFragment();
 
-            universalLog.forEach((r, i) => {
+            // Reverse iterate so the newest pushed item renders on the far left
+            for (let i = universalLog.length - 1; i >= 0; i--) {
+                const r = universalLog[i];
                 const el = document.createElement('div');
                 const isZero = r.n === '0' || r.n === '00' || r.n === '000';
                 const isRed = redNums.includes(parseInt(r.n));
@@ -530,42 +508,124 @@
                 `;
                 
                 fragment.appendChild(el);
-            });
+            }
 
             historyBar.appendChild(fragment);
-            // Snap scroll to the far right (newest chip)
-            setTimeout(() => { historyBar.scrollLeft = historyBar.scrollWidth; }, 10);
+            historyBar.scrollLeft = 0; // Snap to newest (left)
         }
 
         // --- NID MATRIX RENDERING ---
+        function getHitCount(conditionFn) {
+            return universalLog.filter(r => conditionFn(r.n)).length;
+        }
+
         function updateNID() {
             const matrix = document.getElementById('nid-matrix');
-            if (universalLog.length === 0) {
-                matrix.innerHTML = '<div class="text-center text-[10px] font-mono text-slate-500 mt-2">AWAITING ARCHITECTURE</div>';
-                return;
-            }
-
-            // Calculate hit counts
+            
             let counts = {};
             universalLog.forEach(r => { counts[r.n] = (counts[r.n] || 0) + 1; });
 
-            const getCellHtml = (num) => {
+            const getCellHtml = (num, wClass, hClass, customLabel = null) => {
                 const isZero = num === '0' || num === '00' || num === '000';
                 const isRed = redNums.includes(parseInt(num));
-                const colorClass = isZero ? 'nid-green' : (isRed ? 'nid-red' : 'nid-black');
-                const c = counts[num] || 0;
+                
+                let colorClass = 'nid-outside';
+                if (num && num !== 'empty' && !customLabel && !num.includes(':')) {
+                    colorClass = isZero ? 'nid-green' : (isRed ? 'nid-red' : 'nid-black');
+                }
+
+                let displayVal = customLabel || num;
+                let countVal = 0;
+                
+                if (num === 'empty') {
+                    return `<div class="${wClass} ${hClass}"></div>`;
+                }
+                
+                if (!customLabel && !num.includes(':')) {
+                    countVal = counts[num] || 0;
+                } else if (num === '1st12') countVal = getHitCount(n => parseInt(n) >= 1 && parseInt(n) <= 12);
+                else if (num === '2nd12') countVal = getHitCount(n => parseInt(n) >= 13 && parseInt(n) <= 24);
+                else if (num === '3rd12') countVal = getHitCount(n => parseInt(n) >= 25 && parseInt(n) <= 36);
+                else if (num === '1-18') countVal = getHitCount(n => parseInt(n) >= 1 && parseInt(n) <= 18);
+                else if (num === '19-36') countVal = getHitCount(n => parseInt(n) >= 19 && parseInt(n) <= 36);
+                else if (num === 'Even') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 2 === 0);
+                else if (num === 'Odd') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 2 !== 0);
+                else if (num === 'Red') countVal = getHitCount(n => redNums.includes(parseInt(n)));
+                else if (num === 'Black') countVal = getHitCount(n => !redNums.includes(parseInt(n)) && n !== '0' && n !== '00' && n !== '000');
+                else if (num === 'Col3') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 0);
+                else if (num === 'Col2') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 2);
+                else if (num === 'Col1') countVal = getHitCount(n => parseInt(n) !== 0 && n !== '00' && n !== '000' && parseInt(n) % 3 === 1);
+
                 return `
-                    <div class="nid-cell ${colorClass}">
-                        <div class="nid-val">${num}</div>
-                        <div class="nid-count">${c > 0 ? c : '-'}</div>
+                    <div class="nid-cell ${colorClass} ${wClass} ${hClass}">
+                        <div class="nid-val">${displayVal}</div>
+                        <div class="nid-count">${countVal > 0 ? countVal : '-'}</div>
                     </div>
                 `;
             };
 
-            let html = '';
-
-            if (globalConfig.nidFormat === 'Wheel') {
-                // Wheel Sequence View
+            if (globalConfig.nidFormat === 'Standard') {
+                const w = globalConfig.wheel;
+                let html = `<div class="flex gap-1 mx-auto w-max items-stretch">`;
+                
+                // ZEROS BLOCK
+                html += `<div class="flex flex-col gap-1 w-[42px]">`;
+                if (w === 'TZ') {
+                    html += `
+                        ${getCellHtml('000', 'w-full', 'h-[42px]')}
+                        <div class="flex gap-1 h-full">
+                            ${getCellHtml('0', 'w-[19px]', 'h-full')}
+                            ${getCellHtml('00', 'w-[19px]', 'h-full')}
+                        </div>
+                    `;
+                } else if (w === 'US') {
+                    html += `
+                        ${getCellHtml('00', 'w-full', 'h-1/2')}
+                        ${getCellHtml('0', 'w-full', 'h-1/2')}
+                    `;
+                } else {
+                    html += getCellHtml('0', 'w-full', 'h-full');
+                }
+                html += `</div>`;
+                
+                // MAIN FELT BLOCK
+                html += `<div class="flex flex-col gap-1">`;
+                
+                // 3 Numbers Rows
+                const layout = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
+                for(let row=0; row<3; row++) {
+                    html += `<div class="flex gap-1">`;
+                    for(let col=0; col<12; col++) {
+                        html += getCellHtml(layout[row][col].toString(), 'w-[42px]', 'h-[42px]');
+                    }
+                    html += getCellHtml(`Col${3-row}`, 'w-[50px]', 'h-[42px]', '2:1');
+                    html += `</div>`;
+                }
+                
+                // Dozens Row
+                html += `<div class="flex gap-1">`;
+                html += getCellHtml('1st12', 'w-[180px]', 'h-[36px]', '1st 12');
+                html += getCellHtml('2nd12', 'w-[180px]', 'h-[36px]', '2nd 12');
+                html += getCellHtml('3rd12', 'w-[180px]', 'h-[36px]', '3rd 12');
+                html += getCellHtml('empty', 'w-[50px]', 'h-[36px]');
+                html += `</div>`;
+                
+                // Outside Row
+                html += `<div class="flex gap-1">`;
+                html += getCellHtml('1-18', 'w-[88px]', 'h-[36px]');
+                html += getCellHtml('Even', 'w-[88px]', 'h-[36px]');
+                html += getCellHtml('Red', 'w-[88px]', 'h-[36px]', '<div class="w-4 h-4 bg-red-600 rotate-45 transform border border-white mt-1"></div>');
+                html += getCellHtml('Black', 'w-[88px]', 'h-[36px]', '<div class="w-4 h-4 bg-black rotate-45 transform border border-white mt-1"></div>');
+                html += getCellHtml('Odd', 'w-[88px]', 'h-[36px]');
+                html += getCellHtml('19-36', 'w-[88px]', 'h-[36px]');
+                html += getCellHtml('empty', 'w-[50px]', 'h-[36px]');
+                html += `</div>`;
+                
+                html += `</div></div>`;
+                matrix.innerHTML = html;
+                
+            } else {
+                // Wheel Racetrack Math
                 let seq = [];
                 if (globalConfig.wheel === 'EU') seq = WHEEL_EU;
                 else if (globalConfig.wheel === 'US') seq = WHEEL_US;
@@ -575,36 +635,57 @@
                     else seq = WHEEL_TZ_SANDS;
                 }
 
-                html += `<div class="flex overflow-x-auto gap-1 pb-4 no-scrollbar border border-slate-800 p-2 rounded bg-slate-900/60 max-w-full">`;
-                seq.forEach(n => { html += getCellHtml(n); });
-                html += `</div>`;
-            } else {
-                // Standard Felt View
-                const zeroes = (globalConfig.wheel === 'TZ' ? ['000','0','00'] : (globalConfig.wheel === 'US' ? ['0','00'] : ['0']));
-                const layout = [[3,6,9,12,15,18,21,24,27,30,33,36],[2,5,8,11,14,17,20,23,26,29,32,35],[1,4,7,10,13,16,19,22,25,28,31,34]];
-                
-                html += `<div class="flex gap-1 overflow-x-auto pb-2 max-w-full">
-                    <div class="flex flex-col justify-center gap-1 min-w-[40px]">`;
-                
-                if (globalConfig.wheel === 'TZ') {
-                    html += getCellHtml('000') + getCellHtml('0') + getCellHtml('00');
-                } else if (globalConfig.wheel === 'US') {
-                    html += getCellHtml('0') + getCellHtml('00');
-                } else {
-                    html += getCellHtml('0');
-                }
-                
-                html += `</div><div class="grid grid-rows-3 grid-cols-12 gap-1">`;
-                
-                for(let row=0; row<3; row++) {
-                    for(let col=0; col<12; col++) {
-                        html += getCellHtml(layout[row][col].toString());
-                    }
-                }
-                html += `</div></div>`;
-            }
+                const trackW = 740;
+                const trackH = 220;
+                const r = trackH / 2; // 110
+                const straight = trackW - (2 * r); // 520
+                const perimeter = (2 * straight) + (2 * Math.PI * r);
+                const step = perimeter / seq.length;
 
-            matrix.innerHTML = html;
+                let html = `<div class="relative mx-auto" style="width: ${trackW}px; height: ${trackH}px;">`;
+                
+                // Draw inner track line
+                html += `<div class="absolute border border-slate-700/50 rounded-full pointer-events-none" style="top: 25px; left: 25px; right: 25px; bottom: 25px;"></div>`;
+                
+                seq.forEach((num, i) => {
+                    let d = i * step;
+                    let x, y;
+                    
+                    if (d < straight) {
+                        x = (r + straight) - d;
+                        y = 0;
+                    } else if (d < straight + Math.PI * r) {
+                        let a = d - straight;
+                        let theta = -Math.PI/2 + (a / r);
+                        x = r + r * Math.cos(theta);
+                        y = r + r * Math.sin(theta);
+                    } else if (d < (2 * straight) + Math.PI * r) {
+                        let s = d - (straight + Math.PI * r);
+                        x = r + s;
+                        y = trackH;
+                    } else {
+                        let a = d - ((2 * straight) + Math.PI * r);
+                        let theta = Math.PI/2 + (a / r);
+                        x = (r + straight) + r * Math.cos(theta);
+                        y = r + r * Math.sin(theta);
+                    }
+                    
+                    const isZero = num === '0' || num === '00' || num === '000';
+                    const isRed = redNums.includes(parseInt(num));
+                    const colorClass = isZero ? 'nid-green' : (isRed ? 'nid-red' : 'nid-black');
+                    const c = counts[num] || 0;
+
+                    html += `
+                        <div class="rt-cell nid-cell ${colorClass}" style="left: ${x}px; top: ${y}px;">
+                            <div class="nid-val">${num}</div>
+                            <div class="nid-count text-[9px]">${c > 0 ? c : '-'}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+                matrix.innerHTML = html;
+            }
         }
 
         // --- CONFIGURATION LOGIC ---
@@ -618,7 +699,6 @@
             else opts = `<option value="Standard">Standard</option>`;
             
             sub.innerHTML = opts;
-            // Attempt to restore value if it exists for this context
             if (Array.from(sub.options).some(o => o.value === globalConfig.wheelSubtype)) {
                 sub.value = globalConfig.wheelSubtype;
             }
@@ -720,6 +800,7 @@
                 module_id: "ROULETTE_TRACKER", 
                 name: finalName, 
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                date: new Date().toISOString(), // explicitly add date fallback
                 is_favorite: false, 
                 meta_tags: { 
                     wheel: globalConfig.wheel, 
